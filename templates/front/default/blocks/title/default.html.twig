@@ -1,0 +1,33 @@
+{% trans_default_domain 'front_default' %}
+
+{% if intl.title %}
+    {% set animAvtive = true %}
+    {% set anim = blockTransitions|transitionsAttributes({
+        title: animAvtive ? ('block-title-title-h'~intl.titleForce) : null,
+        subtitle: animAvtive ? 'block-title-subtitle' : null
+    }) %}
+    <div class="title-block w-100">
+        {% if intl.subTitlePosition == 'top' and intl.subTitle %}
+            <strong class="sub-title sub-title-h{{ intl.titleForce }} mb-2 d-inline-block w-100{% if anim.subtitle.class %} {{ anim.subtitle.class|raw }}{% endif %}"
+                {% if anim.subtitle.attr %} {{ anim.subtitle.attr|raw }}{% endif %}>
+                {{ intl.subTitle|unescape|raw }}
+            </strong>
+        {% endif %}
+        <h{{ intl.titleForce }} class="title mb-0{% if style %} {{ style }}{% endif %}{% if anim.title.class %} {{ anim.title.class|raw }}{% endif %}"
+            {% if anim.title.attr %} {{ anim.title.attr|raw }}{% endif %}>
+            {% if intl.link %}
+                <a href="{{ intl.link }}"{% if intl.linkExternal %} rel="noopener noreferrer"{% endif %}{% if intl.linkBlank %} target="_blank" {% endif %}>
+            {% endif %}
+                    {{ intl.title|raw }}
+            {% if intl.link %}
+                </a>
+            {% endif %}
+        </h{{ intl.titleForce }}>
+        {% if intl.subTitlePosition == 'bottom' and intl.subTitle %}
+            <strong class="sub-title sub-title-h{{ intl.titleForce }} mt-2 d-inline-block w-100{% if anim.subtitle.class %} {{ anim.subtitle.class|raw }}{% endif %}"
+                {% if anim.subtitle.attr %} {{ anim.subtitle.attr|raw }}{% endif %}>
+                {{ intl.subTitle|unescape|raw }}
+            </strong>
+        {% endif %}
+    </div>
+{% endif %}

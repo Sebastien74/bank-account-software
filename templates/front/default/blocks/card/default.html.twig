@@ -1,0 +1,6 @@
+{% trans_default_domain 'front_default' %}
+
+{% import 'front/'~websiteTemplate~'/include/macros/card.html.twig' as macro %}
+
+{% set args = _context|merge({truncate: null, showLink: true, intl: intl}) %}
+{{ macro.standard(args) }}

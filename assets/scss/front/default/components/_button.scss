@@ -1,0 +1,107 @@
+@charset "UTF-8";
+
+/* -----------------------------------------------------------------
+
+    Copyright  : 2020
+    Created on : 2020-11-11, 6:37 PM
+    Author     : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+
+    FRONT BUTTONS COMPONENTS :
+    =========================
+
+------------------------------------------------------------------ */
+
+.btn.btn-circle {
+
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    transition: all .3s ease-in-out !important;
+    aspect-ratio: 1 !important;
+    width: 45px !important;
+    height: 45px !important;
+    flex: 0 0 45px !important;
+
+    i {
+        font-size: 1rem !important;
+        font-weight: 300 !important;
+    }
+}
+
+.btn:not(.basic) {
+
+    box-shadow: none !important;
+    overflow: hidden;
+    text-align: center;
+    text-decoration: none;
+    justify-content: center;
+    position: relative;
+    z-index: 0;
+    max-width: 100%;
+    white-space: initial;
+    box-sizing: border-box;
+    border: $btn-border-width solid !important;
+
+    &:not(.btn-circle) {
+
+        display: inline-block;
+        border-radius: $btn-border-radius;
+        line-height: 1rem;
+        font-weight: 600;
+        white-space: normal;
+
+        i {
+            font-size: 15px;
+        }
+
+        @include mediaQuery(max-md) {
+            padding: $btn-padding-xs;
+            font-size: $btn-font-size-xs;
+        }
+
+        @include mediaQuery(between-md-lg) {
+            padding: $btn-padding-md;
+            font-size: $btn-font-size-md;
+        }
+    }
+
+    @include mediaQuery(min-lg) {
+
+        &:not(.btn-circle) {
+            padding: $btn-padding;
+            font-size: $btn-font-size;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+
+            &:before {
+                position: absolute;
+                content: "";
+                background: $white;
+                transition-duration: .3s;
+                z-index: -1;
+                top: 0;
+                right: auto;
+                bottom: auto;
+                left: 0;
+                width: 0;
+                height: 100%;
+                opacity: 1;
+                border-radius: $btn-border-radius;
+            }
+
+            &:hover,
+            &:focus,
+            &:active,
+            &.active {
+                &:before {
+                    width: calc(100% - #{$btn-border-width * 2});
+                    //height: calc(100% - #{$btn-border-width * 2});
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}

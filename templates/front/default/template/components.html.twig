@@ -1,0 +1,181 @@
+{% extends 'front/'~website.configuration.template~'/base.html.twig' %}
+
+{% trans_default_domain 'front_default' %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('front-'~websiteTemplate~'-'~templateName, null, webpack) }}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('front-'~websiteTemplate~'-'~templateName, null, webpack, {defer: true}) }}
+{% endblock %}
+
+{% set zonePosition = 1 %}
+{% set websiteColors = website|colors %}
+{% set mainColors = websiteColors.color is defined ? websiteColors.color : [] %}
+{% set backgroundColors = websiteColors.background is defined ? websiteColors.background : [] %}
+{% set buttonColors = websiteColors.button is defined ? websiteColors.button : [] %}
+{% set alertColors = websiteColors.alert is defined ? websiteColors.alert : [] %}
+
+{% block body %}
+
+    {% if isComponentUser() %}
+
+        <div id="content-{{ templateName }}" class="template-page">
+
+            {% for i in 1..1 %}
+                <div id="first-components-section" class="w-100">
+                    {{ website|newZone({
+                        seo: seo,
+                        position: zonePosition,
+                        fullSize: true,
+                        blocks: { (1): {'title-header': { titleForce: i } }}
+                    }) }}
+                    {% set zonePosition = zonePosition + 1 %}
+                </div>
+            {% endfor %}
+
+            <div id="content">
+
+                {% set blockPosition = 1 %}
+
+                {% for background in backgroundColors %}
+
+                    {% set blocks = {} %}
+                    {% for i in 1..6 %}
+                        {% set blocks = blocks|merge({ (i): {title: { titleForce: i } }}) %}
+                        {% set blockPosition = blockPosition + 1 %}
+                    {% endfor %}
+
+                    {% set blocks = blocks|merge({ (blockPosition): {text: {} }}) %}
+                    {% set blockPosition = blockPosition + 1 %}
+
+                    {% set blocks = blocks|merge({ (blockPosition): {link: {} }}) %}
+                    {% set blockPosition = blockPosition + 1 %}
+
+                    {% set blocks = blocks|merge({ (blockPosition): {blockquote: {} }}) %}
+                    {% set blockPosition = blockPosition + 1 %}
+
+                    {% set blocks = blocks|merge({ (blockPosition): {media: {} }}) %}
+                    {% set blockPosition = blockPosition + 1 %}
+
+                    {% set blocks = blocks|merge({ (blockPosition): {media: {type: 'file'} }}) %}
+                    {% set blockPosition = blockPosition + 1 %}
+
+                    {{ website|newZone({
+                        seo: seo,
+                        background: background,
+                        position: zonePosition,
+                        blocks: blocks
+                    }) }}
+
+                    <section class="layout-zone pt-0 pb-lg {{ background }}">
+                        <div class="container">
+                            <div class="row m-0">
+                                <div class="layout-col p-0" data-position="{{ zonePosition }}">
+                                    <div class="layout-block position-relative row">
+                                        <div class="col-lg-6">
+                                            {{ website|newZone({
+                                                seo: seo,
+                                                background: background,
+                                                position: zonePosition,
+                                                blocks: { (1): {'core-action': {
+                                                    action: 'slider-view',
+                                                    module: 'slider',
+                                                    template: 'view' } }}
+                                            }) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {% set zonePosition = zonePosition + 1 %}
+
+                {% endfor %}
+
+                {% for background in backgroundColors %}
+
+                    <section class="layout-zone pt-lg pb-md {{ background }}">
+                        <div class="container">
+                            <div class="row m-0">
+                                <div class="layout-col" data-position="{{ zonePosition }}">
+                                    <div class="layout-block text-center position-relative row">
+                                        <div class="col-12 mb-4">
+                                            <h2 class="mb-4">Textes</h2>
+                                            {% for color in mainColors %}
+                                                <div class="text-{{ color }} d-inline-block{% if not loop.last %} me-3{% endif %}">.text-{{ color }}</div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-12 mb-4">
+                                            <h2 class="mb-4">Bordures</h2>
+                                            {% for color in mainColors %}
+                                                <span class="border border-{{ color }} text-{{ color }} d-inline-block mb-4 pe-5 ps-5 pt-3 pb-3{% if not loop.last %} me-3{% endif %}">.border-{{ color }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-12">
+                                            <h2 class="mb-4">Boutons</h2>
+                                            <div class="inner ">
+                                                {% set outlineSet = false %}
+                                                {% for color in buttonColors %}
+                                                    {% if not outlineSet and 'outline' in color %}
+                                                        {% set outlineSet = true %}
+                                                        <br>
+                                                    {% endif %}
+                                                    <div class="d-inline-flex{% if not loop.last %} me-md-3{% endif %} mb-4">
+                                                        {% include 'front/'~websiteTemplate~'/blocks/link/default.html.twig' with {
+                                                            intl: null,
+                                                            iconStart: 'far info',
+                                                            iconStartWith: 20,
+                                                            iconStartHeight: 20,
+                                                            link: app.request.requestUri,
+                                                            linkLabel: '.btn '~color,
+                                                            linkStyle: 'btn '~color
+                                                        } %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% set activeBadges = false %}
+                                        {% if activeBadges %}
+                                            <div class="col-12 mb-4">
+                                                <h2 class="mb-4">Badges</h2>
+                                                {% for color in mainColors %}
+                                                    <span class="badge badge-{{ color }} d-inline-block mb-4{% if not loop.last %} me-3{% endif %}">.badge-{{ color }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {% set zonePosition = zonePosition + 1 %}
+
+                {% endfor %}
+
+                {% for color in alertColors %}
+                    <div class="container pb-5{% if loop.first %} pt-5{% endif %}">
+                        {{ website|newBlock('alert', { color: color }) }}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="container pt-5 pb-4">
+            <div class="alert alert-info">
+                {{ "Veuillez vous connecter pour visualiser cette page."|trans|raw }}
+            </div>
+        </div>
+
+    {% endif %}
+
+{% endblock %}

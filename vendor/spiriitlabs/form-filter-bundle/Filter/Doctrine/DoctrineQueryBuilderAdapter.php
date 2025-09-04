@@ -1,0 +1,92 @@
+<?php
+
+/*
+ * This file is part of the composer-write-changelogs project.
+ *
+ * (c) Dev Spiriit <dev@spiriit.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Spiriit\Bundle\FormFilterBundle\Filter\Doctrine;
+
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
+use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Orx;
+use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
+
+/**
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
+class DoctrineQueryBuilderAdapter
+{
+    /**
+     * @var mixed
+     */
+    private $qb;
+
+    /**
+     * @param mixed $qb
+     * @throws \RuntimeException
+     */
+    public function __construct($qb)
+    {
+        if (!($qb instanceof ORMQueryBuilder || $qb  instanceof DBALQueryBuilder)) {
+            throw new \RuntimeException('Invalid Doctrine query builder instance.');
+        }
+
+        $this->qb = $qb;
+    }
+
+    /**
+     * @return CompositeExpression|Andx
+     */
+    public function andX()
+    {
+        return $this->qb->expr()->andX();
+    }
+
+    /**
+     * @return CompositeExpression|Orx
+     */
+    public function orX()
+    {
+        return $this->qb->expr()->orX();
+    }
+
+    /**
+     * @param mixed $where
+     */
+    public function where($where)
+    {
+        $this->qb->where($where);
+    }
+
+    /**
+     * @param mixed $where
+     */
+    public function andWhere($where)
+    {
+        $this->qb->andWhere($where);
+    }
+
+    /**
+     * @param mixed $where
+     */
+    public function orWhere($where)
+    {
+        $this->qb->orWhere($where);
+    }
+
+    /**
+     * @param string      $name
+     * @param mixed       $value
+     * @param string|null $type
+     */
+    public function setParameter($name, $value, $type = null)
+    {
+        $this->qb->setParameter($name, $value, $type);
+    }
+}
