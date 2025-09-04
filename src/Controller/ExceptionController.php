@@ -6,13 +6,8 @@ namespace App\Controller;
 
 use App\Command\JsRoutingCommand;
 use App\Entity\Core\Website;
-use App\Entity\Layout\Block;
-use App\Entity\Layout\Page;
 use App\Entity\Security\User;
-use App\Entity\Seo\Seo;
-use App\Entity\Seo\Url;
 use App\Model\Core\WebsiteModel;
-use App\Service\Content\SeoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -54,7 +49,6 @@ class ExceptionController extends BaseController
      */
     public function showAction(
         Request $request,
-        SeoService $seoService,
         FlattenException|\Exception $exception,
         bool $isDebug,
         string $projectDir,
@@ -78,8 +72,8 @@ class ExceptionController extends BaseController
             }
         }
 
-        $arguments = $this->setArguments($request, $exception, $seoService, $logger);
-        $template = $this->getTemplate($request, $projectDir);
+        $arguments = $this->setArguments($request, $exception, $logger);
+        $template = $this->getTemplate($projectDir);
 
         return $this->render($template, $arguments);
     }
@@ -139,7 +133,7 @@ class ExceptionController extends BaseController
     /**
      * Get template.
      */
-    private function getTemplate(Request $request, string $projectDir): string
+    private function getTemplate(string $projectDir): string
     {
         $filesystem = new Filesystem();
         $dirname = $projectDir.'\templates\bundles\TwigBundle\Exception\\';
@@ -167,7 +161,6 @@ class ExceptionController extends BaseController
     private function setArguments(
         Request $request,
         FlattenException|\Exception $exception,
-        SeoService $seoService,
         ?DebugLoggerInterface $logger = null,
     ): array {
         $internalsIPS = ['::1', '127.0.0.1', 'fe80::1', '194.51.155.21', '195.135.16.88', '176.135.112.19', '2a02:8440:5341:81fb:fd04:6bf3:c8c7:1edb', '88.173.106.115', '2001:861:43c3:ce70:bd5f:81d1:7710:888b', '2001:861:43c3:ce70:45e7:2aa7:ab50:c245'];
@@ -195,11 +188,9 @@ class ExceptionController extends BaseController
             $configuration = $website->configuration;
             $userBackIPS = $configuration ? $configuration->entity->getAllIPS() : [];
             $allowedIP = $this->checkIP($userBackIPS);
-            $arguments['thumbConfigurationHeader'] = $this->thumbConfiguration($website, Block::class, 'block', null, 'title-header');
             $arguments['isUserBack'] = $allowedIP || $this->getUser() instanceof User;
             $arguments['website'] = $this->website = $website;
             $arguments['configuration'] = $configuration;
-            $arguments['seo'] = $website->entity ? $this->getSeo($website->entity, $request, $seoService) : null;
             $arguments['template'] = $configuration->template;
             $arguments['templateName'] = 'error';
             $arguments['mainPages'] = $website->configuration->pages;
@@ -207,82 +198,6 @@ class ExceptionController extends BaseController
         }
 
         return $arguments;
-    }
-
-    /**
-     * Get SEO.
-     *
-     * @throws NonUniqueResultException|InvalidArgumentException|\ReflectionException|MappingException|QueryException
-     */
-    private function getSeo(Website $website, Request $request, SeoService $seoService): bool|array
-    {
-        $defaultExceptionUrl = null;
-        $currentLocaleExisting = false;
-        $locales = $website->getConfiguration()->getAllLocales();
-        $website = $this->coreLocator->em()->getRepository(Website::class)->find($website->getId());
-        $page = $this->coreLocator->em()->getRepository(Page::class)->findOneBy([
-            'website' => $website,
-            'slug' => 'error',
-        ]);
-
-        $exceptionUrl = null;
-
-        foreach ($locales as $locale) {
-            $existingUrl = false;
-
-            if ($page && $locale === $request->getLocale()) {
-                foreach ($page->getUrls() as $url) {
-                    /** @var Url $url */
-                    if ($url->getLocale() === $locale) {
-                        $existingUrl = true;
-                        $currentLocaleExisting = true;
-                    }
-                    if ($url->getLocale() === $request->getLocale()) {
-                        $exceptionUrl = $url;
-                    }
-                }
-
-                if (!$existingUrl || null === $exceptionUrl) {
-                    /** @var User $createdBy */
-                    $createdBy = $this->coreLocator->em()->getRepository(User::class)->findOneBy(['login' => 'webmaster']);
-
-                    $errorUrl = new Url();
-                    $errorUrl->setLocale($locale);
-                    $errorUrl->setCode('error');
-                    $errorUrl->setWebsite($website);
-                    $errorUrl->setHideInSitemap(true);
-                    $errorUrl->setAsIndex(false);
-                    $errorUrl->setCreatedBy($createdBy);
-                    $errorUrl->setOnline(true);
-
-                    $seo = new Seo();
-                    $seo->setUrl($errorUrl);
-                    $seo->setCreatedBy($createdBy);
-                    $errorUrl->setSeo($seo);
-
-                    $page->addUrl($errorUrl);
-
-                    $this->coreLocator->em()->persist($page);
-                    $this->coreLocator->em()->flush();
-                    $this->coreLocator->cacheService()->clearCaches($page, true);
-
-                    $exceptionUrl = $errorUrl;
-                    $currentLocaleExisting = true;
-
-                    if ($locale === $website->getConfiguration()->getLocale()) {
-                        $defaultExceptionUrl = $errorUrl;
-                    }
-                }
-            }
-        }
-
-        if (!$currentLocaleExisting) {
-            $exceptionUrl = $defaultExceptionUrl ?: null;
-            $locale = $exceptionUrl ? $exceptionUrl->getLocale() : $website->getConfiguration()->getLocale();
-            $request->setLocale($locale);
-        }
-
-        return $page && $exceptionUrl ? $seoService->execute($exceptionUrl, $page) : false;
     }
 
     /**

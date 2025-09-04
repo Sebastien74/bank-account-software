@@ -5,10 +5,9 @@
  *
  *   1 - vendor
  *   2 - front
- *   3 - gdpr
- *   4 - admin
- *   5 - security
- *   6 - module.exports
+ *   3 - admin
+ *   4 - security
+ *   5 - module.exports
  */
 
 const Encore = require('@symfony/webpack-encore');
@@ -156,24 +155,12 @@ Encore.setOutputPath('public/build/front/default')
     .addEntry('front-default-modules', './assets/js/front/default/modules.js')
     .addEntry('front-default-bootstrap', './assets/js/front/default/bootstrap.js')
     .addEntry('front-default-animations', './assets/js/front/default/animations.js')
-    .addEntry('front-default-accessibility', './assets/js/front/default/accessibility.js')
     .addEntry('front-default-home', './assets/js/front/default/templates/home.js')
     .addEntry('front-default-cms', './assets/js/front/default/templates/cms.js')
-    .addEntry('front-default-legacy', './assets/js/front/default/templates/legacy.js')
-    .addEntry('front-default-security', './assets/js/front/default/templates/security.js')
-    .addEntry('front-default-security-back', './assets/js/front/default/templates/security-back.js')
-    .addEntry('front-default-catalog', './assets/js/front/default/templates/catalog.js')
-    .addEntry('front-default-newscast', './assets/js/front/default/templates/newscast.js')
     .addEntry('front-default-build', './assets/js/front/default/templates/build.js')
-    .addEntry('front-default-identification', './assets/js/front/default/templates/identification.js')
     .addEntry('front-default-switcher', './assets/js/front/default/templates/switcher.js')
     .addEntry('front-default-error', './assets/js/front/default/templates/error.js')
-    .addEntry('front-default-gdpr', './assets/js/front/default/gdpr.js')
-    .addEntry('front-default-matomo', './assets/js/gdpr/matomo.js')
-    .addStyleEntry('front-default-vendor-mobile', ['./assets/scss/front/default/vendor-mobile.scss'])
-    .addStyleEntry('front-default-vendor-desktop', ['./assets/scss/front/default/vendor-desktop.scss'])
     .addStyleEntry('front-default-noscript', ['./assets/scss/front/default/noscript.scss'])
-    .addStyleEntry('front-default-print', ['./assets/scss/front/default/print.scss'])
     .addStyleEntry('front-default-fonts', ['./assets/scss/front/default/fonts.scss'])
     .cleanupOutputBeforeBuild()
     .enableVersioning(enableVersioning)
@@ -256,80 +243,7 @@ if (front_default.optimization && front_default.optimization.minimizer) {
     front_default.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
-/** 3 - gdpr */
-
-Encore.reset();
-
-Encore.setOutputPath('public/build/gdpr')
-    .setPublicPath('/build/gdpr')
-    .addEntry('gdpr', './assets/js/gdpr/vendor.js')
-    .addEntry('google-tag-manager', './assets/js/gdpr/injectors/google-tag-manager.js')
-    .addEntry('google-analytics', './assets/js/gdpr/injectors/google-analytics.js')
-    .addEntry('facebook-pixel', './assets/js/gdpr/injectors/facebook-pixel.js')
-    .cleanupOutputBeforeBuild()
-    .enableSourceMaps(enableSourceMaps)
-    .enableVersioning(enableVersioning)
-    .enableIntegrityHashes(enableIntegrity)
-    .configureBabel(function (babelConfig) {
-        babelConfig.presets.push('@babel/preset-flow');
-    }, {})
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = '3.33'
-    })
-    .copyFiles({
-        from: './assets/medias/images/gdpr',
-        to: 'images/[path][name].[hash:8].[ext]'
-    })
-    .enablePostCssLoader((options) => {
-        options.postcssOptions = {
-            config: path.resolve(__dirname, "postcss.config.js")
-        };
-    })
-    .configureImageRule({
-        type: 'asset',
-        maxSize: 8 * 1024, /** 8 kb - the default is 8kb */
-    })
-    .configureFontRule({
-        type: 'asset',
-        maxSize: 8 * 1024
-    })
-    .splitEntryChunks()
-    .configureSplitChunks(function (splitChunks) {
-        splitChunks.chunks = 'all'; // Tous les types de chunks
-        splitChunks.minSize = 20000; // Taille minimale d'un chunk
-        splitChunks.maxSize = 250000; // Taille maximale d'un chunk
-        splitChunks.maxAsyncRequests = 30;
-        splitChunks.maxInitialRequests = 30;
-        splitChunks.enforceSizeThreshold = 50000;
-    })
-    .addPlugin(new CleanWebpackPlugin())
-    .enableSingleRuntimeChunk()
-    .enableSassLoader();
-
-if (enableNotification) {
-    Encore.enableBuildNotifications();
-}
-
-const gdpr = Encore.getWebpackConfig();
-gdpr.name = 'gdpr';
-gdpr.target = target;
-gdpr.cache = cache;
-gdpr.parallelism = parallelism;
-gdpr.optimization.concatenateModules = concatenateModules;
-gdpr.optimization.providedExports = providedExports;
-gdpr.optimization.usedExports = usedExports;
-gdpr.optimization.removeEmptyChunks = removeEmptyChunks;
-gdpr.optimization.mergeDuplicateChunks = mergeDuplicateChunks;
-gdpr.optimization.sideEffects = sideEffects;
-gdpr.optimization.splitChunks = splitChunks;
-gdpr.optimization.minimize = minimize;
-gdpr.resolve.extensions.push('json');
-if (gdpr.optimization && gdpr.optimization.minimizer) {
-    gdpr.optimization.minimizer.push(new CssMinimizerPlugin());
-}
-
-/** 4 - admin */
+/** 3 - admin */
 
 Encore.reset();
 
@@ -428,7 +342,7 @@ if (admin.optimization && admin.optimization.minimizer) {
     admin.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
-/** 5 - security */
+/** 4 - security */
 
 Encore.reset();
 
@@ -498,5 +412,5 @@ if (security.optimization && security.optimization.minimizer) {
     security.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
-/** 6 - module.exports */
-module.exports = [vendor, front_default, gdpr, admin, security];
+/** 5 - module.exports */
+module.exports = [vendor, front_default, admin, security];

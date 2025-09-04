@@ -55,11 +55,6 @@
                                     {% endif %}
                                 {% elseif interface.name in displayAdminName %}
                                     <small class="info-text italic ms-2">{{ block.adminName|truncate(35, false) }}</small>
-                                {% elseif 'layout-catalog-features' == blockTypeCode %}
-                                    {% set featureId = block.data.featureId is defined ? block.data.featureId : false %}
-                                    {% if featureId %}
-                                        <small class="info-text italic ms-2">{{ featureId|blockFeatureName }}</small>
-                                    {% endif %}
                                 {% endif %}
 
                                 {% if intl.introduction is defined and intl.introduction or intl.body is defined and intl.body %}

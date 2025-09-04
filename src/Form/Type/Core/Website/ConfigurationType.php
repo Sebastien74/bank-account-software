@@ -124,11 +124,6 @@ class ConfigurationType extends AbstractType
                 'help' => $this->translator->trans('A activer uniquement si le site est en production', [], 'admin'),
             ]);
 
-            $builder->add('accessibilityStatus', Type\CheckboxType::class, [
-                'label' => $this->translator->trans("Activer le module d'accessibilité", [], 'admin'),
-                'display' => 'switch',
-            ]);
-
             $builder->add('duplicateMediasStatus', Type\CheckboxType::class, [
                 'label' => $this->translator->trans('Activer la duplication des médias', [], 'admin'),
                 'display' => 'switch',

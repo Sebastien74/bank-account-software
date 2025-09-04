@@ -28,11 +28,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="social-tab" data-bs-toggle="tab" href="#social" role="tab" aria-controls="social" aria-selected="false">
-                        {{ 'fal share-alt'|icon(null, 17, 'dark me-sm-2') }}<span>{{ "Réseaux sociaux"|trans }}</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" id="color-tab" data-bs-toggle="tab" href="#color" role="tab" aria-controls="color" aria-selected="false">
                         {{ 'fal palette'|icon(null, 17, 'dark me-sm-2') }}<span>{{ "Couleurs"|trans }}</span>
                     </a>
@@ -63,11 +58,6 @@
                 <div class="tab-pane fade show active" id="media" role="tabpanel" aria-labelledby="media-tab">
                     <div class="card-body pb-0">
                         {% include 'admin/page/website/include/configuration/medias.html.twig' %}
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
-                    <div class="card-body pb-0">
-                        {% include 'admin/page/website/include/configuration/social-network.html.twig' %}
                     </div>
                 </div>
                 <div class="tab-pane fade" id="color" role="tabpanel" aria-labelledby="color-tab">

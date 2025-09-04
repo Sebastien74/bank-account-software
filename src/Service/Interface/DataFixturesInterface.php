@@ -22,7 +22,6 @@ interface DataFixturesInterface
     public function pageDuplication(): Fixtures\PageDuplicationFixtures;
     public function page(): Fixtures\PageFixtures;
     public function security(): Fixtures\SecurityFixtures;
-    public function seo(): Fixtures\SeoFixtures;
     public function thumbnail(): Fixtures\ThumbnailFixtures;
     public function transition(): Fixtures\TransitionFixtures;
     public function translations(): Fixtures\TranslationsFixtures;

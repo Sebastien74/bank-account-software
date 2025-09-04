@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Entity\Core\Website;
-use App\Entity\Layout\Page;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -55,10 +54,6 @@ class BaseListing extends BaseEntity
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $orderBy = 'publicationStart-desc';
-
-    #[ORM\ManyToOne(targetEntity: Page::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Page $page = null;
 
     #[ORM\ManyToOne(targetEntity: Website::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -204,18 +199,6 @@ class BaseListing extends BaseEntity
     public function setOrderBy(string $orderBy): static
     {
         $this->orderBy = $orderBy;
-
-        return $this;
-    }
-
-    public function getPage(): ?Page
-    {
-        return $this->page;
-    }
-
-    public function setPage(?Page $page): static
-    {
-        $this->page = $page;
 
         return $this;
     }

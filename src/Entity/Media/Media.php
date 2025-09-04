@@ -23,14 +23,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['filename'], flags: ['fulltext'])]
 #[ORM\Index(columns: ['name'], flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
-#[ORM\AssociationOverrides([
-    new ORM\AssociationOverride(
-        name: 'categories',
-        joinColumns: [new ORM\JoinColumn(name: 'media_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        joinTable: new ORM\JoinTable(name: 'media_core_categories')
-    ),
-])]
 class Media extends BaseInterface
 {
     /**
@@ -113,10 +105,6 @@ class Media extends BaseInterface
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Media $media = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, cascade: ['persist'])]
-    #[ORM\OrderBy(['adminName' => 'ASC'])]
-    private ArrayCollection|PersistentCollection $categories;
-
     /**
      * Media constructor.
      */
@@ -125,7 +113,6 @@ class Media extends BaseInterface
         $this->thumbs = new ArrayCollection();
         $this->mediaScreens = new ArrayCollection();
         $this->intls = new ArrayCollection();
-        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -411,30 +398,6 @@ class Media extends BaseInterface
     public function setMedia(?self $media): static
     {
         $this->media = $media;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getCategories(): Collection
-    {
-        return $this->categories;
-    }
-
-    public function addCategory(Category $category): static
-    {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Category $category): static
-    {
-        $this->categories->removeElement($category);
 
         return $this;
     }

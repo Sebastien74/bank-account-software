@@ -5,14 +5,9 @@ declare(strict_types=1);
 namespace App\Entity\Core;
 
 use App\Entity\BaseEntity;
-use App\Entity\Seo\Redirection;
-use App\Entity\Seo\SeoConfiguration;
 use App\Repository\Core\WebsiteRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -46,28 +41,10 @@ class Website extends BaseEntity
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Security $security = null;
 
-    #[ORM\OneToOne(inversedBy: 'website', targetEntity: SeoConfiguration::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ?SeoConfiguration $seoConfiguration = null;
-
     #[ORM\OneToOne(inversedBy: 'website', targetEntity: Configuration::class, cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Configuration $configuration = null;
-
-    #[ORM\OneToMany(mappedBy: 'website', targetEntity: Redirection::class, cascade: ['persist'])]
-    #[ORM\OrderBy(['id' => 'DESC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $redirections;
-
-    /**
-     * WebsiteModel constructor.
-     */
-    public function __construct()
-    {
-        $this->redirections = new ArrayCollection();
-    }
 
     public function isActive(): ?bool
     {
@@ -117,18 +94,6 @@ class Website extends BaseEntity
         return $this;
     }
 
-    public function getSeoConfiguration(): ?SeoConfiguration
-    {
-        return $this->seoConfiguration;
-    }
-
-    public function setSeoConfiguration(?SeoConfiguration $seoConfiguration): static
-    {
-        $this->seoConfiguration = $seoConfiguration;
-
-        return $this;
-    }
-
     public function getConfiguration(): ?Configuration
     {
         return $this->configuration;
@@ -137,36 +102,6 @@ class Website extends BaseEntity
     public function setConfiguration(?Configuration $configuration): static
     {
         $this->configuration = $configuration;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Redirection>
-     */
-    public function getRedirections(): Collection
-    {
-        return $this->redirections;
-    }
-
-    public function addRedirection(Redirection $redirection): static
-    {
-        if (!$this->redirections->contains($redirection)) {
-            $this->redirections->add($redirection);
-            $redirection->setWebsite($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRedirection(Redirection $redirection): static
-    {
-        if ($this->redirections->removeElement($redirection)) {
-            // set the owning side to null (unless already changed)
-            if ($redirection->getWebsite() === $this) {
-                $redirection->setWebsite(null);
-            }
-        }
 
         return $this;
     }

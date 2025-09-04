@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * RequestListener.
@@ -75,6 +76,10 @@ class RequestListener
         $this->coreLocator->lastRoute()->execute($event);
         $this->coreLocator->cacheService()->generateRoutes();
         $this->request->getSession()->remove('mainExceptionMessage');
+
+        if (!$isLogin && !$this->coreLocator->user() instanceof UserInterface) {
+            $this->event->setResponse(new RedirectResponse($this->coreLocator->router()->generate('security_login')));
+        }
 
         if ($isFront) {
             $this->checkDisabledUris();
@@ -156,13 +161,6 @@ class RequestListener
      */
     private function frontRequest(): void
     {
-        $asAccessibility = $this->request->get('user_accessibility') || $this->request->get('user_accessibility_initial');
-        if ($asAccessibility) {
-            $response = new RedirectResponse($this->request->getPathInfo());
-            $response->headers->setCookie(Cookie::create('USER_ACCESSIBILITY', $this->request->get('user_accessibility')));
-            $response->send();
-        }
-
         if ('login' === trim($this->request->getRequestUri(), '/') && $this->coreLocator->checkIP($this->website)) {
             $this->event->setResponse(new RedirectResponse($this->coreLocator->router()->generate('security_login')));
         } else {

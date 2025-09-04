@@ -8,8 +8,8 @@
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
 
     1 ) App modules
-        a - Gdpr
-        b - Layout
+        a - Layout
+        b - Modules
     2 Mixins
     3 ) Colors system
     4 ) Core
@@ -37,13 +37,7 @@
    1 ) Modules (others in library.scss)
 ----------------------------------------------*/
 
-/*-- a - Gdpr --*/
-
-$enable-gdpr-axeptio: true !default;
-$enable-gdpr-cms: false !default;
-$enable-gdpr-page: false !default;
-
-/*-- b - Layout --*/
+/*-- a - Layout --*/
 
 $enable-medias-queries: false !default;
 $enable-preloader: false !default;
@@ -58,7 +52,7 @@ $enable-animate-css: false !default;
 $enable-animate-css-animations: (
 ) !default;
 
-/*-- c - modules --*/
+/*-- b - Modules --*/
 
 $enable-newsletter: false !default;
 $enable-basic-nav: true !default;

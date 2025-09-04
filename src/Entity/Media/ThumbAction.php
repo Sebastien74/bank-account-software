@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\Media;
 
 use App\Entity\BaseInterface;
-use App\Entity\Layout\BlockType;
 use App\Repository\Media\ThumbActionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,10 +42,6 @@ class ThumbAction extends BaseInterface
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $actionFilter = null;
-
-    #[ORM\ManyToOne(targetEntity: BlockType::class)]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    private ?BlockType $blockType = null;
 
     #[ORM\ManyToOne(targetEntity: ThumbConfiguration::class, cascade: ['persist'], inversedBy: 'actions')]
     #[ORM\JoinColumn(onDelete: 'cascade')]
@@ -101,18 +96,6 @@ class ThumbAction extends BaseInterface
     public function setActionFilter(?string $actionFilter): static
     {
         $this->actionFilter = $actionFilter;
-
-        return $this;
-    }
-
-    public function getBlockType(): ?BlockType
-    {
-        return $this->blockType;
-    }
-
-    public function setBlockType(?BlockType $blockType): static
-    {
-        $this->blockType = $blockType;
 
         return $this;
     }

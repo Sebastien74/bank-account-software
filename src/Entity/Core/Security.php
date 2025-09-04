@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\Core;
 
 use App\Entity\BaseInterface;
-use App\Entity\Layout\Page;
 use App\Repository\Core\SecurityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

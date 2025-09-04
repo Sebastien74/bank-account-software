@@ -440,7 +440,7 @@ class AdminController extends BaseController
     protected function breadcrumb(Request $request, array $items = []): void
     {
         $label = $this->coreLocator->translator()->trans('Tableau de bord', [], 'admin_breadcrumb');
-        $dashboardArgs = $this->coreLocator->routeArgs('admin_catalog_index');
+        $dashboardArgs = $this->coreLocator->routeArgs('admin_dashboard');
         $this->arguments['breadcrumb'][$label] = $this->coreLocator->router()->generate('admin_dashboard', $dashboardArgs);
 
         if (empty($items)) {

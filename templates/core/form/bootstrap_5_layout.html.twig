@@ -414,21 +414,6 @@
     {%- if label -%}
         {{- parent() -}}
     {%- endif -%}
-    {%- if granted('ROLE_AI') -%}
-        {%- if name == 'introduction' or name == 'title' or name == 'subTitle' or name == 'body' -%}
-            <div class="btn ai-button btn-chatgpt tool-5 spelling-correction"
-                 data-bs-toggle="tooltip"
-                 title="{{ 'Corriger les fautes'|trans }}"
-                 data-method="POST"
-                 data-felix-api="{{ path('ai_api_run',
-                        {
-                            'tool': 5,
-                        }) }}">
-                <span class="d-none spinner-grow spinner-grow-sm bg-white" role="status" aria-hidden="true"></span>
-                <span class="ai-icon">{{ 'cms spell'|icon(null, null, null, [], '#ffffff') }}</span>
-            </div>
-        {%- endif -%}
-    {%- endif -%}
 {%- endblock form_label %}
 
 {%- block checkbox_radio_label -%}

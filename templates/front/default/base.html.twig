@@ -18,42 +18,21 @@
     {% set trans_domain = 'front_default' %}
     {% trans_default_domain 'front_default' %}
 
-    {% import 'front/'~websiteTemplate~'/include/api.html.twig' as macroApi %}
-
     {% set entity = entity is defined ? entity : null %}
-    {% set gdprActive = 'gdpr'|moduleActive(configuration) ? 1 : 0 %}
     {% set isUserBack = isUserBack is defined ? isUserBack : false %}
-    {% set microDataActive = microDataActive is defined ? microDataActive : website.seoConfiguration.microData %}
-    {% set information = website.information %}
-    {% set infoIntl = information.intl %}
-    {% set companyName = infoIntl.title is defined and infoIntl.title ? infoIntl.title : "Agence Félix"|trans|raw %}
-    {% set api = website.api is defined ? website.api : null %}
+    {% set companyName = "Bank Account Software"|trans|raw %}
     {% set urlId = seo.url.id is defined ? seo.url.id : null %}
     {% set bodyBg = configuration.backgroundColor is defined ? configuration.backgroundColor : null %}
     {% set pageBg = entity.backgroundColor is defined and entity.backgroundColor ? entity.backgroundColor : null %}
     {% set intlMedia = intlMedia is defined and interfaceName is defined and intlMedia.media.filename is defined and interfaceName == 'page' ? intlMedia : null %}
     {% set thumbConfiguration = intlMedia and thumbConfiguration is defined ? thumbConfiguration : {} %}
     {% set bgImgStyle = intlMedia ? intlMedia.mediaRelation|file(thumbConfiguration, {style: true}) : null %}
-    {% set networks = logos['social-networks'] is defined and logos['social-networks'] ? logos['social-networks'] : null %}
-    {% set phones = information.phones is defined and information.phones|length > 0 ? information.phones : [] %}
-    {% set emails = information.emails is defined and information.emails|length > 0 ? information.emails : [] %}
-    {% set websiteAlertmessage = information.alerts is defined and information.alerts is not empty ? information.alerts : false %}
-    {% set websiteAlertHideMode = infoIntl.linkBlank is defined ? infoIntl.linkBlank : true %}
-    {% set websiteAlertAlreadyShow = websiteAlertHideMode and app.session.get('front_website_alert_show') is defined and app.session.get('front_website_alert_show') %}
-    {% set websiteAlertIsActive = infoIntl.active is defined and infoIntl.active and websiteAlertmessage and not websiteAlertAlreadyShow %}
     {% set haveInternalError = granted('ROLE_INTERNAL') and app.request.session.get('config_error') %}
     {% set stickyColClass = entity.haveStickyCol is defined and entity.haveStickyCol ? ' body-sticky-col'
         : (entityModel.haveStickyCol is defined and entityModel.haveStickyCol ? ' body-sticky-col' : null) %}
     {% set customBodyClass = customBodyClass is defined ? customBodyClass~stickyColClass : stickyColClass %}
-    {% set axeptioId = website.api.custom.axeptioId is defined ? website.api.custom.axeptioId : null %}
-    {% set axeptioCookie = website.api.custom.axeptioCookieVersion is defined ? website.api.custom.axeptioCookieVersion : null %}
-    {% set axeptioExternal = website.api.custom.axeptioExternal is defined ? website.api.custom.axeptioExternal : null %}
-    {% set axeptioActive = axeptioId or axeptioExternal %}
-    {% set matomoId = website.api.custom.matomoId is defined ? website.api.custom.matomoId : null %}
-    {% set matomoUrl = website.api.custom.matomoUrl is defined ? website.api.custom.matomoUrl : null %}
     {% set pageClass = entity.catalog.slug is defined ? 'body-'~entity.catalog.slug : (entity.slug is defined ? 'body-'~entity.slug : null) %}
     {% set pageSlug = pageClass ? pageClass~'-page' : null %}
-    {% set asAccessibility = app.request.cookies.get('USER_ACCESSIBILITY') %}
 
     <head>
 
@@ -93,25 +72,9 @@
             {% endif %}
         {% endif %}
 
-        {{ macroApi.render({
-            gdprActive: gdprActive,
-            axeptioActive: axeptioActive,
-            searchConsoleKey: website.api.google.searchConsoleKey is defined ? website.api.google.searchConsoleKey : null,
-            domainVerification: website.api.facebook.domainVerification is defined ? website.api.facebook.domainVerification : null
-        }) }}
-
         {% if website.logos is defined %}
-            {% include 'core/favicon.html.twig' with {website: website, logos: website.logos, microDataActive: microDataActive} only %}
+            {% include 'core/favicon.html.twig' with {website: website, logos: website.logos} only %}
         {% endif %}
-
-        {% if microDataActive %}
-            {% include 'front/'~websiteTemplate~'/include/microdata.html.twig' with {
-                microdata: seo.microdata is defined ? seo.microdata : (microdata is defined ? microdata : null),
-                disableMicrodata: disableMicrodata is defined and disableMicrodata,
-                networks: networks
-            } only %}
-        {% endif %}
-        {% block microData %}{% endblock %}
 
         <!-- Main Stylesheets -->
         {% block stylesheets %}{% endblock %}
@@ -124,15 +87,6 @@
         <link href="{{ asset('build/front/'~websiteTemplate~'/front-'~websiteTemplate~'-fonts.css', webpack) }}" rel="preload" as="style" class="preload-css">
 
         <!-- Stylesheets -->
-        {{ encore_entry_link_tags('front-'~websiteTemplate~'-vendor-mobile', null, webpack, {media: 'screen and (max-width: 575px)'}) }}
-        {{ encore_entry_link_tags('front-'~websiteTemplate~'-vendor-desktop', null, webpack, {media: 'screen and (min-width: 576px)'}) }}
-        {% if axeptioExternal or axeptioId %}
-            <link href="{{ asset('build/front/'~websiteTemplate~'/front-'~websiteTemplate~'-gdpr.css', webpack) }}" rel="preload" as="style" class="preload-css">
-        {% endif %}
-        {% if asAccessibility %}
-            <link href="{{ asset('build/front/'~websiteTemplate~'/front-'~websiteTemplate~'-accessibility.css', webpack) }}" rel="preload" as="style" class="preload-css">
-        {% endif %}
-        <link href="{{ asset('build/front/'~websiteTemplate~'/front-'~websiteTemplate~'-print.css', webpack) }}" rel="preload" media="print" as="style" class="preload-css">
         {% if app.debug %}
             {{ encore_entry_link_tags('debug', null, 'vendor') }}
         {% endif %}
@@ -149,17 +103,6 @@
             {% endfor %}
         {% endif %}
 
-        {{ macroApi.render({
-            gdprActive: gdprActive,
-            axeptioId: axeptioId,
-            axeptioActive: axeptioActive,
-            analyticsUa: website.api.google.analyticsUa is defined ? website.api.google.analyticsUa : null,
-            tagManagerKey: website.api.google.tagManagerKey is defined ? website.api.google.tagManagerKey : null,
-            pixel: website.api.facebook.pixel is defined ? website.api.facebook.pixel : null,
-            headScript: website.api.custom.headScript is defined ? website.api.custom.headScript : null,
-            headScriptSeo: website.api.custom.headScriptSeo is defined ? website.api.custom.headScriptSeo : null
-        }) }}
-
         <noscript nonce="{{ csp_nonce() }}">
             <div class="alert-no-script bg-primary py-3"><div class="container"><p class="mb-0 text-center fw-700">{{ "Activez JavaScript pour charger plus de contenu interactif."|trans|raw }}</p></div></div>
             {{ encore_entry_link_tags('front-'~websiteTemplate~'-noscript', null, webpack) }}
@@ -168,34 +111,11 @@
     </head>
 
     <body id="{{ templateName }}-body" tabindex="-1"
-          class="{{ bodyClasses(configuration, customBodyClass, entity) }}{% if websiteAlertIsActive %} alert-active{% endif %}{% if bodyBg %} {{ bodyBg }}{% endif %}{% if haveInternalError %} internal-error-show{% endif %}{% if axeptioActive %} axeptio-active{% endif %}{% if asAccessibility %} as-accessibility{% endif %} back-row-toggle splat-toggle"
-          data-id="{{ website.id }}"{% if isUserBack %} data-userback="{{ isUserBack }}"{% endif %}
-          data-gdpr="{{ gdprActive }}"
-          data-axeptio-external="{{ axeptioExternal }}"
-          data-axeptio-cookie="{{ axeptioCookie }}"
-          data-axeptio="{{ axeptioId }}"
-          data-matomo-id="{{ matomoId }}"
-          data-matomo-url="{{ matomoUrl }}">
+          class="{{ bodyClasses(configuration, customBodyClass, entity) }}{% if bodyBg %} {{ bodyBg }}{% endif %}{% if haveInternalError %} internal-error-show{% endif %}"
+          data-id="{{ website.id }}"{% if isUserBack %} data-userback="{{ isUserBack }}"{% endif %}>
 
         <a href="#body-page" class="skip-link btn btn-black">{{ "Aller au contenu principal"|trans|striptags }}</a>
         <a href="#footer" class="skip-link btn btn-black">{{ "Aller au pied de page"|trans|striptags }}</a>
-
-        {{ macroApi.render({
-            gdprActive: gdprActive,
-            axeptioActive: axeptioActive,
-            noscriptTagManagerKey: website.api.google.tagManagerKey is defined ? website.api.google.tagManagerKey : null,
-            noscriptPixel: website.api.facebook.pixel is defined ? website.api.facebook.pixel : null,
-            topBodyScript: website.api.custom.topBodyScript is defined ? website.api.custom.topBodyScript : null,
-            topBodyScriptSeo: website.api.custom.topBodyScriptSeo is defined ? website.api.custom.topBodyScriptSeo : null
-        }) }}
-
-        {% if websiteAlertIsActive and not onlyBody %}
-            {% include 'front/'~websiteTemplate~'/include/website-alert.html.twig' with {
-                information: information,
-                websiteTemplate: websiteTemplate,
-                websiteAlertmessage: websiteAlertmessage
-            } only %}
-        {% endif %}
 
         {% if configuration.preloader %}
             {% include 'front/'~websiteTemplate~'/include/preloader.html.twig' with {logos: website.logos, companyName: companyName} only %}
@@ -219,14 +139,13 @@
                 {% include 'front/'~websiteTemplate~'/include/footer.html.twig' with {
                     websiteTemplate: websiteTemplate,
                     configuration: configuration,
-                    information: information,
                     website: website,
                     urlId: urlId,
                     logos: website.logos,
-                    axeptioActive: axeptioActive,
                     mainPages: mainPages,
                     companyName: companyName,
-                    seo: seo is defined ? seo : null} only %}
+                    seo: seo is defined ? seo : null
+                } only %}
             {% endif %}
 
         </div>
@@ -261,25 +180,8 @@
                     <script src="{{ preloadFile }}" type="module" defer crossorigin="anonymous" fetchpriority="high"></script>
                 {% endfor %}
             {% endif %}
-            {% if axeptioExternal or axeptioId %}
-                {{ encore_entry_script_tags('front-'~websiteTemplate~'-gdpr', null, webpack, {async: true}) }}
-            {% endif %}
-            {% if matomoId %}
-                {{ encore_entry_script_tags('front-'~websiteTemplate~'-matomo', null, webpack, {async: true}) }}
-            {% endif %}
             {{ jsRouting() }}
         {% endblock %}
-
-        {% if not isDesktop() and configuration.progressiveWebApp and 'APP_ENV_NAME'|getEnv != 'local' and not onlyBody %}
-            {% include 'front/'~websiteTemplate~'/include/service-worker.html.twig' with {website: website, logos: website.logos, companyName: companyName} only %}
-        {% endif %}
-
-        {{ macroApi.render({
-            gdprActive: gdprActive,
-            axeptioActive: axeptioActive,
-            bottomBodyScript: website.api.custom.bottomBodyScript is defined ? website.api.custom.bottomBodyScript : null,
-            bottomBodyScriptSeo: website.api.custom.bottomBodyScriptSeo is defined ? website.api.custom.bottomBodyScriptSeo : null
-        }) }}
 
     </body>
 

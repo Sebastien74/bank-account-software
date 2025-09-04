@@ -202,8 +202,7 @@ class ConfigurationManager
         $websiteModel = \App\Model\Core\WebsiteModel::fromEntity($website, $this->coreLocator, $locale);
         $domains = $this->entityManager->getRepository(Domain::class)->findBy(['configuration' => $configuration, 'locale' => $locale, 'asDefault' => true]);
         $domain = !empty($domains[0]) ? $domains[0]->getName() : $this->request->getSchemeAndHttpHost();
-        $information = $website instanceof Website ? $this->i18nRuntime->intl($website->getInformation(), $locale) : null;
-        $name = $information ? $information->getTitle() : null;
+        $name = 'Bank Account Software';
         $logos = $website instanceof Website ? $websiteModel->configuration->logos : [];
         $theme = $website instanceof Website ? $this->colorRuntime->color('favicon', $websiteModel, 'webmanifest-theme') : null;
         $background = $website instanceof Website ? $this->colorRuntime->color('favicon', $websiteModel, 'webmanifest-background') : null;

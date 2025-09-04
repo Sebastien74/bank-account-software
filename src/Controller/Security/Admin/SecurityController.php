@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Security\Admin;
 
-use App\Controller\Front\FrontController;
+use App\Controller\BaseController;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
 use App\Form\Manager\Security\Admin\RegisterManager;
@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[Route('/secure/user/{_locale}/%security_token%', schemes: '%protocol%')]
-class SecurityController extends FrontController
+class SecurityController extends BaseController
 {
     /**
      * Login page.
@@ -85,7 +85,7 @@ class SecurityController extends FrontController
         $security = $website->entity->getSecurity();
 
         if (!$security->isAdminRegistration()) {
-            return $this->redirectToRoute('front_index');
+            return $this->redirectToRoute('security_login');
         }
 
         $form = $this->createForm(RegistrationType::class);

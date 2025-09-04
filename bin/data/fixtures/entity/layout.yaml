@@ -330,36 +330,6 @@ App\Entity\Layout\CssClass:
             fr: "Supprimer la classe"
             en: 'Delete class'
 
-App\Entity\Layout\FieldConfiguration:
-    translations:
-        singular:
-            fr: 'ConfigurationModel de champs formulaire'
-            en: 'Form field configuration'
-        plural:
-            fr: 'Configurations de champs formulaire'
-            en: 'Form field configurations'
-        add:
-            fr: 'Ajouter une configuration'
-            en: 'Add configuration'
-        delete:
-            fr: "Supprimer la configuration"
-            en: 'Delete configuration'
-
-App\Entity\Layout\FieldValue:
-    translations:
-        singular:
-            fr: 'Valeur de champs formulaire'
-            en: 'Form field value'
-        plural:
-            fr: 'Valeurs de champs formulaire'
-            en: 'Form field values'
-        add:
-            fr: 'Ajouter une valeur'
-            en: 'Add value'
-        delete:
-            fr: "Supprimer la valeur"
-            en: 'Delete value'
-
 App\Entity\Layout\Grid:
     translations:
         singular:

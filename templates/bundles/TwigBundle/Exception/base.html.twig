@@ -9,7 +9,7 @@
 {% set webpack = 'front_'~websiteTemplate|replace({'-': '_'}) %}
 {% set websiteInformation = website.information %}
 {% set information = websiteInformation|intl %}
-{% set companyName = information.title is defined and information.title ? information.title : "Agence Félix"|trans|raw %}
+{% set companyName = information.title is defined and information.title ? information.title : "Bank Account Software"|trans|raw %}
 {% set assetAdmin = not isPreview and template == 'admin' and app.user or not isPreview and '/admin-' in app.request.uri and app.user %}
 
 {% set base = template == "admin" and not isPreview or '/admin-' in app.request.uri and not isPreview

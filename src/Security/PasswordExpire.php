@@ -56,8 +56,6 @@ class PasswordExpire
         $this->parseUsers(User::class, 15, 'password-info');
         $this->parseUsers(User::class, 0, 'password-alert');
         $this->cronSchedulerService->logger('[OK] '.User::class.' successfully executed', $input);
-
-        $this->getEmails($websites);
         $this->sendEmails();
         $this->cronSchedulerService->logger('[OK] Email successfully sent.', $input);
 
@@ -115,21 +113,6 @@ class PasswordExpire
         $user->setResetPassword(true);
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-    }
-
-    /**
-     * Get Websites senders emails.
-     */
-    private function getEmails(mixed $websites): void
-    {
-        foreach ($websites as $website) {
-            /** @var Website $website */
-            foreach ($website->getInformation()->getEmails() as $email) {
-                if ('support' === $email->getSlug() || 'no-reply' === $email->getSlug()) {
-                    $this->emails[$website->getId()][$email->getLocale()][$email->getSlug()] = $email->getEmail();
-                }
-            }
-        }
     }
 
     /**
@@ -208,19 +191,8 @@ class PasswordExpire
             return $this->emailNames[$website->getId()];
         }
 
-        $defaultLocale = $website->getConfiguration()->getLocale();
-
-        foreach ($website->getInformation()->getIntls() as $intl) {
-            if ($intl->getLocale() === $user->getLocale()) {
-                $this->emailNames[$website->getId()] = $intl->getTitle();
-            }
-            if (empty($this->emailNames[$website->getId()]) && $intl->getLocale() === $defaultLocale) {
-                $this->emailNames[$website->getId()] = $intl->getTitle();
-            }
-        }
-
         if (empty($this->emailNames[$website->getId()])) {
-            $this->emailNames[$website->getId()] = 'Agence Félix';
+            $this->emailNames[$website->getId()] = 'Bank Account Software';
         }
 
         return $this->emailNames[$website->getId()];

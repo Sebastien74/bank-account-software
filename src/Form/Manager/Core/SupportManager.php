@@ -39,7 +39,7 @@ class SupportManager
         $configuration = $website->getConfiguration();
         $emails = array_merge($configuration->getEmailsDev(), $configuration->getEmailsSupport());
 
-        $this->mailer->setSubject($this->coreLocator->translator()->trans('Agence Félix Support', [], 'security_cms'));
+        $this->mailer->setSubject($this->coreLocator->translator()->trans('Bank Account Software Support', [], 'security_cms'));
         $this->mailer->setName($data['name']);
         $this->mailer->setTo(array_unique($emails));
         $this->mailer->setReplyTo($data['email']);

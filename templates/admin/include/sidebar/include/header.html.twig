@@ -20,7 +20,7 @@
                 {{ asset('medias/icons/brands/cloudversify.svg')|file({}, {width: 50, height: 50, class: 'img-white float-start', title: "Tableau de bord"|trans}) }}
             {% endif %}
             <span class="cms-name hide-menu float-start d-none d-xl-inline-block">
-                {% set cmsName = customAdmin is defined and not customAdmin ? "Administration"|trans : "Agence Félix CMS"|trans %}
+                {% set cmsName = customAdmin is defined and not customAdmin ? "Administration"|trans : "Bank Account Software"|trans %}
                 {{ cmsName|raw }}
                 <br>
                 <small class="cms-version text-italic float-start">{{ "Symfony"|trans|raw }} {{ symfonyVersion() }} - {{ "CMS 7.1"|trans|raw }} - {{ "PHP"|trans|raw }} {{ phpversion() }}</small>

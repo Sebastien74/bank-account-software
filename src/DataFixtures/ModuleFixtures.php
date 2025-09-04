@@ -60,6 +60,7 @@ class ModuleFixtures extends BaseFixtures implements DependentFixtureInterface
     {
         return [
             [$this->translator->trans('Pages', [], 'admin'), 'pages', 'ROLE_PAGE', 'fal network-wired'],
+            [$this->translator->trans('Médias', [], 'admin'), 'medias', 'ROLE_MEDIA', 'fal photo-video'],
             [$this->translator->trans('Traductions', [], 'admin'), 'translation', 'ROLE_TRANSLATION', 'fal globe-stand'],
             [$this->translator->trans('Utilisateurs', [], 'admin'), 'user', 'ROLE_USERS', 'fal users'],
             [$this->translator->trans('Actions personnalisées', [], 'admin'), 'customs-actions', 'ROLE_CUSTOMS_ACTIONS', 'fal flame'],

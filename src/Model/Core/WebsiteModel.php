@@ -9,7 +9,6 @@ use App\Entity\Core\Security;
 use App\Entity\Core\Website;
 use App\Entity\Core\Website as WebsiteEntity;
 use App\Model\BaseModel;
-use App\Model\Seo\SeoConfigurationModel;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -35,7 +34,6 @@ final class WebsiteModel extends BaseModel
         public readonly ?WebsiteEntity $entity = null,
         public readonly ?string $uploadDirname = null,
         public readonly ?ConfigurationModel $configuration = null,
-        public readonly ?SeoConfigurationModel $seoConfiguration = null,
         public readonly ?InformationModel $information = null,
         public readonly ?object $hosts = null,
         public readonly ?string $schemeAndHttpHost = null,
@@ -86,7 +84,6 @@ final class WebsiteModel extends BaseModel
             entity: $website,
             uploadDirname: $website->getUploadDirname(),
             configuration: $configuration,
-            seoConfiguration: SeoConfigurationModel::fromEntity($website, $coreLocator),
             information: $information,
             hosts: $hosts,
             schemeAndHttpHost: $hosts->schemeAndHttpHost,

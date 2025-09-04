@@ -128,12 +128,11 @@ class WebsiteFixtures
         $this->fixtures->configuration()->add($website, $yamlConfiguration, $locale, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);
         $this->fixtures->security()->execute($website);
         $configuration = $website->getConfiguration();
-        $this->fixtures->seo()->add($website, $user);
-        $webmasterFolder = $this->fixtures->defaultMedias()->add($website, $yamlConfiguration, $user);
+        $this->fixtures->defaultMedias()->add($website, $yamlConfiguration, $user);
         $this->fixtures->blockType()->add($configuration, self::DEV_MODE, $websiteToDuplicate);
         $this->fixtures->color()->add($configuration, $yamlConfiguration, $user, $websiteToDuplicate);
         $this->fixtures->transition()->add($configuration, $user, $websiteToDuplicate);
-        $pages = $asMainWebsite || !$websiteToDuplicate instanceof Website
+        $asMainWebsite || !$websiteToDuplicate instanceof Website
             ? $this->fixtures->page()->add($website, $pagesParams, $user, true, self::MAIN_PAGES)
             : $this->fixtures->pageDuplication()->add($website, $websiteToDuplicate);
         $this->fixtures->layout()->add($configuration, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);

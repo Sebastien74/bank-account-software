@@ -52,11 +52,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link{% if activeTab == 'networks' %} active{% endif %}" id="networks-tab" data-bs-toggle="tab" href="#networks" role="tab" aria-controls="networks" aria-selected="false">
-                        {{ 'fal rss'|icon(15, 17, 'dark me-sm-2') }}<span>{{ "Réseaux sociaux"|trans }}</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link{% if activeTab == 'legal-notice' %} active{% endif %}" id="legal-notice-tab" data-bs-toggle="tab" href="#legal-notice" role="tab" aria-controls="legal-notice" aria-selected="false">
                         {{ 'fal balance-scale-start'|icon(21, 17, 'dark me-sm-2') }}<span>{{ "Mentions légales"|trans }}</span>
                     </a>
@@ -115,11 +110,6 @@
                                 classname: interface.classname
                             } only %}
                         </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade{% if activeTab == 'networks' %} show active{% endif %}" id="networks" role="tabpanel" aria-labelledby="networks-tab">
-                    <div class="card-body pb-0">
-                        {% include 'admin/page/information/social-network.html.twig' with {socialsNetworks: form.socialNetworks} %}
                     </div>
                 </div>
                 <div class="tab-pane fade{% if activeTab == 'legal-notice' %} show active{% endif %}" id="legal-notice" role="tabpanel" aria-labelledby="legal-notice-tab">

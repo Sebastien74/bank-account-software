@@ -531,7 +531,6 @@ class CoreLocator implements CoreLocatorInterface
         $animations = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-animations', 'front_default');
         $bootstrap = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-bootstrap', 'front_default');
         $modules = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-modules', 'front_default');
-        $accessibility = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-accessibility', 'front_default');
 
         if (!empty($onLoaded[0])) {
             $preloads['js'] = [
@@ -539,7 +538,6 @@ class CoreLocator implements CoreLocatorInterface
                 $this->schemeAndHttpHost().$animations[0],
                 $this->schemeAndHttpHost().$bootstrap[0],
                 $this->schemeAndHttpHost().$modules[0],
-                $this->schemeAndHttpHost().$accessibility[0],
             ];
             $this->cache['preloads'] = $preloads;
         }

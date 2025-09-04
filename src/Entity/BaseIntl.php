@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Entity\Core\Website;
-use App\Entity\Layout\Page;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -99,10 +98,6 @@ class BaseIntl extends BaseInterface
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $associatedWords = null;
-
-    #[ORM\ManyToOne(targetEntity: Page::class, cascade: ['persist'], fetch: 'EAGER')]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    protected ?Page $targetPage = null;
 
     #[ORM\ManyToOne(targetEntity: Website::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -373,18 +368,6 @@ class BaseIntl extends BaseInterface
     public function setAssociatedWords(?string $associatedWords): static
     {
         $this->associatedWords = $associatedWords;
-
-        return $this;
-    }
-
-    public function getTargetPage(): ?Page
-    {
-        return $this->targetPage;
-    }
-
-    public function setTargetPage(?Page $targetPage): static
-    {
-        $this->targetPage = $targetPage;
 
         return $this;
     }

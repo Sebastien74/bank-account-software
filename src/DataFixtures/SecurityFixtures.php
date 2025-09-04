@@ -109,7 +109,7 @@ class SecurityFixtures extends BaseFixtures
             'email' => 'support@agence-felix.fr',
             'login' => 'webmaster',
             'roles' => $this->getYamlRoles(true),
-            'lastname' => 'Agence Félix',
+            'lastname' => 'Bank Account Software',
             'group' => $this->translator->trans('Interne', [], 'security'),
             'password' => '$2y$10$yzsckDg/ad8P/MiLzuOPCehisJDkLKfO45LB4u9KtUd.T.LDjFVTq',
             'code' => 'internal',

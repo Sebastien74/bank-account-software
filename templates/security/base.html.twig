@@ -9,7 +9,7 @@
 {% set information = website.information %}
 {% set cacheClearDate = website.cacheClearDate is defined and website.cacheClearDate ? website.cacheClearDate|date('Y-m-d') : null %}
 {% set isCustomPath = logos['security-logo'] is defined and logos['security-logo'] or not adminTheme %}
-{% set companyName = isCustomPath and information.title is defined and information.title ? information.title : "Agence Félix CMS"|trans|striptags %}
+{% set companyName = isCustomPath and information.title is defined and information.title ? information.title : "Bank Account Software"|trans|striptags %}
 {#{% set faviconPath = isCustomPath and logos['favicon'] is defined and logos['favicon'] ? asset(logos['favicon']) : asset('build/security/images/favicon.ico', 'security') %}#}
 {% set faviconPath = asset('build/security/images/favicon.ico', 'security') %}
 {% set logoPath = isCustomPath and logos['security-logo'] is defined and logos['security-logo'] and 'placeholder' not in logos['security-logo'] ? asset(logos['security-logo'])
@@ -71,7 +71,7 @@
                 {% if adminTheme is not empty %}
                     <div id="contact-info" class="col-12 text-center p-3 p-sm-4 align-self-end">
                         <address>
-                            <b>{{ "Agence Félix - Agence de Publicité"|trans|raw }}</b> <br>
+                            <b>{{ "Bank Account Software"|trans|raw }}</b> <br>
                             <small class="d-inline-block">{{ "4BIS Avenue du Pont de Tasset <br/> 74960 Cran-Gevrier / Annecy <br/> FRANCE"|trans|raw }}</small>
                         </address>
                         <ul class="reset">

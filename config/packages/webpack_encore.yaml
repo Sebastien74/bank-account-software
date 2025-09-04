@@ -24,7 +24,6 @@ webpack_encore:
     builds:
         vendor: '%kernel.project_dir%/public/build/vendor'
         front_default: '%kernel.project_dir%/public/build/front/default'
-        gdpr: '%kernel.project_dir%/public/build/gdpr'
         admin: '%kernel.project_dir%/public/build/admin'
         security: '%kernel.project_dir%/public/build/security'
 
@@ -35,8 +34,6 @@ framework:
                 json_manifest_path: '%kernel.project_dir%/public/build/vendor/manifest.json'
             front_default:
                 json_manifest_path: '%kernel.project_dir%/public/build/front/default/manifest.json'
-            gdpr:
-                json_manifest_path: '%kernel.project_dir%/public/build/gdpr/manifest.json'
             admin:
                 json_manifest_path: '%kernel.project_dir%/public/build/admin/manifest.json'
             security:

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\Core;
 
 use App\Entity\BaseEntity;
-use App\Entity\Layout\BlockType;
-use App\Entity\Layout\CssClass;
-use App\Entity\Layout\Page;
 use App\Entity\Translation\TranslationDomain;
 use App\Repository\Core\ConfigurationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,28 +24,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 #[ORM\AssociationOverrides([
     new ORM\AssociationOverride(
-        name: 'modules',
-        joinColumns: [new ORM\JoinColumn(name: 'configuration_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'module_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        joinTable: new ORM\JoinTable(name: 'core_configuration_modules')
-    ),
-    new ORM\AssociationOverride(
-        name: 'blockTypes',
-        joinColumns: [new ORM\JoinColumn(name: 'configuration_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'type_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        joinTable: new ORM\JoinTable(name: 'core_configuration_block_types')
-    ),
-    new ORM\AssociationOverride(
         name: 'transDomains',
         joinColumns: [new ORM\JoinColumn(name: 'configuration_id', referencedColumnName: 'id')],
         inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'domain_id', referencedColumnName: 'id')],
         joinTable: new ORM\JoinTable(name: 'core_configuration_translation_domains')
-    ),
-    new ORM\AssociationOverride(
-        name: 'pages',
-        joinColumns: [new ORM\JoinColumn(name: 'configuration_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id', unique: true, onDelete: 'cascade')],
-        joinTable: new ORM\JoinTable(name: 'core_configuration_pages')
     ),
 ])]
 class Configuration extends BaseEntity
@@ -87,9 +66,6 @@ class Configuration extends BaseEntity
 
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $seoStatus = false;
-
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $accessibilityStatus = false;
 
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $mediasCategoriesStatus = false;
@@ -159,68 +135,21 @@ class Configuration extends BaseEntity
     #[ORM\OneToOne(mappedBy: 'configuration', targetEntity: Website::class, fetch: 'EAGER')]
     private ?Website $website = null;
 
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: ConfigurationMediaRelation::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\JoinColumn(onDelete: 'cascade')]
-    #[ORM\OrderBy(['position' => 'ASC', 'locale' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $mediaRelations;
-
     #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: Domain::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['locale' => 'ASC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $domains;
 
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: Color::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['category' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $colors;
-
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: Transition::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['active' => 'DESC', 'adminName' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $transitions;
-
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: CssClass::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['name' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $cssClasses;
-
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: Icon::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['filename' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $icons;
-
-    #[ORM\ManyToMany(targetEntity: Module::class, cascade: ['persist'])]
-    #[ORM\OrderBy(['adminName' => 'ASC'])]
-    private ArrayCollection|PersistentCollection $modules;
-
-    #[ORM\ManyToMany(targetEntity: BlockType::class, cascade: ['persist'])]
-    #[ORM\OrderBy(['adminName' => 'ASC'])]
-    private ArrayCollection|PersistentCollection $blockTypes;
-
     #[ORM\ManyToMany(targetEntity: TranslationDomain::class, cascade: ['persist'])]
     #[ORM\OrderBy(['adminName' => 'ASC'])]
     private ArrayCollection|PersistentCollection $transDomains;
-
-    #[ORM\ManyToMany(targetEntity: Page::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['adminName' => 'ASC'])]
-    private ArrayCollection|PersistentCollection $pages;
 
     /**
      * ConfigurationModel constructor.
      */
     public function __construct()
     {
-        $this->mediaRelations = new ArrayCollection();
         $this->domains = new ArrayCollection();
-        $this->colors = new ArrayCollection();
-        $this->transitions = new ArrayCollection();
-        $this->cssClasses = new ArrayCollection();
-        $this->icons = new ArrayCollection();
-        $this->modules = new ArrayCollection();
-        $this->blockTypes = new ArrayCollection();
-        $this->transDomains = new ArrayCollection();
-        $this->pages = new ArrayCollection();
     }
 
     /**
@@ -358,18 +287,6 @@ class Configuration extends BaseEntity
     public function setSeoStatus(bool $seoStatus): static
     {
         $this->seoStatus = $seoStatus;
-
-        return $this;
-    }
-
-    public function isAccessibilityStatus(): ?bool
-    {
-        return $this->accessibilityStatus;
-    }
-
-    public function setAccessibilityStatus(bool $accessibilityStatus): static
-    {
-        $this->accessibilityStatus = $accessibilityStatus;
 
         return $this;
     }
@@ -653,36 +570,6 @@ class Configuration extends BaseEntity
     }
 
     /**
-     * @return Collection<int, ConfigurationMediaRelation>
-     */
-    public function getMediaRelations(): Collection
-    {
-        return $this->mediaRelations;
-    }
-
-    public function addMediaRelation(ConfigurationMediaRelation $mediaRelation): static
-    {
-        if (!$this->mediaRelations->contains($mediaRelation)) {
-            $this->mediaRelations->add($mediaRelation);
-            $mediaRelation->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMediaRelation(ConfigurationMediaRelation $mediaRelation): static
-    {
-        if ($this->mediaRelations->removeElement($mediaRelation)) {
-            // set the owning side to null (unless already changed)
-            if ($mediaRelation->getConfiguration() === $this) {
-                $mediaRelation->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Domain>
      */
     public function getDomains(): Collection
@@ -713,174 +600,6 @@ class Configuration extends BaseEntity
     }
 
     /**
-     * @return Collection<int, Color>
-     */
-    public function getColors(): Collection
-    {
-        return $this->colors;
-    }
-
-    public function addColor(Color $color): static
-    {
-        if (!$this->colors->contains($color)) {
-            $this->colors->add($color);
-            $color->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeColor(Color $color): static
-    {
-        if ($this->colors->removeElement($color)) {
-            // set the owning side to null (unless already changed)
-            if ($color->getConfiguration() === $this) {
-                $color->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Transition>
-     */
-    public function getTransitions(): Collection
-    {
-        return $this->transitions;
-    }
-
-    public function addTransition(Transition $transition): static
-    {
-        if (!$this->transitions->contains($transition)) {
-            $this->transitions->add($transition);
-            $transition->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransition(Transition $transition): static
-    {
-        if ($this->transitions->removeElement($transition)) {
-            // set the owning side to null (unless already changed)
-            if ($transition->getConfiguration() === $this) {
-                $transition->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CssClass>
-     */
-    public function getCssClasses(): Collection
-    {
-        return $this->cssClasses;
-    }
-
-    public function addCssClass(CssClass $cssClass): static
-    {
-        if (!$this->cssClasses->contains($cssClass)) {
-            $this->cssClasses->add($cssClass);
-            $cssClass->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCssClass(CssClass $cssClass): static
-    {
-        if ($this->cssClasses->removeElement($cssClass)) {
-            // set the owning side to null (unless already changed)
-            if ($cssClass->getConfiguration() === $this) {
-                $cssClass->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Icon>
-     */
-    public function getIcons(): Collection
-    {
-        return $this->icons;
-    }
-
-    public function addIcon(Icon $icon): static
-    {
-        if (!$this->icons->contains($icon)) {
-            $this->icons->add($icon);
-            $icon->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeIcon(Icon $icon): static
-    {
-        if ($this->icons->removeElement($icon)) {
-            // set the owning side to null (unless already changed)
-            if ($icon->getConfiguration() === $this) {
-                $icon->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Module>
-     */
-    public function getModules(): Collection
-    {
-        return $this->modules;
-    }
-
-    public function addModule(Module $module): static
-    {
-        if (!$this->modules->contains($module)) {
-            $this->modules->add($module);
-        }
-
-        return $this;
-    }
-
-    public function removeModule(Module $module): static
-    {
-        $this->modules->removeElement($module);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, BlockType>
-     */
-    public function getBlockTypes(): Collection
-    {
-        return $this->blockTypes;
-    }
-
-    public function addBlockType(BlockType $blockType): static
-    {
-        if (!$this->blockTypes->contains($blockType)) {
-            $this->blockTypes->add($blockType);
-        }
-
-        return $this;
-    }
-
-    public function removeBlockType(BlockType $blockType): static
-    {
-        $this->blockTypes->removeElement($blockType);
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, TranslationDomain>
      */
     public function getTransDomains(): Collection
@@ -900,30 +619,6 @@ class Configuration extends BaseEntity
     public function removeTransDomain(TranslationDomain $transDomain): static
     {
         $this->transDomains->removeElement($transDomain);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Page>
-     */
-    public function getPages(): Collection
-    {
-        return $this->pages;
-    }
-
-    public function addPage(Page $page): static
-    {
-        if (!$this->pages->contains($page)) {
-            $this->pages->add($page);
-        }
-
-        return $this;
-    }
-
-    public function removePage(Page $page): static
-    {
-        $this->pages->removeElement($page);
 
         return $this;
     }

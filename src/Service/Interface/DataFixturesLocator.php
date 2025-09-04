@@ -24,7 +24,6 @@ class DataFixturesLocator implements DataFixturesInterface
         #[AutowireLocator(Fixtures\PageDuplicationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageDuplicationLocator,
         #[AutowireLocator(Fixtures\PageFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageLocator,
         #[AutowireLocator(Fixtures\SecurityFixtures::class, indexAttribute: 'key')] protected ServiceLocator $securityLocator,
-        #[AutowireLocator(Fixtures\SeoFixtures::class, indexAttribute: 'key')] protected ServiceLocator $seoLocator,
         #[AutowireLocator(Fixtures\ThumbnailFixtures::class, indexAttribute: 'key')] protected ServiceLocator $thumbnailLocator,
         #[AutowireLocator(Fixtures\TransitionFixtures::class, indexAttribute: 'key')] protected ServiceLocator $transitionLocator,
         #[AutowireLocator(Fixtures\TranslationsFixtures::class, indexAttribute: 'key')] protected ServiceLocator $translationLocator,
@@ -121,16 +120,6 @@ class DataFixturesLocator implements DataFixturesInterface
     public function security(): Fixtures\SecurityFixtures
     {
         return $this->securityLocator->get('security_fixtures');
-    }
-
-    /**
-     * To get SeoFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function seo(): Fixtures\SeoFixtures
-    {
-        return $this->seoLocator->get('seo_fixtures');
     }
 
     /**
