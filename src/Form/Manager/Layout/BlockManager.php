@@ -6,9 +6,6 @@ namespace App\Form\Manager\Layout;
 
 use App\Entity\Core\Website;
 use App\Entity\Layout;
-use App\Entity\Module\Catalog\Feature;
-use App\Model\Layout\BlockModel;
-use App\Service\Core\Urlizer;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -49,21 +46,6 @@ class BlockManager
             $this->$setter($block, $website);
         }
         $this->setListing($block);
-        $this->setFieldConfiguration($block, $website, $interface, $form);
-        $this->setFeature($block);
-
-        $fieldConfiguration = $block->getFieldConfiguration();
-        if ($fieldConfiguration) {
-            $intl = BlockModel::fromEntity($block, $this->coreLocator)->intl;
-            if ($intl->title && $block->getAdminName() !== $intl->title) {
-                $adminName = str_replace('&nbsp;', ' ', $intl->title);
-                $block->setAdminName($adminName);
-            }
-            if (empty($fieldConfiguration->getSlug())) {
-                $fieldConfiguration->setSlug($blockTypeSlug.'-'.$fieldConfiguration->getId());
-                $this->coreLocator->em()->persist($fieldConfiguration);
-            }
-        }
 
         if ('card' === $blockTypeSlug) {
             foreach ($block->getIntls() as $intl) {
@@ -142,89 +124,5 @@ class BlockManager
         }
 
         return $tabs;
-    }
-
-    /**
-     * Set FieldConfiguration.
-     */
-    private function setFieldConfiguration(Layout\Block $block, Website $website, array $interface, Form $form): void
-    {
-        $fieldConfiguration = $block->getFieldConfiguration();
-        $configuration = $website->getConfiguration();
-        $defaultLocale = $configuration->getLocale();
-        $this->blockType = $block->getBlockType()?->getSlug();
-
-        if ($fieldConfiguration) {
-            if (!$fieldConfiguration->getBlock()) {
-                $fieldConfiguration->setBlock($block);
-            }
-
-            $fieldValuePosition = 1;
-            foreach ($fieldConfiguration->getFieldValues() as $value) {
-                if ($value->getId()) {
-                    ++$fieldValuePosition;
-                }
-            }
-
-            foreach ($fieldConfiguration->getFieldValues() as $value) {
-                $value->setConfiguration($fieldConfiguration);
-                if (!$value->getId()) {
-                    $value->setPosition($fieldValuePosition);
-                    ++$fieldValuePosition;
-                }
-                foreach ($configuration->getAllLocales() as $locale) {
-                    $exist = $this->localeExist($value, $locale);
-                    if (!$exist) {
-                        $this->addIntl($website, $locale, $value, $defaultLocale);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * To set feature.
-     */
-    private function setFeature(Layout\Block $block): void
-    {
-        $post = $this->coreLocator->request()->request->all();
-        if (!empty($post['feature'])) {
-            $features = [];
-            $feature = !empty($post['feature']['feature']) ? $this->coreLocator->em()->getRepository(Feature::class)->find($post['feature']['feature']) : null;
-            $features['featureId'] = $feature ? $feature->getId() : null;
-            $block->setData($features);
-        }
-    }
-
-    /**
-     * Check if intl locale exist.
-     */
-    private function localeExist(Layout\FieldValue $value, string $locale): bool
-    {
-        foreach ($value->getIntls() as $existingIntl) {
-            if ($existingIntl->getLocale() === $locale) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Add intl.
-     */
-    private function addIntl(Website $website, string $locale, Layout\FieldValue $value, string $defaultLocale): void
-    {
-        $intl = new Layout\FieldValueIntl();
-        $intl->setLocale($locale);
-        $intl->setWebsite($website);
-        if ($locale === $defaultLocale) {
-            $body = 'form-emails' === $this->blockType && !str_contains($value->getAdminName(), '@')
-                ? Urlizer::urlize($value->getAdminName()).'@email.com'
-                : $value->getAdminName();
-            $intl->setIntroduction($value->getAdminName());
-            $intl->setBody($body);
-        }
-        $value->addIntl($intl);
     }
 }

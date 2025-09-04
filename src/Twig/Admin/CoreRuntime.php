@@ -7,7 +7,6 @@ namespace App\Twig\Admin;
 use App\Entity\Core\Log;
 use App\Entity\Layout\BlockType;
 use App\Entity\Layout\LayoutConfiguration;
-use App\Entity\Module\Catalog\Feature;
 use App\Entity\Security\Group;
 use App\Entity\Security\User;
 use App\Service\Interface\CoreLocatorInterface;
@@ -222,15 +221,6 @@ class CoreRuntime implements RuntimeExtensionInterface
         }
 
         return true;
-    }
-
-    /**
-     * Get Block Feature name.
-     */
-    public function blockFeatureName(?int $featureId = null): ?string
-    {
-        $feature = $featureId ? $this->coreLocator->em()->getRepository(Feature::class)->find($featureId) : false;
-        return $feature ? $feature->getAdminName() : null;
     }
 
     /**

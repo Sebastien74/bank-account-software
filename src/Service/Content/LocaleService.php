@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service\Content;
 
-use App\Entity\Core\Configuration;
 use App\Entity\Core\Domain;
 use App\Entity\Core\Website;
 use App\Entity\Layout\Page;
-use App\Entity\Module\Catalog\Product;
 use App\Entity\Seo\Url;
 use App\Model\Core\WebsiteModel;
 use App\Service\Core\InterfaceHelper;

@@ -7,7 +7,6 @@ namespace App\Controller\Admin\Media;
 use App\Controller\Admin\AdminController;
 use App\Entity\Media\Media;
 use App\Entity\Media\MediaRelation;
-use App\Entity\Module\Slider\Slider;
 use App\Form\Manager\Media\MediaManager;
 use App\Form\Widget\MediaRelationType;
 use Doctrine\ORM\NonUniqueResultException;
@@ -167,7 +166,7 @@ class MediaRelationController extends AdminController
             'excludes_fields' => $excludesFields,
             'form_name' => 'media_relation_'.$this->entity->getId(),
         ];
-        if (Slider::class !== $referClassname && !$asVideo) {
+        if (!$asVideo) {
             $this->formOptions['fields']['intl'] = isset($formOptions['intls']) ? $intlFields : ['title' => 'col-md-8', 'targetLink', 'targetLabel' => 'col-md-4', 'targetPage' => 'col-md-4', 'targetStyle' => 'col-md-4', 'newTab' => 'col-md-6'];
             $this->formOptions['intlTitleForce'] = false;
             $this->template = 'admin/core/form/media-relation-medium.html.twig';

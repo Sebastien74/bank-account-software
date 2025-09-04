@@ -37,7 +37,6 @@
     {% set networks = logos['social-networks'] is defined and logos['social-networks'] ? logos['social-networks'] : null %}
     {% set phones = information.phones is defined and information.phones|length > 0 ? information.phones : [] %}
     {% set emails = information.emails is defined and information.emails|length > 0 ? information.emails : [] %}
-    {% set isUserFront = app.user|isUserFront %}
     {% set websiteAlertmessage = information.alerts is defined and information.alerts is not empty ? information.alerts : false %}
     {% set websiteAlertHideMode = infoIntl.linkBlank is defined ? infoIntl.linkBlank : true %}
     {% set websiteAlertAlreadyShow = websiteAlertHideMode and app.session.get('front_website_alert_show') is defined and app.session.get('front_website_alert_show') %}
@@ -181,8 +180,6 @@
         <a href="#body-page" class="skip-link btn btn-black">{{ "Aller au contenu principal"|trans|striptags }}</a>
         <a href="#footer" class="skip-link btn btn-black">{{ "Aller au pied de page"|trans|striptags }}</a>
 
-        {{ dump('récupérer user front back compte de IBW') }}
-
         {{ macroApi.render({
             gdprActive: gdprActive,
             axeptioActive: axeptioActive,
@@ -198,22 +195,6 @@
                 websiteTemplate: websiteTemplate,
                 websiteAlertmessage: websiteAlertmessage
             } only %}
-        {% endif %}
-
-        {% if mainMenus.main.arguments is defined and mainMenus.main.arguments and not onlyBody %}
-            {% set menuArgs = mainMenus.main.arguments|merge({
-                currentClassname: interface.classname is defined ? interface.classname : null,
-                currentEntityId: entity.id is defined ? entity.id : null,
-                infoIntl: infoIntl,
-                information: information,
-                logos: website.logos,
-                emails: information.zones.emails.header is defined and information.zones.emails.header is not empty ? information.zones.emails.header : false,
-                phones: information.zones.phones.header is defined and information.zones.phones.header is not empty ? information.zones.phones.header : false,
-                pageBg: pageBg,
-                mainPages: mainPages,
-                microDataActive: microDataActive,
-                seo: seo is defined ? seo : null}) %}
-            {% include mainMenus.main.arguments.template with menuArgs only %}
         {% endif %}
 
         {% if configuration.preloader %}
@@ -243,7 +224,6 @@
                     urlId: urlId,
                     logos: website.logos,
                     axeptioActive: axeptioActive,
-                    mainMenus: mainMenus,
                     mainPages: mainPages,
                     companyName: companyName,
                     seo: seo is defined ? seo : null} only %}
@@ -261,11 +241,6 @@
 
 {#        {% include 'front/'~websiteTemplate~'/include/recaptcha.html.twig' with {configuration: configuration} only %}#}
         {% include 'front/'~websiteTemplate~'/include/translations.html.twig' only %}
-
-        {% if website.api is defined and website.api and not onlyBody %}
-            {{ website.api|addThis(webpack) }}
-            {{ website.api|tawkTo }}
-        {% endif %}
 
         {% if configuration.scrollTopBtn and not onlyBody %}
             {% include 'front/'~websiteTemplate~'/include/scroll-top-btn.html.twig' with {website: website, websiteTemplate: websiteTemplate} only %}
@@ -297,10 +272,6 @@
 
         {% if not isDesktop() and configuration.progressiveWebApp and 'APP_ENV_NAME'|getEnv != 'local' and not onlyBody %}
             {% include 'front/'~websiteTemplate~'/include/service-worker.html.twig' with {website: website, logos: website.logos, companyName: companyName} only %}
-        {% endif %}
-
-        {% if isUserFront(app.user) and not app.user.confirmEmail and not onlyBody %}
-            {% include 'front/'~websiteTemplate~'/include/user-front-alert.html.twig' with {user: app.user} only %}
         {% endif %}
 
         {{ macroApi.render({

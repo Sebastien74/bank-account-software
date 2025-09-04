@@ -8,7 +8,6 @@ use App\Entity\Core\Website;
 use App\Entity\Layout\Block;
 use App\Entity\Media\ThumbConfiguration;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Entity\Seo\Url;
 use App\Http\TransparentPixelResponse;
 use App\Model\Core\WebsiteModel;
@@ -209,11 +208,10 @@ class FrontController extends CacheController
         $websiteTemplate = $website->configuration->template;
 
         $arguments = [
-            'isUserBack' => $this->coreLocator->checkIP($website) && !$user instanceof UserFront || $user instanceof User,
+            'isUserBack' => $this->coreLocator->checkIP($website) || $user instanceof User,
             'website' => $website,
             'configuration' => $website->configuration,
             'websiteTemplate' => $websiteTemplate,
-            'mainMenus' => $this->frontLocator->menuService()->all($website, $url),
             'mainPages' => $website->configuration->pages,
             'logos' => $website->configuration->logos,
             'thumbConfigurationHeader' => $thumbConfigurationHeader,

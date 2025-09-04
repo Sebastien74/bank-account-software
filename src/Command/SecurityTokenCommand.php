@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Service\Core\CronSchedulerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -52,7 +51,6 @@ class SecurityTokenCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
 
         $this->checkTokens(User::class, $input);
-        $this->checkTokens(UserFront::class, $input);
 
         $command = $input->getArgument('command');
         $this->cronSchedulerService->logger('[EXECUTED] '.$command, $input);
@@ -71,7 +69,7 @@ class SecurityTokenCommand extends Command
         $tokenProperties = ['token', 'tokenRequest', 'tokenRemoveRequest'];
 
         foreach ($users as $user) {
-            /** @var User|UserFront $user */
+            /** @var User $user */
             $now = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
             foreach ($tokenProperties as $property) {
                 $getter = 'get'.ucfirst($property);

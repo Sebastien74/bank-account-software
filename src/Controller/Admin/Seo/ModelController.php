@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Seo;
 
-use App\Entity\Module\Catalog\Catalog;
-use App\Entity\Module\Catalog\Feature;
-use App\Entity\Module\Catalog\Product;
 use App\Entity\Seo\Model;
 use App\Form\Type\Seo\ModelType;
 use App\Service\Content\SeoInterface;
@@ -108,17 +105,6 @@ class ModelController extends BaseController
             }
             $this->arguments['keywords'] = $keywords;
             $this->arguments['haveCaption'] = false;
-        }
-
-        if (Product::class === $this->entity->getClassName() || Catalog::class === $this->entity->getClassName()) {
-            $featuresLabel = $this->coreLocator->translator()->trans('Caractéristiques', [], 'admin');
-            $website = $this->getWebsite();
-            $this->arguments['haveCaption'] = false;
-            $this->arguments['keywords'][$featuresLabel] = [];
-            $features = $this->coreLocator->em()->getRepository(Feature::class)->findBy(['website' => $website->entity], ['adminName' => 'ASC']);
-            foreach ($features as $feature) {
-                $this->arguments['keywords'][$featuresLabel][] = 'feature.'.$feature->getSlug();
-            }
         }
     }
 }

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Front;
 
-use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
 use App\Entity\Layout\Page;
-use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Entity\Seo\Url;
 use App\Model\Core\ConfigurationModel;
 use App\Model\Core\WebsiteModel;

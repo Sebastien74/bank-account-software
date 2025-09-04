@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service\Admin;
 
-use App\Form\Manager\Core\SearchManager;
 use App\Form\Type\Core\IndexSearchType;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -39,7 +38,6 @@ class IndexHelper
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
         private readonly PaginatorInterface $paginator,
-        private readonly SearchManager $searchManager,
         private readonly FormFactoryInterface $formFactory,
     ) {
         $this->request = $this->coreLocator->request();
@@ -179,11 +177,6 @@ class IndexHelper
     private function getQueryBuilder(array $interface, $entities = null, bool $forceEntities = false)
     {
         $queryBuilder = null;
-
-        if ($this->displaySearchForm && $this->searchForm->isSubmitted() && !empty($this->searchForm->getData()['search'])) {
-            $queryBuilder = $this->searchManager->execute($this->searchForm, $interface);
-        }
-
         if (!$queryBuilder) {
             if ($entities || $forceEntities) {
                 $queryBuilder = $entities;

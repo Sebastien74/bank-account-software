@@ -8,7 +8,6 @@ use App\Entity\Core\Domain;
 use App\Entity\Core\Website;
 use App\Entity\Layout;
 use App\Entity\Media;
-use App\Entity\Module\Catalog;
 use App\Entity\Seo;
 use App\Model\Core\InformationModel;
 use App\Model\Core\WebsiteModel;
@@ -592,9 +591,6 @@ class SeoService implements SeoInterface
             'companyLogo' => !empty($this->logos['logo']) ? $this->schemeAndHttpHost.$this->logos['logo'] : null,
             'image' => !empty($this->logos['share']) ? $this->schemeAndHttpHost.$this->logos['share'] : null,
             'description' => $this->seo && $this->seo->getMetaDescription() ? $this->seo->getMetaDescription() : ($intl instanceof IntlModel && $intl->introduction ? $intl->introduction : null),
-            'phone' => $information instanceof InformationModel && $information->phone ? $information->phone->getTagNumber() : null,
-            'email' => $information instanceof InformationModel ? $information->email : null,
-            'address' => $information instanceof InformationModel ? $information->address : null,
             'author' => $author ?: ($this->informationIntl instanceof IntlModel ? $this->informationIntl->title : null),
             'authorType' => $this->seo instanceof Seo\Seo && $this->seo->getAuthorType() ? $this->seo->getAuthorType()
                 : ($intl instanceof IntlModel && $intl->authorType ? $intl->authorType : 'Organization'),
@@ -710,27 +706,6 @@ class SeoService implements SeoInterface
 
                 foreach ($methods as $methodSEO) {
                     $method = 'get'.ucfirst($methodSEO);
-                    /* To set Product Features */
-                    if (str_contains($match, 'feature.')) {
-                        $featureMatches = explode('.', $match);
-                        $featureCode = end($featureMatches);
-                        $featureString = '';
-                        foreach ($entity->entity->getValues() as $value) {
-                            /** @var Catalog\FeatureValueProduct $value */
-                            $feature = $value->getFeature();
-                            $value = $value->getValue();
-                            if ($feature instanceof Catalog\Feature && $value instanceof Catalog\FeatureValue && $feature->getSlug() === $featureCode) {
-                                $intlValue = $this->getIntl($value);
-                                $isIntl = is_object($intlValue) && str_ends_with(get_class($intlValue), 'Intl');
-                                $featureTitle = $isIntl && $intlValue->getTitle() ? $intlValue->getTitle() : $value->getAdminName();
-                                $featureString .= $featureTitle.', ';
-                            }
-                        }
-                        if ($featureString) {
-                            $string = str_replace('['.$match.']', rtrim($featureString, ', '), $string);
-                        }
-                    }
-
                     if ($property instanceof PersistentCollection) {
                         if ($property->isEmpty() && 'title' === $methodSEO && method_exists($entity, 'getAdminName')) {
                             $property = $entity->getAdminName();

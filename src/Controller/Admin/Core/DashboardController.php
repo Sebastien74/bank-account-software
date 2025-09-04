@@ -7,7 +7,6 @@ namespace App\Controller\Admin\Core;
 use App\Controller\Admin\AdminController;
 use App\Entity\Core\Domain;
 use App\Entity\Core\Website;
-use App\Entity\Module\Search\SearchValue;
 use App\Entity\Seo\NotFoundUrl;
 use App\Entity\Seo\Url;
 use Knp\Component\Pager\PaginatorInterface;
@@ -36,20 +35,11 @@ class DashboardController extends AdminController
         $website = $this->getWebsite();
         $notFoundsLimit = 50;
         $noSeoCounts = $this->coreLocator->em()->getRepository(Url::class)->countEmptyLocalesSEO($website->entity);
-        $searchValues = $this->coreLocator->em()->getRepository(SearchValue::class)->findByWebsite($website->entity);
-        $searchValues = $paginator->paginate(
-            $searchValues,
-            $request->query->getInt('page', 1),
-            5,
-            ['wrap-queries' => true]
-        );
-        $searchValues->setParam('_fragment', 'stats-search');
 
         return $this->adminRender('admin/page/core/dashboard.html.twig', [
             'notFoundUrls' => $this->getNotFoundUrls($website->entity, $notFoundsLimit),
             'notFoundsLimit' => $notFoundsLimit,
             'noSeoCounts' => $noSeoCounts,
-            'searchValues' => $searchValues,
         ]);
     }
 

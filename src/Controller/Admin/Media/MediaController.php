@@ -10,8 +10,6 @@ use App\Entity\Layout\Block;
 use App\Entity\Layout\Page;
 use App\Entity\Media\Folder;
 use App\Entity\Media\Media;
-use App\Entity\Module\Catalog as CatalogEntities;
-use App\Entity\Module\Newscast as NewscastEntities;
 use App\Form\Interface\MediaFormManagerInterface;
 use App\Form\Type\Media\SearchType;
 use App\Form\Widget\MediaType;
@@ -203,10 +201,6 @@ class MediaController extends AdminController
     public function reorderMedias(Website $website): JsonResponse
     {
         $classnames = [
-            NewscastEntities\Newscast::class => 'Actualités',
-            NewscastEntities\Category::class => "Catégories d'actualités",
-            CatalogEntities\Product::class => 'Produits',
-            CatalogEntities\Category::class => 'Catégories de produits',
             Page::class => 'Pages',
         ];
 
@@ -278,16 +272,6 @@ class MediaController extends AdminController
             $mediaFolder = $media->getFolder();
             $entity = $this->coreLocator->em()->getRepository($classname)->find($entityId);
             $parentFolder = $this->getFolder($website, $folderName);
-            if ($entity instanceof CatalogEntities\Product) {
-                $parentFolder = $this->getFolder($website, $entity->getCatalog()->getAdminName(), $parentFolder);
-            } elseif ($entity instanceof NewscastEntities\Newscast && $entity->getCategory()) {
-                $year = $entity->getPublicationDate() ? $entity->getPublicationDate()->format('Y')
-                    : ($entity->getPublicationStart() ? $entity->getPublicationStart()->format('Y')
-                        : ($entity->getUpdatedAt() ? $entity->getUpdatedAt()->format('Y')
-                            : ($entity->getCreatedAt() ? $entity->getCreatedAt()->format('Y') : '')));
-                $parentFolderName = $year.' Catégorie : '.$entity->getCategory()->getAdminName();
-                $parentFolder = $this->getFolder($website, $parentFolderName, $parentFolder);
-            }
             $folder = $this->getFolder($website, $entity->getAdminName(), $parentFolder);
             $reset = !$mediaFolder || ($mediaFolder->getSlug() !== $folder->getSlug())
                 || ($mediaFolder->getParent() && $mediaFolder->getParent()->getSlug() !== $parentFolder->getSlug());

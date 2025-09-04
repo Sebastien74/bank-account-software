@@ -21,7 +21,6 @@ class SecurityFormManagerLocator implements SecurityFormManagerInterface
      * ApiFormManagerLocator constructor.
      */
     public function __construct(
-        #[AutowireLocator(AdminSecurity\CompanyManager::class, indexAttribute: 'key')] protected ServiceLocator $adminCompanyLocator,
         #[AutowireLocator(AdminSecurity\ConfirmPasswordManager::class, indexAttribute: 'key')] protected ServiceLocator $adminConfirmPasswordLocator,
         #[AutowireLocator(AdminSecurity\GroupPasswordManager::class, indexAttribute: 'key')] protected ServiceLocator $adminGroupPasswordLocator,
         #[AutowireLocator(AdminSecurity\RegisterManager::class, indexAttribute: 'key')] protected ServiceLocator $adminRegisterLocator,
@@ -34,16 +33,6 @@ class SecurityFormManagerLocator implements SecurityFormManagerInterface
         #[AutowireLocator(FrontSecurity\ResetPasswordManager::class, indexAttribute: 'key')] protected ServiceLocator $frontResetPasswordLocator,
         #[AutowireLocator(FrontSecurity\UserManager::class, indexAttribute: 'key')] protected ServiceLocator $frontUserLocator,
     ) {
-    }
-
-    /**
-     * To get AdminSecurity\RoleManager.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function adminCompany(): AdminSecurity\CompanyManager
-    {
-        return $this->adminCompanyLocator->get('security_admin_company_form_manager');
     }
 
     /**

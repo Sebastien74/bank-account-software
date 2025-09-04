@@ -56,8 +56,8 @@ class RedirectionService
         $host = $request->getHost();
         $repository = $this->coreLocator->em()->getRepository(CoreEntities\Website::class);
         $websiteId = $request->get('website') ? intval($request->get('website')) : null;
-        $website = preg_match('/\/preview\//', $request->getUri())
-            ? $repository->findObject($websiteId)
+        /* @var WebsiteModel $website */
+        $website = preg_match('/\/preview\//', $request->getUri()) ? $repository->findObject($websiteId)
             : $repository->findOneByHost($host);
 
         $configuration = null;

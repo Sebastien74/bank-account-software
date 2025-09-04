@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service\Content;
 
-use App\Entity\Api\Api;
 use App\Model\Core\WebsiteModel;
 
 /**
@@ -26,9 +25,8 @@ class CryptService
      */
     public function execute(WebsiteModel $website, string $string, string $action = 'e'): bool|string|null
     {
-        $api = $website->entity->getApi();
-        $secretKey = $api instanceof Api && $api->getSecuritySecretKey() ? $api->getSecuritySecretKey() : $this->secretKey;
-        $secretIv = $api instanceof Api && $api->getSecuritySecretIv() ? $api->getSecuritySecretIv() : $this->secretIv;
+        $secretKey = $this->secretKey;
+        $secretIv = $this->secretIv;
 
         $output = false;
         $encryptMethod = 'AES-256-CBC';

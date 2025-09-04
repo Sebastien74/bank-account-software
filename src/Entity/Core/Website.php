@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Core;
 
-use App\Entity\Api\Api;
 use App\Entity\BaseEntity;
-use App\Entity\Information\Information;
 use App\Entity\Seo\Redirection;
 use App\Entity\Seo\SeoConfiguration;
 use App\Repository\Core\WebsiteRepository;
@@ -48,11 +46,6 @@ class Website extends BaseEntity
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Security $security = null;
 
-    #[ORM\OneToOne(inversedBy: 'website', targetEntity: Information::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ?Information $information = null;
-
     #[ORM\OneToOne(inversedBy: 'website', targetEntity: SeoConfiguration::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
     #[Assert\Valid(['groups' => ['form_submission']])]
@@ -62,10 +55,6 @@ class Website extends BaseEntity
     #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Configuration $configuration = null;
-
-    #[ORM\OneToOne(inversedBy: 'website', targetEntity: Api::class, cascade: ['persist', 'remove'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ?Api $api = null;
 
     #[ORM\OneToMany(mappedBy: 'website', targetEntity: Redirection::class, cascade: ['persist'])]
     #[ORM\OrderBy(['id' => 'DESC'])]
@@ -128,18 +117,6 @@ class Website extends BaseEntity
         return $this;
     }
 
-    public function getInformation(): ?Information
-    {
-        return $this->information;
-    }
-
-    public function setInformation(?Information $information): static
-    {
-        $this->information = $information;
-
-        return $this;
-    }
-
     public function getSeoConfiguration(): ?SeoConfiguration
     {
         return $this->seoConfiguration;
@@ -160,18 +137,6 @@ class Website extends BaseEntity
     public function setConfiguration(?Configuration $configuration): static
     {
         $this->configuration = $configuration;
-
-        return $this;
-    }
-
-    public function getApi(): ?Api
-    {
-        return $this->api;
-    }
-
-    public function setApi(?Api $api): static
-    {
-        $this->api = $api;
 
         return $this;
     }

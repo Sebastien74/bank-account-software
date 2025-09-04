@@ -14,6 +14,4 @@ use App\Service\Export;
 interface ExportInterface
 {
     public function coreService(): Export\ExportCsvService;
-    public function contactsService(): Export\ExportContactService;
-    public function productsService(): Export\ExportProductsService;
 }

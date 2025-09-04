@@ -23,12 +23,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\AssociationOverrides([
     new ORM\AssociationOverride(
-        name: 'companies',
-        joinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'cascade')],
-        inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'company_id', referencedColumnName: 'id')],
-        joinTable: new ORM\JoinTable(name: 'security_users_companies')
-    ),
-    new ORM\AssociationOverride(
         name: 'websites',
         joinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'cascade')],
         inverseJoinColumns: [new ORM\InverseJoinColumn(name: 'website_id', referencedColumnName: 'id')],
@@ -62,10 +56,6 @@ class User extends BaseSecurity
     #[ORM\JoinColumn(nullable: true, onDelete: 'cascade')]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ?Profile $profile = null;
-
-    #[ORM\ManyToMany(targetEntity: Company::class)]
-    #[ORM\OrderBy(['name' => 'ASC'])]
-    private ArrayCollection|PersistentCollection $companies;
 
     #[ORM\ManyToMany(targetEntity: Website::class)]
     #[ORM\OrderBy(['adminName' => 'ASC'])]
@@ -117,30 +107,6 @@ class User extends BaseSecurity
     public function setProfile(?Profile $profile): static
     {
         $this->profile = $profile;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Company>
-     */
-    public function getCompanies(): Collection
-    {
-        return $this->companies;
-    }
-
-    public function addCompany(Company $company): static
-    {
-        if (!$this->companies->contains($company)) {
-            $this->companies->add($company);
-        }
-
-        return $this;
-    }
-
-    public function removeCompany(Company $company): static
-    {
-        $this->companies->removeElement($company);
 
         return $this;
     }

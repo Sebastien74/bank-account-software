@@ -8,8 +8,6 @@ use App\Controller\Admin\AdminController;
 use App\Entity\Core\Entity;
 use App\Entity\Core\Website;
 use App\Entity\Layout;
-use App\Entity\Module\Form\Form;
-use App\Entity\Module\Form\StepForm;
 use App\Form\Interface\LayoutFormFormManagerLocator;
 use App\Form\Type\Layout\Block as FormType;
 use App\Form\Type\Layout\Management\BackgroundColorBlockType;
@@ -187,19 +185,6 @@ class BlockController extends AdminController
             $this->formType = self::FORM_TYPES[$blockTypeSlug];
         }
 
-        if (!$this->formType) {
-            foreach (self::FORM_TYPES_GROUPS as $group => $configuration) {
-                if (preg_match('/'.$group.'/', $blockTypeSlug)) {
-                    $this->formType = $configuration['formType'];
-                    $this->template = 'admin/page/layout/field.html.twig';
-                    $formClass = 'form' === $request->get('interfaceName') ? Form::class : StepForm::class;
-                    $this->formOptions['currentForm'] = $this->coreLocator->em()->getRepository($formClass)->find($request->attributes->getInt('interfaceEntity'));
-                    $this->formOptions['layout'] = $layout;
-                    break;
-                }
-            }
-        }
-
         if ('core-action' === $blockTypeSlug) {
             $this->pageTitle = $this->coreLocator->translator()->trans('Bloc :', [], 'admin').' '.$this->coreLocator->translator()->trans($block->getAction()->getSlug(), [], 'entity_action');
         } else {
@@ -354,9 +339,6 @@ class BlockController extends AdminController
         $entityId = $request->get('interfaceEntity');
         $configuration = [
             'page' => \App\Entity\Layout\Page::class,
-            'form' => \App\Entity\Module\Form\Form::class,
-            'newscastcategory' => \App\Entity\Module\Newscast\Category::class,
-            'catalog' => \App\Entity\Module\Catalog\Catalog::class,
         ];
 
         if ($entityId && !empty($configuration[$interfaceName])) {

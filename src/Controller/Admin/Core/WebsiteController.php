@@ -7,9 +7,7 @@ namespace App\Controller\Admin\Core;
 use App\Controller\Admin\AdminController;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Form\Interface\ApiFormManagerInterface;
 use App\Form\Interface\CoreFormManagerInterface;
-use App\Form\Interface\InformationFormManagerInterface;
 use App\Form\Type\Core\Website\WebsiteType;
 use App\Form\Type\Core\WebsitesSelectorType;
 use App\Repository\Core\WebsiteRepository;
@@ -41,8 +39,6 @@ class WebsiteController extends AdminController
      */
     public function __construct(
         protected CoreFormManagerInterface $coreFormInterface,
-        protected InformationFormManagerInterface $infoFormLocator,
-        protected ApiFormManagerInterface $apiFormManagerLocator,
         protected CoreLocatorInterface $coreLocator,
         protected AdminLocatorInterface $adminLocator,
     ) {
@@ -83,11 +79,7 @@ class WebsiteController extends AdminController
     #[Route('/edit/{site}', name: 'admin_site_edit', methods: 'GET|POST')]
     public function edit(Request $request)
     {
-        $website = $this->getWebsite();
         $this->template = 'admin/page/website/website.html.twig';
-        $this->infoFormLocator->networks()->synchronizeLocales($website->entity, $website->seoConfiguration);
-        $this->apiFormManagerLocator->google()->synchronizeLocales($website->entity, $website->seoConfiguration);
-        $this->apiFormManagerLocator->custom()->synchronizeLocales($website->entity, $website->seoConfiguration);
 
         return parent::edit($request);
     }

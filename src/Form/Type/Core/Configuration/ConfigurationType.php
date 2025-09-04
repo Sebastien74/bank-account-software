@@ -111,10 +111,6 @@ class ConfigurationType extends AbstractType
             'multiple' => true,
         ]);
 
-        $builder->add('website', WebsiteType::class, [
-            'label' => false,
-        ]);
-
         $save = new WidgetType\SubmitType($this->coreLocator);
         $save->add($builder, ['btn_save' => true]);
     }

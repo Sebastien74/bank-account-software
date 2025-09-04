@@ -6,15 +6,11 @@ namespace App\Form\Manager\Layout;
 
 use App\Entity\Core\Website;
 use App\Entity\Layout;
-use App\Entity\Module\Menu\Menu;
-use App\Form\Manager\Module\AddLinkManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * LayoutManager.
@@ -28,23 +24,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 ])]
 class LayoutManager
 {
-    private ?Request $request;
-
     /**
      * LayoutManager constructor.
      */
-    public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly RequestStack $requestStack,
-        private readonly AddLinkManager $addLinkManager,
-    ) {
-        $this->request = $this->requestStack->getMainRequest();
+    public function __construct(private readonly EntityManagerInterface $entityManager) {
     }
 
     /**
      * Post Layout.
      *
-     * @throws NonUniqueResultException
+     * @throws NonUniqueResultException|Exception
      */
     public function post(array $interface, FormInterface $form, Website $website): void
     {
@@ -79,10 +68,6 @@ class LayoutManager
             $this->setGridZone($entity->getLayout());
             $this->entityManager->persist($layout);
             $this->entityManager->flush();
-            $inMenu = isset($this->request->get('page')['inMenu']);
-            if ($entity instanceof Layout\Page && $inMenu) {
-                $this->addToMenu($entity, $website);
-            }
         }
     }
 
@@ -219,21 +204,5 @@ class LayoutManager
         $block->setBlockType($blockType);
         $block->setPaddingRight('pe-0');
         $block->setPaddingLeft('ps-0');
-    }
-
-    /**
-     * Add to main menu.
-     *
-     * @throws NonUniqueResultException
-     */
-    private function addToMenu(Layout\Page $page, Website $website): void
-    {
-        $mainMenu = $this->entityManager->getRepository(Menu::class)->findOneBy([
-            'main' => true,
-            'website' => $website,
-        ]);
-        if ($mainMenu) {
-            $this->addLinkManager->post(['page'.$page->getId() => $page], $mainMenu, $website->getConfiguration()->getLocale(), true);
-        }
     }
 }

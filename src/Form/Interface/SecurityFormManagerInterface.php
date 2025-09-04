@@ -14,7 +14,6 @@ use App\Form\Manager\Security\Front as FrontSecurity;
  */
 interface SecurityFormManagerInterface
 {
-    public function adminCompany(): AdminSecurity\CompanyManager;
     public function adminConfirmPassword(): AdminSecurity\ConfirmPasswordManager;
     public function adminGroupPassword(): AdminSecurity\GroupPasswordManager;
     public function adminRegister(): AdminSecurity\RegisterManager;

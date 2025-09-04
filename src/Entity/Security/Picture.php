@@ -32,9 +32,6 @@ class Picture
     #[ORM\OneToOne(mappedBy: 'picture', targetEntity: User::class, cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
-    #[ORM\OneToOne(mappedBy: 'picture', targetEntity: UserFront::class, cascade: ['persist', 'remove'])]
-    private ?UserFront $userFront = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -87,28 +84,6 @@ class Picture
         }
 
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getUserFront(): ?UserFront
-    {
-        return $this->userFront;
-    }
-
-    public function setUserFront(?UserFront $userFront): static
-    {
-        // unset the owning side of the relation if necessary
-        if (null === $userFront && null !== $this->userFront) {
-            $this->userFront->setPicture(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if (null !== $userFront && $userFront->getPicture() !== $this) {
-            $userFront->setPicture($this);
-        }
-
-        $this->userFront = $userFront;
 
         return $this;
     }

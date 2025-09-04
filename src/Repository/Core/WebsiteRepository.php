@@ -212,8 +212,6 @@ class WebsiteRepository extends ServiceEntityRepository
     {
         return $queryBuilder
             ->leftJoin('w.configuration', 'c')
-            ->leftJoin('w.api', 'a')
-            ->leftJoin('w.information', 'i')
             ->leftJoin('w.security', 's')
             ->leftJoin('w.seoConfiguration', 'sc')
             ->leftJoin('c.domains', 'd')
@@ -221,8 +219,6 @@ class WebsiteRepository extends ServiceEntityRepository
             ->leftJoin('c.modules', 'cm')
             ->leftJoin('c.pages', 'cp')
             ->addSelect('c')
-            ->addSelect('a')
-            ->addSelect('i')
             ->addSelect('s')
             ->addSelect('sc')
             ->addSelect('d')

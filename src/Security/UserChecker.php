@@ -60,7 +60,7 @@ class UserChecker implements UserCheckerInterface
         $isImpersonator = $this->user && in_array('IS_IMPERSONATOR', $roles);
         if (!in_array($routeName, $disableDRoutes) && $isAdmin && !$isImpersonator) {
             $isLoginRoute = in_array($routeName, $loginRoutes);
-            if ($this->user instanceof Security\User || $this->user instanceof Security\UserFront) {
+            if ($this->user instanceof Security\User) {
                 //                if (!$user->isOnline() && !$request->getSession()->get('onAuthenticationSuccess')) {
                 //                    $request->getSession()->invalidate();
                 //                    $this->coreLocator->tokenStorage()->setToken();

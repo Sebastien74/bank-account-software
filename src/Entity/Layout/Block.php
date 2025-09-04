@@ -121,9 +121,6 @@ class Block extends BaseConfiguration
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $data = [];
 
-    #[ORM\OneToOne(inversedBy: 'block', targetEntity: FieldConfiguration::class, cascade: ['persist', 'remove'], fetch: 'EAGER')]
-    private ?FieldConfiguration $fieldConfiguration = null;
-
     #[ORM\OneToMany(mappedBy: 'block', targetEntity: ActionIntl::class, cascade: ['persist'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\JoinColumn(onDelete: 'cascade')]
     #[ORM\OrderBy(['locale' => 'ASC'])]
@@ -547,18 +544,6 @@ class Block extends BaseConfiguration
     public function setData(?array $data): static
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    public function getFieldConfiguration(): ?FieldConfiguration
-    {
-        return $this->fieldConfiguration;
-    }
-
-    public function setFieldConfiguration(?FieldConfiguration $fieldConfiguration): static
-    {
-        $this->fieldConfiguration = $fieldConfiguration;
 
         return $this;
     }

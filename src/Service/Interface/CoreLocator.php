@@ -56,9 +56,7 @@ class CoreLocator implements CoreLocatorInterface
         #[AutowireLocator(InterfaceHelper::class, indexAttribute: 'key')] protected ServiceLocator $interfaceLocator,
         #[AutowireLocator(Core\LastRouteService::class, indexAttribute: 'key')] protected ServiceLocator $lastRouteLocator,
         #[AutowireLocator(Content\RedirectionService::class, indexAttribute: 'key')] protected ServiceLocator $redirectionLocator,
-        #[AutowireLocator(Content\MarkdownServiceInterface::class, indexAttribute: 'key')] protected ServiceLocator $markdownLocator,
         #[AutowireLocator(Core\FileInfo::class, indexAttribute: 'key')] protected ServiceLocator $fileLocator,
-        #[AutowireLocator(Core\AI::class, indexAttribute: 'key')] protected ServiceLocator $aiLocator,
         private readonly EntryFilesTwigExtension $entryFiles,
         private readonly Core\CacheServiceInterface $cacheService,
         private readonly QueryServiceInterface $queryService,
@@ -352,16 +350,6 @@ class CoreLocator implements CoreLocatorInterface
     }
 
     /**
-     * To get AI.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function ai(): Core\AI
-    {
-        return $this->aiLocator->get('ai_service');
-    }
-
-    /**
      * To set Xss Protection Data.
      */
     public function XssProtectionData(mixed $value = null): ?string
@@ -394,14 +382,6 @@ class CoreLocator implements CoreLocatorInterface
             'setter' => !empty($metadata['mappedBy']) ? 'set'.ucfirst($metadata['mappedBy']) : null,
             'sourceEntity' => !empty($metadata['sourceEntity']) ? $metadata['sourceEntity'] : null,
         ];
-    }
-
-    /**
-     * To get markdown service.
-     */
-    public function markdown(?string $string = null): Content\MarkdownServiceInterface
-    {
-        return $this->markdownLocator->get('markdown_service');
     }
 
     /**

@@ -7,7 +7,6 @@ namespace App\EventSubscriber;
 use App\Entity\Core\Security;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Model\Core\WebsiteModel;
 use App\Service\Core\CspNonceGenerator;
 use App\Service\Interface\CoreLocatorInterface;
@@ -102,7 +101,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
         if ($this->coreLocator->tokenStorage()->getToken()) {
             $user = $this->coreLocator->tokenStorage()->getToken()->getUser();
             $this->isSecure($event, $website, $user);
-            if ($user instanceof User || $user instanceof UserFront) {
+            if ($user instanceof User) {
                 $userKey = $user->getSecretKey();
                 if (empty($_COOKIE['SECURITY_USER_SECRET']) && $this->coreLocator->authorizationChecker()->isGranted('ROLE_ADMIN')) {
                     $response->headers->setCookie(Cookie::create('SECURITY_USER_SECRET', $userKey));
@@ -213,8 +212,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             || preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $this->uri)
             || preg_match('/\/secure\/user/', $this->uri)
             || preg_match('/\/front\//', $this->uri)
-            || in_array($this->routeName, $allowedRoutes)
-            || $user instanceof UserFront) {
+            || in_array($this->routeName, $allowedRoutes)) {
             return;
         }
 

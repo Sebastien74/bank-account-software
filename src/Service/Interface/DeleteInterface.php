@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\Interface;
 
 use App\Service\Admin\DeleteService;
-use App\Service\Delete\ContactDeleteService;
 
 /**
  * DeleteInterface.
@@ -15,5 +14,4 @@ use App\Service\Delete\ContactDeleteService;
 interface DeleteInterface
 {
     public function coreService(): DeleteService;
-    public function contactsService(): ContactDeleteService;
 }

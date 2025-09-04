@@ -6,9 +6,7 @@ namespace App\Security;
 
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Model\Core\WebsiteModel;
-use App\Repository\Security\UserFrontRepository;
 use App\Repository\Security\UserRepository;
 use App\Service\Content\CryptService;
 use App\Service\Interface\CoreLocatorInterface;
@@ -50,6 +48,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class BaseAuthenticator
 {
+    private const string SECRET_KEY = 'fc58fd900e20f8f9bfc5af9ac8a5c247';
+    private const string SECRET_IV = '2y10nlpXG3AbjE4Rt72AkKZRVu3IdRJZ395JXjlM05Wd4StMG7efwqi';
+
     private TranslatorInterface $translator;
     private EntityManagerInterface $entityManager;
     private string $loginRoute = '';
@@ -245,7 +246,7 @@ class BaseAuthenticator
 
         if (empty($this->credentials['csrf_token']) && !empty($this->credentials['username'])) {
             $user = $this->entityManager->getRepository($this->classname)->loadUserByIdentifier($this->credentials['username']);
-            if ($user instanceof User || $user instanceof UserFront) {
+            if ($user instanceof User) {
                 $authenticatedToken = new UsernamePasswordToken($user, 'main', $user->getRoles());
                 $this->credentials['csrf_token'] = $this->csrfTokenManager->getToken($authenticatedToken->getUserIdentifier())->getValue();
             }
@@ -287,7 +288,7 @@ class BaseAuthenticator
     /**
      * To set user Repository.
      */
-    public function setUserRepository(UserFrontRepository|UserRepository $userRepository): void
+    public function setUserRepository(UserRepository $userRepository): void
     {
         $this->userRepository = $userRepository;
     }
@@ -300,8 +301,6 @@ class BaseAuthenticator
     public function checkRecaptcha(WebsiteModel $website, Request $request, bool $asResponse = false)
     {
         $formSecurityKey = $website->entity->getSecurity()->getSecurityKey();
-        $this->setSecurityKeys($website);
-
         $fieldHo = $request->request->get('field_ho');
         $fieldHoEntitled = $request->request->get('field_ho_entitled');
         if (!$fieldHo) {
@@ -352,7 +351,7 @@ class BaseAuthenticator
      */
     public function checkPassword(WebsiteModel $website): void
     {
-        if ($this->user instanceof User || $this->user instanceof UserFront) {
+        if ($this->user instanceof User) {
             $passwordExpire = $this->userChecker->passwordExpired($website, $this->user);
             if ($passwordExpire) {
                 $message = $this->translator->trans('Votre mot de passe a expiré, vous devez le réinitialiser.', [], 'security_cms');
@@ -366,7 +365,7 @@ class BaseAuthenticator
      */
     public function checkActive(WebsiteModel $website): void
     {
-        $isUser = $this->user instanceof User || $this->user instanceof UserFront;
+        $isUser = $this->user instanceof User;
         if ($isUser && !$this->user->isActive()) {
             $message = $this->getInactiveMessage($website);
             throw new SecurityException\CustomUserMessageAccountStatusException($message);
@@ -378,17 +377,7 @@ class BaseAuthenticator
      */
     public function getInactiveMessage(WebsiteModel $website): string
     {
-        $security = $website->entity->getSecurity();
-
-        if ($security->isFrontRegistrationValidation()) {
-            $message = $this->translator->trans("Votre compte n'est pas activé. Il doit être validé par l'administrateur.", [], 'security_cms');
-        } elseif ($security->isFrontEmailConfirmation()) {
-            $message = $this->translator->trans("L’activation de votre compte est en attente.<br>Un e-mail de confirmation vous a été adressé lors de votre inscription. Pensez à cliquer sur le lien qu’il contient pour activer votre compte.", [], 'security_cms');
-        } else {
-            $message = $this->translator->trans("Votre compte n'est pas activé.", [], 'security_cms');
-        }
-
-        return $message;
+        return $this->translator->trans("Votre compte n'est pas activé.", [], 'security_cms');
     }
 
     /**
@@ -400,34 +389,6 @@ class BaseAuthenticator
         if (!$this->csrfTokenManager->isTokenValid($token)) {
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new SecurityException\InvalidCsrfTokenException());
             throw new SecurityException\InvalidCsrfTokenException();
-        }
-    }
-
-    /**
-     * Set security keys if not generated.
-     *
-     * @throws \Exception
-     */
-    private function setSecurityKeys(WebsiteModel $website): void
-    {
-        $api = $website->entity->getApi();
-        $securityKey = $api->getSecuritySecretKey();
-        $securityIv = $api->getSecuritySecretIv();
-        $flush = !$securityKey || !$securityIv;
-
-        if (!$securityKey) {
-            $key = base64_encode(uniqid().password_hash(uniqid(), PASSWORD_BCRYPT).random_bytes(10));
-            $api->setSecuritySecretKey(substr(str_shuffle($key), 0, 45));
-        }
-
-        if (!$securityIv) {
-            $key = base64_encode(uniqid().password_hash(uniqid(), PASSWORD_BCRYPT).random_bytes(10));
-            $api->setSecuritySecretIv(substr(str_shuffle($key), 0, 45));
-        }
-
-        if ($flush) {
-            $this->entityManager->persist($api);
-            $this->entityManager->flush();
         }
     }
 

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Entity\Api\Api;
 use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
-use App\Entity\Information\Information;
 use App\Entity\Security\User;
 use App\Entity\Seo\SeoConfiguration;
 use App\Entity\Translation;
@@ -289,11 +287,9 @@ class DoctrineEventsListener
         $filesystem = new Filesystem();
         $entityClassname = str_replace('Proxies\__CG__\\', '', get_class($entity));
         $entitiesCache = [
-            Api::class => ['apimodel'],
             SeoConfiguration::class => ['apimodel'],
             Website::class => ['apimodel', 'domains'],
             Configuration::class => ['pages'],
-            Information::class => ['apimodel'],
         ];
 
         foreach ($entitiesCache as $classname => $filenames) {

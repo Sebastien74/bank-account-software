@@ -6,8 +6,6 @@ namespace App\Service\DataFixtures;
 
 use App\Entity\Core\Security;
 use App\Entity\Core\Website;
-use App\Entity\Security\Message;
-use App\Entity\Security\MessageIntl;
 use App\Entity\Security\User;
 use App\Service\Interface\CoreLocatorInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -49,7 +47,6 @@ class SecurityFixtures
         $this->addWebsiteToMaster($website);
         $this->addConfiguration($website);
         $this->addWebsite($website);
-        $this->addMessages($website);
     }
 
     /**
@@ -91,92 +88,6 @@ class SecurityFixtures
         if ($customer) {
             $customer->addWebsite($website);
             $this->coreLocator->em()->persist($customer);
-        }
-    }
-
-    /**
-     * Messages.
-     */
-    private function messages(): array
-    {
-        return [
-            'confirmation-registration' => [
-                'adminName' => "Email de confirmation du mail utilisateur à l'inscription (Front)",
-                'fr' => [
-                    'subject' => 'Confirmation de votre e-mail',
-                ]
-            ],
-            'webmaster-registration' => [
-                'adminName' => 'Email pour le webmaster pour un nouvel inscrit (Front)',
-                'fr' => [
-                    'subject' => 'Nouvel inscrit',
-                ]
-            ],
-            'password-request' => [
-                'adminName' => 'Email pour la réinitialisation du mot de passe utilisateur (Front)',
-                'fr' => [
-                    'subject' => 'Réinitialisation de votre mot de passe',
-                ]
-            ],
-            'password-expire' => [
-                'adminName' => "Email pour l'expiration du mot de passe utilisateur (Front)",
-                'fr' => [
-                    'subject' => 'Votre mot de passe a expiré',
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * Add Messages.
-     *
-     * @throws LoaderError|SyntaxError|RuntimeError
-     */
-    public function addMessages(Website $website): void
-    {
-        $configuration = $website->getConfiguration();
-        $locales = $configuration->getAllLocales();
-        $baseDirname = '/front/default/actions/security/email/';
-        $dirname = $this->coreLocator->projectDir().'/templates'.$baseDirname;
-        $dirname = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dirname);
-
-        $position = count($this->coreLocator->em()->getRepository(Message::class)->findBy(['website' => $website])) + 1;
-        foreach ($this->messages() as $slug => $messageConfig) {
-            $existing = $this->coreLocator->em()->getRepository(Message::class)->findOneBy(['slug' => $slug, 'website' => $website]);
-            if (!$existing) {
-                $message = new Message();
-                $message->setSlug($slug);
-                $message->setWebsite($website);
-                $message->setPosition($position);
-                $message->setAdminName($messageConfig['adminName']);
-                foreach ($locales as $locale) {
-                    $localeMessage = !empty($messageConfig[$locale]) ? $messageConfig[$locale] : false;
-                    if ($localeMessage) {
-                        $intl = new MessageIntl();
-                        $intl->setLocale($locale);
-                        $intl->setWebsite($website);
-                        if (!empty($localeMessage['subject'])) {
-                            $intl->setTitle($localeMessage['subject']);
-                        }
-                        if (!empty($localeMessage['content'])) {
-                            $intl->setBody($localeMessage['content']);
-                        } else {
-                            $template = $dirname.$slug.'.html.twig';
-                            $filesystem = new Filesystem();
-                            if ($filesystem->exists($template)) {
-                                $html = $this->templating->render($baseDirname.$slug.'.html.twig');
-                                if (preg_match('#<td\s+[^>]*id=["\']content-fixtures["\'][^>]*>(.*?)</td>#is', $html, $matches)) {
-                                    $intl->setBody($matches[1]);
-                                }
-                            }
-                        }
-                        $message->addIntl($intl);
-                    }
-                }
-                $this->coreLocator->em()->persist($message);
-                $this->coreLocator->em()->flush();
-                ++$position;
-            }
         }
     }
 }

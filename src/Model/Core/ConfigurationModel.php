@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\Core;
 
 use App\Entity\Core\Configuration;
-use App\Entity\Core\Configuration as ConfigurationEntity;
 use App\Entity\Core\Module;
 use App\Entity\Layout\Page;
 use App\Entity\Security\User;

@@ -6,7 +6,6 @@ namespace App\Form\Manager\Core;
 
 use App\Entity\Core\Website;
 use App\Entity\Media\Media;
-use App\Entity\Security\UserFront;
 use App\Entity\Seo\Url;
 use App\Form\Manager\Seo\UrlManager;
 use App\Service\Core\InterfaceHelper;
@@ -51,44 +50,16 @@ class BaseManager
      *
      * @throws MappingException
      */
-    public function prePersist(mixed $entity, Website $website, ?UserFront $userFront = null): void
+    public function prePersist(mixed $entity, Website $website): void
     {
         $allLocales = $this->getAllLocales($website);
         $intls = $entity->getIntls();
-        if (method_exists($entity, 'setUserFront')) {
-            $entity->setUserFront($userFront);
-        }
         if (method_exists($entity, 'setWebsite')) {
             $entity->setWebsite($website);
         }
         $this->addIntls($allLocales, $website, $intls, $entity);
         $this->addUrls($allLocales, $website, $entity);
         $this->setTitleForce($intls);
-    }
-
-    /**
-     * Front post.
-     *
-     * @throws NonUniqueResultException
-     */
-    public function frontPost(mixed $entity, ?UploadedFile $uploadedFile = null): void
-    {
-        $userFront = $entity->getUserFront();
-
-        $this->setFile($userFront, $entity, $uploadedFile);
-        $this->setUrls($entity);
-        $this->setAdminName($entity);
-
-        if (!$entity->getId()) {
-            $this->setPosition($entity);
-        }
-
-        if (!$entity->getId() && $userFront instanceof UserFront) {
-            $entity->setAuthor($userFront->getLastName().' '.$userFront->getFirstName());
-        }
-
-        $this->coreLocator->em()->persist($entity);
-        $this->coreLocator->em()->flush();
     }
 
     /**
@@ -198,51 +169,6 @@ class BaseManager
         }
 
         return false;
-    }
-
-    /**
-     * Set File.
-     *
-     * @throws MappingException
-     */
-    private function setFile(UserFront $user, mixed $entity, ?UploadedFile $uploadedFile = null): void
-    {
-        if ($uploadedFile instanceof UploadedFile) {
-            $website = $entity->getWebsite();
-            $isUpload = $this->uploader->upload($uploadedFile, $website, null, false);
-
-            $media = new Media();
-            foreach ($entity->getMediaRelations() as $mediaRelation) {
-                if ($mediaRelation->getMedia()->getUserFront() instanceof UserFront) {
-                    $media = $mediaRelation->getMedia();
-                    break;
-                }
-            }
-
-            if ($media->getFilename()) {
-                $dirname = $this->uploader->getUploadsPath().'/'.$media->getFilename();
-                $filesystem = new Filesystem();
-                if ($filesystem->exists($dirname) && !is_dir($dirname)) {
-                    $filesystem->remove($dirname);
-                }
-            }
-
-            if ($isUpload) {
-                $media->setFilename($this->uploader->getFilename());
-                $media->setName($this->uploader->getName());
-                $media->setExtension($this->uploader->getExtension());
-            }
-
-            if (!$media->getId()) {
-                $media->setWebsite($website);
-                $media->setUserFront($user);
-                $mediaRelationData = $this->coreLocator->metadata($entity, 'mediaRelations');
-                $mediaRelation = new ($mediaRelationData->targetEntity)();
-                $mediaRelation->setLocale($website->getConfiguration()->getLocale());
-                $mediaRelation->setMedia($media);
-                $entity->addMediaRelation($mediaRelation);
-            }
-        }
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service\Translation;
 
-use App\Entity\Api;
 use App\Entity\BaseMediaRelation;
 use App\Entity\Core\Website;
 use App\Entity\Translation\Translation;
@@ -102,8 +101,6 @@ class ExportService
     {
         $excluded = [
             BaseMediaRelation::class,
-            Api\Facebook::class,
-            Api\Instagram::class,
         ];
         $metadata = $this->coreLocator->em()->getMetadataFactory()->getAllMetadata();
         $intls = [];

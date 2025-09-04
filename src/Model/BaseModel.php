@@ -7,13 +7,11 @@ namespace App\Model;
 use App\Entity\Core\Website;
 use App\Entity\Layout\Layout;
 use App\Entity\Layout\Page;
-use App\Entity\Module\Form\Form;
 use App\Service\Core\Urlizer;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Query\QueryException;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -354,35 +352,5 @@ class BaseModel extends FunctionModel
         $string = str_replace(' ', '', $string);
 
         return lcfirst($string);
-    }
-
-    /**
-     * To get Form Page.
-     *
-     * @throws NonUniqueResultException|MappingException|QueryException
-     */
-    protected static function getFormPage(mixed $model): ?string
-    {
-        $entity = $model->entity;
-        $pageUrl = null;
-        $route = self::$coreLocator->request()->get('_route');
-
-        if ($route && str_contains($route, '_view')) {
-            $form = self::getContent('form', $entity);
-            $page = $form ? self::$coreLocator->em()->getRepository(Page::class)->findByAction(
-                self::$coreLocator->website()->entity,
-                self::$coreLocator->locale(),
-                Form::class,
-                $form->getId()
-            ) : null;
-            $page = $page ? ViewModel::fromEntity($page, self::$coreLocator, [
-                'disabledLayout' => true,
-                'disabledIntl' => true,
-                'disabledMedias' => true,
-            ]) : null;
-            $pageUrl = $page && $page->online ? $page->url.'?category='.$model->interfaceName.'&code='.$model->id : null;
-        }
-
-        return $pageUrl;
     }
 }

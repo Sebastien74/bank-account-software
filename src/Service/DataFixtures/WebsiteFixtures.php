@@ -128,27 +128,15 @@ class WebsiteFixtures
         $this->fixtures->configuration()->add($website, $yamlConfiguration, $locale, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);
         $this->fixtures->security()->execute($website);
         $configuration = $website->getConfiguration();
-        $this->fixtures->information()->add($website, $yamlConfiguration, $user);
-        $this->fixtures->api()->add($website, $yamlConfiguration);
         $this->fixtures->seo()->add($website, $user);
         $webmasterFolder = $this->fixtures->defaultMedias()->add($website, $yamlConfiguration, $user);
         $this->fixtures->blockType()->add($configuration, self::DEV_MODE, $websiteToDuplicate);
         $this->fixtures->color()->add($configuration, $yamlConfiguration, $user, $websiteToDuplicate);
         $this->fixtures->transition()->add($configuration, $user, $websiteToDuplicate);
-        if (in_array('ROLE_NEWSCAST', self::DEFAULTS_MODULES)) {
-            $this->fixtures->newscast()->add($website, $user);
-        }
-        if (in_array('ROLE_CATALOG', self::DEFAULTS_MODULES)) {
-            $this->fixtures->catalog()->add($website, $user);
-        }
-        $this->fixtures->newsletter()->add($website, $user);
         $pages = $asMainWebsite || !$websiteToDuplicate instanceof Website
             ? $this->fixtures->page()->add($website, $pagesParams, $user, true, self::MAIN_PAGES)
             : $this->fixtures->pageDuplication()->add($website, $websiteToDuplicate);
         $this->fixtures->layout()->add($configuration, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);
-        $this->fixtures->menu()->add($website, $pages, $pagesParams, $user, $websiteToDuplicate);
-        $this->fixtures->gdpr()->add($webmasterFolder, $website, $user);
-        $this->fixtures->map()->add($webmasterFolder, $website, $user);
         $this->entityService->website($website);
         $this->entityService->createdBy($user);
         $this->entityService->execute($website, $locale);
@@ -166,14 +154,6 @@ class WebsiteFixtures
     {
         return [
             ['name' => 'Accueil', 'asIndex' => true, 'reference' => 'home', 'menus' => [], 'template' => 'home', 'urlAsIndex' => true, 'deletable' => true],
-            ['name' => 'Actualités', 'asIndex' => false, 'reference' => 'news', 'menus' => ['main'], 'template' => 'cms', 'urlAsIndex' => true, 'deletable' => true, 'disable' => !in_array('ROLE_NEWSCAST', self::DEFAULTS_MODULES)],
-            ['name' => 'Nos produits', 'asIndex' => false, 'reference' => 'products', 'menus' => ['main'], 'template' => 'cms', 'urlAsIndex' => true, 'deletable' => true, 'disable' => !in_array('ROLE_CATALOG', self::DEFAULTS_MODULES)],
-            ['name' => 'Écrivez-nous', 'asIndex' => false, 'reference' => 'contact', 'menus' => ['main'], 'template' => 'cms', 'urlAsIndex' => true, 'deletable' => true],
-            ['name' => 'Plan de site', 'asIndex' => false, 'reference' => 'sitemap', 'menus' => ['footer'], 'template' => 'cms', 'urlAsIndex' => true, 'deletable' => true],
-            ['name' => 'Mentions légales', 'asIndex' => false, 'reference' => 'legals', 'menus' => ['footer'], 'template' => 'legacy', 'urlAsIndex' => false, 'deletable' => true],
-            ['name' => 'Politique relative aux cookies', 'asIndex' => false, 'reference' => 'cookies', 'menus' => ['footer'], 'template' => 'legacy', 'urlAsIndex' => false, 'deletable' => true],
-            ['name' => 'Components', 'asIndex' => false, 'reference' => 'components', 'menus' => ['main'], 'template' => 'cms', 'urlAsIndex' => false, 'deletable' => true],
-            ['name' => 'Erreurs', 'asIndex' => false, 'reference' => 'error', 'menus' => [], 'template' => 'error', 'urlAsIndex' => false, 'deletable' => false],
         ];
     }
 }

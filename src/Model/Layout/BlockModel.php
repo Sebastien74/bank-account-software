@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace App\Model\Layout;
 
 use App\Entity\Layout\Block;
-use App\Entity\Module\Catalog\Product;
-use App\Entity\Module\Newscast\Newscast;
 use App\Model\BaseModel;
 use App\Model\EntityModel;
 use App\Model\IntlModel;
 use App\Model\MediaModel;
-use App\Model\Module\NewscastModel;
-use App\Model\Module\ProductModel;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -104,8 +100,7 @@ final class BlockModel extends BaseModel
             $interface = self::$coreLocator->interfaceHelper()->interfaceByName(self::$coreLocator->request()->get('category'));
             $entity = !empty($interface['classname']) ? self::$coreLocator->em()->getRepository($interface['classname'])->find(self::$coreLocator->request()->get('code')) : null;
             $modelClassnames = [
-                Product::class => ProductModel::class,
-                Newscast::class => NewscastModel::class,
+
             ];
             $modelClassname = $entity && !empty($modelClassnames[get_class($entity)]) ? $modelClassnames[get_class($entity)] : EntityModel::class;
             $model = $entity ? ($modelClassname)::fromEntity($entity, self::$coreLocator, [

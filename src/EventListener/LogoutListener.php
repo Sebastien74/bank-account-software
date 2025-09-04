@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,7 +50,7 @@ class LogoutListener
         }
 
         if (is_object($token) && method_exists($token, 'getUser')) {
-            /** @var User|UserFront $user */
+            /** @var User $user */
             $user = $token->getUser();
             $user->setIsonline(false);
             $this->entityManager->persist($user);

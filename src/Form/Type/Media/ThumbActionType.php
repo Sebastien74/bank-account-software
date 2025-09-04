@@ -6,7 +6,6 @@ namespace App\Form\Type\Media;
 
 use App\Entity\Layout\BlockType;
 use App\Entity\Media\ThumbAction;
-use App\Entity\Module\Search\Search;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -116,7 +115,7 @@ class ThumbActionType extends AbstractType
             $namespace = $data->getName();
             if (0 === $data->getReflectionClass()->getModifiers()) {
                 $entity = new $namespace();
-                if (method_exists($entity, 'getMediaRelations') || str_contains($namespace, 'Listing') || Search::class === $namespace) {
+                if (method_exists($entity, 'getMediaRelations') || str_contains($namespace, 'Listing')) {
                     $namespaces[$this->translator->trans($namespace, [], 'entity')] = $namespace;
                 }
             }

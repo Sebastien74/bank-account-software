@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Form\Type\Layout\Block;
 
 use App\Entity\Core\Website;
-use App\Entity\Information\Information;
 use App\Entity\Layout\ActionIntl;
 use App\Entity\Layout\Block;
 use App\Service\Core\InterfaceHelper;
@@ -95,8 +94,7 @@ class ActionIntlType extends AbstractType
 
         $choices = [];
         foreach ($result as $entity) {
-            $label = $this->entity instanceof Information ? 'Information' : $entity->getAdminName();
-            $choices[$label] = $entity->getId();
+            $choices[$entity->getAdminName()] = $entity->getId();
         }
 
         return $choices;

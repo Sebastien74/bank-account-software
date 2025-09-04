@@ -29,7 +29,6 @@ class AdminLocator implements AdminLocatorInterface
         #[AutowireLocator(AdminService\FormHelper::class, indexAttribute: 'key')] protected ServiceLocator $formHelperLocator,
         #[AutowireLocator(AdminService\TreeHelper::class, indexAttribute: 'key')] protected ServiceLocator $treeHelperLocator,
         #[AutowireLocator(AdminService\IndexHelper::class, indexAttribute: 'key')] protected ServiceLocator $indexHelperLocator,
-        #[AutowireLocator(AdminService\FormDuplicateHelper::class, indexAttribute: 'key')] protected ServiceLocator $formDuplicateLocator,
         #[AutowireLocator(AdminService\ClearMediasService::class, indexAttribute: 'key')] protected ServiceLocator $clearMediasServiceLocator,
         #[AutowireLocator(AdminService\SearchFilterService::class, indexAttribute: 'key')] protected ServiceLocator $searchFilterServiceLocator,
         #[AutowireLocator(AdminService\VideoService::class, indexAttribute: 'key')] protected ServiceLocator $videoServiceLocator,
@@ -43,7 +42,6 @@ class AdminLocator implements AdminLocatorInterface
         #[AutowireLocator(FormManager\Translation\IntlManager::class, indexAttribute: 'key')] protected ServiceLocator $intlManagerLocator,
         private readonly DeleteInterface $deleteInterface,
         private readonly ExportInterface $exportInterface,
-        private readonly ImportInterface $importInterface,
         private readonly CoreLocatorInterface $coreLocator,
         private readonly AppRuntime $appRuntime,
     ) {
@@ -77,16 +75,6 @@ class AdminLocator implements AdminLocatorInterface
     public function indexHelper(): AdminService\IndexHelper
     {
         return $this->indexHelperLocator->get('index_helper');
-    }
-
-    /**
-     * To get FormDuplicateHelper.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function formDuplicateHelper(): AdminService\FormDuplicateHelper
-    {
-        return $this->formDuplicateLocator->get('form_duplicate_helper');
     }
 
     /**
@@ -205,14 +193,6 @@ class AdminLocator implements AdminLocatorInterface
     public function deleteManagers(): DeleteInterface
     {
         return $this->deleteInterface;
-    }
-
-    /**
-     * To get ImportInterface.
-     */
-    public function importManagers(): ImportInterface
-    {
-        return $this->importInterface;
     }
 
     /**

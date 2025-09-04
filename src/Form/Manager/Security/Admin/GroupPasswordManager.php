@@ -7,7 +7,6 @@ namespace App\Form\Manager\Security\Admin;
 use App\Entity\Core\Website;
 use App\Entity\Security\Group;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Form\Form;
@@ -43,9 +42,6 @@ class GroupPasswordManager
 
         $usersBack = $this->entityManager->getRepository(User::class)->findBy(['group' => $group]);
         $this->setPasswords($usersBack, $plainPassword);
-
-        $usersFront = $this->entityManager->getRepository(UserFront::class)->findBy(['group' => $group]);
-        $this->setPasswords($usersFront, $plainPassword);
 
         $this->entityManager->persist($group);
     }

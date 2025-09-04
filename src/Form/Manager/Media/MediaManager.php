@@ -9,7 +9,6 @@ use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
 use App\Entity\Layout;
 use App\Entity\Media;
-use App\Entity\Module\Map\Point;
 use App\Entity\Seo\Seo;
 use App\Service\Core\InterfaceHelper;
 use App\Service\Core\Uploader;
@@ -139,8 +138,6 @@ class MediaManager
                 }
             }
         }
-
-        $this->setGeoJson($entity, $form, $website);
 
         /* Media video */
         if ($entity instanceof Layout\Block && 'video' === $form->getName()) {
@@ -818,15 +815,6 @@ class MediaManager
             if ($masterEntity instanceof Layout\Page) {
                 $masterEntityMessage = ' [Page : '.$layout->getAdminName().' ID: '.$masterEntity->getId().']';
             }
-            if ($masterEntity instanceof \App\Entity\Module\Newscast\Newscast) {
-                $masterEntityMessage = ' [Actualité : '.$layout->getAdminName().' ID: '.$masterEntity->getId().']';
-            }
-            if ($masterEntity instanceof \App\Entity\Module\Form\Form) {
-                $masterEntityMessage = ' [Formulaire : '.$layout->getAdminName().' ID: '.$masterEntity->getId().']';
-            }
-            if ($masterEntity instanceof \App\Entity\Module\Newscast\Category) {
-                $masterEntityMessage = " - [ Catégorie d'Actualité : ".$layout->getAdminName().' ID: '.$masterEntity->getId().']';
-            }
         }
 
         return $masterEntityMessage;
@@ -847,34 +835,5 @@ class MediaManager
         $adminName = $layout instanceof Layout\Layout ? preg_replace('/\x03/', ' ', $layout->getAdminName()) : null;
 
         return $adminName ? ucfirst(strtolower($adminName)) : null;
-    }
-
-    /**
-     * To set GeoJson file.
-     */
-    private function setGeoJson(mixed $entity, FormInterface $form, Website $website): void
-    {
-        if ($entity instanceof Point && !empty($form['geoJson'])) {
-            $geoJson = $form['geoJson']->getData();
-            $geoJson->setPoint($entity);
-            $geoJson->setLocale('all');
-            $geoJsonMedia = $geoJson->getMedia();
-            $geoJsonMedia->setWebsite($website);
-            if (!empty($this->request->files->get('point')['geoJson']['media']['uploadedFile'])) {
-                $folder = $this->entityManager->getRepository(Media\Folder::class)->findOneBy(['website' => $website, 'slug' => 'geojson']);
-                if (!$folder instanceof Media\Folder) {
-                    $folderPosition = count($this->entityManager->getRepository(Media\Folder::class)->findBy(['website' => $website, 'level' => 1])) + 1;
-                    $folder = new Media\Folder();
-                    $folder->setWebsite($website);
-                    $folder->setPosition($folderPosition);
-                    $folder->setAdminName('GeoJson');
-                    $folder->setSlug('geojson');
-                    $this->entityManager->persist($folder);
-                }
-                $geoJsonMedia->setFolder($folder);
-                $uploadedFile = $this->request->files->get('point')['geoJson']['media']['uploadedFile'];
-                $this->setUploadedMedia($uploadedFile, $geoJsonMedia, $website);
-            }
-        }
     }
 }

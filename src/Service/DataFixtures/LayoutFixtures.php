@@ -6,10 +6,6 @@ namespace App\Service\DataFixtures;
 
 use App\Entity\Core as CoreEntities;
 use App\Entity\Layout as LayoutEntities;
-use App\Entity\Module\Catalog as CatalogEntities;
-use App\Entity\Module\Form\Form;
-use App\Entity\Module\Newscast as NewscastEntities;
-use App\Entity\Module\Portfolio as PortfolioEntities;
 use App\Entity\Security\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -128,41 +124,6 @@ class LayoutFixtures
                 'adminName' => 'Page',
                 'blocks' => ['content', 'global'],
                 'modules' => array_merge(['ROLE_CONTACT', 'ROLE_SITE_MAP', 'ROLE_PAGE'], $fullDefaultModules),
-            ],
-            NewscastEntities\Category::class => (object) [
-                'adminName' => "Catégorie d'actualité",
-                'blocks' => ['layout', 'global'],
-                'modules' => [],
-            ],
-            NewscastEntities\Newscast::class => (object) [
-                'adminName' => 'Fiche actualité',
-                'blocks' => ['content', 'global'],
-                'modules' => $fullDefaultModules,
-            ],
-            CatalogEntities\Catalog::class => (object) [
-                'adminName' => 'Catalogue',
-                'blocks' => ['content', 'global', 'layout', 'layout-catalog'],
-                'modules' => [],
-            ],
-            CatalogEntities\Product::class => (object) [
-                'adminName' => 'Fiche produit',
-                'blocks' => ['content', 'global', 'layout', 'layout-catalog'],
-                'modules' => $fullDefaultModules,
-            ],
-            Form::class => (object) [
-                'adminName' => 'Formulaire',
-                'blocks' => ['form'],
-                'modules' => [],
-            ],
-            PortfolioEntities\Category::class => (object) [
-                'adminName' => 'Catégorie de portfolio',
-                'blocks' => ['layout'],
-                'modules' => [],
-            ],
-            PortfolioEntities\Card::class => (object) [
-                'adminName' => 'Fiche portfolio',
-                'blocks' => ['content', 'global'],
-                'modules' => $fullDefaultModules,
             ],
         ];
     }

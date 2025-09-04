@@ -15,20 +15,12 @@ class DataFixturesLocator implements DataFixturesInterface
      * FrontFormManagerLocator constructor.
      */
     public function __construct(
-        #[AutowireLocator(Fixtures\ApiFixtures::class, indexAttribute: 'key')] protected ServiceLocator $apiLocator,
         #[AutowireLocator(Fixtures\BlockTypeFixtures::class, indexAttribute: 'key')] protected ServiceLocator $blockTypeLocator,
         #[AutowireLocator(Fixtures\ColorFixtures::class, indexAttribute: 'key')] protected ServiceLocator $colorLocator,
         #[AutowireLocator(Fixtures\CommandFixtures::class, indexAttribute: 'key')] protected ServiceLocator $commandLocator,
         #[AutowireLocator(Fixtures\ConfigurationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $configurationLocator,
         #[AutowireLocator(Fixtures\DefaultMediasFixtures::class, indexAttribute: 'key')] protected ServiceLocator $defaultMediaLocator,
-        #[AutowireLocator(Fixtures\GdprFixtures::class, indexAttribute: 'key')] protected ServiceLocator $gdprLocator,
-        #[AutowireLocator(Fixtures\InformationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $infoLocator,
         #[AutowireLocator(Fixtures\LayoutFixtures::class, indexAttribute: 'key')] protected ServiceLocator $layoutLocator,
-        #[AutowireLocator(Fixtures\MapFixtures::class, indexAttribute: 'key')] protected ServiceLocator $mapLocator,
-        #[AutowireLocator(Fixtures\MenuFixtures::class, indexAttribute: 'key')] protected ServiceLocator $menuLocator,
-        #[AutowireLocator(Fixtures\NewscastFixtures::class, indexAttribute: 'key')] protected ServiceLocator $newscastLocator,
-        #[AutowireLocator(Fixtures\CatalogFixtures::class, indexAttribute: 'key')] protected ServiceLocator $catalogLocator,
-        #[AutowireLocator(Fixtures\NewsletterFixtures::class, indexAttribute: 'key')] protected ServiceLocator $newsletterLocator,
         #[AutowireLocator(Fixtures\PageDuplicationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageDuplicationLocator,
         #[AutowireLocator(Fixtures\PageFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageLocator,
         #[AutowireLocator(Fixtures\SecurityFixtures::class, indexAttribute: 'key')] protected ServiceLocator $securityLocator,
@@ -39,16 +31,6 @@ class DataFixturesLocator implements DataFixturesInterface
         #[AutowireLocator(Fixtures\UploadedFileFixtures::class, indexAttribute: 'key')] protected ServiceLocator $uploadFileLocator,
         #[AutowireLocator(Fixtures\WebsiteFixtures::class, indexAttribute: 'key')] protected ServiceLocator $websiteFileLocator,
     ) {
-    }
-
-    /**
-     * To get ApiFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function api(): Fixtures\ApiFixtures
-    {
-        return $this->apiLocator->get('api_fixtures');
     }
 
     /**
@@ -102,26 +84,6 @@ class DataFixturesLocator implements DataFixturesInterface
     }
 
     /**
-     * To get GdprFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function gdpr(): Fixtures\GdprFixtures
-    {
-        return $this->gdprLocator->get('gdpr_fixtures');
-    }
-
-    /**
-     * To get InformationFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function information(): Fixtures\InformationFixtures
-    {
-        return $this->infoLocator->get('information_fixtures');
-    }
-
-    /**
      * To get LayoutFixtures.
      *
      * @throws ContainerExceptionInterface
@@ -129,56 +91,6 @@ class DataFixturesLocator implements DataFixturesInterface
     public function layout(): Fixtures\LayoutFixtures
     {
         return $this->layoutLocator->get('layout_fixtures');
-    }
-
-    /**
-     * To get MapFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function map(): Fixtures\MapFixtures
-    {
-        return $this->mapLocator->get('map_fixtures');
-    }
-
-    /**
-     * To get MenuFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function menu(): Fixtures\MenuFixtures
-    {
-        return $this->menuLocator->get('menu_fixtures');
-    }
-
-    /**
-     * To get NewscastFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function newscast(): Fixtures\NewscastFixtures
-    {
-        return $this->newscastLocator->get('newscast_fixtures');
-    }
-
-    /**
-     * To get CatalogFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function catalog(): Fixtures\CatalogFixtures
-    {
-        return $this->catalogLocator->get('catalog_fixtures');
-    }
-
-    /**
-     * To get NewsletterFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function newsletter(): Fixtures\NewsletterFixtures
-    {
-        return $this->newsletterLocator->get('newsletter_fixtures');
     }
 
     /**

@@ -22,8 +22,6 @@ interface AdminLocatorInterface
 
     public function indexHelper(): AdminService\IndexHelper;
 
-    public function formDuplicateHelper(): AdminService\FormDuplicateHelper;
-
     public function clearMediasService(): AdminService\ClearMediasService;
 
     public function searchFilterService(): AdminService\SearchFilterService;
@@ -47,8 +45,6 @@ interface AdminLocatorInterface
     public function intlManager(): FormManager\Translation\IntlManager;
 
     public function deleteManagers(): DeleteInterface;
-
-    public function importManagers(): ImportInterface;
 
     public function exportManagers(): ExportInterface;
 

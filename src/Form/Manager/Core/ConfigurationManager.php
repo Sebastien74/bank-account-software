@@ -9,7 +9,6 @@ use App\Entity\Core\Configuration;
 use App\Entity\Core\ConfigurationMediaRelation;
 use App\Entity\Core\Domain;
 use App\Entity\Core\Website;
-use App\Entity\Information\SocialNetwork;
 use App\Entity\Media\Media;
 use App\Entity\Media\MediaRelation;
 use App\Service\Interface\CoreLocatorInterface;
@@ -73,7 +72,6 @@ class ConfigurationManager
     public function synchronizeLocales(Configuration $configuration): void
     {
         $this->synchronizeMedias($configuration);
-        $this->synchronizeNetworks($configuration);
     }
 
     /**
@@ -253,33 +251,6 @@ class ConfigurationManager
                 $this->entityManager->persist($media);
                 $this->entityManager->flush();
             }
-        }
-    }
-
-    /**
-     * Synchronize SocialNetwork.
-     */
-    private function synchronizeNetworks(Configuration $configuration): void
-    {
-        $flush = false;
-        $information = $configuration->getWebsite()->getInformation();
-        $existingLocales = [];
-        foreach ($information->getSocialNetworks() as $socialNetwork) {
-            $existingLocales[] = $socialNetwork->getLocale();
-        }
-
-        foreach ($configuration->getAllLocales() as $locale) {
-            if (!in_array($locale, $existingLocales)) {
-                $socialNetwork = new SocialNetwork();
-                $socialNetwork->setLocale($locale);
-                $information->addSocialNetwork($socialNetwork);
-                $flush = true;
-            }
-        }
-
-        if ($flush) {
-            $this->entityManager->persist($configuration);
-            $this->entityManager->flush();
         }
     }
 

@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Form\Type\Security\Admin;
 
 use App\Entity\Core\Website;
-use App\Entity\Security\Company;
 use App\Entity\Security\Group;
 use App\Entity\Security\User;
 use App\Form\Widget as WidgetType;
-use App\Repository\Security\CompanyRepository;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -38,7 +36,6 @@ class UserType extends AbstractType
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly CompanyRepository $companyRepository,
     ) {
         $this->translator = $this->coreLocator->translator();
         $user = !empty($this->tokenStorage->getToken()) ? $this->tokenStorage->getToken()->getUser() : null;
@@ -49,7 +46,6 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isNew = !$builder->getData()->getId();
-        $haveCompanies = count($this->companyRepository->findAll()) > 0;
 
         $builder->add('login', Type\TextType::class, [
             'label' => $this->translator->trans("Nom d'utilisateur", [], 'admin'),
@@ -119,8 +115,6 @@ class UserType extends AbstractType
             'constraints' => [new Assert\NotBlank()],
         ]);
 
-        $class = $isNew ? 'col-12' : 'col-12';
-        $class = $isNew && $haveCompanies ? 'col-md-6' : $class;
         $builder->add('websites', EntityType::class, [
             'label' => 'Site(s)',
             'required' => true,
@@ -136,34 +130,13 @@ class UserType extends AbstractType
             'display' => 'search',
             'attr' => [
                 'data-placeholder' => $this->translator->trans('Séléctionnez', [], 'security_cms'),
-                'group' => $class,
+                'group' => 'col-12',
             ],
             'constraints' => [new Assert\Count([
                 'min' => 1,
                 'minMessage' => $this->translator->trans('Vous devez sélctionner au moins un site.', [], 'security_cms'),
             ])],
         ]);
-
-        if ($haveCompanies) {
-            $builder->add('companies', EntityType::class, [
-                'label' => 'Entreprise(s)',
-                'required' => false,
-                'class' => Company::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->orderBy('c.name', 'ASC');
-                },
-                'choice_label' => function ($entity) {
-                    return strip_tags($entity->getName());
-                },
-                'multiple' => true,
-                'display' => 'search',
-                'attr' => [
-                    'placeholder' => $this->translator->trans('Séléctionnez', [], 'security_cms'),
-                    'group' => $isNew ? 'col-md-6' : 'col-12',
-                ],
-            ]);
-        }
 
         if ($isNew) {
             $builder->add('plainPassword', Type\RepeatedType::class, [

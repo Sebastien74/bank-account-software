@@ -42,7 +42,6 @@ class PageType extends AbstractType
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly MenuRepository $menuRepository,
     ) {
         $this->translator = $this->coreLocator->translator();
         $this->entityManager = $this->coreLocator->em();
@@ -64,7 +63,6 @@ class PageType extends AbstractType
         $zonesNavModule = $this->entityManager->getRepository(BlockType::class)->findOneBy(['slug' => 'zones-navigation']);
         $zonesNavActive = $zonesNavModule ? $this->entityManager->getRepository(Configuration::class)->blockTypeExist($this->website, $zonesNavModule) : null;
         $intlNavActive = $pagesNavActive || $zonesNavActive;
-        $mainMenu = $this->menuRepository->findMain($this->website);
 
         $adminName = new WidgetType\AdminNameType($this->coreLocator);
         $adminName->add($builder, [
@@ -111,23 +109,12 @@ class PageType extends AbstractType
             }
 
             if ($isNew) {
-                if ($mainMenu) {
-                    $builder->add('inMenu', Type\CheckboxType::class, [
-                        'required' => false,
-                        'mapped' => false,
-                        'display' => 'button',
-                        'color' => 'outline-info-darken',
-                        'label' => $this->translator->trans('Afficher dans le menu', [], 'admin'),
-                        'attr' => ['group' => $secureActive ? 'col-md-4 text-center' : 'col-md-6 text-center', 'class' => 'w-100'],
-                    ]);
-                }
-
                 $builder->add('infill', Type\CheckboxType::class, [
                     'required' => false,
                     'display' => 'button',
                     'color' => 'outline-info-darken',
                     'label' => $this->translator->trans('Page intercalaire', [], 'admin'),
-                    'attr' => ['group' => $secureActive && $mainMenu ? 'col-md-4 text-center' : 'col-md-6 text-center', 'class' => 'w-100'],
+                    'attr' => ['group' => 'col-md-6 text-center', 'class' => 'w-100'],
                 ]);
             }
 
@@ -137,7 +124,7 @@ class PageType extends AbstractType
                     'display' => 'button',
                     'color' => 'outline-info-darken',
                     'label' => $this->translator->trans('Page sécurisée', [], 'admin'),
-                    'attr' => ['group' => !$mainMenu ? 'col-md-6 text-center' : 'col-md-4 text-center', 'class' => 'w-100'],
+                    'attr' => ['group' => 'col-md-6 text-center', 'class' => 'w-100'],
                 ]);
             }
 

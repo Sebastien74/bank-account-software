@@ -6,9 +6,9 @@ fonts: ['front-default']
 
 domains:
     fr:
-        cms7.local: true
-        cms7.felix-dev-8-2.fr: false
-        www.cms7.felix-dev-8-2.fr: false
+        bank-account-software.local: true
+        bank-account-software.felix-dev-8-2.fr: false
+        bank-account-software.cms7.felix-dev-8-2.fr: false
 
 apis:
     fr:

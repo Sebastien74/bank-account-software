@@ -50,10 +50,6 @@ class WebsiteType extends AbstractType
         ]);
 
         if (!$isNew) {
-            $builder->add('api', ApiType::class, [
-                'label' => false,
-                'website' => $options['website'],
-            ]);
 
             $builder->add('security', SecurityType::class, [
                 'label' => false,

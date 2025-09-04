@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace App\Twig\Core;
 
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
-use App\Model\BaseModel;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\PersistentCollection;
 use Exception;
-use League\CommonMark\Exception\CommonMarkException;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -590,14 +587,6 @@ class AppRuntime implements RuntimeExtensionInterface
     public function isUserBack(mixed $user = null): bool
     {
         return $user instanceof User;
-    }
-
-    /**
-     * Check if is UserFront instance.
-     */
-    public function isUserFront(mixed $user = null): bool
-    {
-        return $user instanceof UserFront;
     }
 
     /**

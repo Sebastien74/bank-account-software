@@ -54,9 +54,6 @@ class UserRequest
     #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
     protected ?string $locale = null;
 
-    #[ORM\OneToOne(mappedBy: 'userRequest', targetEntity: UserFront::class)]
-    private ?UserFront $userFront = null;
-
     /**
      * @throws Exception
      */
@@ -185,28 +182,6 @@ class UserRequest
     public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
-
-        return $this;
-    }
-
-    public function getUserFront(): ?UserFront
-    {
-        return $this->userFront;
-    }
-
-    public function setUserFront(?UserFront $userFront): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($userFront === null && $this->userFront !== null) {
-            $this->userFront->setUserRequest(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($userFront !== null && $userFront->getUserRequest() !== $this) {
-            $userFront->setUserRequest($this);
-        }
-
-        $this->userFront = $userFront;
 
         return $this;
     }

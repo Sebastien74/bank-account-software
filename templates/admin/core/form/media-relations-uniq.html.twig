@@ -227,23 +227,6 @@
                                     {% set haveMedia = mediaRelation.media.vars.value.filename is defined and mediaRelation.media.vars.value.filename %}
                                     {% set haveAlt = mediaRelation.intl.vars.value.placeholder is defined and mediaRelation.intl.vars.value.placeholder|striptags|length > 0 %}
                                     {{ form_row(mediaRelation.intl.placeholder, {attr: {'data-help': haveMedia and not haveAlt ? 'no-alt' : false}}) }}
-                                    {% if granted('ROLE_AI') and mediaRelation.media.vars.value.id is defined %}
-                                        <div class="mb-3 w-100 text-white btn py-2 ai-button btn-chatgpt px-3"
-                                             data-api-run="{{ path('ai_api_run', {
-                                                 'tool': 4,
-                                                 'locale': locale,
-                                                 'save': false,
-                                             }) }}"
-                                             data-felix-api="{{ path('ai_api_run_get_medias', {
-                                                 'tool': 4,
-                                                 'locale': locale,
-                                                 'mediaId': mediaRelation.media.vars.value.id,
-                                             }) }}">
-                                            <span class="ai-icon">{{ 'cms ai'|icon(null, null, null, [], '#ffffff') }}</span>
-                                            <span class="d-none spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                                            <span class="ms-1">{{ 'Générer la balise ALT'|trans|raw }}</span>
-                                        </div>
-                                    {% endif %}
                                 {% endif %}
                                 {% if mediaRelation.intl.introduction is defined %}
                                     {{ form_row(mediaRelation.intl.introduction) }}

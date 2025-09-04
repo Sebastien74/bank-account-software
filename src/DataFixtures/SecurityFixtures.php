@@ -117,32 +117,6 @@ class SecurityFixtures extends BaseFixtures
             'picture' => 'webmaster.svg',
         ];
 
-        $users[] = [
-            'markup' => '233',
-            'email' => 'customer@agence-felix.fr',
-            'login' => 'customer',
-            'roles' => self::CUSTOMER_ROLES,
-            'lastname' => $this->translator->trans('Administrateur', [], 'security'),
-            'group' => $this->translator->trans('Administrateur', [], 'security'),
-            'password' => '$2y$10$d7fMNRs1DspZZ9KYML4UQuGirin.2N1pgkxFG/tHNmP4e3pLAIlt2',
-            'code' => 'administrator',
-            'active' => true,
-            'picture' => 'customer.png',
-        ];
-
-        $users[] = [
-            'markup' => '234',
-            'email' => 'translator@agence-felix.fr',
-            'login' => 'translator',
-            'roles' => self::TRANSLATOR_ROLES,
-            'lastname' => $this->translator->trans('Traducteur', [], 'security'),
-            'group' => $this->translator->trans('Traducteur', [], 'security'),
-            'password' => '$2y$10$VGz4ZdbQLjT4gKzT7U3TOeJObWMl3WUjGQZi137HpiaqRcdYwzmbG',
-            'code' => 'translator',
-            'active' => false,
-            'picture' => 'translator.png',
-        ];
-
         return $users;
     }
 

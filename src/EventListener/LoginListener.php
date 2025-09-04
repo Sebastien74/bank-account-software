@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
@@ -34,7 +33,7 @@ class LoginListener
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         $user = $event->getAuthenticationToken()->getUser();
-        if ($user instanceof User || $user instanceof UserFront) {
+        if ($user instanceof User) {
             $user->setIsOnline(true);
             if (method_exists($user, 'setLastLogin')) {
                 $user->setLastLogin(new \DateTime('now', new \DateTimeZone('Europe/Paris')));

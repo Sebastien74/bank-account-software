@@ -88,19 +88,6 @@
         {{ form_row(media.notContractual) }}
         {% if media.intls is defined %}
             {% include 'admin/core/form/intls.html.twig' with {intls: media.intls} %}
-            <div class="w-100 text-white btn py-2 ai-button btn-chatgpt px-3"
-                 data-api-run="{{ path('ai_api_run', {
-                     'tool': 4,
-                     'save': false,
-                 }) }}"
-                 data-felix-api="{{ path('ai_api_run_get_medias', {
-                     'tool': 4,
-                     'mediaId': entity.id,
-                 }) }}">
-                <span class="ai-icon">{{ 'cms ai'|icon(null, null, null, [], '#ffffff') }}</span>
-                <span class="d-none spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                <span class="ms-1">{{ 'Générer la balise ALT'|trans|raw }}</span>
-            </div>
         {% endif %}
     </div>
 

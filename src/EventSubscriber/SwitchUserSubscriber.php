@@ -6,12 +6,12 @@ namespace App\EventSubscriber;
 
 use App\Entity\Layout\Page;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Model\ViewModel;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\QueryException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,11 +39,11 @@ class SwitchUserSubscriber implements EventSubscriberInterface
     /**
      * On switch User Event.
      *
-     * @throws NonUniqueResultException|MappingException
+     * @throws NonUniqueResultException|MappingException|QueryException
      */
     public function onSwitchUser(SwitchUserEvent $event): void
     {
-        /** @var User|UserFront $user */
+        /** @var User $user */
         $user = $event->getTargetUser();
         $request = $event->getRequest();
 

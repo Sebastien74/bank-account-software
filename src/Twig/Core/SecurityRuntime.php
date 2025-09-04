@@ -7,7 +7,6 @@ namespace App\Twig\Core;
 use App\Entity\Security\Picture;
 use App\Entity\Security\Profile;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Model\Core\WebsiteModel;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -39,9 +38,9 @@ class SecurityRuntime implements RuntimeExtensionInterface
     /**
      * Get User|UserFront Profile image.
      */
-    public function getProfileImg(User|UserFront|null $user = null): string
+    public function getProfileImg(User|null $user = null): string
     {
-        if ($user instanceof User || $user instanceof UserFront) {
+        if ($user instanceof User) {
             $picture = $user->getPicture();
             $dirname = $picture instanceof Picture && $picture->getDirname() ? $picture->getDirname() : null;
             $filesystem = new Filesystem();
@@ -57,10 +56,10 @@ class SecurityRuntime implements RuntimeExtensionInterface
     /**
      * Get User|UserFront Profile Address[].
      */
-    public function getProfileAddresses(User|UserFront|null $user = null): array
+    public function getProfileAddresses(User|null $user = null): array
     {
         $addresses = [];
-        if ($user instanceof User || $user instanceof UserFront) {
+        if ($user instanceof User) {
             $profile = $user->getProfile();
             if ($profile instanceof Profile) {
                 foreach ($profile->getAddresses() as $address) {
@@ -79,18 +78,12 @@ class SecurityRuntime implements RuntimeExtensionInterface
      */
     public function getOnlineUsers(WebsiteModel $website, string $type): array
     {
-        $userClass = 'admin' === $type ? User::class : UserFront::class;
         $delay = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
         $delay->setTimestamp(strtotime('2 minutes ago'));
 
-        $qb = $this->entityManager->getRepository($userClass)->createQueryBuilder('u')
+        $qb = $this->entityManager->getRepository(User::class)->createQueryBuilder('u')
             ->andWhere('u.lastActivity > :delay')
             ->setParameter('delay', $delay);
-
-        if (UserFront::class === $userClass) {
-            $qb->andWhere('u.website = :website')
-                ->setParameter(':website', $website->entity);
-        }
 
         return $qb->getQuery()->getResult();
     }

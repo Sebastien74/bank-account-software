@@ -18,5 +18,5 @@ class UniqUserEmail extends Constraint
 {
     protected string $message = '';
 
-    protected User|UserFront|null $user = null;
+    protected User|null $user = null;
 }

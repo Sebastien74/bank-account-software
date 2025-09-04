@@ -6,6 +6,11 @@ namespace App\Service\Doctrine;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform as PlatformInterface;
 
+/**
+ * MySqlPlatform.
+ *
+ * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ */
 class MySqlPlatform extends PlatformInterface
 {
     /**

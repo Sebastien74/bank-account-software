@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Twig\Content;
 
 use App\Entity\Core\Website;
-use App\Entity\Information\Phone;
 use App\Model\Core\WebsiteModel;
 use App\Service\Content\CryptService;
 use App\Service\Core\Urlizer;
@@ -13,10 +12,6 @@ use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
 use Psr\Cache\InvalidArgumentException;
-use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig\Extension\RuntimeExtensionInterface;
 
 /**
@@ -31,7 +26,6 @@ class CoreRuntime implements RuntimeExtensionInterface
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly Environment $templating,
         private readonly CryptService $cryptService,
     ) {
     }
@@ -62,90 +56,6 @@ class CoreRuntime implements RuntimeExtensionInterface
     public function jsonDecode($json): mixed
     {
       return json_decode($json, true);
-    }
-
-    /**
-     * Generate view for email.
-     *
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function email(string $email, WebsiteModel $website, array $options = []): void
-    {
-        echo $this->templating->render('core/email.html.twig', [
-            'email' => $email,
-            'website' => $website,
-            'only_href' => !isset($options['only_href']) ? true : $options['only_href'],
-            'icon' => !isset($options['icon']) ? true : $options['icon'],
-            'entitled' => !isset($options['entitled']) ? true : $options['entitled'],
-            'options' => $options,
-        ]);
-    }
-
-    /**
-     * Generate view for phone.
-     *
-     * @throws LoaderError|RuntimeError|SyntaxError
-     */
-    public function phone(mixed $phone, WebsiteModel $website, array $options = [])
-    {
-        if (is_string($phone)) {
-            return null;
-        }
-
-        if (is_array($phone) && !isset($phone['id'])) {
-            $data = $phone;
-            $phone = new Phone();
-            $phone->setTagNumber($data['link']);
-            $phone->setNumber($data['label']);
-        }
-
-        if ($phone instanceof Phone && empty($phone->getType())) {
-            $phone->setType('office');
-        }
-
-        echo $this->templating->render('core/phone.html.twig', [
-            'phone' => $phone,
-            'website' => $website,
-            'only_href' => !isset($options['only_href']) ? true : $options['only_href'],
-            'icon' => !isset($options['icon']) ? true : $options['icon'],
-            'entitled' => !isset($options['entitled']) ? true : $options['entitled'],
-            'options' => $options,
-        ]);
-    }
-
-    /**
-     * Generate view for address.
-     *
-     * @throws LoaderError|RuntimeError|SyntaxError
-     */
-    public function address(mixed $address, WebsiteModel $website, ?string $zone = null, ?array $options = []): void
-    {
-        echo $this->templating->render('core/address.html.twig', [
-            'address' => $address,
-            'website' => $website,
-            'zone' => $zone,
-            'options' => $options,
-        ]);
-    }
-
-    /**
-     * Convert text for mailto link.
-     */
-    public function mailToBody(string $text): string
-    {
-        $response = str_replace("\r\n", '<br>', $text);
-        $response = str_replace('</p>', '</p><br>', $response);
-        $response = str_replace('<ul>', '', $response);
-        $response = str_replace('</ul>', '', $response);
-        $response = str_replace('<li>', '%0D%0A%09•%20', $response);
-        $response = str_replace('</li>', '', $response);
-        $response = str_replace('<br/>', '%0D%0A', $response);
-        $response = str_replace('<br>', '%0D%0A', $response);
-        $response = str_replace(' ', '%20', $response);
-
-        return strip_tags($response);
     }
 
     /**

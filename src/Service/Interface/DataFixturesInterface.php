@@ -13,20 +13,12 @@ use App\Service\DataFixtures as Fixtures;
  */
 interface DataFixturesInterface
 {
-    public function api(): Fixtures\ApiFixtures;
     public function blockType(): Fixtures\BlockTypeFixtures;
     public function color(): Fixtures\ColorFixtures;
     public function command(): Fixtures\CommandFixtures;
     public function configuration(): Fixtures\ConfigurationFixtures;
     public function defaultMedias(): Fixtures\DefaultMediasFixtures;
-    public function gdpr(): Fixtures\GdprFixtures;
-    public function information(): Fixtures\InformationFixtures;
     public function layout(): Fixtures\LayoutFixtures;
-    public function map(): Fixtures\MapFixtures;
-    public function menu(): Fixtures\MenuFixtures;
-    public function newscast(): Fixtures\NewscastFixtures;
-    public function catalog(): Fixtures\CatalogFixtures;
-    public function newsletter(): Fixtures\NewsletterFixtures;
     public function pageDuplication(): Fixtures\PageDuplicationFixtures;
     public function page(): Fixtures\PageFixtures;
     public function security(): Fixtures\SecurityFixtures;

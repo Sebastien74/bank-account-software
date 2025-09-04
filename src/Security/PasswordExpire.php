@@ -7,7 +7,6 @@ namespace App\Security;
 use App\Entity\Core\Domain;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use App\Service\Core\CronSchedulerService;
 use App\Service\Core\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,11 +57,6 @@ class PasswordExpire
         $this->parseUsers(User::class, 0, 'password-alert');
         $this->cronSchedulerService->logger('[OK] '.User::class.' successfully executed', $input);
 
-        /* Users Front */
-        $this->parseUsers(UserFront::class, 15, 'password-info');
-        $this->parseUsers(UserFront::class, 0, 'password-alert');
-        $this->cronSchedulerService->logger('[OK] '.UserFront::class.' successfully executed', $input);
-
         $this->getEmails($websites);
         $this->sendEmails();
         $this->cronSchedulerService->logger('[OK] Email successfully sent.', $input);
@@ -79,7 +73,7 @@ class PasswordExpire
     {
         $users = $this->entityManager->getRepository($classname)->findAll();
         foreach ($users as $user) {
-            /** @var User|UserFront $user */
+            /** @var User $user */
             $findDate = $this->getDateTime($user, $delta);
             if ($user->getResetPasswordDate() < $findDate && $user->isActive()) {
                 if (is_array($user->getAlerts()) && !in_array($alert, $user->getAlerts())) {
@@ -101,7 +95,7 @@ class PasswordExpire
      */
     private function getDateTime($user, int $delta): \DateTimeImmutable|bool
     {
-        $userDelay = $user instanceof UserFront ? $user->getWebsite()->getSecurity()->getFrontPasswordDelay() : $this->adminDelay;
+        $userDelay = $this->adminDelay;
         $delay = $userDelay - $delta;
         $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
         $findDate = new \DateTimeImmutable($date->format('Y-m-d H:i:s'));
@@ -114,7 +108,7 @@ class PasswordExpire
      */
     private function setUser($user, string $alert): void
     {
-        /** @var UserFront|User $user */
+        /** @var User $user */
         $alerts = $user->getAlerts();
         $alerts[] = $alert;
         $user->setAlerts(array_unique($alerts));
@@ -146,7 +140,7 @@ class PasswordExpire
         foreach ($this->users as $userType => $alerts) {
             foreach ($alerts as $alertType => $users) {
                 foreach ($users as $user) {
-                    /** @var User|UserFront $user */
+                    /** @var User $user */
                     $website = $this->getUserWebsite($user);
                     $defaultLocale = $website->getConfiguration()->getLocale();
                     $from = $this->getEmailBySlug($website, $user, 'support', $defaultLocale);
@@ -168,7 +162,7 @@ class PasswordExpire
     /**
      * Get Email subject.
      */
-    private function getEmailSubject(string $alertType, User|UserFront $user): string
+    private function getEmailSubject(string $alertType, User $user): string
     {
         return 'password-info' === $alertType
             ? $this->translator->trans('Votre mot de passe arrive à expiration', [], 'security_cms', $user->getLocale())
@@ -178,7 +172,7 @@ class PasswordExpire
     /**
      * Get Email by slug.
      */
-    private function getEmailBySlug(Website $website, User|UserFront $user, string $slug, string $defaultLocale): ?string
+    private function getEmailBySlug(Website $website, User $user, string $slug, string $defaultLocale): ?string
     {
         return !empty($this->emails[$website->getId()][$user->getLocale()][$slug])
             ? $this->emails[$website->getId()][$user->getLocale()][$slug]
@@ -188,9 +182,9 @@ class PasswordExpire
     /**
      * Get User WebsiteModel.
      */
-    private function getUserWebsite(User|UserFront $user): ?Website
+    private function getUserWebsite(User $user): ?Website
     {
-        $website = $user instanceof UserFront ? $user->getWebsite() : $user->getWebsites()[0];
+        $website = $user->getWebsites()[0];
 
         if (!$website) {
             $websites = $this->entityManager->getRepository(Website::class)->findAll();
@@ -208,7 +202,7 @@ class PasswordExpire
     /**
      * Get User WebsiteModel.
      */
-    private function getMailName(Website $website, User|UserFront $user): ?string
+    private function getMailName(Website $website, User $user): ?string
     {
         if (!empty($this->emailNames[$website->getId()])) {
             return $this->emailNames[$website->getId()];

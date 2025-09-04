@@ -84,7 +84,6 @@ class UrlRepository extends ServiceEntityRepository
             ->leftJoin('s.mediaRelation', 'mr')
             ->leftJoin('mr.media', 'm')
             ->leftJoin('w.configuration', 'c')
-            ->leftJoin('w.information', 'i')
             ->leftJoin('w.seoConfiguration', 'sc')
             ->leftJoin('i.intls', 'ii')
             ->addSelect('w')
@@ -93,7 +92,6 @@ class UrlRepository extends ServiceEntityRepository
             ->addSelect('mr')
             ->addSelect('m')
             ->addSelect('c')
-            ->addSelect('i')
             ->addSelect('sc')
             ->addSelect('ii');
     }

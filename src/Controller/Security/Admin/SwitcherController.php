@@ -7,7 +7,6 @@ namespace App\Controller\Security\Admin;
 use App\Controller\Admin\AdminController;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Security\UserFront;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -31,8 +30,7 @@ class SwitcherController extends AdminController
         if (!in_array('ROLE_ALLOWED_TO_SWITCH', $this->getUser()->getRoles())) {
             $this->denyAccessUnlessGranted('ROLE_ALLOWED_TO_SWITCH');
         }
-        $userClassname = 'front' === $type ? UserFront::class : User::class;
-        $users = $this->coreLocator->em()->getRepository($userClassname)->findForSwitcher();
+        $users = $this->coreLocator->em()->getRepository(User::class)->findForSwitcher();
 
         return new JsonResponse(['html' => $this->renderView('security/switcher.html.twig', [
             'website' => $website,

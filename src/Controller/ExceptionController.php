@@ -12,7 +12,6 @@ use App\Entity\Security\User;
 use App\Entity\Seo\Seo;
 use App\Entity\Seo\Url;
 use App\Model\Core\WebsiteModel;
-use App\Service\Content\MenuServiceInterface;
 use App\Service\Content\SeoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
@@ -51,11 +50,10 @@ class ExceptionController extends BaseController
     /**
      * Page render.
      *
-     * @throws NonUniqueResultException|InvalidArgumentException|\ReflectionException|MappingException
+     * @throws NonUniqueResultException|InvalidArgumentException|\ReflectionException|MappingException|QueryException
      */
     public function showAction(
         Request $request,
-        MenuServiceInterface $menuService,
         SeoService $seoService,
         FlattenException|\Exception $exception,
         bool $isDebug,
@@ -80,7 +78,7 @@ class ExceptionController extends BaseController
             }
         }
 
-        $arguments = $this->setArguments($request, $exception, $menuService, $seoService, $logger);
+        $arguments = $this->setArguments($request, $exception, $seoService, $logger);
         $template = $this->getTemplate($request, $projectDir);
 
         return $this->render($template, $arguments);
@@ -164,13 +162,11 @@ class ExceptionController extends BaseController
     /**
      * Set page arguments.
      *
-     * @throws NonUniqueResultException|InvalidArgumentException|\ReflectionException
-     * @throws MappingException
+     * @throws NonUniqueResultException|InvalidArgumentException|\ReflectionException|MappingException|QueryException
      */
     private function setArguments(
         Request $request,
         FlattenException|\Exception $exception,
-        MenuServiceInterface $menuService,
         SeoService $seoService,
         ?DebugLoggerInterface $logger = null,
     ): array {
@@ -206,7 +202,6 @@ class ExceptionController extends BaseController
             $arguments['seo'] = $website->entity ? $this->getSeo($website->entity, $request, $seoService) : null;
             $arguments['template'] = $configuration->template;
             $arguments['templateName'] = 'error';
-            $arguments['mainMenus'] = !$website->isEmpty ? $menuService->all($website) : [];
             $arguments['mainPages'] = $website->configuration->pages;
             $arguments['logos'] = $website->logos;
         }

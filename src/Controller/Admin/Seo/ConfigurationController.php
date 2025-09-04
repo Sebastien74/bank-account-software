@@ -6,10 +6,7 @@ namespace App\Controller\Admin\Seo;
 
 use App\Controller\Admin\AdminController;
 use App\Entity\Seo\SeoConfiguration;
-use App\Form\Interface\ApiFormManagerInterface;
-use App\Form\Interface\InformationFormManagerInterface;
 use App\Form\Type\Seo\Configuration\ConfigurationType;
-use App\Model\Seo\SeoConfigurationModel;
 use App\Service\Interface\AdminLocatorInterface;
 use App\Service\Interface\CoreLocatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,8 +31,6 @@ class ConfigurationController extends AdminController
      * ConfigurationController constructor.
      */
     public function __construct(
-        protected readonly ApiFormManagerInterface $apiFormManager,
-        protected readonly InformationFormManagerInterface $infoFormManager,
         protected CoreLocatorInterface $coreLocator,
         protected AdminLocatorInterface $adminLocator,
     ) {
@@ -56,14 +51,7 @@ class ConfigurationController extends AdminController
         if (!$this->entity) {
             throw $this->createNotFoundException($this->coreLocator->translator()->trans("Cette configuration n\'existe pas !!", [], 'admin'));
         }
-
-        $seoConfigurationModel = SeoConfigurationModel::fromEntity($website->entity, $this->coreLocator);
         $this->template = 'admin/page/seo/configuration.html.twig';
-        $this->infoFormManager->networks()->synchronizeLocales($website->entity, $seoConfigurationModel);
-        $this->apiFormManager->custom()->synchronizeLocales($website->entity, $seoConfigurationModel);
-        $this->apiFormManager->facebook()->synchronizeLocales($website->entity, $seoConfigurationModel);
-        $this->apiFormManager->google()->synchronizeLocales($website->entity, $seoConfigurationModel);
-        $this->apiFormManager->instagram()->synchronizeLocales($website->entity, $seoConfigurationModel);
 
         return parent::edit($request);
     }

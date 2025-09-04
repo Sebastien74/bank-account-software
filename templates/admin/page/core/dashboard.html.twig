@@ -54,32 +54,8 @@
                             </a>
                         </div>
                     {% endif %}
-                    {% if 'newscast'|moduleActive(configuration) %}
-                        <div class="col-6 col-md-4 text-center py-2">
-                            <a href="{{ path('admin_newscast_index', {website: websiteId}) }}" data-toggle="preloader" class="text-info shadow-item d-flex flex-column h-100 p-4">
-                                <span class="d-inline-block w-100 mb-2">{{ 'admin news-color'|icon(65, 65, 'info') }}</span>
-                                <span class="entitled text-dark d-inline-block mt-auto">{{ "Publiez une actu"|trans }}</span>
-                            </a>
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="row d-flex w-100">
-                    {% if 'form'|moduleActive(configuration) %}
-                        <div class="col-6 col-md-4 text-center py-2">
-                            <a href="{{ path('admin_form_index', {website: websiteId}) }}" data-toggle="preloader" class="text-info shadow-item d-flex flex-column h-100 p-4">
-                                <span class="d-inline-block w-100 mb-2">{{ 'admin form-color'|icon(70, 70, 'info') }}</span>
-                                <span class="entitled text-dark d-inline-block mt-auto">{{ "Gérez vos formulaires"|trans }}</span>
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if 'slider'|moduleActive(configuration) %}
-                        <div class="col-6 col-md-4 text-center py-2">
-                            <a href="{{ path('admin_slider_index', {website: websiteId}) }}" data-toggle="preloader" class="text-info shadow-item d-flex flex-column h-100 p-4">
-                                <span class="d-inline-block w-100 mb-2">{{ 'admin sliders-color'|icon(65, 65, 'info') }}</span>
-                                <span class="entitled text-dark d-inline-block mt-auto">{{ "Vos sliders"|trans }}</span>
-                            </a>
-                        </div>
-                    {% endif %}
                     <div class="col-6 col-md-4 text-center py-2">
                         <a href="{{ path('admin_support', {website: websiteId()}) }}" data-toggle="preloader" class="text-info d-flex shadow-item flex-column h-100 p-4">
                             <span class="d-inline-block w-100 mb-2">{{ 'admin headset-color'|icon(65, 65, 'info') }}</span>

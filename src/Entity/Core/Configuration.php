@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\Core;
 
 use App\Entity\BaseEntity;
-use App\Entity\Gdpr\Category;
 use App\Entity\Layout\BlockType;
 use App\Entity\Layout\CssClass;
 use App\Entity\Layout\Page;
@@ -191,10 +190,6 @@ class Configuration extends BaseEntity
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $icons;
 
-    #[ORM\OneToMany(mappedBy: 'configuration', targetEntity: Category::class)]
-    #[Assert\Valid(['groups' => ['form_submission']])]
-    private ArrayCollection|PersistentCollection $gdprcategories;
-
     #[ORM\ManyToMany(targetEntity: Module::class, cascade: ['persist'])]
     #[ORM\OrderBy(['adminName' => 'ASC'])]
     private ArrayCollection|PersistentCollection $modules;
@@ -222,7 +217,6 @@ class Configuration extends BaseEntity
         $this->transitions = new ArrayCollection();
         $this->cssClasses = new ArrayCollection();
         $this->icons = new ArrayCollection();
-        $this->gdprcategories = new ArrayCollection();
         $this->modules = new ArrayCollection();
         $this->blockTypes = new ArrayCollection();
         $this->transDomains = new ArrayCollection();
@@ -832,36 +826,6 @@ class Configuration extends BaseEntity
             // set the owning side to null (unless already changed)
             if ($icon->getConfiguration() === $this) {
                 $icon->setConfiguration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getGdprcategories(): Collection
-    {
-        return $this->gdprcategories;
-    }
-
-    public function addGdprcategory(Category $gdprcategory): static
-    {
-        if (!$this->gdprcategories->contains($gdprcategory)) {
-            $this->gdprcategories->add($gdprcategory);
-            $gdprcategory->setConfiguration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGdprcategory(Category $gdprcategory): static
-    {
-        if ($this->gdprcategories->removeElement($gdprcategory)) {
-            // set the owning side to null (unless already changed)
-            if ($gdprcategory->getConfiguration() === $this) {
-                $gdprcategory->setConfiguration(null);
             }
         }
 
