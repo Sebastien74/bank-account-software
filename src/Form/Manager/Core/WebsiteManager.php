@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Form\Manager\Core;
 
 use App\Entity\Core as CoreEntities;
-use App\Entity\Layout as LayoutEntities;
 use App\Service\Interface\CoreLocatorInterface;
 use App\Service\Interface\DataFixturesInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -60,79 +59,8 @@ class WebsiteManager
             $configuration->setLocales($locales);
         }
 
-        $this->setModules($configuration);
-        $this->setLayoutConfiguration($configuration);
         $this->setSecurity($website, $configuration);
         $this->cacheDomains($configuration);
-    }
-
-    /**
-     * To set modules.
-     */
-    private function setModules(CoreEntities\Configuration $configuration): void
-    {
-        $associateModules = [
-            'form-calendar' => 'form',
-        ];
-
-        foreach ($associateModules as $code => $associateCode) {
-            foreach ($configuration->getModules() as $module) {
-                if ($module->getSlug() === $code) {
-                    $associateModuleExist = false;
-                    foreach ($configuration->getModules() as $moduleDb) {
-                        if ($moduleDb->getSlug() === $associateCode) {
-                            $associateModuleExist = true;
-                            break;
-                        }
-                    }
-                    if (!$associateModuleExist) {
-                        $associateModule = $this->coreLocator->em()->getRepository(CoreEntities\Module::class)->findOneBy(['slug' => $associateCode]);
-                        if ($associateModule instanceof CoreEntities\Module) {
-                            $configuration->addModule($associateModule);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * To set LayoutConfiguration Page.
-     */
-    private function setLayoutConfiguration(CoreEntities\Configuration $configuration): void
-    {
-        $layoutConfiguration = $this->coreLocator->em()->getRepository(LayoutEntities\LayoutConfiguration::class)->findOneBy([
-            'website' => $configuration->getWebsite(),
-            'entity' => LayoutEntities\Page::class,
-        ]);
-
-        $modulesNotInLayout = ['edit', 'information', 'medias', 'newsletter', 'navigation', 'customs-actions', 'user', 'gdpr', 'seo', 'css', 'edit', 'translation', 'secure-page', 'secure-module', 'google-analytics'];
-        $modulesInLayout = [];
-        $blockTypesNotInLayout = [];
-        $blockTypesInLayout = [];
-        if ($layoutConfiguration instanceof LayoutEntities\LayoutConfiguration) {
-            foreach ($layoutConfiguration->getModules() as $module) {
-                $modulesInLayout[] = $module->getSlug();
-            }
-            foreach ($layoutConfiguration->getBlockTypes() as $blockType) {
-                $blockTypesInLayout[] = $blockType->getSlug();
-            }
-        }
-        foreach ($configuration->getModules() as $module) {
-            if (!in_array($module->getSlug(), $modulesInLayout) && !in_array($module->getSlug(), $modulesNotInLayout)) {
-                $layoutConfiguration->addModule($module);
-                $this->coreLocator->em()->persist($layoutConfiguration);
-            }
-        }
-        foreach ($configuration->getBlockTypes() as $blockType) {
-            if (!in_array($blockType->getSlug(), $blockTypesInLayout)
-                && !in_array($blockType->getSlug(), $blockTypesNotInLayout)
-                && !str_contains($blockType->getSlug(), 'form-')
-                && !str_contains($blockType->getSlug(), 'layout-')) {
-                $layoutConfiguration->addBlockType($blockType);
-                $this->coreLocator->em()->persist($layoutConfiguration);
-            }
-        }
     }
 
     /**

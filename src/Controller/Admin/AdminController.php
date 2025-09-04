@@ -7,9 +7,6 @@ namespace App\Controller\Admin;
 use App\Controller\BaseController;
 use App\Entity\Core\Entity;
 use App\Entity\Core\Website;
-use App\Entity\Layout\BlockMediaRelation;
-use App\Entity\Layout\LayoutConfiguration;
-use App\Entity\Layout\Page;
 use App\Form\Type\Core\FilterType;
 use App\Form\Type\Core\PositionType;
 use App\Form\Type\Core\TreeType;
@@ -270,33 +267,6 @@ class AdminController extends BaseController
     }
 
     /**
-     * Duplicate.
-     *
-     * @throws NonUniqueResultException
-     */
-    protected function duplicate(Request $request)
-    {
-        $helper = $this->adminLocator->formDuplicateHelper();
-        $helper->execute($request, $this->formType, $this->class, $this->formOptions, $this->formDuplicateManager);
-        if (!$helper->getEntity()) {
-            return new Response();
-        }
-        $render = $this->renderView('admin/core/duplicate.html.twig', [
-            'pageTitle' => $this->pageTitle,
-            'form' => $helper->getForm()->createView(),
-            'interface' => $helper->getInterface(),
-            'entity' => $helper->getEntityToDuplicate(),
-            'refresh' => $request->get('refresh'),
-            'template' => $request->get('template'),
-        ]);
-        if ($helper->isSubmitted()) {
-            return new JsonResponse(['success' => $helper->isValid(), 'html' => $render]);
-        }
-
-        return new JsonResponse(['html' => $render]);
-    }
-
-    /**
      * Export.
      */
     protected function export(Request $request)
@@ -482,10 +452,6 @@ class AdminController extends BaseController
 
         $website = $interface ? $interface['website'] : $this->getWebsite();
         $website = $website instanceof Website ? WebsiteModel::fromEntity($website, $this->coreLocator) : $website;
-        $mediasAlertExec = $entity instanceof Page || ($entity && method_exists($entity, 'isCustomLayout') && $entity->isCustomLayout());
-        $mediasAlert = 'layout' === $view && $mediasAlertExec && $entity->getLayout()
-            ? $this->coreLocator->em()->getRepository(BlockMediaRelation::class)->findWithEmptyAlt($entity->getLayout())
-            : ('edit' === $view ? $this->adminLocator->mediasAlert($entity) : []);
 
         $arguments = [
             'pageTitle' => $this->pageTitle,
@@ -504,9 +470,6 @@ class AdminController extends BaseController
             'template' => $this->template,
             'view' => !empty($this->arguments['view']) ? $this->arguments['view'] : null,
             'tooHeavyFiles' => $this->adminLocator->tooHeavyFiles($entity),
-            'seoAlert' => $this->coreLocator->seoService()->seoAlert($entity, $website),
-            'mediasAlert' => $mediasAlert,
-            'seoModels' => $this->coreLocator->seoService()->getLocalesModels($entity, $website),
         ];
 
         if (empty($this->arguments['breadcrumb'])) {
@@ -523,12 +486,6 @@ class AdminController extends BaseController
                     }
                 }
             }
-        }
-
-        if ($entity && method_exists($entity, 'getLayout')) {
-            $arguments['layoutConfiguration'] = $this->coreLocator->em()->getRepository(LayoutConfiguration::class)->findOneBy(
-                ['entity' => $interface['classname'], 'website' => $interface['website']]
-            );
         }
 
         $arguments = array_merge($arguments, $this->arguments);

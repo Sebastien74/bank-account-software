@@ -26,43 +26,7 @@ use Symfony\Component\Yaml\Yaml;
 ])]
 class WebsiteFixtures
 {
-    private const bool DEV_MODE = false;
     private const bool GENERATE_TRANSLATIONS = false;
-    private const array MAIN_PAGES = ['contact'];
-    private const array DEFAULTS_MODULES = [
-        'ROLE_EDIT',
-        'ROLE_INFORMATION',
-        'ROLE_PAGE',
-        'ROLE_MEDIA',
-        'ROLE_NEWSCAST',
-        'ROLE_SEO',
-        'ROLE_SLIDER',
-        'ROLE_TRANSLATION',
-        'ROLE_NAVIGATION',
-        'ROLE_FORM',
-        'ROLE_USERS',
-    ];
-    private const array OTHERS_MODULES = [
-        'ROLE_CATALOG',
-        'ROLE_SECURE_PAGE',
-        'ROLE_STEP_FORM',
-        'ROLE_GALLERY',
-        'ROLE_TABLE',
-        'ROLE_MAP',
-        'ROLE_SITE_MAP',
-        'ROLE_SOCIAL_WALL',
-        'ROLE_TAB',
-        'ROLE_SEARCH_ENGINE',
-        'ROLE_CONTACT',
-        'ROLE_AGENDA',
-        'ROLE_PORTFOLIO',
-        'ROLE_FORM_CALENDAR',
-        'ROLE_NEWSLETTER',
-        'ROLE_TIMELINE',
-        'ROLE_FAQ',
-        'ROLE_RECRUITMENT',
-    ];
-
     private array $websites = [];
     private array $yamlConfiguration = [];
 
@@ -121,38 +85,17 @@ class WebsiteFixtures
         $website->setCacheClearDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $website->setUploadDirname(uniqid());
 
-        $pagesParams = $this->getPagesParams();
         $yamlConfiguration = $this->yamlConfiguration;
         $locale = !empty($yamlConfiguration['locale']) && $asMainWebsite ? $yamlConfiguration['locale'] : $locale;
 
-        $this->fixtures->configuration()->add($website, $yamlConfiguration, $locale, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);
+        $this->fixtures->configuration()->add($website, $yamlConfiguration, $locale, $user);
         $this->fixtures->security()->execute($website);
         $configuration = $website->getConfiguration();
-        $this->fixtures->defaultMedias()->add($website, $yamlConfiguration, $user);
-        $this->fixtures->blockType()->add($configuration, self::DEV_MODE, $websiteToDuplicate);
-        $this->fixtures->color()->add($configuration, $yamlConfiguration, $user, $websiteToDuplicate);
-        $this->fixtures->transition()->add($configuration, $user, $websiteToDuplicate);
-        $asMainWebsite || !$websiteToDuplicate instanceof Website
-            ? $this->fixtures->page()->add($website, $pagesParams, $user, true, self::MAIN_PAGES)
-            : $this->fixtures->pageDuplication()->add($website, $websiteToDuplicate);
-        $this->fixtures->layout()->add($configuration, self::DEV_MODE, self::DEFAULTS_MODULES, self::OTHERS_MODULES, $user, $websiteToDuplicate);
         $this->entityService->website($website);
         $this->entityService->createdBy($user);
         $this->entityService->execute($website, $locale);
-        $this->fixtures->thumbnail()->add($website, $user, $websiteToDuplicate);
-        $this->fixtures->command()->add($website, $user);
         if ($asMainWebsite && self::GENERATE_TRANSLATIONS) {
             $this->fixtures->translations()->generate($configuration, $this->websites);
         }
-    }
-
-    /**
-     * Get Pages[] params.
-     */
-    private function getPagesParams(): array
-    {
-        return [
-            ['name' => 'Accueil', 'asIndex' => true, 'reference' => 'home', 'menus' => [], 'template' => 'home', 'urlAsIndex' => true, 'deletable' => true],
-        ];
     }
 }

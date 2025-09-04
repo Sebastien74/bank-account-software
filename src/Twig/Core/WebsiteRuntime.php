@@ -99,23 +99,6 @@ class WebsiteRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * Check if module is active.
-     */
-    public function moduleActive(string $moduleCode, ?ConfigurationModel $configuration = null, bool $object = false): mixed
-    {
-        $configuration = !empty($cache['configuration']) ? $cache['configuration'] : $configuration;
-        if (!$configuration) {
-            $configuration = $this->coreLocator->website()->configuration;
-        }
-        $modules = $configuration->modules;
-        if (isset($modules[$moduleCode])) {
-            return $object ? $this->coreLocator->em()->getRepository(Core\Module::class)->findOneBySlug($moduleCode) : $modules[$moduleCode];
-        }
-
-        return false;
-    }
-
-    /**
      * Get app colors by category.
      */
     public function appColors(WebsiteModel $website, string $category): string

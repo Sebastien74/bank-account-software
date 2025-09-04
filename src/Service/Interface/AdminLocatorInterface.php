@@ -36,10 +36,6 @@ interface AdminLocatorInterface
 
     public function globalManager(): FormManager\Core\GlobalManager;
 
-    public function urlManager(): FormManager\Seo\UrlManager;
-
-    public function layoutManager(): FormManager\Layout\LayoutManager;
-
     public function treeManager(): FormManager\Core\TreeManager;
 
     public function intlManager(): FormManager\Translation\IntlManager;

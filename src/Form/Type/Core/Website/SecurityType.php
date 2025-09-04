@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Type\Core\Website;
 
 use App\Entity\Core\Security;
-use App\Entity\Core\Website;
-use App\Entity\Layout\Page;
 use App\Service\Interface\CoreLocatorInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,7 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SecurityType extends AbstractType
 {
     private TranslatorInterface $translator;
-    private Website $website;
 
     /**
      * SecurityType constructor.
@@ -36,8 +31,6 @@ class SecurityType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->website = $options['website'];
-
         $builder->add('secureWebsite', Type\CheckboxType::class, [
             'required' => false,
             'display' => 'button',
@@ -110,20 +103,6 @@ class SecurityType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez une durée', [], 'admin'),
             ],
         ]);
-    }
-
-    /**
-     * Check if secure pages Module is activated.
-     */
-    private function getSecureModule(Website $website): bool
-    {
-        foreach ($website->getConfiguration()->getModules() as $module) {
-            if ('secure-page' === $module->getSlug()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

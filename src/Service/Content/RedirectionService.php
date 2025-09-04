@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Service\Content;
 
 use App\Entity\Core as CoreEntities;
-use App\Entity\Layout\Page;
-use App\Entity\Seo\Redirection;
-use App\Form\Interface\SeoFormManagerInterface;
 use App\Model\Core\ConfigurationModel;
 use App\Model\Core\WebsiteModel;
 use App\Service\Core\Urlizer;
@@ -39,10 +36,8 @@ class RedirectionService
     /**
      * RedirectionService constructor.
      */
-    public function __construct(
-        private readonly CoreLocatorInterface $coreLocator,
-        private readonly SeoFormManagerInterface $seoLocator,
-    ) {
+    public function __construct(private readonly CoreLocatorInterface $coreLocator)
+    {
         $this->protocol = $_ENV['APP_PROTOCOL'].'://';
     }
 
@@ -72,7 +67,6 @@ class RedirectionService
                 $locale = $domain ? $domain->locale : $configuration->locale;
                 $domainRedirection = $this->domainRedirection($request, $website, $configuration, $domain);
                 $urlRedirection = $this->urlRedirection($request, $website, $locale, $domainRedirection);
-                $inBuild = $this->inBuild($request, $website, $configuration);
                 $request->setLocale($locale);
                 $request->getSession()->set('_locale', $locale);
             }
@@ -83,7 +77,6 @@ class RedirectionService
             'domainRedirection' => $domainRedirection,
             'urlRedirection' => $urlRedirection,
             'banRedirection' => $this->isBan($request, $configuration),
-            'inBuildRedirection' => $inBuild,
         ];
     }
 
@@ -156,56 +149,7 @@ class RedirectionService
                         return $item->get();
                     }
                 }
-            } else {
-                $redirections = $this->coreLocator->em()->getRepository(Redirection::class)->findBy(['website' => $website->id]);
-                $this->seoLocator->redirection()->setCache($redirections);
             }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if WebsiteModel is in build.
-     */
-    public function inBuild(Request $request, WebsiteModel $website, ConfigurationModel $configuration): bool|string
-    {
-        $configurationEntity = new CoreEntities\Configuration();
-        $ipsDev = $configurationEntity->getAllIPS($configuration->ipsDev);
-        $ipsCustomer = $configurationEntity->getAllIPS([], $configuration->ipsCustomer);
-
-        $inMaintenance = (isset($_ENV['UNDER_MAINTENANCE']) && $_ENV['UNDER_MAINTENANCE']) || !$configuration->onlineStatus;
-        $envIPS = !empty($_ENV['MAINTENANCE_ALLOWED_IPS']) ? $_ENV['MAINTENANCE_ALLOWED_IPS'] : [];
-        $IPS = !$request->get('disabled_ips') ? array_unique(array_merge(self::IPS_DEV, $ipsDev, $ipsCustomer, $envIPS)) : [];
-        $allowedIP = $this->checkIP($IPS);
-
-        $allowedPath = false;
-        if ($inMaintenance) {
-            $paths = ['media/cache/resolve'];
-            foreach ($paths as $path) {
-                if (str_contains($request->getRequestUri(), $path)) {
-                    $allowedPath = true;
-                    break;
-                }
-            }
-        }
-
-        if ($inMaintenance && !$allowedIP && !$allowedPath) {
-            $buildPages = $this->coreLocator->em()->getRepository(Page::class)->findBy([
-                'website' => $website->id,
-                'template' => 'build.html.twig',
-            ]);
-            $uri = trim($request->getRequestUri(), '/');
-            $buildPage = !empty($buildPages[0]) ? $buildPages[0] : null;
-            if ($buildPage instanceof Page) {
-                foreach ($buildPage->getUrls() as $url) {
-                    if ($url->isOnline() && $url->getLocale() === $request->getLocale() && $url->getCode() !== $uri) {
-                        return $this->coreLocator->router()->generate('front_index', ['url' => $url->getCode()]);
-                    }
-                }
-            }
-
-            return 'front_build_page' !== $request->get('_route') ? $this->coreLocator->router()->generate('front_build_page') : false;
         }
 
         return false;

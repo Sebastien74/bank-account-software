@@ -7,7 +7,6 @@ namespace App\EventListener;
 use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Seo\SeoConfiguration;
 use App\Entity\Translation;
 use App\Service\Interface\AdminLocatorInterface;
 use App\Service\Interface\CoreLocatorInterface;
@@ -131,9 +130,6 @@ class DoctrineEventsListener
                 if ($entity->getId() && empty($this->objects[$classname])) {
                     $this->logger($entity, 'onFlush');
                     $this->setMasterField($entity, true);
-                    if ($this->inAdmin) {
-                        $this->coreLocator->cacheService()->clearCaches($entity);
-                    }
                     $this->objects[$classname][$entity->getId()] = $entity;
                 }
                 $this->removeCacheFiles($entity);
@@ -149,7 +145,6 @@ class DoctrineEventsListener
         $entity = $args->getObject();
         $allowed = $this->inAdmin && $this->request instanceof Request;
         if ($allowed && $this->inAdmin && !$this->disabledCache($entity) || $this->request->isMethod('delete')) {
-            $this->coreLocator->cacheService()->clearCaches($entity);
             $this->logger($entity, 'postRemove');
         }
     }
@@ -212,9 +207,6 @@ class DoctrineEventsListener
             if (is_object($masterEntity) && method_exists($masterEntity, 'setUpdatedAt')) {
                 $masterEntity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
                 $this->coreLocator->em()->persist($masterEntity);
-                if ($this->inAdmin && $clearCache) {
-                    $this->coreLocator->cacheService()->clearCaches($entity);
-                }
             }
         }
     }
@@ -287,7 +279,6 @@ class DoctrineEventsListener
         $filesystem = new Filesystem();
         $entityClassname = str_replace('Proxies\__CG__\\', '', get_class($entity));
         $entitiesCache = [
-            SeoConfiguration::class => ['apimodel'],
             Website::class => ['apimodel', 'domains'],
             Configuration::class => ['pages'],
         ];

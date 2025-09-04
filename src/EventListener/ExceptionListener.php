@@ -8,7 +8,6 @@ use App\Command\DoctrineCommand;
 use App\Entity\Core\Log;
 use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Entity\Seo\NotFoundUrl;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Monolog\Handler\RotatingFileHandler;
@@ -82,8 +81,6 @@ class ExceptionListener
                     $response = $this->coreLocator->redirectionService()->execute($request);
                     if ($response['urlRedirection']) {
                         $event->setResponse(new RedirectResponse($response['urlRedirection'], 301));
-                    } else {
-                        $this->notFound($request);
                     }
                 } catch (\Exception $e) {
                 }
@@ -127,50 +124,6 @@ class ExceptionListener
             $session = new Session();
             $session->getFlashBag()->add('error', 'Access denied!!');
             $event->setResponse(new RedirectResponse($this->coreLocator->router()->generate('admin_dashboard', ['website' => $website->getId()])));
-        }
-    }
-
-    /**
-     * Add 404 database.
-     *
-     * @throws \Exception
-     */
-    private function notFound(Request $request): void
-    {
-        $excluded = ['build', '_wdt', 'front', 'accueil', '&', '.js', 'admin', 'images', '/www.'];
-        $register = true;
-        foreach ($excluded as $item) {
-            if (str_contains($request->getUri(), $item)) {
-                $register = false;
-                break;
-            }
-        }
-
-        if ($register) {
-            $website = $this->coreLocator->em()->getRepository(Website::class)->findOneByHost($request->getHost());
-            $type = preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri()) ? 'admin' : 'front';
-            $category = $this->asResources($request->getUri()) ? 'resource' : 'url';
-            $existing = $this->coreLocator->em()->getRepository(NotFoundUrl::class)->findOneBy([
-                'website' => $website->entity,
-                'url' => $request->getUri(),
-                'uri' => $request->getRequestUri(),
-                'type' => $type,
-                'category' => $category,
-            ]);
-
-            if (!$existing) {
-                $newNotFound = new NotFoundUrl();
-                $newNotFound->setUrl($request->getUri());
-                $newNotFound->setUri($request->getRequestUri());
-                $newNotFound->setType($type);
-                $newNotFound->setCategory($category);
-                $newNotFound->setCreatedAt(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                if ($website) {
-                    $newNotFound->setWebsite($website->entity);
-                }
-                $this->coreLocator->em()->persist($newNotFound);
-                $this->coreLocator->em()->flush();
-            }
         }
     }
 

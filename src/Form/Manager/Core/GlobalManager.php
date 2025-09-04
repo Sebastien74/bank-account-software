@@ -6,7 +6,6 @@ namespace App\Form\Manager\Core;
 
 use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
-use App\Entity\Layout;
 use App\Form\Interface as FormManagerInterface;
 use App\Service\Core\Urlizer;
 use App\Service\Interface as ServiceLocator;
@@ -47,7 +46,6 @@ class GlobalManager
      */
     public function __construct(
         private readonly FormManagerInterface\CoreFormManagerInterface $coreManagerLocator,
-        private readonly FormManagerInterface\LayoutFormManagerInterface $layoutManager,
         private readonly FormManagerInterface\MediaFormManagerInterface $mediaManager,
         private readonly FormManagerInterface\IntlFormManagerInterface $intlManager,
         private readonly ServiceLocator\CoreLocatorInterface $coreLocator,
@@ -89,29 +87,18 @@ class GlobalManager
 
             $this->request->getSession()->set('entityPostClassname', get_class($this->data));
             $this->adminLocator->urlManager()->post($this->form, $this->website);
-            $this->layoutManager->layout()->post($interface, $this->form, $this->website);
             $this->mediaManager->media()->post($this->form, $this->website, $interface);
             $this->intlManager->intl()->post($this->form, $this->website, $isNew);
 
-            if ($this->data instanceof Layout\Block) {
-                $this->setZone();
-            }
-
             $this->coreLocator->em()->persist($this->data);
             $this->coreLocator->em()->flush();
-
             $this->callManager('onFlush', $interface);
+
             $this->dispatchEvent();
 
             $this->coreManagerLocator->session()->execute($this->request, $this->data);
-
             $this->setFlashBag($isNew, 'success', $disableFlash, $interface);
 
-            $clearMediasEntities = [Layout\Page::class, Layout\Block::class];
-            if (!empty($this->interface['classname']) && in_array($this->interface['classname'], $clearMediasEntities)) {
-                $clearMediasService = $this->adminLocator->clearMediasService();
-                $clearMediasService->execute($this->interface['classname']);
-            }
         } catch (\Exception $exception) {
             $session = new Session();
             $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('Une erreur est survenue : ', [], 'admin').$exception->getMessage());

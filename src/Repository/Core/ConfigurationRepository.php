@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Repository\Core;
 
 use App\Entity\Core\Configuration;
-use App\Entity\Core\Module;
-use App\Entity\Core\Website;
-use App\Entity\Layout\BlockType;
 use App\Model\Core\WebsiteModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -98,64 +95,5 @@ class ConfigurationRepository extends ServiceEntityRepository
         $configuration = $queryBuilder->getOneOrNullResult();
 
         return $configuration ? $configuration->getMediaRelations() : [];
-    }
-
-    /**
-     * Get BlockTypes by categories.
-     *
-     * @throws NonUniqueResultException
-     */
-    public function findBlocksTypes(Website $website, $categories): PersistentCollection|array
-    {
-        $qb = $this->createQueryBuilder('c')->select('c')
-            ->join('c.blockTypes', 'b')
-            ->join('c.website', 'w')
-            ->andWhere('w.id = :website')
-            ->setParameter('website', $website)
-            ->addSelect('w')
-            ->addSelect('b');
-
-        foreach ($categories as $key => $category) {
-            $qb->orWhere('b.category = :category'.$key);
-            $qb->setParameter(':category'.$key, $category);
-        }
-
-        $result = $qb->getQuery()->getOneOrNullResult();
-
-        return $result ? $result->getBlockTypes() : [];
-    }
-
-    /**
-     * Check if Website Module existing.
-     */
-    public function moduleExist(Website $website, ?Module $module = null, bool $object = false): bool|Module
-    {
-        if (!$module) {
-            return false;
-        }
-        foreach ($website->getConfiguration()->getModules() as $moduleDb) {
-            if ($moduleDb->getId() === $module->getId()) {
-                return $object ? $module : true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if Website BlockType existing.
-     */
-    public function blockTypeExist(Website $website, ?BlockType $blockType = null, bool $object = false): bool|BlockType
-    {
-        if (!$blockType) {
-            return false;
-        }
-        foreach ($website->getConfiguration()->getBlockTypes() as $blockTypeDb) {
-            if ($blockTypeDb->getId() === $blockType->getId()) {
-                return $object ? $blockType : true;
-            }
-        }
-
-        return false;
     }
 }

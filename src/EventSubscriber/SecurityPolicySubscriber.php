@@ -37,7 +37,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
     private Request $request;
     private ?string $uri = null;
     private ?string $requestUri = null;
-    private ?string $host = null;
     private ?string $schemeAndHttpHost = null;
     private ?string $routeName = null;
     private Session $session;
@@ -68,7 +67,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
         $this->request = $event->getRequest();
         $this->uri = $this->request->getUri();
         $this->requestUri = $this->request->getRequestUri();
-        $this->host = $this->request->getHost();
         $this->schemeAndHttpHost = $this->request->getSchemeAndHttpHost();
         $this->routeName = $this->request->get('_route');
         $this->session = $this->request->getSession();
@@ -100,7 +98,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
 
         if ($this->coreLocator->tokenStorage()->getToken()) {
             $user = $this->coreLocator->tokenStorage()->getToken()->getUser();
-            $this->isSecure($event, $website, $user);
             if ($user instanceof User) {
                 $userKey = $user->getSecretKey();
                 if (empty($_COOKIE['SECURITY_USER_SECRET']) && $this->coreLocator->authorizationChecker()->isGranted('ROLE_ADMIN')) {
@@ -192,33 +189,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             /* HTTP 1.0 */
             header('Cache-Control: max-age=2592000');
             /* 30days (60sec * 60min * 24hours * 30days) */
-        }
-    }
-
-    /**
-     * Check if is secure website & redirect if User isn't connected.
-     */
-    private function isSecure(ResponseEvent $responseEvent, ?WebsiteModel $website = null, mixed $user = null): void
-    {
-        $allowedRoutes = [
-            'security_front_login',
-            'security_front_password_request',
-            'security_front_password_confirm',
-            'security_front_register',
-            'front_webmaster_toolbox',
-        ];
-
-        if (!$this->isMainRequest
-            || preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $this->uri)
-            || preg_match('/\/secure\/user/', $this->uri)
-            || preg_match('/\/front\//', $this->uri)
-            || in_array($this->routeName, $allowedRoutes)) {
-            return;
-        }
-
-        $website = $website instanceof WebsiteModel ? $website : $this->coreLocator->em()->getRepository(Website::class)->findOneByHost($this->host);
-        if ($website->entity->getSecurity()->isSecureWebsite() && !$user instanceof User) {
-            $responseEvent->setResponse(new RedirectResponse($this->coreLocator->router()->generate('security_front_login')));
         }
     }
 

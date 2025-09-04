@@ -6,8 +6,6 @@ namespace App\Form\Type\Core\Website;
 
 use App\Entity\Core\Configuration;
 use App\Entity\Core\Entity;
-use App\Entity\Core\Module;
-use App\Entity\Layout\BlockType;
 use App\Entity\Translation\TranslationDomain;
 use App\Form\Widget as WidgetType;
 use App\Service\Interface\CoreLocatorInterface;
@@ -260,22 +258,6 @@ class ConfigurationType extends AbstractType
                 ],
             ]);
 
-            $builder->add('modules', EntityType::class, [
-                'label' => false,
-                'class' => Module::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('m')
-                        ->orderBy('m.adminName', 'ASC');
-                },
-                'choice_label' => function ($entity) {
-                    return strip_tags($entity->getAdminName());
-                },
-                'by_reference' => false,
-                'multiple' => true,
-                'expanded' => true,
-                'display' => 'switch',
-            ]);
-
             $builder->add('blockTypeSearch', Type\TextType::class, [
                 'mapped' => false,
                 'attr' => [
@@ -285,22 +267,6 @@ class ConfigurationType extends AbstractType
                 ],
             ]);
 
-            $builder->add('blockTypes', EntityType::class, [
-                'label' => false,
-                'class' => BlockType::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('b')
-                        ->andWhere('b.slug != :slug')
-                        ->setParameter('slug', 'core-action')
-                        ->orderBy('b.adminName', 'ASC');
-                },
-                'choice_label' => function ($entity) {
-                    return strip_tags($entity->getAdminName());
-                },
-                'multiple' => true,
-                'expanded' => true,
-                'display' => 'switch',
-            ]);
         } else {
             $builder->add('locales', WidgetType\LanguageIconType::class, [
                 'required' => false,

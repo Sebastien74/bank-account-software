@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\DataFixtures;
 
 use App\Entity\Core as CoreEntities;
-use App\Entity\Layout\CssClass;
 use App\Entity\Security\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -22,9 +21,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 ])]
 class ConfigurationFixtures
 {
-    private const bool DISABLED_GDPR = true;
-    private const array CUSTOM_CLASSES = [];
-
     private array $yamlConfiguration = [];
 
     /**
@@ -43,22 +39,13 @@ class ConfigurationFixtures
         CoreEntities\Website $website,
         array $yamlConfiguration,
         string $locale,
-        bool $devMode,
-        array $defaultsModules,
-        array $othersModules,
-        ?User $user = null,
-        ?CoreEntities\Website $websiteToDuplicate = null): CoreEntities\Configuration
-    {
+        ?User $user = null
+    ): CoreEntities\Configuration {
+
         $this->yamlConfiguration = $yamlConfiguration;
-
         $configuration = $this->addConfiguration($locale, $website, $yamlConfiguration, $user);
-
-        $this->addModules($configuration, $devMode, $defaultsModules, $othersModules, $websiteToDuplicate);
         $this->addDomains($configuration);
-        $this->addClasses($configuration, $websiteToDuplicate);
-
         $website->setConfiguration($configuration);
-
         $this->entityManager->persist($configuration);
 
         return $configuration;
@@ -87,27 +74,6 @@ class ConfigurationFixtures
     }
 
     /**
-     * Add Modules.
-     */
-    private function addModules(CoreEntities\Configuration $configuration, bool $devMode, array $defaultsModules, array $othersModules, ?CoreEntities\Website $websiteToDuplicate = null): void
-    {
-        if ($websiteToDuplicate instanceof CoreEntities\Website) {
-            foreach ($websiteToDuplicate->getConfiguration()->getModules() as $module) {
-                $configuration->addModule($module);
-            }
-        } else {
-            $modules = $this->entityManager->getRepository(CoreEntities\Module::class)->findAll();
-            $modulesToAdd = $devMode ? array_merge($defaultsModules, $othersModules) : $defaultsModules;
-            foreach ($modules as $module) {
-                /** @var CoreEntities\Module $module */
-                if (in_array($module->getRole(), $modulesToAdd) || 'gdpr' === $module->getSlug() && !self::DISABLED_GDPR) {
-                    $configuration->addModule($module);
-                }
-            }
-        }
-    }
-
-    /**
      * Add Domains.
      */
     private function addDomains(CoreEntities\Configuration $configuration): void
@@ -128,27 +94,6 @@ class ConfigurationFixtures
                         ++$position;
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Add class.
-     */
-    private function addClasses(CoreEntities\Configuration $configuration, ?CoreEntities\Website $websiteToDuplicate = null): void
-    {
-        if ($websiteToDuplicate instanceof CoreEntities\Website) {
-            foreach ($websiteToDuplicate->getConfiguration()->getCssClasses() as $referClass) {
-                $class = new CssClass();
-                $class->setName($referClass->getName());
-                $class->setDescription($referClass->getDescription());
-                $configuration->addCssClass($class);
-            }
-        } else {
-            foreach (self::CUSTOM_CLASSES as $classname) {
-                $class = new CssClass();
-                $class->setName($classname);
-                $configuration->addCssClass($class);
             }
         }
     }

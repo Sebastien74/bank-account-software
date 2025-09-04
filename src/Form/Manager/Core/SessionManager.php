@@ -7,7 +7,6 @@ namespace App\Form\Manager\Core;
 use App\Entity\Core\Configuration;
 use App\Entity\Core\Website;
 use App\Entity\Media\ThumbConfiguration;
-use App\Entity\Seo\SeoConfiguration;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\Request;
 

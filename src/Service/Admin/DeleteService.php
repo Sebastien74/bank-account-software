@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Admin;
 
-use App\Entity\Layout\Page;
 use App\Entity\Media\Media;
-use App\Entity\Seo\Url;
 use App\Service\Interface\AdminLocatorInterface;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -117,22 +115,7 @@ class DeleteService
             $this->positions($entities, $entityToDelete);
         }
 
-        if (is_object($entityToDelete) && method_exists($entityToDelete, 'getUrls')) {
-            if ($entityToDelete instanceof Page && 'build.html.twig' === $entityToDelete->getTemplate()) {
-                $this->coreLocator->em()->remove($entityToDelete);
-            } else {
-                foreach ($entityToDelete->getUrls() as $url) {
-                    /* @var Url $url */
-                    $url->setAsIndex(false);
-                    $url->setOnline(false);
-                    $url->setHideInSitemap(true);
-                    $url->setArchived(true);
-                    $this->coreLocator->em()->persist($url);
-                }
-            }
-        } else {
-            $this->coreLocator->em()->remove($entityToDelete);
-        }
+        $this->coreLocator->em()->remove($entityToDelete);
         $this->coreLocator->em()->flush();
     }
 

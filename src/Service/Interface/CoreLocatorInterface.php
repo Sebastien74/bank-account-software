@@ -26,17 +26,11 @@ interface CoreLocatorInterface
 {
     public function website(): ?WebsiteModel;
 
-    public function seoService(): Content\SeoService;
-
     public function treeService(): Core\TreeService;
-
-    public function listingService(): Content\ListingService;
 
     public function thumbService(): Content\ThumbService;
 
     public function interfaceHelper(): InterfaceHelper;
-
-    public function cacheService(): Core\CacheServiceInterface;
 
     public function requestStack(): HttpFoundation\RequestStack;
 

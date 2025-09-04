@@ -36,8 +36,6 @@ class AdminLocator implements AdminLocatorInterface
         #[AutowireLocator(AdminService\TitleService::class, indexAttribute: 'key')] protected ServiceLocator $titleServiceLocator,
         #[AutowireLocator(AdminService\DeleteService::class, indexAttribute: 'key')] protected ServiceLocator $deleteServiceLocator,
         #[AutowireLocator(FormManager\Core\GlobalManager::class, indexAttribute: 'key')] protected ServiceLocator $globalLocator,
-        #[AutowireLocator(FormManager\Seo\UrlManager::class, indexAttribute: 'key')] protected ServiceLocator $urlManagerLocator,
-        #[AutowireLocator(FormManager\Layout\LayoutManager::class, indexAttribute: 'key')] protected ServiceLocator $layoutManagerLocator,
         #[AutowireLocator(FormManager\Core\TreeManager::class, indexAttribute: 'key')] protected ServiceLocator $treeManagerLocator,
         #[AutowireLocator(FormManager\Translation\IntlManager::class, indexAttribute: 'key')] protected ServiceLocator $intlManagerLocator,
         private readonly DeleteInterface $deleteInterface,
@@ -145,26 +143,6 @@ class AdminLocator implements AdminLocatorInterface
     public function globalManager(): FormManager\Core\GlobalManager
     {
         return $this->globalLocator->get('core_global_form_manager');
-    }
-
-    /**
-     * To get UrlManager.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function urlManager(): FormManager\Seo\UrlManager
-    {
-        return $this->urlManagerLocator->get('seo_url_form_manager');
-    }
-
-    /**
-     * To get LayoutManager.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function layoutManager(): FormManager\Layout\LayoutManager
-    {
-        return $this->layoutManagerLocator->get('layout_form_manager');
     }
 
     /**

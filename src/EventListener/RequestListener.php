@@ -54,6 +54,8 @@ class RequestListener
      */
     public function onKernelRequest(RequestEvent $event): void
     {
+
+        die;
         $this->request = $event->getRequest();
         $this->routeName = $this->request->attributes->get('_route');
         if (!$event->isMainRequest() || !$this->isMainRequest() || $this->isSubRequest()) {
@@ -74,7 +76,6 @@ class RequestListener
 
         $this->website = $this->coreLocator->website();
         $this->coreLocator->lastRoute()->execute($event);
-        $this->coreLocator->cacheService()->generateRoutes();
         $this->request->getSession()->remove('mainExceptionMessage');
 
         if (!$isLogin && !$this->coreLocator->user() instanceof UserInterface) {

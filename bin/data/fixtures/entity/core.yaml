@@ -88,23 +88,6 @@ App\Entity\Core\Log:
             fr: 'Logs'
             en: 'Logs'
 
-App\Entity\Core\Module:
-    translations:
-        singular:
-            fr: 'Module'
-            en: 'Module'
-        plural:
-            fr: 'Modules'
-            en: 'Modules'
-        add:
-            fr: 'Ajouter un module'
-            en: 'Add module'
-        delete:
-            fr: "Supprimer le module"
-            en: 'Delete module'
-    columns:
-        - adminName
-
 App\Entity\Core\ScheduledCommand:
     translations:
         singular:

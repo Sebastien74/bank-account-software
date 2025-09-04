@@ -5,19 +5,12 @@ declare(strict_types=1);
 namespace App\Form\Manager\Core;
 
 use App\Entity\Core\Website;
-use App\Entity\Media\Media;
-use App\Entity\Seo\Url;
-use App\Form\Manager\Seo\UrlManager;
 use App\Service\Core\InterfaceHelper;
-use App\Service\Core\Uploader;
-use App\Service\Core\Urlizer;
 use App\Service\Interface\CoreLocatorInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * BaseManager.
@@ -31,18 +24,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 ])]
 class BaseManager
 {
-    private bool $inAdmin;
-
     /**
      * BaseManager constructor.
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly UrlManager $urlManager,
-        private readonly Uploader $uploader,
         private readonly InterfaceHelper $interfaceHelper,
     ) {
-        $this->inAdmin = (bool) preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $coreLocator->requestStack()->getMainRequest()->getUri());
     }
 
     /**
@@ -58,7 +46,6 @@ class BaseManager
             $entity->setWebsite($website);
         }
         $this->addIntls($allLocales, $website, $intls, $entity);
-        $this->addUrls($allLocales, $website, $entity);
         $this->setTitleForce($intls);
     }
 
@@ -130,24 +117,6 @@ class BaseManager
     }
 
     /**
-     * Add Urls.
-     */
-    private function addUrls(array $allLocales, Website $website, mixed $entity): void
-    {
-        $urls = $entity->getUrls();
-        foreach ($allLocales as $locale) {
-            $existing = $this->existingLocale($locale, $urls);
-            if (!$existing) {
-                $url = new Url();
-                $url->setLocale($locale);
-                $url->setWebsite($website);
-                $entity->addUrl($url);
-                $this->coreLocator->em()->persist($entity);
-            }
-        }
-    }
-
-    /**
      * Set title force to H1.
      */
     public function setTitleForce(Collection $intls): void
@@ -169,31 +138,6 @@ class BaseManager
         }
 
         return false;
-    }
-
-    /**
-     * Set Urls.
-     *
-     * @throws NonUniqueResultException
-     */
-    private function setUrls(mixed $entity): void
-    {
-        $titles = [];
-        foreach ($entity->getIntls() as $intl) {
-            $titles[$intl->getLocale()] = $intl->getTitle();
-        }
-
-        foreach ($entity->getUrls() as $url) {
-            if (!$url->getCode()) {
-                $url->setCode(Urlizer::urlize($titles[$url->getLocale()]));
-                $existing = $this->urlManager->getExistingUrl($url, $url->getWebsite(), $entity);
-                $stringUrl = !$existing ? $url->getCode() : $url->getCode().'-'.$entity->getId();
-                $url->setCode($stringUrl);
-            }
-            if (!$this->inAdmin) {
-                $url->setOnline(false);
-            }
-        }
     }
 
     /**

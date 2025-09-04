@@ -86,13 +86,11 @@ class WebsiteRepository extends ServiceEntityRepository
             ->innerJoin('w.configuration', 'c')
             ->innerJoin('w.security', 's')
             ->innerJoin('c.domains', 'd')
-            ->leftJoin('c.modules', 'mo')
             ->andWhere('d.name = :host')
             ->setParameter('host', $host)
             ->addSelect('c')
             ->addSelect('s')
             ->addSelect('d')
-            ->addSelect('mo')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -122,15 +120,11 @@ class WebsiteRepository extends ServiceEntityRepository
     {
         $website = $this->createQueryBuilder('w')
             ->leftJoin('w.configuration', 'c')
-            ->leftJoin('c.modules', 'm')
             ->leftJoin('c.transDomains', 'td')
-            ->leftJoin('c.colors', 'co')
             ->andWhere('w.id = :id')
             ->setParameter('id', $id)
             ->addSelect('c')
-            ->addSelect('m')
             ->addSelect('td')
-            ->addSelect('co')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -208,14 +202,8 @@ class WebsiteRepository extends ServiceEntityRepository
             ->leftJoin('w.configuration', 'c')
             ->leftJoin('w.security', 's')
             ->leftJoin('c.domains', 'd')
-            ->leftJoin('c.transitions', 'ct')
-            ->leftJoin('c.modules', 'cm')
-            ->leftJoin('c.pages', 'cp')
             ->addSelect('c')
             ->addSelect('s')
-            ->addSelect('d')
-            ->addSelect('ct')
-            ->addSelect('cm')
-            ->addSelect('cp');
+            ->addSelect('d');
     }
 }

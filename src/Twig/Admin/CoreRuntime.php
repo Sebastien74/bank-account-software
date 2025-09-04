@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\Twig\Admin;
 
 use App\Entity\Core\Log;
-use App\Entity\Layout\BlockType;
-use App\Entity\Layout\LayoutConfiguration;
 use App\Entity\Security\Group;
 use App\Entity\Security\User;
 use App\Service\Interface\CoreLocatorInterface;
-use App\Twig\Content\FontsRuntime;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Kernel;
 use Twig\Extension\RuntimeExtensionInterface;
@@ -25,10 +22,8 @@ class CoreRuntime implements RuntimeExtensionInterface
     /**
      * CoreRuntime constructor.
      */
-    public function __construct(
-        private readonly CoreLocatorInterface $coreLocator,
-        private readonly FontsRuntime $fontsRuntime,
-    ) {
+    public function __construct(private readonly CoreLocatorInterface $coreLocator)
+    {
     }
 
     /**
@@ -53,42 +48,6 @@ class CoreRuntime implements RuntimeExtensionInterface
         $minVersion = strlen('.'.end($matches));
 
         return substr($version, 0, -$minVersion);
-    }
-
-    /**
-     * Get BlockTypes & Actions groups.
-     */
-    public function blockTypesActionsGroups(LayoutConfiguration $configuration, object $entity): array
-    {
-        $groups = [];
-        $groups = $this->getBlockTypes($configuration, $entity, $groups);
-
-        return $this->getModules($configuration, $groups);
-    }
-
-    /**
-     * Check if BlockTYpe is active.
-     */
-    public function blockTypesActive(string $classname, string $slug): bool
-    {
-        $layoutConfiguration = $this->coreLocator->em()->getRepository(LayoutConfiguration::class)->findOneBy(['website' => $this->coreLocator->website()->entity, 'entity' => $classname]);
-        $blocksTypesActions = $layoutConfiguration ? $this->blockTypesActionsGroups($layoutConfiguration, new $classname()) : [];
-
-        $active = false;
-        foreach ($blocksTypesActions as $type => $groups) {
-            if ('block' === $type) {
-                foreach ($groups as $group) {
-                    foreach ($group as $blockType) {
-                        if ($slug === $blockType->getSlug()) {
-                            $active = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $active;
     }
 
     /**
@@ -179,17 +138,6 @@ class CoreRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * Get font.
-     */
-    private function getFont(string $fontName, string $type): string
-    {
-        $font = $this->fontsRuntime->fontConfig($fontName, true);
-
-        return 'link' === $type && !empty($font['link']) ? $font['link'].'# '
-            : ('family' === $type && !empty($font['fontFamily']) ? ucfirst(str_replace(['google-', '-'], ['', ' '], $fontName)).'='.$font['fontFamily'].'; ' : '');
-    }
-
-    /**
      * Check button display status.
      */
     public function buttonChecker(string $route, mixed $entity, array $interface = []): mixed
@@ -221,79 +169,5 @@ class CoreRuntime implements RuntimeExtensionInterface
         }
 
         return true;
-    }
-
-    /**
-     * Get BlockTypes groups.
-     */
-    private function getBlockTypes(LayoutConfiguration $configuration, object $entity, array $groups = []): array
-    {
-        $layoutGroups = ['layout', 'form'];
-        $done = [];
-
-        foreach ($configuration->getBlockTypes() as $blockType) {
-            $groupCategory = $blockType->getCategory();
-            $groupCategory = str_contains($groupCategory, 'layout-') ? 'layout' : $groupCategory;
-            foreach ($layoutGroups as $group) {
-                if ($group === $groupCategory && 'action' !== $blockType->getSlug()) {
-                    $groups['block'][$group][$blockType->getPosition()] = $blockType;
-                    $done[] = $blockType->getId();
-                    ksort($groups['block'][$group]);
-                }
-            }
-            if (!in_array($blockType->getId(), $done) && 'action' !== $blockType->getSlug()) {
-                $groupName = $blockType->isDropdown() ? 'secondary' : 'main';
-                $groups['block'][$groupName][$blockType->getPosition()] = $blockType;
-                ksort($groups['block'][$groupName]);
-            }
-        }
-
-        if (!empty($groups['block'])) {
-            ksort($groups['block']);
-        }
-
-        $asCustomLayout = method_exists($entity, 'isCustomLayout') && $entity->isCustomLayout();
-        if ($asCustomLayout && method_exists($entity, 'getPublicationStart')) {
-            $blockType = $this->coreLocator->em()->getRepository(BlockType::class)->findOneBy(['slug' => 'layout-dates']);
-            if ($blockType instanceof BlockType) {
-                $groups['block']['layout'][$blockType->getPosition()] = $blockType;
-            }
-            $blockType = $this->coreLocator->em()->getRepository(BlockType::class)->findOneBy(['slug' => 'layout-back-button']);
-            if ($blockType instanceof BlockType) {
-                $groups['block']['layout'][$blockType->getPosition()] = $blockType;
-            }
-        }
-
-        return $groups;
-    }
-
-    /**
-     * Get Modules groups.
-     */
-    private function getModules(LayoutConfiguration $configuration, array $groups = []): array
-    {
-        foreach ($configuration->getModules() as $module) {
-            foreach ($module->getActions() as $action) {
-                if ($action->isActive()) {
-                    $groupName = $action->isDropdown() ? 'secondary' : 'main';
-                    $groups['module'][$groupName][$action->getPosition()] = $action;
-                    ksort($groups['module'][$groupName]);
-                }
-            }
-        }
-        if (isset($groups['module'])) {
-            ksort($groups['module']);
-        }
-
-        return $groups;
-    }
-
-    private function isEditMode(): bool
-    {
-        $request = $this->coreLocator->request();
-
-        return str_contains($request->getUri(), 'preview')
-            && $request->get('edit_mode')
-            && $this->coreLocator->authorizationChecker()->isGranted('ROLE_EDIT');
     }
 }

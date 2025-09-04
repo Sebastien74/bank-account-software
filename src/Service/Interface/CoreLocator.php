@@ -49,16 +49,13 @@ class CoreLocator implements CoreLocatorInterface
      * CoreLocator constructor.
      */
     public function __construct(
-        #[AutowireLocator(Content\SeoService::class, indexAttribute: 'key')] protected ServiceLocator $seoLocator,
         #[AutowireLocator(Core\TreeService::class, indexAttribute: 'key')] protected ServiceLocator $treeLocator,
-        #[AutowireLocator(Content\ListingService::class, indexAttribute: 'key')] protected ServiceLocator $listingLocator,
         #[AutowireLocator(Content\ThumbService::class, indexAttribute: 'key')] protected ServiceLocator $thumbLocator,
         #[AutowireLocator(InterfaceHelper::class, indexAttribute: 'key')] protected ServiceLocator $interfaceLocator,
         #[AutowireLocator(Core\LastRouteService::class, indexAttribute: 'key')] protected ServiceLocator $lastRouteLocator,
         #[AutowireLocator(Content\RedirectionService::class, indexAttribute: 'key')] protected ServiceLocator $redirectionLocator,
         #[AutowireLocator(Core\FileInfo::class, indexAttribute: 'key')] protected ServiceLocator $fileLocator,
         private readonly EntryFilesTwigExtension $entryFiles,
-        private readonly Core\CacheServiceInterface $cacheService,
         private readonly QueryServiceInterface $queryService,
         private readonly HttpFoundation\RequestStack $requestStack,
         private readonly TranslatorInterface $translator,
@@ -109,16 +106,6 @@ class CoreLocator implements CoreLocatorInterface
     }
 
     /**
-     * To get SeoInterface.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function seoService(): Content\SeoService
-    {
-        return $this->seoLocator->get('seo_service');
-    }
-
-    /**
      * To get TreeService.
      *
      * @throws ContainerExceptionInterface
@@ -126,16 +113,6 @@ class CoreLocator implements CoreLocatorInterface
     public function treeService(): Core\TreeService
     {
         return $this->treeLocator->get('tree_service');
-    }
-
-    /**
-     * To get ListingService.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function listingService(): Content\ListingService
-    {
-        return $this->listingLocator->get('listing_service');
     }
 
     /**
@@ -156,14 +133,6 @@ class CoreLocator implements CoreLocatorInterface
     public function interfaceHelper(): InterfaceHelper
     {
         return $this->interfaceLocator->get('interface_helper');
-    }
-
-    /**
-     * To get CacheServiceInterface.
-     */
-    public function cacheService(): Core\CacheServiceInterface
-    {
-        return $this->cacheService;
     }
 
     /**

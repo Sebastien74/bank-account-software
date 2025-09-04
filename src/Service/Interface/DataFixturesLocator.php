@@ -15,51 +15,11 @@ class DataFixturesLocator implements DataFixturesInterface
      * FrontFormManagerLocator constructor.
      */
     public function __construct(
-        #[AutowireLocator(Fixtures\BlockTypeFixtures::class, indexAttribute: 'key')] protected ServiceLocator $blockTypeLocator,
-        #[AutowireLocator(Fixtures\ColorFixtures::class, indexAttribute: 'key')] protected ServiceLocator $colorLocator,
-        #[AutowireLocator(Fixtures\CommandFixtures::class, indexAttribute: 'key')] protected ServiceLocator $commandLocator,
         #[AutowireLocator(Fixtures\ConfigurationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $configurationLocator,
-        #[AutowireLocator(Fixtures\DefaultMediasFixtures::class, indexAttribute: 'key')] protected ServiceLocator $defaultMediaLocator,
-        #[AutowireLocator(Fixtures\LayoutFixtures::class, indexAttribute: 'key')] protected ServiceLocator $layoutLocator,
-        #[AutowireLocator(Fixtures\PageDuplicationFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageDuplicationLocator,
-        #[AutowireLocator(Fixtures\PageFixtures::class, indexAttribute: 'key')] protected ServiceLocator $pageLocator,
         #[AutowireLocator(Fixtures\SecurityFixtures::class, indexAttribute: 'key')] protected ServiceLocator $securityLocator,
-        #[AutowireLocator(Fixtures\ThumbnailFixtures::class, indexAttribute: 'key')] protected ServiceLocator $thumbnailLocator,
-        #[AutowireLocator(Fixtures\TransitionFixtures::class, indexAttribute: 'key')] protected ServiceLocator $transitionLocator,
         #[AutowireLocator(Fixtures\TranslationsFixtures::class, indexAttribute: 'key')] protected ServiceLocator $translationLocator,
-        #[AutowireLocator(Fixtures\UploadedFileFixtures::class, indexAttribute: 'key')] protected ServiceLocator $uploadFileLocator,
         #[AutowireLocator(Fixtures\WebsiteFixtures::class, indexAttribute: 'key')] protected ServiceLocator $websiteFileLocator,
     ) {
-    }
-
-    /**
-     * To get BlockTypeFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function blockType(): Fixtures\BlockTypeFixtures
-    {
-        return $this->blockTypeLocator->get('block_type_fixtures');
-    }
-
-    /**
-     * To get ColorFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function color(): Fixtures\ColorFixtures
-    {
-        return $this->colorLocator->get('color_fixtures');
-    }
-
-    /**
-     * To get CommandFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function command(): Fixtures\CommandFixtures
-    {
-        return $this->commandLocator->get('command_fixtures');
     }
 
     /**
@@ -73,46 +33,6 @@ class DataFixturesLocator implements DataFixturesInterface
     }
 
     /**
-     * To get DefaultMediasFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function defaultMedias(): Fixtures\DefaultMediasFixtures
-    {
-        return $this->defaultMediaLocator->get('default_medias_fixtures');
-    }
-
-    /**
-     * To get LayoutFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function layout(): Fixtures\LayoutFixtures
-    {
-        return $this->layoutLocator->get('layout_fixtures');
-    }
-
-    /**
-     * To get PageDuplicationFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function pageDuplication(): Fixtures\PageDuplicationFixtures
-    {
-        return $this->pageDuplicationLocator->get('page_duplication_fixtures');
-    }
-
-    /**
-     * To get PageFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function page(): Fixtures\PageFixtures
-    {
-        return $this->pageLocator->get('page_fixtures');
-    }
-
-    /**
      * To get SecurityFixtures.
      *
      * @throws ContainerExceptionInterface
@@ -123,26 +43,6 @@ class DataFixturesLocator implements DataFixturesInterface
     }
 
     /**
-     * To get ThumbnailFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function thumbnail(): Fixtures\ThumbnailFixtures
-    {
-        return $this->thumbnailLocator->get('thumbnail_fixtures');
-    }
-
-    /**
-     * To get TransitionFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function transition(): Fixtures\TransitionFixtures
-    {
-        return $this->transitionLocator->get('transition_fixtures');
-    }
-
-    /**
      * To get TranslationsFixtures.
      *
      * @throws ContainerExceptionInterface
@@ -150,16 +50,6 @@ class DataFixturesLocator implements DataFixturesInterface
     public function translations(): Fixtures\TranslationsFixtures
     {
         return $this->translationLocator->get('translations_fixtures');
-    }
-
-    /**
-     * To get UploadedFileFixtures.
-     *
-     * @throws ContainerExceptionInterface
-     */
-    public function uploadedFile(): Fixtures\UploadedFileFixtures
-    {
-        return $this->uploadFileLocator->get('uploaded_file_fixtures');
     }
 
     /**

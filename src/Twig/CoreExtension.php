@@ -6,7 +6,6 @@ namespace App\Twig;
 
 use App\Twig\Admin as AdminRuntime;
 use App\Twig\Content as ContentRuntime;
-use App\Twig\Content\BreadcrumbRuntime;
 use App\Twig\Core as CoreRuntime;
 use App\Twig\Translation as TranslationRuntime;
 use Twig\Extension\AbstractExtension;
@@ -26,7 +25,6 @@ class CoreExtension extends AbstractExtension
         $adminFilters = [
             new TwigFilter('symfonyVersion', [AdminRuntime\CoreRuntime::class, 'symfonyVersion']),
             new TwigFilter('phpversion', [AdminRuntime\CoreRuntime::class, 'phpversion']),
-            new TwigFilter('blockTypesActionsGroups', [AdminRuntime\CoreRuntime::class, 'blockTypesActionsGroups']),
             new TwigFilter('indexAllowed', [AdminRuntime\CoreRuntime::class, 'indexAllowed']),
             new TwigFilter('seasonIcon', [AdminRuntime\CoreRuntime::class, 'seasonIcon']),
             new TwigFilter('logAlert', [AdminRuntime\CoreRuntime::class, 'logAlert']),
@@ -37,8 +35,6 @@ class CoreExtension extends AbstractExtension
 
         /** Content */
         $contentFilters = [
-            new TwigFilter('breadcrumb', [BreadcrumbRuntime::class, 'breadcrumb']),
-            new TwigFilter('indexPage', [BreadcrumbRuntime::class, 'indexPage']),
             new TwigFilter('browser', [ContentRuntime\BrowserRuntime::class, 'browser']),
             new TwigFilter('screen', [ContentRuntime\BrowserRuntime::class, 'screen']),
             new TwigFilter('isDesktop', [ContentRuntime\BrowserRuntime::class, 'isDesktop']),
@@ -70,29 +66,7 @@ class CoreExtension extends AbstractExtension
             new TwigFilter('convertToBytesSize', [ContentRuntime\FileRuntime::class, 'convertToBytesSize']),
             new TwigFilter('fileExist', [ContentRuntime\FileRuntime::class, 'fileExist']),
             new TwigFilter('jsRouting', [ContentRuntime\FileRuntime::class, 'jsRouting']),
-            new TwigFilter('asGoogleFont', [ContentRuntime\FontsRuntime::class, 'asGoogleFont']),
-            new TwigFilter('fontConfig', [ContentRuntime\FontsRuntime::class, 'fontConfig']),
-            new TwigFilter('appAdminFonts', [ContentRuntime\FontsRuntime::class, 'appAdminFonts']),
             new TwigFilter('icon', [ContentRuntime\IconRuntime::class, 'icon']),
-            new TwigFilter('layoutRelations', [ContentRuntime\LayoutRuntime::class, 'layoutRelations']),
-            new TwigFilter('cacheKey', [ContentRuntime\LayoutRuntime::class, 'cacheKey']),
-            new TwigFilter('styleClass', [ContentRuntime\LayoutRuntime::class, 'styleClass']),
-            new TwigFilter('renderBlock', [ContentRuntime\LayoutRuntime::class, 'renderBlock']),
-            new TwigFilter('bodyClasses', [ContentRuntime\LayoutRuntime::class, 'bodyClasses']),
-            new TwigFilter('zoneClasses', [ContentRuntime\LayoutRuntime::class, 'zoneClasses']),
-            new TwigFilter('colClasses', [ContentRuntime\LayoutRuntime::class, 'colClasses']),
-            new TwigFilter('blockClasses', [ContentRuntime\LayoutRuntime::class, 'blockClasses']),
-            new TwigFilter('blockAlignment', [ContentRuntime\LayoutRuntime::class, 'blockAlignment']),
-            new TwigFilter('elementOrders', [ContentRuntime\LayoutRuntime::class, 'elementOrders']),
-            new TwigFilter('margins', [ContentRuntime\LayoutRuntime::class, 'margins']),
-            new TwigFilter('paddings', [ContentRuntime\LayoutRuntime::class, 'paddings']),
-            new TwigFilter('effectsAttrs', [ContentRuntime\LayoutRuntime::class, 'effectsAttrs']),
-            new TwigFilter('mediasSizes', [ContentRuntime\LayoutRuntime::class, 'mediasSizes']),
-            new TwigFilter('mainLayoutTitle', [ContentRuntime\LayoutRuntime::class, 'mainLayoutTitle']),
-            new TwigFilter('layoutBlockType', [ContentRuntime\LayoutRuntime::class, 'layoutBlockType']),
-            new TwigFilter('transitionsAttributes', [ContentRuntime\LayoutRuntime::class, 'transitionsAttributes']),
-            new TwigFilter('transitionAttributes', [ContentRuntime\LayoutRuntime::class, 'transitionAttributes']),
-            new TwigFilter('manifest', [ContentRuntime\ManifestRuntime::class, 'manifest']),
             new TwigFilter('fonts', [ContentRuntime\MediaRuntime::class, 'fonts']),
             new TwigFilter('mediasSize', [ContentRuntime\MediaRuntime::class, 'mediasSize']),
             new TwigFilter('haveMainMedia', [ContentRuntime\MediaRuntime::class, 'haveMainMedia']),
@@ -101,13 +75,11 @@ class CoreExtension extends AbstractExtension
             new TwigFilter('mediasByCategories', [ContentRuntime\MediaRuntime::class, 'mediasByCategories']),
             new TwigFilter('mediasWithFilename', [ContentRuntime\MediaRuntime::class, 'mediasWithFilename']),
             new TwigFilter('imgIsWhite', [ContentRuntime\MediaRuntime::class, 'imgIsWhite']),
-            new TwigFilter('seo', [ContentRuntime\SeoRuntime::class, 'seo']),
             new TwigFilter('fileIcon', [ContentRuntime\ThumbnailRuntime::class, 'fileIcon']),
             new TwigFilter('file', [ContentRuntime\ThumbnailRuntime::class, 'file']),
             new TwigFilter('thumb', [ContentRuntime\ThumbnailRuntime::class, 'thumb']),
             new TwigFilter('imgFilter', [ContentRuntime\ThumbnailRuntime::class, 'imgFilter']),
             new TwigFilter('mediaThumbs', [ContentRuntime\ThumbnailRuntime::class, 'mediaThumbs']),
-            new TwigFilter('video', [ContentRuntime\VideoRuntime::class, 'video']),
         ];
 
         /** Core */
@@ -184,15 +156,9 @@ class CoreExtension extends AbstractExtension
         /** Translations */
         $translationFilters = [
             new TwigFilter('intl', [TranslationRuntime\i18nRuntime::class, 'intl']),
-            new TwigFilter('intlAction', [TranslationRuntime\i18nRuntime::class, 'intlAction']),
-            new TwigFilter('intlUrl', [TranslationRuntime\i18nRuntime::class, 'intlUrl']),
-            new TwigFilter('intlMainUrl', [TranslationRuntime\i18nRuntime::class, 'intlMainUrl']),
-            new TwigFilter('intlLink', [TranslationRuntime\i18nRuntime::class, 'intlLink']),
             new TwigFilter('intlMedia', [TranslationRuntime\i18nRuntime::class, 'intlMedia']),
             new TwigFilter('intlMedias', [TranslationRuntime\i18nRuntime::class, 'intlMedias']),
             new TwigFilter('findIntl', [TranslationRuntime\i18nRuntime::class, 'findIntl']),
-            new TwigFilter('intlsModules', [TranslationRuntime\i18nRuntime::class, 'intlsModules']),
-            new TwigFilter('intlsBlockTypes', [TranslationRuntime\i18nRuntime::class, 'intlsBlockTypes']),
             new TwigFilter('intlsWithContent', [TranslationRuntime\i18nRuntime::class, 'intlsWithContent']),
             new TwigFilter('readingDirection', [TranslationRuntime\IntlRuntime::class, 'readingDirection']),
             new TwigFilter('canonicalizeLocale', [TranslationRuntime\IntlRuntime::class, 'canonicalizeLocale']),
@@ -221,7 +187,6 @@ class CoreExtension extends AbstractExtension
         $adminFunctions = [
             new TwigFunction('symfonyVersion', [AdminRuntime\CoreRuntime::class, 'symfonyVersion']),
             new TwigFunction('phpversion', [AdminRuntime\CoreRuntime::class, 'phpversion']),
-            new TwigFunction('blockTypesActionsGroups', [AdminRuntime\CoreRuntime::class, 'blockTypesActionsGroups']),
             new TwigFunction('indexAllowed', [AdminRuntime\CoreRuntime::class, 'indexAllowed']),
             new TwigFunction('seasonIcon', [AdminRuntime\CoreRuntime::class, 'seasonIcon']),
             new TwigFunction('logAlert', [AdminRuntime\CoreRuntime::class, 'logAlert']),
@@ -232,8 +197,6 @@ class CoreExtension extends AbstractExtension
 
         /** Content */
         $contentFunctions = [
-            new TwigFunction('breadcrumb', [BreadcrumbRuntime::class, 'breadcrumb']),
-            new TwigFunction('indexPage', [BreadcrumbRuntime::class, 'indexPage']),
             new TwigFunction('browser', [ContentRuntime\BrowserRuntime::class, 'browser']),
             new TwigFunction('screen', [ContentRuntime\BrowserRuntime::class, 'screen']),
             new TwigFunction('isDesktop', [ContentRuntime\BrowserRuntime::class, 'isDesktop']),
@@ -265,29 +228,7 @@ class CoreExtension extends AbstractExtension
             new TwigFunction('convertToBytesSize', [ContentRuntime\FileRuntime::class, 'convertToBytesSize']),
             new TwigFunction('fileExist', [ContentRuntime\FileRuntime::class, 'fileExist']),
             new TwigFunction('jsRouting', [ContentRuntime\FileRuntime::class, 'jsRouting']),
-            new TwigFunction('asGoogleFont', [ContentRuntime\FontsRuntime::class, 'asGoogleFont']),
-            new TwigFunction('fontConfig', [ContentRuntime\FontsRuntime::class, 'fontConfig']),
-            new TwigFunction('appAdminFonts', [ContentRuntime\FontsRuntime::class, 'appAdminFonts']),
             new TwigFunction('icon', [ContentRuntime\IconRuntime::class, 'icon']),
-            new TwigFunction('layoutRelations', [ContentRuntime\LayoutRuntime::class, 'layoutRelations']),
-            new TwigFunction('cacheKey', [ContentRuntime\LayoutRuntime::class, 'cacheKey']),
-            new TwigFunction('styleClass', [ContentRuntime\LayoutRuntime::class, 'styleClass']),
-            new TwigFunction('renderBlock', [ContentRuntime\LayoutRuntime::class, 'renderBlock']),
-            new TwigFunction('bodyClasses', [ContentRuntime\LayoutRuntime::class, 'bodyClasses']),
-            new TwigFunction('zoneClasses', [ContentRuntime\LayoutRuntime::class, 'zoneClasses']),
-            new TwigFunction('colClasses', [ContentRuntime\LayoutRuntime::class, 'colClasses']),
-            new TwigFunction('blockClasses', [ContentRuntime\LayoutRuntime::class, 'blockClasses']),
-            new TwigFunction('blockAlignment', [ContentRuntime\LayoutRuntime::class, 'blockAlignment']),
-            new TwigFunction('elementOrders', [ContentRuntime\LayoutRuntime::class, 'elementOrders']),
-            new TwigFunction('margins', [ContentRuntime\LayoutRuntime::class, 'margins']),
-            new TwigFunction('paddings', [ContentRuntime\LayoutRuntime::class, 'paddings']),
-            new TwigFunction('effectsAttrs', [ContentRuntime\LayoutRuntime::class, 'effectsAttrs']),
-            new TwigFunction('mediasSizes', [ContentRuntime\LayoutRuntime::class, 'mediasSizes']),
-            new TwigFunction('mainLayoutTitle', [ContentRuntime\LayoutRuntime::class, 'mainLayoutTitle']),
-            new TwigFunction('layoutBlockType', [ContentRuntime\LayoutRuntime::class, 'layoutBlockType']),
-            new TwigFunction('transitionsAttributes', [ContentRuntime\LayoutRuntime::class, 'transitionsAttributes']),
-            new TwigFunction('transitionAttributes', [ContentRuntime\LayoutRuntime::class, 'transitionAttributes']),
-            new TwigFunction('manifest', [ContentRuntime\ManifestRuntime::class, 'manifest']),
             new TwigFunction('fonts', [ContentRuntime\MediaRuntime::class, 'fonts']),
             new TwigFunction('mediasSize', [ContentRuntime\MediaRuntime::class, 'mediasSize']),
             new TwigFunction('haveMainMedia', [ContentRuntime\MediaRuntime::class, 'haveMainMedia']),
@@ -296,13 +237,11 @@ class CoreExtension extends AbstractExtension
             new TwigFunction('mediasByCategories', [ContentRuntime\MediaRuntime::class, 'mediasByCategories']),
             new TwigFunction('mediasWithFilename', [ContentRuntime\MediaRuntime::class, 'mediasWithFilename']),
             new TwigFunction('imgIsWhite', [ContentRuntime\MediaRuntime::class, 'imgIsWhite']),
-            new TwigFunction('seo', [ContentRuntime\SeoRuntime::class, 'seo']),
             new TwigFunction('fileIcon', [ContentRuntime\ThumbnailRuntime::class, 'fileIcon']),
             new TwigFunction('file', [ContentRuntime\ThumbnailRuntime::class, 'file']),
             new TwigFunction('thumb', [ContentRuntime\ThumbnailRuntime::class, 'thumb']),
             new TwigFunction('imgFilter', [ContentRuntime\ThumbnailRuntime::class, 'imgFilter']),
             new TwigFunction('mediaThumbs', [ContentRuntime\ThumbnailRuntime::class, 'mediaThumbs']),
-            new TwigFunction('video', [ContentRuntime\VideoRuntime::class, 'video']),
         ];
 
         /** Core */
@@ -379,15 +318,10 @@ class CoreExtension extends AbstractExtension
         /** Translations */
         $translationFunctions = [
             new TwigFunction('intl', [TranslationRuntime\i18nRuntime::class, 'intl']),
-            new TwigFunction('intlAction', [TranslationRuntime\i18nRuntime::class, 'intlAction']),
             new TwigFunction('intlUrl', [TranslationRuntime\i18nRuntime::class, 'intlUrl']),
-            new TwigFunction('intlMainUrl', [TranslationRuntime\i18nRuntime::class, 'intlMainUrl']),
-            new TwigFunction('intlLink', [TranslationRuntime\i18nRuntime::class, 'intlLink']),
             new TwigFunction('intlMedia', [TranslationRuntime\i18nRuntime::class, 'intlMedia']),
             new TwigFunction('intlMedias', [TranslationRuntime\i18nRuntime::class, 'intlMedias']),
             new TwigFunction('findIntl', [TranslationRuntime\i18nRuntime::class, 'findIntl']),
-            new TwigFunction('intlsModules', [TranslationRuntime\i18nRuntime::class, 'intlsModules']),
-            new TwigFunction('intlsBlockTypes', [TranslationRuntime\i18nRuntime::class, 'intlsBlockTypes']),
             new TwigFunction('intlsWithContent', [TranslationRuntime\i18nRuntime::class, 'intlsWithContent']),
             new TwigFunction('readingDirection', [TranslationRuntime\IntlRuntime::class, 'readingDirection']),
             new TwigFunction('canonicalizeLocale', [TranslationRuntime\IntlRuntime::class, 'canonicalizeLocale']),

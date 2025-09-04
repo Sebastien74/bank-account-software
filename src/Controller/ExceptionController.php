@@ -63,15 +63,6 @@ class ExceptionController extends BaseController
         $this->statusCode = $exception->getStatusCode();
         $this->statusCode = 0 === $this->statusCode ? 500 : $this->statusCode;
 
-        if (404 === $this->statusCode) {
-            $website = $this->coreLocator->website();
-            $configuration = $website->configuration;
-            $inBuild = $this->coreLocator->redirectionService()->inBuild($request, $website, $configuration);
-            if ($inBuild) {
-                return $this->redirect($inBuild);
-            }
-        }
-
         $arguments = $this->setArguments($request, $exception, $logger);
         $template = $this->getTemplate($projectDir);
 
@@ -193,7 +184,6 @@ class ExceptionController extends BaseController
             $arguments['configuration'] = $configuration;
             $arguments['template'] = $configuration->template;
             $arguments['templateName'] = 'error';
-            $arguments['mainPages'] = $website->configuration->pages;
             $arguments['logos'] = $website->logos;
         }
 
