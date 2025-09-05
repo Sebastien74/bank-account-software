@@ -486,35 +486,6 @@ class CoreLocator implements CoreLocatorInterface
     }
 
     /**
-     * To get preload Files.
-     */
-    public function preloadFiles(): array
-    {
-        if (!empty($this->cache['preloads'])) {
-            return $this->cache['preloads'];
-        }
-
-        $preloads = [];
-        $template = Core\Urlizer::urlize(($this->website()->configuration->template));
-        $onLoaded = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-on-loaded', 'front_default');
-        $animations = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-animations', 'front_default');
-        $bootstrap = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-bootstrap', 'front_default');
-        $modules = $this->entryFiles->getWebpackJsFiles('front-'.$template.'-modules', 'front_default');
-
-        if (!empty($onLoaded[0])) {
-            $preloads['js'] = [
-                $this->schemeAndHttpHost().$onLoaded[0],
-                $this->schemeAndHttpHost().$animations[0],
-                $this->schemeAndHttpHost().$bootstrap[0],
-                $this->schemeAndHttpHost().$modules[0],
-            ];
-            $this->cache['preloads'] = $preloads;
-        }
-
-        return $preloads;
-    }
-
-    /**
      * To get projectDir.
      */
     public function projectDir(): string

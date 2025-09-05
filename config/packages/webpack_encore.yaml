@@ -23,7 +23,6 @@ webpack_encore:
     # If you have multiple builds:
     builds:
         vendor: '%kernel.project_dir%/public/build/vendor'
-        front_default: '%kernel.project_dir%/public/build/front/default'
         admin: '%kernel.project_dir%/public/build/admin'
         security: '%kernel.project_dir%/public/build/security'
 
@@ -32,8 +31,6 @@ framework:
         packages:
             vendor:
                 json_manifest_path: '%kernel.project_dir%/public/build/vendor/manifest.json'
-            front_default:
-                json_manifest_path: '%kernel.project_dir%/public/build/front/default/manifest.json'
             admin:
                 json_manifest_path: '%kernel.project_dir%/public/build/admin/manifest.json'
             security:

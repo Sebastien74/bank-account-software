@@ -22,30 +22,6 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {PurgeCSSPlugin} = require('purgecss-webpack-plugin');
 
-function safeList() {
-    let patterns = [
-        'html', 'body', 'img', 'svg', 'picture', 'sup', 'a', 'button', 'address', 'badge', 'ended', 'no-backdrop', 'no-webp', 'support-webp', 'standardize-medias', 'as-btn',
-        /start$/, /end$/, /next$/, /prev$/, /open$/, /text$/, /modal$/, /card$/, /carousel$/, /tooltip$/, /collapsed$/, /collapsing$/, /navigation$/,
-        /img$/, /svg$/, /active$/, /show$/, /link$/, /address$/,
-        /-body/, /-footer/, /-style/, /m-/, /mx-/, /my-/, /mb-/, /mt-/, /ms-/, /me-/, /p-/, /px-/, /py-/, /pb-/, /pt-/, /ps-/, /pe-/, /fw-/, /fz-/, /-none/, /h-0/,
-        /offset-/, /h-100/, /d-/, /align-/, /vertical-align-/, /flex-/, /list-/, /justify-/, /fixed-/, /link-/, /display-/, /opactity-/,
-        /screen-/, /ribbon-/, /alert-/, /badge-/, /-view-body/, /text-/, /zone-/, /custom-/, /col-/, /-block/, /level-/, /ff-/,
-        /-block/, /order-/, /btn-/, /gdt-/, /bg-/, /modal-/, /tooltip-/, /card-/, /cta-/, /carousel-/, /overlay-/, /-overlay/, /as-scroll/,
-        /address/, /container/, /body/, /description/, /introduction/, /sr-only/,
-        /datepicker-/, /days/, /days-/, /dow/, /selected/, /autofill/, /focus/, /choices__/, /splide_/,
-        /overflow-initial/, /parallax-window/, /mobile-first/, /full-size/, /aos/, /lax/, /as-newscast-teaser/, /animation/, /aspect-ratio/, /large-file-container/, /fa-spin/, /shadow-box/, /shadow-left/, /shadow-right/,
-    ];
-    return {
-        standard: patterns
-    }
-}
-
-function blockList() {
-    return [
-        'code', 'lead'
-    ];
-}
-
 const enableNotification = false;
 const enableSourceMaps = !Encore.isProduction();
 const enableVersioning = true; // else Encore.isProduction()
@@ -143,104 +119,6 @@ vendor.optimization.minimize = minimize;
 vendor.resolve.extensions.push('json');
 if (vendor.optimization && vendor.optimization.minimizer) {
     vendor.optimization.minimizer.push(new CssMinimizerPlugin());
-}
-
-/** 2 - front */
-
-Encore.reset();
-
-Encore.setOutputPath('public/build/front/default')
-    .setPublicPath('/build/front/default')
-    .addEntry('front-default-on-loaded', './assets/js/front/default/on-loaded.js')
-    .addEntry('front-default-modules', './assets/js/front/default/modules.js')
-    .addEntry('front-default-bootstrap', './assets/js/front/default/bootstrap.js')
-    .addEntry('front-default-animations', './assets/js/front/default/animations.js')
-    .addEntry('front-default-home', './assets/js/front/default/templates/home.js')
-    .addEntry('front-default-cms', './assets/js/front/default/templates/cms.js')
-    .addEntry('front-default-build', './assets/js/front/default/templates/build.js')
-    .addEntry('front-default-switcher', './assets/js/front/default/templates/switcher.js')
-    .addEntry('front-default-error', './assets/js/front/default/templates/error.js')
-    .addStyleEntry('front-default-noscript', ['./assets/scss/front/default/noscript.scss'])
-    .addStyleEntry('front-default-fonts', ['./assets/scss/front/default/fonts.scss'])
-    .cleanupOutputBeforeBuild()
-    .enableVersioning(enableVersioning)
-    .enableSourceMaps(enableSourceMaps)
-    .enableIntegrityHashes(enableIntegrity)
-    .autoProvideVariables({
-        moment: 'moment'
-    })
-    .copyFiles({
-        from: './assets/medias/images/front/default',
-        to: 'images/[path][name].[hash:8].[ext]'
-    })
-    .copyFiles({
-        from: './assets/medias/movies',
-        to: 'movies/[path][name].[hash:8].[ext]'
-    })
-    .configureBabel(function (babelConfig) {
-        babelConfig.presets.push('@babel/preset-flow');
-    }, {})
-    .configureBabel((config) => {
-        config.plugins.push('@babel/plugin-proposal-class-properties');
-    })
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = false;
-        config.targets = { esmodules: true };
-    })
-    .enablePostCssLoader((options) => {
-        options.postcssOptions = {
-            config: path.resolve(__dirname, "postcss.config.js")
-        };
-    })
-    .configureImageRule({
-        type: 'asset',
-        maxSize: 8 * 1024, /** 8 kb - the default is 8kb */
-    })
-    .configureFontRule({
-        type: 'asset',
-        maxSize: 8 * 1024
-    })
-    .splitEntryChunks()
-    .enableStimulusBridge('./assets/js/front/default/controllers.json')
-    .configureSplitChunks(function (splitChunks) {
-        splitChunks.chunks = 'all'; // Tous les types de chunks
-        splitChunks.minSize = 10000; // Taille minimale d'un chunk
-        splitChunks.maxSize = 200000; // Taille maximale d'un chunk
-        splitChunks.maxAsyncRequests = 10;
-        splitChunks.maxInitialRequests = 10;
-        splitChunks.enforceSizeThreshold = 50000;
-    })
-    .addPlugin(new CleanWebpackPlugin())
-    .addPlugin(new PurgeCSSPlugin({
-        paths: glob.sync(
-            `${path.join(__dirname, 'templates')}/{front/default,core,components,gdpr}/**/*.html.twig`, {nodir: true}
-        ),
-        safelist: safeList,
-        blocklist: blockList,
-    }))
-    .disableSingleRuntimeChunk()
-    .enableSassLoader();
-
-if (enableNotification) {
-    Encore.enableBuildNotifications();
-}
-
-const front_default = Encore.getWebpackConfig();
-front_default.name = 'front_default';
-front_default.target = target;
-front_default.cache = cache;
-front_default.parallelism = parallelism;
-front_default.optimization.concatenateModules = concatenateModules;
-front_default.optimization.providedExports = providedExports;
-front_default.optimization.usedExports = usedExports;
-front_default.optimization.removeEmptyChunks = removeEmptyChunks;
-front_default.optimization.mergeDuplicateChunks = mergeDuplicateChunks;
-front_default.optimization.sideEffects = sideEffects;
-front_default.optimization.splitChunks = splitChunks;
-front_default.optimization.minimize = minimize;
-front_default.resolve.extensions.push('json');
-if (front_default.optimization && front_default.optimization.minimizer) {
-    front_default.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
 /** 3 - admin */
@@ -413,4 +291,4 @@ if (security.optimization && security.optimization.minimizer) {
 }
 
 /** 5 - module.exports */
-module.exports = [vendor, front_default, admin, security];
+module.exports = [vendor, admin, security];

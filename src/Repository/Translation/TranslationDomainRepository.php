@@ -19,13 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class TranslationDomainRepository extends ServiceEntityRepository
 {
     private const FRONT_DOMAINS = [
-        'front_default',
-        'front',
-        'front_form',
-        'front_js_plugins',
-        'gdpr',
-        'build',
-        'ie_alert',
+
     ];
 
     /**

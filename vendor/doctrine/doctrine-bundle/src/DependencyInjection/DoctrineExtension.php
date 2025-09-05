@@ -18,6 +18,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
+use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
@@ -31,6 +32,7 @@ use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Mapping\MappedSuperclass;
+use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
@@ -57,7 +59,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
@@ -70,8 +72,10 @@ use Symfony\Component\VarExporter\ProxyHelper;
 use function array_intersect_key;
 use function array_keys;
 use function array_merge;
+use function assert;
 use function class_exists;
 use function interface_exists;
+use function is_bool;
 use function is_dir;
 use function method_exists;
 use function reset;
@@ -169,8 +173,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function dbalLoad(array $config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('dbal.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('dbal.php');
 
         if (empty($config['default_connection'])) {
             $keys                         = array_keys($config['connections']);
@@ -472,8 +476,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             throw new LogicException('To configure the ORM layer, you must first install the doctrine/orm package.');
         }
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('orm.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('orm.php');
 
         if (class_exists(AbstractType::class)) {
             $container->getDefinition('form.type.entity')->addTag('kernel.reset', ['method' => 'reset']);
@@ -576,7 +580,25 @@ class DoctrineExtension extends AbstractDoctrineExtension
             trigger_deprecation('doctrine/doctrine-bundle', '2.11', 'Not setting "doctrine.orm.enable_lazy_ghost_objects" to true is deprecated.');
         }
 
-        $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'proxy_dir', 'proxy_namespace'];
+        if ($config['enable_native_lazy_objects'] ?? false) {
+            /** @phpstan-ignore function.alreadyNarrowedType */
+            if (! method_exists(ORMConfiguration::class, 'enableNativeLazyObjects')) {
+                throw new LogicException(
+                    'Native lazy objects are not supported with your installed version of the ORM. Please upgrade to "doctrine/orm >= 3.4".',
+                );
+            }
+
+            if (PHP_VERSION_ID < 80400) {
+                throw new LogicException('Using native lazy objects requires PHP 8.4 or higher.');
+            }
+
+            $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
+        } elseif (! class_exists(AnnotationDriver::class)) {
+            // Only emit the deprecation notice for ORM 3 users
+            trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
+        }
+
+        $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.' . $key, $config[$key]);
         }
@@ -702,7 +724,21 @@ class DoctrineExtension extends AbstractDoctrineExtension
         ];
 
         if (PHP_VERSION_ID >= 80400 && class_exists(LegacyReflectionFields::class)) {
-            $methods['enableNativeLazyObjects'] = $entityManager['enable_native_lazy_objects'];
+            $enableNativeLazyObjects = $container->getParameter('doctrine.orm.enable_native_lazy_objects');
+
+            assert(is_bool($enableNativeLazyObjects));
+
+            $methods['enableNativeLazyObjects'] = $enableNativeLazyObjects;
+
+            // Do not set deprecated proxy configurations when native lazy objects are enabled with `doctrine/orm:^3.5`
+            /** @phpstan-ignore function.alreadyNarrowedType */
+            if ($enableNativeLazyObjects && method_exists(ORMSetup::class, 'createAttributeMetadataConfig')) {
+                unset(
+                    $methods['setProxyDir'],
+                    $methods['setProxyNamespace'],
+                    $methods['setAutoGenerateProxyClasses'],
+                );
+            }
         }
 
         if (isset($entityManager['fetch_mode_subselect_batch_size'])) {
@@ -1188,8 +1224,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             return;
         }
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('messenger.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('messenger.php');
 
         /**
          * The Doctrine transport component (symfony/doctrine-messenger) is optional.
@@ -1227,8 +1263,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         array $connWithBacktrace,
         array $connWithTtl,
     ): void {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('middlewares.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('middlewares.php');
 
         $loggingMiddlewareAbstractDef = $container->getDefinition('doctrine.dbal.logging_middleware');
         foreach ($connWithLogging as $connName) {

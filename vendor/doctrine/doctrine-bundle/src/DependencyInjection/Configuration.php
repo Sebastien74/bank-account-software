@@ -428,6 +428,7 @@ class Configuration implements ConfigurationInterface
             'default_entity_manager' => true,
             'auto_generate_proxy_classes' => true,
             'enable_lazy_ghost_objects' => true,
+            'enable_native_lazy_objects' => true,
             'proxy_dir' => true,
             'proxy_namespace' => true,
             'resolve_target_entities' => true,
@@ -474,7 +475,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)
-                            ->info('Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL", "FILE_NOT_EXISTS_OR_CHANGED"')
+                            ->info('Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL", "FILE_NOT_EXISTS_OR_CHANGED", this option is ignored when the "enable_native_lazy_objects" option is true')
                             ->validate()
                                 ->ifTrue(function ($v) {
                                     $generationModes = $this->getAutoGenerateModes();
@@ -506,8 +507,18 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(! method_exists(ProxyFactory::class, 'resetUninitializedProxy'))
                             ->info('Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation')
                         ->end()
-                        ->scalarNode('proxy_dir')->defaultValue('%kernel.build_dir%/doctrine/orm/Proxies')->end()
-                        ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
+                        ->booleanNode('enable_native_lazy_objects')
+                            ->defaultFalse()
+                            ->info('Enables the new native implementation of PHP lazy objects instead of generated proxies')
+                        ->end()
+                        ->scalarNode('proxy_dir')
+                            ->defaultValue('%kernel.build_dir%/doctrine/orm/Proxies')
+                            ->info('Configures the path where generated proxy classes are saved when using non-native lazy objects, this option is ignored when the "enable_native_lazy_objects" option is true')
+                        ->end()
+                        ->scalarNode('proxy_namespace')
+                            ->defaultValue('Proxies')
+                            ->info('Defines the root namespace for generated proxy classes when using non-native lazy objects, this option is ignored when the "enable_native_lazy_objects" option is true')
+                        ->end()
                         ->arrayNode('controller_resolver')
                             ->canBeDisabled()
                             ->children()
@@ -652,10 +663,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('class_metadata_factory_name')->defaultValue(ClassMetadataFactory::class)->end()
                     ->scalarNode('default_repository_class')->defaultValue(EntityRepository::class)->end()
                     ->scalarNode('auto_mapping')->defaultFalse()->end()
-                    ->booleanNode('enable_native_lazy_objects')
-                        ->defaultFalse()
-                        ->info('Enables the new native implementation of PHP lazy objects instead of generated proxies')
-                    ->end()
                     ->scalarNode('naming_strategy')->defaultValue('doctrine.orm.naming_strategy.default')->end()
                     ->scalarNode('quote_strategy')->defaultValue('doctrine.orm.quote_strategy.default')->end()
                     ->scalarNode('typed_field_mapper')->defaultValue('doctrine.orm.typed_field_mapper.default')->end()

@@ -84,8 +84,6 @@ interface CoreLocatorInterface
 
     public function unescape(?string $string = null): ?string;
 
-    public function preloadFiles(): array;
-
     public function projectDir(): string;
 
     public function publicDir(): string;

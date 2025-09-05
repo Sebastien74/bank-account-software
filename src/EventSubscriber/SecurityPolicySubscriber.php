@@ -79,12 +79,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             $response->headers->clearCookie('SECURITY_ERROR');
         }
 
-        if ('front_clear_cache' === $this->routeName) {
-            $nonce = $this->session->get('app_nonce');
-            if ($nonce === $this->request->get('token')) {
-                return;
-            }
-        } elseif (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
+        if (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
             return;
         }
 

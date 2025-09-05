@@ -54,6 +54,7 @@ class ExceptionController extends BaseController
         string $projectDir,
         ?DebugLoggerInterface $logger = null,
     ): Response {
+
         $this->isDebug = $isDebug;
 
         if (!$this->isDebug && preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri()) && !$this->getUser() instanceof User) {

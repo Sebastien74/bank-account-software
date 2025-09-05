@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Command\CacheCommand;
-use App\Entity\Core\Website;
 use App\Model\Core\WebsiteModel;
 use Doctrine\ORM\NonUniqueResultException;
-use Exception;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * BaseController.
@@ -30,32 +25,6 @@ abstract class BaseController extends AbstractController
      */
     public function __construct(protected \App\Service\Interface\CoreLocatorInterface $coreLocator)
     {
-    }
-
-    /**
-     * To clear cache.
-     *
-     * @throws Exception
-     */
-    #[Route('/app/clear/cache', name: 'front_clear_cache', options: ['expose' => true, 'isMainRequest' => false], methods: 'GET', schemes: '%protocol%')]
-    public function clearAppCache(CacheCommand $cacheCommand, bool $isDebug): JsonResponse
-    {
-        if (!$isDebug) {
-            $cacheCommand->clear();
-            $websites = $this->coreLocator->em()->getRepository(Website::class)->findAll();
-            foreach ($websites as $website) {
-                $website->setCacheClearDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $this->coreLocator->em()->persist($website);
-            }
-            $this->coreLocator->em()->flush();
-        }
-
-        return new JsonResponse(['success' => true]);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return parent::getSubscribedServices();
     }
 
     /**

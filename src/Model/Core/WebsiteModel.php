@@ -50,7 +50,7 @@ final class WebsiteModel extends BaseModel
     /**
      * Get model.
      *
-     * @throws MappingException|NonUniqueResultException|InvalidArgumentException|\ReflectionException
+     * @throws MappingException|NonUniqueResultException|InvalidArgumentException
      */
     public static function fromEntity(WebsiteEntity $website, CoreLocatorInterface $coreLocator, ?string $locale = null): self
     {

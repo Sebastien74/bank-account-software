@@ -54,8 +54,6 @@ class RequestListener
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-
-        die;
         $this->request = $event->getRequest();
         $this->routeName = $this->request->attributes->get('_route');
         if (!$event->isMainRequest() || !$this->isMainRequest() || $this->isSubRequest()) {
@@ -172,8 +170,6 @@ class RequestListener
                 $this->event->setResponse(new RedirectResponse($response['domainRedirection'], 301));
             } elseif ($response['urlRedirection']) {
                 $this->event->setResponse(new RedirectResponse($response['urlRedirection'], 301));
-            } elseif ($response['inBuildRedirection']) {
-                $this->event->setResponse(new RedirectResponse($response['inBuildRedirection'], 302));
             } elseif ($response['banRedirection']) {
                 $this->event->setResponse(new RedirectResponse($response['banRedirection'], 302));
             }

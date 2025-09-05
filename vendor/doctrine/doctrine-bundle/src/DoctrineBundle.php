@@ -84,8 +84,12 @@ class DoctrineBundle extends Bundle
 
     public function boot(): void
     {
-        // Register an autoloader for proxies to avoid issues when unserializing them
-        // when the ORM is used.
+        // Register an autoloader for proxies when native lazy objects are not in use
+        // to avoid issues when unserializing them when the ORM is used.
+        if ($this->container->hasParameter('doctrine.orm.enable_native_lazy_objects') && $this->container->getParameter('doctrine.orm.enable_native_lazy_objects')) {
+            return;
+        }
+
         if (! $this->container->hasParameter('doctrine.orm.proxy_namespace')) {
             return;
         }

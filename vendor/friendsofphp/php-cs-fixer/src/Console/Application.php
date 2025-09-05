@@ -42,11 +42,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
  *
  * @internal
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class Application extends BaseApplication
 {
     public const NAME = 'PHP CS Fixer';
-    public const VERSION = '3.86.0';
+    public const VERSION = '3.87.1';
     public const VERSION_CODENAME = 'Alexander';
 
     /**
@@ -207,7 +209,8 @@ final class Application extends BaseApplication
                     'line' => $e->getLine(),
                     'code' => $e->getCode(),
                     'trace' => $e->getTraceAsString(),
-                ]
+                ],
+                \JSON_THROW_ON_ERROR
             ));
 
             return;

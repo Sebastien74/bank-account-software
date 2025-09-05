@@ -6,7 +6,6 @@ namespace App\Controller\Admin\Development;
 
 use App\Controller\Admin\AdminController;
 use App\Entity\Core\Website;
-use App\Service\DataFixtures\SecurityFixtures;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,11 +35,8 @@ class TestController extends AdminController
      * @throws \Exception
      */
     #[Route('/view/{website}', name: 'admin_dev_test', methods: 'GET|POST')]
-    public function test(Request $request, SecurityFixtures $fixtures, Website $website): Response
+    public function test(Request $request, Website $website): Response
     {
-        $fixtures->addMessages($website);
-
-        die;
 
         parent::breadcrumb($request, []);
 

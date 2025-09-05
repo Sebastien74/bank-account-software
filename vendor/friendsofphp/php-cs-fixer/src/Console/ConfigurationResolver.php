@@ -75,6 +75,8 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Katsuhiro Ogawa <ko.fivestar@gmail.com>
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class ConfigurationResolver
 {
@@ -91,6 +93,11 @@ final class ConfigurationResolver
         self::BOOL_YES,
         self::BOOL_NO,
     ];
+
+    /**
+     * @TODO v4: this is no longer needed due to `MARKER-multi-paths-vs-only-cwd-config`
+     */
+    private ?string $deprecatedNestedConfigDir = null;
 
     private ?bool $allowRisky = null;
 
@@ -252,6 +259,13 @@ final class ConfigurationResolver
 
                 if (isset($deprecatedConfigs[$configFileBasename])) {
                     throw new InvalidConfigurationException("Configuration file `{$configFileBasename}` is outdated, rename to `{$deprecatedConfigs[$configFileBasename]}`.");
+                }
+
+                if (null !== $this->deprecatedNestedConfigDir && str_starts_with($configFile, $this->deprecatedNestedConfigDir)) {
+                    // @TODO v4: when removing, remove also TODO with `MARKER-multi-paths-vs-only-cwd-config`
+                    Utils::triggerDeprecation(
+                        new InvalidConfigurationException("Configuration file `{$configFile}` is picked as file inside passed `path` CLI argument. This will be ignored in the future and only config file in `cwd` will be picked. Please use `config` CLI option instead if you want to keep current behaviour."),
+                    );
                 }
 
                 $this->config = self::separatedContextLessInclude($configFile);
@@ -551,6 +565,8 @@ final class ConfigurationResolver
     /**
      * Compute file candidates for config file.
      *
+     * @TODO v4: don't offer configs from passed `path` CLI argument
+     *
      * @return list<string>
      */
     private function computeConfigFiles(): array
@@ -570,6 +586,7 @@ final class ConfigurationResolver
         if ($this->isStdIn() || 0 === \count($path)) {
             $configDir = $this->cwd;
         } elseif (1 < \count($path)) {
+            // @TODO v4: this is no longer needed due to `MARKER-multi-paths-vs-only-cwd-config`
             throw new InvalidConfigurationException('For multiple paths config parameter is required.');
         } elseif (!is_file($path[0])) {
             $configDir = $path[0];
@@ -594,6 +611,8 @@ final class ConfigurationResolver
             // @TODO v4 drop handling (triggering error) for v2 config names
             $candidates[] = $this->cwd.\DIRECTORY_SEPARATOR.'.php_cs'; // old v2 config, present here only to throw nice error message later
             $candidates[] = $this->cwd.\DIRECTORY_SEPARATOR.'.php_cs.dist'; // old v2 config, present here only to throw nice error message later
+
+            $this->deprecatedNestedConfigDir = $configDir;
         }
 
         return $candidates;
@@ -684,13 +703,11 @@ final class ConfigurationResolver
         }
 
         if (str_starts_with($rules, '{')) {
-            $rules = json_decode($rules, true);
-
-            if (\JSON_ERROR_NONE !== json_last_error()) {
-                throw new InvalidConfigurationException(\sprintf('Invalid JSON rules input: "%s".', json_last_error_msg()));
+            try {
+                return json_decode($rules, true, 512, \JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new InvalidConfigurationException(\sprintf('Invalid JSON rules input: "%s".', $e->getMessage()));
             }
-
-            return $rules;
         }
 
         $rules = [];
@@ -981,7 +998,7 @@ final class ConfigurationResolver
 
         // verify that the config has an instance of Config
         if (!$config instanceof ConfigInterface) {
-            throw new InvalidConfigurationException(\sprintf('The config file: "%s" does not return a "PhpCsFixer\ConfigInterface" instance. Got: "%s".', $path, \is_object($config) ? \get_class($config) : \gettype($config)));
+            throw new InvalidConfigurationException(\sprintf('The config file: "%s" does not return a "%s" instance. Got: "%s".', $path, ConfigInterface::class, get_debug_type($config)));
         }
 
         return $config;
