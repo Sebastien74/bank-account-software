@@ -44,9 +44,7 @@ $ribbon-danger-color: #fff;
 -----------------------------------*/
 
 @import "~bootstrap/scss/bootstrap";
-
-@import '../vendor/components/recaptcha';
 @import 'core/app';
 @import 'core/preloader';
-@import 'core/ribbon';
 @import 'core/form';
+@import '../vendor/components/ribbon';

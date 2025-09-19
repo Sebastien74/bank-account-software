@@ -6,6 +6,6 @@ app_extra:
     resource: .
     type: extra
 
-admin_controller:
-    resource: ../../src/Controller/Admin/AdminController.php
-    type: attribute
+#base_controller:
+#    resource: ../../src/Controller/BaseController.php
+#    type: attribute

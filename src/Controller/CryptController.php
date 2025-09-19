@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Core\Website;
-use App\Model\Core\WebsiteModel;
-use App\Service\Content\CryptService;
-use App\Service\Interface\CoreLocatorInterface;
-use Doctrine\ORM\Mapping\MappingException;
-use Doctrine\ORM\NonUniqueResultException;
-use Psr\Cache\InvalidArgumentException;
+use App\Service\CryptService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,18 +16,21 @@ use Symfony\Component\Routing\Attribute\Route;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-#[Route('/cms/front/crypt', schemes: '%protocol%')]
+#[Route('/front/crypt', schemes: '%protocol%')]
 class CryptController extends AbstractController
 {
     /**
      * Encrypt.
-     *
-     * @throws MappingException|NonUniqueResultException|InvalidArgumentException|\ReflectionException
      */
-    #[Route('/encrypt/{website}/{string}', name: 'front_encrypt', options: ['isMainRequest' => false], defaults: ['website' => null, 'string' => null], methods: 'GET')]
-    public function encrypt(CoreLocatorInterface $coreLocator, CryptService $cryptService, ?Website $website = null, ?string $string = null): JsonResponse
+    #[Route('/encrypt/{string}',
+        name: 'front_encrypt',
+        options: ['isMainRequest' => false],
+        defaults: ['string' => null],
+        methods: 'GET'
+    )]
+    public function encrypt(CryptService $cryptService, ?string $string = null): JsonResponse
     {
-        $response = new JsonResponse(['result' => $cryptService->execute(WebsiteModel::fromEntity($website, $coreLocator), $string, 'e')]);
+        $response = new JsonResponse(['result' => $cryptService->execute($string, 'e')]);
         header('Cache-Control: max-age=31536000');
 
         return $response;
@@ -41,17 +38,16 @@ class CryptController extends AbstractController
 
     /**
      * Decrypt.
-     *
-     * @throws MappingException|NonUniqueResultException|InvalidArgumentException|\ReflectionException
      */
-    #[Route('/decrypt/{website}/{string}',
+    #[Route('/decrypt/{string}',
         name: 'front_decrypt',
         options: ['isMainRequest' => false],
-        defaults: ['website' => null, 'string' => null],
-        methods: 'GET')]
-    public function decrypt(CoreLocatorInterface $coreLocator, CryptService $codeService, ?Website $website = null, ?string $string = null): JsonResponse
+        defaults: ['string' => null],
+        methods: 'GET'
+    )]
+    public function decrypt(CryptService $codeService, ?string $string = null): JsonResponse
     {
-        $response = new JsonResponse(['result' => $codeService->execute(WebsiteModel::fromEntity($website, $coreLocator), $string, 'd')]);
+        $response = new JsonResponse(['result' => $codeService->execute($string, 'd')]);
         header('Cache-Control: max-age=31536000');
 
         return $response;

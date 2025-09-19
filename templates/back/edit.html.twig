@@ -1,0 +1,38 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'admin' %}
+
+{% set pageIcon = 'fal wallet' %}
+{% set pageTitle = "Mes comptes"|trans %}
+{% set excludes = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
+
+{% block stylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}
+
+{% block body %}
+    <div id="wallet-edit" class="container-fluid pt-4 pb-5 position-relative">
+        {{ form_start(form, {attr: {
+            novalidate: "novalidate",
+        }}) }}
+            <div class="row">
+                {% for field in form.children %}
+                    {% set notExcluded = field.vars.name not in excludes %}
+                    {% if notExcluded %}
+                        {{ form_row(form[field.vars.name]) }}
+                    {% endif %}
+                {% endfor %}
+                <div class="d-flex mt-4 justify-content-end">
+                    {% if form.save is defined %}
+                        {{ form_row(form.save) }}
+                    {% endif %}
+                    {% if form.saveBack is defined %}
+                        {{ form_row(form.saveBack) }}
+                    {% endif %}
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

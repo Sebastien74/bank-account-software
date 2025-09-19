@@ -1,0 +1,42 @@
+.modal-content {
+
+    border: 0 !important;
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+
+        border: 0 !important;
+
+        label {
+            color: $white;
+        }
+
+        .btn-close {
+            color: $white;
+        }
+    }
+
+    .modal-header {
+        padding-right: 1.5rem !important;
+        padding-left: 1.5rem !important;
+    }
+
+    .modal-body {
+
+        .invalid-feedback {
+            color: $red-300 !important;
+        }
+
+        .delete-alert {
+            color: $white;
+            font-size: 18px;
+        }
+    }
+
+    .modal-footer {
+
+        padding-right: 1.5rem !important;
+        padding-left: 1.5rem !important;
+    }
+}

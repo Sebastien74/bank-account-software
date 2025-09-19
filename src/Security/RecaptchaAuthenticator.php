@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\Core\Website;
-use App\Service\Content\CryptService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\CryptService;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -31,7 +29,6 @@ class RecaptchaAuthenticator
     public function __construct(
         private readonly CryptService $cryptService,
         private readonly TranslatorInterface $translator,
-        private readonly EntityManagerInterface $entityManager,
         private readonly string $logDir,
     ) {
         $this->session = new Session();
@@ -44,14 +41,12 @@ class RecaptchaAuthenticator
      */
     public function execute(Request $request): bool
     {
-        $website = $this->entityManager->getRepository(Website::class)->findOneByHost($request->getHost());
-        $formSecurityKey = $website->getSecurity()->getSecurityKey();
-        $this->setSecurityKeys($website);
+        $formSecurityKey = $_ENV['SECRET_KEY'];
         $fieldHo = $request->request->get('field_ho');
         $fieldHoEntitled = $request->request->get('field_ho_entitled');
 
         if (!empty($fieldHo) && empty($fieldHoEntitled)) {
-            $honeyPost = $this->cryptService->execute($website, $fieldHo, 'd');
+            $honeyPost = $this->cryptService->execute($fieldHo, 'd');
             if (urldecode($honeyPost) == $formSecurityKey) {
                 return true;
             }
@@ -64,35 +59,5 @@ class RecaptchaAuthenticator
         $logger->critical('Recaptcha security. IP register :'.$request->getClientIp());
 
         return false;
-    }
-
-    /**
-     * Set security keys if not generated.
-     *
-     * @throws \Exception
-     */
-    private function setSecurityKeys(Website $website): void
-    {
-        $flush = false;
-        $api = $website->getApi();
-        $securityKey = $api->getSecuritySecretKey();
-        $securityIv = $api->getSecuritySecretIv();
-
-        if (!$securityKey) {
-            $key = base64_encode(uniqid().password_hash(uniqid(), PASSWORD_BCRYPT).random_bytes(10));
-            $api->setSecuritySecretKey(substr(str_shuffle($key), 0, 45));
-            $flush = true;
-        }
-
-        if (!$securityIv) {
-            $key = base64_encode(uniqid().password_hash(uniqid(), PASSWORD_BCRYPT).random_bytes(10));
-            $api->setSecuritySecretIv(substr(str_shuffle($key), 0, 45));
-            $flush = true;
-        }
-
-        if ($flush) {
-            $this->entityManager->persist($api);
-            $this->entityManager->flush();
-        }
     }
 }

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\DataFixtures;
 
 use App\Entity\Security\Group;
-use App\Entity\Security\Picture;
 use App\Entity\Security\Role;
 use App\Entity\Security\User;
-use App\Service\Core\Urlizer;
+use App\Service\Urlizer;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -21,40 +21,20 @@ use Symfony\Component\Yaml\Yaml;
  */
 class SecurityFixtures extends BaseFixtures
 {
-    private const array CUSTOMER_ROLES = [
-        'ROLE_USER',
-        'ROLE_ADMIN',
-        'ROLE_ADD',
-        'ROLE_EDIT',
-        'ROLE_DELETE',
-        'ROLE_EXPORT',
-        'ROLE_PAGE',
-        'ROLE_MEDIA',
-        'ROLE_NEWSCAST',
-        'ROLE_SEO',
-        'ROLE_INFORMATION',
-        'ROLE_SLIDER',
-        'ROLE_TRANSLATION',
-        'ROLE_NAVIGATION',
-        'ROLE_CHATBOT',
-    ];
-    private const array TRANSLATOR_ROLES = [
-        'ROLE_USER',
-        'ROLE_ADMIN',
-        'ROLE_TRANSLATION',
-        'ROLE_TRANSLATOR',
-    ];
-
     private int $position = 1;
     private ?User $createdBy = null;
 
+    /**
+     * loadData.
+     *
+     * @throws Exception
+     */
     protected function loadData(ObjectManager $manager): void
     {
         $this->manager = $manager;
         $this->addRoles();
         foreach ($this->getUsers() as $userConfig) {
-            $user = $this->addUser($userConfig);
-            $this->setPicture($user, $userConfig);
+            $this->addUser($userConfig);
         }
         $this->manager->flush();
     }
@@ -106,11 +86,11 @@ class SecurityFixtures extends BaseFixtures
     {
         $users[] = [
             'markup' => '232',
-            'email' => 'support@agence-felix.fr',
+            'email' => 'fournier.sebastien@outlook.com',
             'login' => 'webmaster',
             'roles' => $this->getYamlRoles(true),
             'lastname' => 'Bank Account Software',
-            'group' => $this->translator->trans('Interne', [], 'security'),
+            'group' => 'Interne',
             'password' => '$2y$10$yzsckDg/ad8P/MiLzuOPCehisJDkLKfO45LB4u9KtUd.T.LDjFVTq',
             'code' => 'internal',
             'active' => true,
@@ -122,6 +102,8 @@ class SecurityFixtures extends BaseFixtures
 
     /**
      * Add User.
+     *
+     * @throws Exception
      */
     private function addUser(array $userConfig): User
     {
@@ -155,20 +137,6 @@ class SecurityFixtures extends BaseFixtures
         $this->manager->persist($user);
 
         return $user;
-    }
-
-    /**
-     * Set User Picture.
-     */
-    private function setPicture(User $user, array $userConfig): void
-    {
-        $userConfig = (object) $userConfig;
-        $picture = new Picture();
-        $picture->setFilename($userConfig->picture);
-        $picture->setDirname('/uploads/users/'.$userConfig->picture);
-        $picture->setUser($user);
-        $user->setPicture($picture);
-        $this->manager->persist($user);
     }
 
     /**

@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Entity\Core\Website;
-use App\Model\Core\ConfigurationModel;
-use App\Model\Core\WebsiteModel;
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CoreLocatorInterface;
 use Psr\Cache\InvalidArgumentException;
+use ReflectionException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -27,13 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class LocaleSubscriber implements EventSubscriberInterface
 {
-    private Request $request;
-    private ?string $host = null;
     private ?string $routeName = null;
-    private bool $inAdmin;
-    private SessionInterface $session;
-    private ?WebsiteModel $website = null;
-    private ?object $domain = null;
 
     /**
      * LocaleSubscriber constructor.
@@ -47,46 +37,41 @@ class LocaleSubscriber implements EventSubscriberInterface
     /**
      * onKernelRequest.
      *
-     * @throws \ReflectionException|InvalidArgumentException
+     * @throws ReflectionException|InvalidArgumentException
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        $this->request = $event->getRequest();
-        $this->routeName = $this->request->attributes->get('_route');
+        $request = $event->getRequest();
+        $this->routeName = $request->attributes->get('_route');
 
         if (!$event->isMainRequest() || !$this->isMainRequest()) {
             return;
         }
 
-        $uri = $this->request->getUri();
-        $this->host = $this->request->getHost();
-        $this->inAdmin = preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
-        $this->session = $this->request->getSession();
-        $asSwitch = !empty($this->request->get('_switch_user'));
+        $uri = $request->getUri();
+        $inAdmin = preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
+        $session = $request->getSession();
+        $asSwitch = !empty($request->get('_switch_user'));
 
-        if (!$this->request->hasPreviousSession() && !$event->isMainRequest() || $asSwitch || str_contains($uri, '_fragment') || str_contains($uri, '_wdt')) {
+        if (!$request->hasPreviousSession() && !$event->isMainRequest() || $asSwitch || str_contains($uri, '_fragment') || str_contains($uri, '_wdt')) {
             return;
         }
 
         /* Front request */
-        if (!$this->inAdmin) {
-            $this->setWebsite();
-            $configuration = $this->website->configuration;
-            $domain = $configuration->domain ?? $this->domain;
-            $locale = $this->request->getPreferredLanguage($configuration->allLocales) ?? $this->defaultLocale;
-            $locale = $domain ? $domain->locale : ($configuration instanceof ConfigurationModel ? $configuration->locale : $locale);
-            $this->session->set('_locale', $locale);
-            $this->request->setLocale($locale);
+        if (!$inAdmin) {
+            $locale = $request->getPreferredLanguage(['fr', 'en']) ?? $this->defaultLocale;
+            $session->set('_locale', $locale);
+            $request->setLocale($locale);
         } /* Try to see if the locale has been set as a _locale routing parameter */
-        elseif ($locale = $this->request->attributes->get('_locale')) {
-            $this->session->set('_locale', $locale);
+        elseif ($locale = $request->attributes->get('_locale')) {
+            $session->set('_locale', $locale);
         } /* If no explicit locale has been set on this request, use one from the session */
         else {
             $token = $this->coreLocator->tokenStorage()->getToken();
             if (!empty($token)) {
                 $user = $token->getUser();
                 if ($user && method_exists($user, 'getLocale') && $user->getLocale()) {
-                    $this->session->set('_locale', $user->getLocale());
+                    $session->set('_locale', $user->getLocale());
                 }
             }
         }
@@ -121,16 +106,6 @@ class LocaleSubscriber implements EventSubscriberInterface
         }
 
         return true;
-    }
-
-    /**
-     * Set WebsiteModel.
-     */
-    private function setWebsite(): void
-    {
-        if (!$this->inAdmin) {
-            $this->website = $this->coreLocator->em()->getRepository(Website::class)->findOneByHost($this->host);
-        }
     }
 
     /**

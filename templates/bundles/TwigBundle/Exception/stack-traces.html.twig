@@ -14,7 +14,7 @@
         <title>{{ status_code }} Error - {{ "Bank Account Software"|trans }}</title>
         <meta name="description" content="{{ "Bank Account Software"|trans }}" />
         <meta name="author" content="{{ "Bank Account Software"|trans }}" />
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/admin/images/theme/favicon.ico', 'admin') }}" />
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon.ico') }}" />
         <style>{{ include('@Twig/exception.css.twig') }}</style>
         {% block head %}{% endblock %}
     </head>
@@ -24,13 +24,13 @@
         <header>
             <div class="container">
                 <h1 class="logo">
-                    <img src="{{ asset('build/vendor/images/symfony.png', 'vendor') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
+                    <img src="{{ asset('build/back/images/symfony.png', 'back') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
                     Symfony Exception
                 </h1>
                 <div class="help-link">
                     <a href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/index.html" target="_blank">
                         <span class="icon">
-                            <img src="{{ asset('build/vendor/images/symfony-documentation.png', 'vendor') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
+                            <img src="{{ asset('build/back/images/symfony-documentation.png', 'back') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
                         </span>
                         <span class="hidden-xs-down">Symfony</span> Docs
                     </a>
@@ -38,7 +38,7 @@
                 <div class="help-link">
                     <a href="https://symfony.com/support" target="_blank">
                         <span class="icon">
-                            <img src="{{ asset('build/vendor/images/symfony-interrogation.png', 'vendor') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
+                            <img src="{{ asset('build/back/images/symfony-interrogation.png', 'back') }}" height="25" width="25" alt="Symfony" class="img-fluid header-logo" />
                         </span>
                         <span class="hidden-xs-down">Symfony</span> Support
                     </a>

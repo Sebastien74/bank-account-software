@@ -22,17 +22,14 @@ webpack_encore:
     # strict_mode: false
     # If you have multiple builds:
     builds:
-        vendor: '%kernel.project_dir%/public/build/vendor'
-        admin: '%kernel.project_dir%/public/build/admin'
+        back: '%kernel.project_dir%/public/build/back'
         security: '%kernel.project_dir%/public/build/security'
 
 framework:
     assets:
         packages:
-            vendor:
-                json_manifest_path: '%kernel.project_dir%/public/build/vendor/manifest.json'
-            admin:
-                json_manifest_path: '%kernel.project_dir%/public/build/admin/manifest.json'
+            back:
+                json_manifest_path: '%kernel.project_dir%/public/build/back/manifest.json'
             security:
                 json_manifest_path: '%kernel.project_dir%/public/build/security/manifest.json'
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Service\Core\Urlizer;
+use App\Service\Urlizer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -27,9 +27,6 @@ abstract class BaseEntity extends BaseInterface
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     protected ?string $slug = null;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    protected ?string $computeETag = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $position = 1;
@@ -69,18 +66,6 @@ abstract class BaseEntity extends BaseInterface
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
-
-        return $this;
-    }
-
-    public function getComputeETag(): ?string
-    {
-        return $this->computeETag;
-    }
-
-    public function setComputeETag(?string $computeETag): static
-    {
-        $this->computeETag = $computeETag;
 
         return $this;
     }

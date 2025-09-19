@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Model\Core\WebsiteModel;
-use Doctrine\ORM\NonUniqueResultException;
+use App\Entity\Wallet\CategoryType;
+use App\Form\Manager\GlobalManagerInterface;
+use App\Service\CoreLocatorInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,77 +22,60 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class BaseController extends AbstractController
 {
+    protected mixed $entityClassname = null;
+
     /**
      * BaseController constructor.
      */
-    public function __construct(protected \App\Service\Interface\CoreLocatorInterface $coreLocator)
-    {
+    public function __construct(
+        protected readonly CoreLocatorInterface $coreLocator,
+        protected readonly PaginatorInterface $paginator,
+        protected readonly GlobalManagerInterface $globalFormManager,
+    ) {
     }
 
     /**
-     * Get Request WebsiteModel.
+     * To get entities Pagination.
      */
-    protected function getWebsite(): ?WebsiteModel
+    protected function getPagination(int $limit = 15): PaginationInterface|RedirectResponse
     {
-        return $this->coreLocator->website();
-    }
+        $referEntity = new $this->entityClassname();
+        $interface = $referEntity && method_exists($referEntity, 'getInterface') ? $referEntity::getInterface() : [];
+        $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
+        $repository = $this->coreLocator->em()->getRepository($this->entityClassname);
+        $entities = $masterField ? $repository->findBy([$masterField => $this->coreLocator->request()->get($masterField)], ['adminName' => 'ASC'])
+            : $repository->findBy([], ['adminName' => 'ASC']);
 
-    /**
-     * Get Entity Interface.
-     */
-    protected function getInterface(string $classname, array $options = []): bool|array
-    {
-        try {
-            return $this->coreLocator->interfaceHelper()->generate($classname, $options);
-        } catch (NonUniqueResultException $e) {
-            return false;
-        }
-    }
+//        dump($masterField);
+//        dd($entities);
 
-    /**
-     * Get current namespace.
-     */
-    protected function getCurrentNamespace(Request $request): ?string
-    {
-        $matches = explode('::', $request->get('_controller'));
-
-        return !empty($matches) ? $matches[0] : null;
-    }
-
-    /**
-     * Get Tree of Entities.
-     */
-    protected function getTree(object|array $entities): array
-    {
-        return $this->coreLocator->treeService()->execute($entities);
-    }
-
-    /**
-     * Generate pagination.
-     */
-    protected function getPagination(PaginatorInterface $paginator, $queryBuilder, int $queryLimit = 12): PaginationInterface
-    {
-        return $paginator->paginate(
-            $queryBuilder,
+        $paginator = $this->paginator->paginate(
+            $entities,
             $this->coreLocator->request()->query->getInt('page', 1),
-            $queryLimit,
+            $limit,
             ['wrap-queries' => true]
         );
+
+        $currentPage = $this->coreLocator->request()->query->getInt('page', 1);
+        if ($paginator->count() === 0 && $currentPage > 1) {
+            return $this->redirectToRoute('admin_'.$interface['name'].'_index');
+        }
+
+        return $paginator;
     }
 
     /**
-     * Get Thumb ConfigurationModel.
+     * To get default arguments.
      */
-    protected function thumbConfiguration(WebsiteModel $website, string $classname, ?string $action = null, mixed $filter = null, ?string $type = null): array
+    protected function defaultArguments(): array
     {
-        return $this->coreLocator->thumbService()->thumbConfiguration($website, $classname, $action, $filter, $type);
-    }
-
-    /**
-     * Get Thumb by filter.
-     */
-    protected function thumbConfigurationByFilter(WebsiteModel $website, string $classname, $filter = null): array
-    {
-        return $this->coreLocator->thumbService()->thumbConfigurationByFilter($website, $classname, $filter);
+        return [
+            'companyName' => $_ENV['APP_COMPANY_NAME'],
+            'securityKey' => $_ENV['SECRET_KEY'],
+            'allowedIP' => $this->coreLocator->checkIP(),
+            'referClass' => $this->entityClassname ? new $this->entityClassname() : [],
+            'interface' => $this->entityClassname && method_exists($this->entityClassname, 'getInterface') ? $this->entityClassname::getInterface() : [],
+            'buttons' => $this->entityClassname && method_exists($this->entityClassname, 'getButtons') ? $this->entityClassname::getButtons() : [],
+        ];
     }
 }

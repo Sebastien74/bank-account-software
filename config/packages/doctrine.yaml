@@ -11,7 +11,7 @@ doctrine:
                     collate: utf8mb4_general_ci
                 #server_version: '15'
                 profiling_collect_backtrace: '%kernel.debug%'
-                platform_service: 'mmi.dbal.mysql_platform'
+#                platform_service: 'mmi.dbal.mysql_platform'
 
     orm:
         default_entity_manager: default

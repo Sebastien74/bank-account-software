@@ -6,7 +6,7 @@ namespace App\Entity;
 
 use App\Entity\Security\Group;
 use App\Entity\Security\User;
-use App\Service\Core\Urlizer;
+use App\Service\Urlizer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;

@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Entity\Core\Security;
-use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Model\Core\WebsiteModel;
-use App\Service\Core\CspNonceGenerator;
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CspNonceGenerator;
+use App\Service\CoreLocatorInterface;
 use Psr\Cache\InvalidArgumentException;
 use Random\RandomException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,6 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class SecurityPolicySubscriber implements EventSubscriberInterface
 {
+    private const bool CSP_DISABLED_FOR_DEV = false;
     private const bool XSS_DENIED = true;
     private const string XSS_PATTERN = '/(<\s*script|on\w+\s*=|javascript:|<svg|<img|<iframe|<object|data:text\/html)/i';
 
@@ -79,14 +76,14 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             $response->headers->clearCookie('SECURITY_ERROR');
         }
 
-        if (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
+        if ('front_clear_cache' === $this->routeName) {
+            $nonce = $this->session->get('app_nonce');
+            if ($nonce === $this->request->get('token')) {
+                return;
+            }
+        } elseif (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
             return;
         }
-
-        /** @var Website $website */
-        $website = $this->coreLocator->em()->getRepository(Website::class)->findOneByHost();
-        $security = $website instanceof WebsiteModel ? $website->security : null;
-        $headers = $security instanceof Security && is_array($security->getHeaderData()) ? $security->getHeaderData() : [];
 
         $this->xssProtection();
         $this->setCacheControl();
@@ -104,11 +101,24 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
                     $this->session->set('SECURITY_TOKEN', $_ENV['SECURITY_TOKEN']);
                 }
             }
-            if ($user instanceof User) {
-                $this->checkAdmin($user, $event);
-            }
         }
 
+        $headers = [
+            'strict-transport-security',
+            'permissions-policy',
+            'content-security-policy',
+            'referrer-policy',
+            'cross-origin-embedder-policy',
+            'cross-origin-resource-policy',
+            'x-xss-protection',
+            'x-ua-compatible',
+            'content-type-options-nosniff',
+            'x-frame-options-deny',
+            'x-frame-options-sameorigin',
+            'x-permitted-cross-domain-policies',
+            'cross-origin-opener-policy',
+            'access-control-allow-origin',
+        ];
         if (in_array('x-frame-options-sameorigin', $headers) && in_array('x-frame-options-deny', $headers)) {
             unset($headers[array_search('x-frame-options-sameorigin', $headers)]);
         }
@@ -184,34 +194,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             /* HTTP 1.0 */
             header('Cache-Control: max-age=2592000');
             /* 30days (60sec * 60min * 24hours * 30days) */
-        }
-    }
-
-    /**
-     * Check if User is allowed to edit WebsiteModel.
-     *
-     * @throws InvalidArgumentException
-     */
-    private function checkAdmin(User $user, ResponseEvent $responseEvent): void
-    {
-        if ($this->inAdmin && !str_contains($this->requestUri, '_switch_user') && !str_contains($this->requestUri, '/medias/cache/')) {
-            $website = $this->coreLocator->website();
-            $websiteId = $website?->id;
-            $allowed = false;
-            foreach ($user->getWebsites() as $userWebsite) {
-                if ($userWebsite->getId() === $websiteId) {
-                    $allowed = true;
-                    break;
-                }
-            }
-            if (!$allowed && !in_array('ROLE_INTERNAL', $user->getRoles())) {
-                if (count($user->getWebsites()) > 0) {
-                    $responseEvent->setResponse(new RedirectResponse($this->coreLocator->router()->generate('admin_dashboard', ['website' => $user->getWebsites()[0]->getId()])));
-                } else {
-                    header('Location: '.$this->schemeAndHttpHost.'/denied.php?site=true');
-                    exit;
-                }
-            }
         }
     }
 
@@ -295,24 +277,25 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             return [];
         }
 
-        $headers = [
+        $headers = 'content-security-policy' === $header ? [
+            'content-security-policy' => ['key' => 'Content-Security-Policy', 'values' => $this->securityPolicy()],
+        ] : [
             'strict-transport-security' => ['key' => 'Strict-Transport-Security', 'values' => 'max-age=31536000; includeSubDomains; preload'],
             'permissions-policy' => ['key' => 'Permissions-Policy', 'values' => 'geolocation=(), microphone=(), camera=(), payment=()'],
-            'content-security-policy' => ['key' => 'Content-Security-Policy', 'values' => $this->securityPolicy()],
             'referrer-policy' => ['key' => 'Referrer-Policy', 'values' => 'strict-origin-when-cross-origin'],
             'cross-origin-embedder-policy' => ['key' => 'Cross-Origin-Embedder-Policy', 'values' => 'unsafe-none'],
             'cross-origin-resource-policy' => ['key' => 'Cross-Origin-Resource-Policy', 'values' => 'cross-origin'],
             'x-xss-protection' => ['key' => 'X-XSS-Protection', 'values' => '1; mode=block'], /* if not work uncomment line in .htaccess */
             'x-ua-compatible' => ['key' => 'X-UA-Compatible', 'values' => 'IE=edge,chrome=1'],
             'content-type-options-nosniff' => ['key' => 'X-Content-Type-Options', 'values' => 'nosniff'], /* if not work uncomment line in .htaccess */
-            'x-frame-options-deny' => ['key' => 'X-Frame-Options', 'values' => 'DENY'],  /* if not work uncomment line in .htaccess */
+            'x-frame-options-deny' => ['key' => 'X-Frame-Options', 'values' => 'DENY'],  /* if not work uncomment line in.htaccess */
             'x-frame-options-sameorigin' => ['key' => 'X-Frame-Options', 'values' => 'SAMEORIGIN'],  /* if not work uncomment line in .htaccess */
             'x-permitted-cross-domain-policies' => ['key' => 'X-Permitted-Cross-Domain-Policies', 'values' => 'none'],
-            'cross-origin-opener-policy' => ['key' => 'Cross-Origin-Opener-Policy', 'values' => 'none'],
+            'cross-origin-opener-policy' => ['key' => 'Cross-Origin-Opener-Policy', 'values' => 'same-origin'],
             'access-control-allow-origin' => ['key' => 'Access-Control-Allow-Origin', 'values' => $this->schemeAndHttpHost],
         ];
 
-        if ($this->coreLocator->isDebug()) {
+        if (self::CSP_DISABLED_FOR_DEV && $this->coreLocator->isDebug()) {
             unset($headers['content-security-policy']);
         }
 
@@ -329,104 +312,111 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
         $nonce = $this->nonceGenerator->getNonce();
         $matomo = 'https://matomo.agence-felix.fr';
 
-        // Allowed external sources for inline and third-party scripts
         $allowedScriptDomains = [
-            "'self'",
             "'nonce-{$nonce}'",
+            "'strict-dynamic'",
+            "'unsafe-inline'",
+            "'self'",
+            'https:',
             'https://www.googletagmanager.com',
             'https://www.google-analytics.com',
             'https://www.youtube.com',
             'https://static.axept.io',
             'https://cdn.matomo.cloud',
+            'https://*.clarity.ms',
             $matomo,
+            "'report-sample'",
         ];
 
-        // Allowed frame
         $allowedFrame = [
             "'self'",
-            'https://www.youtube.com',
+            'https://*.youtube.com',
+            'https://www.youtube-nocookie.com',
             'https://www.googletagmanager.com',
         ];
 
-        // Allowed domains for XHR/fetch/WebSocket/API connections
         $allowedConnectDomains = [
             "'self'",
+            'https://www.google-analytics.com',
+            'https://*.google-analytics.com',
+            'https://stats.g.doubleclick.net',
+            'https://www.googletagmanager.com',
+            'https://cdn.matomo.cloud',
+            $matomo,
+            'https://*.clarity.ms',
+            'https://*.axept.io',
+            'https://axeptio.imgix.net',
             'https://www.youtube.com',
             'https://www.google.com',
-            'https://www.google-analytics.com',
-            'https://region1.google-analytics.com',
-            'https://cdn.matomo.cloud',
-            'https://client.axept.io',
-            'https://api.axept.io',
-            'https://axeptio.imgix.net',
-            $matomo,
         ];
 
         // Allowed script els
         $scriptEls = [
-            "'self'",
-            "data:",
+            "'nonce-{$nonce}'",
+            "'strict-dynamic'",
             "'unsafe-inline'",
-            'https://www.youtube.com',
-            'https://www.google-analytics.com',
+            "'self'",
             'https://www.googletagmanager.com',
+            'https://www.google-analytics.com',
+            'https://www.youtube.com',
             'https://fonts.googleapis.com',
             'https://static.axept.io',
+            'https://*.clarity.ms',
             $matomo,
+            "'report-sample'",
         ];
 
-        // Allowed sources for images
+        $styleSrc = [
+            "'self'",
+            "'nonce-{$nonce}'",
+            "'unsafe-hashes'",   // permet d'autoriser des attributs style="" via hash
+            'https://fonts.googleapis.com',
+            'https://*.typekit.net',
+            "'report-sample'",
+        ];
+        $styleSrcElem = $styleSrc;
+
         $allowedImageDomains = [
             "'self'",
             "data:",
             "blob:",
             'https://www.youtube.com',
+            'https://*.ytimg.com',
+            'https://img.youtube.com',
+            'https://*.clarity.ms',
+            'https://*.matomo.cloud',
+            $matomo,
+            'https://cdn.matomo.cloud',
+            'https://favicons.axept.io',
+            'https://*.basemaps.cartocdn.com',
             'https://www.google-analytics.com',
             'https://www.googletagmanager.com',
             'https://www.google.com',
-            'https://i.ytimg.com',
-            'https://cdn.matomo.cloud',
-            'https://img.youtube.com',
-            'https://favicons.axept.io',
-            $matomo,
         ];
 
-        // Allowed style src
-        $allowedStyleSrc = [
-            "'self'",
-            "'unsafe-inline'",
-            "data:",
-            'https://use.typekit.net',
-        ];
-
-        foreach (range('a', 'z') as $subdomain) {
-            $allowedImageDomains[] = "https://{$subdomain}.basemaps.cartocdn.com";
-            $allowedImageDomains[] = "https://{$subdomain}.clarity.ms";
-            $allowedConnectDomains[] = "https://{$subdomain}.clarity.ms";
-            $allowedScriptDomains[] = "https://{$subdomain}.clarity.ms";
-            $scriptEls[] = "https://{$subdomain}.clarity.ms";
-            $allowedStyleSrc[] = "https://{$subdomain}.typekit.net ";
-        }
-
-        // Allowed sources for fonts
         $fontsDomains = [
             "'self'",
             "data:",
             'https://fonts.gstatic.com',
             'https://fonts.googleapis.com',
             'https://use.typekit.net',
+            "'report-sample'",
         ];
 
-        // CSP assembled with nonce for both scripts and styles
-        return "default-src 'self'; " .
+        return
+            "require-trusted-types-for 'script'; ".
+            "trusted-types default dompurify webpack-policy 'allow-duplicates'; ".
+            "default-src 'self'; ".
             "frame-src ".implode(' ', $allowedFrame)."; ".
             "script-src ".implode(' ', $allowedScriptDomains)."; ".
+            "script-src-elem ".implode(' ', $scriptEls)."; ".
+            "script-src-attr 'unsafe-hashes'; ".
             "connect-src ".implode(' ', $allowedConnectDomains)."; ".
             "img-src ".implode(' ', $allowedImageDomains)."; ".
             "media-src 'self' data:; ".
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; https://use.typekit.net;".
-            "style-src-elem ".implode(' ', $allowedStyleSrc)."; ".
-            "script-src-elem ".implode(' ', $scriptEls)."; ".
+            "style-src ".implode(' ', $styleSrcElem)."; ".
+            "style-src-elem ".implode(' ', $styleSrcElem)."; ".
+            "style-src-attr 'unsafe-inline'; ".
             "font-src ".implode(' ', $fontsDomains)."; ".
             "object-src 'none'; base-uri 'self'; form-action 'self'; ".
             "upgrade-insecure-requests;";

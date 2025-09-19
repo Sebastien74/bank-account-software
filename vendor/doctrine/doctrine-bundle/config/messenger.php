@@ -2,11 +2,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bridge\Doctrine\Messenger\DoctrineClearEntityManagerWorkerSubscriber;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineCloseConnectionMiddleware;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineOpenTransactionLoggerMiddleware;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
-use Symfony\Bridge\Doctrine\Messenger\DoctrineClearEntityManagerWorkerSubscriber;
 use Symfony\Bridge\Doctrine\SchemaListener\MessengerTransportDoctrineSchemaListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 
@@ -56,7 +56,5 @@ return static function (ContainerConfigurator $container): void {
                 tagged_iterator('messenger.receiver'),
             ])
             ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema'])
-            ->tag('doctrine.event_listener', ['event' => 'onSchemaCreateTable'])
-
-        ;
+            ->tag('doctrine.event_listener', ['event' => 'onSchemaCreateTable']);
 };

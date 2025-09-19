@@ -38,7 +38,5 @@ return static function (ContainerConfigurator $container): void {
             ->args([
                 service('doctrine.dbal.connection_expiries'),
                 null,
-            ])
-
-        ;
+            ]);
 };

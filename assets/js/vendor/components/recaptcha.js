@@ -31,10 +31,9 @@ export function generate() {
         body.querySelectorAll('form.security').forEach(function (form) {
             let data = form.querySelector('.form-data');
             let string = encodeURIComponent(data.dataset.id);
-            let website = data.dataset.website;
-            if (string !== '' && website !== '') {
+            if (string !== '') {
                 let xHttp = new XMLHttpRequest();
-                let url = dataEl.dataset.encrypt + '/' + website + '/' + string;
+                let url = dataEl.dataset.encrypt + '/' + string;
                 xHttp.open("GET", url, true);
                 xHttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
                 xHttp.send();

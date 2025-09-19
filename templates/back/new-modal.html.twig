@@ -1,0 +1,44 @@
+{% trans_default_domain 'admin' %}
+
+{% set excludes = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
+
+{% if form is defined %}
+    <span data-bs-toggle="tooltip" data-bs-title="{{ "Ajouter"|trans|striptags }}">
+        <button type="button" class="btn btn-dark btn-square{% if formErrors is defined and formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
+            {{ 'fas plus-circle'|icon(null, 20, 'white') }}
+        </button>
+    </span>
+    <div class="modal fade" id="add-entity-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                {{ form_start(form, {attr: {
+                    novalidate: "novalidate",
+                }}) }}
+                <div class="modal-header">
+                    <strong class="text-white fs-5 d-flex align-items-center">{{ 'fas plus-circle'|icon(null, 25, 'white me-2') }} {{ "Ajouter"|trans|raw }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
+                </div>
+                <div class="modal-body px-4">
+                    <div class="row">
+                        {% for field in form.children %}
+                            {% set notExcluded = field.vars.name not in excludes %}
+                            {% if notExcluded %}
+                                {{ form_row(form[field.vars.name]) }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
+                    {% if form.saveEdit is defined %}
+                        {{ form_widget(form.saveEdit) }}
+                    {% endif %}
+                    {% if form.save is defined %}
+                        {{ form_widget(form.save) }}
+                    {% endif %}
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endif %}

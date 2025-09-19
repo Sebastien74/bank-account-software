@@ -593,8 +593,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             }
 
             $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
-        } elseif (! class_exists(AnnotationDriver::class)) {
-            // Only emit the deprecation notice for ORM 3 users
+        } elseif (! class_exists(AnnotationDriver::class) && PHP_VERSION_ID >= 80400) {
+            // Only emit the deprecation notice for ORM 3 and PHP 8.4+ users
             trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
         }
 

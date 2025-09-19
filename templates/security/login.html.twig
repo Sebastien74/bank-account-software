@@ -2,7 +2,7 @@
 
 {% trans_default_domain 'security_cms' %}
 
-{% block title %}{{ "Connexion"|trans|htmlEntities }}{% endblock %}
+{% block title %}{{ "Connexion"|trans|striptags }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -20,7 +20,7 @@
         action: path('security_login'),
         id: "login-form",
     }}) }}
-        <div class="form-data" data-id="{{ securityKey }}" data-website="{{ websiteId() }}"></div>
+        <div class="form-data" data-id="{{ securityKey }}"></div>
         {% for field in form.children %}
             {% if field.vars.name == '_remember_me' %}
                 <div class="row mb-4">
@@ -41,11 +41,5 @@
             {% include 'security/includes/alert.html.twig' with {alert: 'danger', message: error.messageKey|trans(error.messageData, 'security')|raw} only %}
         {% endif %}
         {% include "security/includes/flashbag.html.twig" %}
-        {% if website.entity.security.adminRegistration %}
-            <a href="{{ path('security_register') }}"
-               class="btn btn-lg btn-outline-info btn-block text-uppercase w-100 mt-3">
-                {{ 'Inscrivez-vous'|trans|raw }}
-            </a>
-        {% endif %}
     {{ form_end(form) }}
 {% endblock %}

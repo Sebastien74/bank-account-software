@@ -1,0 +1,17 @@
+.sidebar {
+
+    width: 350px;
+    min-height: calc(100dvh - 70px);
+
+    .nav-link {
+
+        opacity: .7;
+        font-size: 15px;
+        transition: all .3s ease-in-out;
+
+        &:hover {
+            opacity: 1;
+            transition: all .3s ease-in-out;
+        }
+    }
+}

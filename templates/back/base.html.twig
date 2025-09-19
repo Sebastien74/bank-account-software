@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{ app.request.locale }}" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="" />
+        <meta name="author" content="{{ companyName|striptags }}" />
+        <title>{{ pageTitle|striptags ~' - '~companyName|striptags }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}" />
+        <meta name="apple-mobile-web-app-title" content="{{ companyName|striptags }}" />
+        <link rel="manifest" href="{{ asset('site.webmanifest') }}" />
+        <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/dashboard/" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+        {{ encore_entry_link_tags('back-vendor', null, 'back') }}
+        <meta name="theme-color" content="#712cf9" />
+    </head>
+    <body>
+        {% include 'back/includes/flashbag.html.twig' %}
+        {% include 'back/includes/header.html.twig' %}
+        <div class="d-flex">
+            {% include 'back/includes/sidebar.html.twig' %}
+            <main id="main-container" class="px-5">
+                {% block body %}{% endblock %}
+            </main>
+        </div>
+        {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false}) }}
+        <div id="data-translation" class="d-none"
+             data-search="{{ "Chercher"|trans|striptags }}"
+        ></div>
+    </body>
+</html>

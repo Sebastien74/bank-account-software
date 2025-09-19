@@ -21,19 +21,4 @@ class GroupRepository extends ServiceEntityRepository
     {
         parent::__construct($this->registry, Group::class);
     }
-
-    /**
-     * Find by Role name.
-     *
-     * @return array<Group>
-     */
-    public function findByRoleName(string $roleName): array
-    {
-        return $this->createQueryBuilder('g')
-            ->leftJoin('g.roles', 'r')
-            ->andWhere('r.name = :name')
-            ->setParameter(':name', $roleName)
-            ->getQuery()
-            ->getResult();
-    }
 }

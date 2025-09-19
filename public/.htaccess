@@ -32,12 +32,12 @@ AddDefaultCharset UTF-8
 	RewriteRule ^ /denied.php? [L,R=301]
 
 	# 🔒 Block direct access to sensitive file types
-	<FilesMatch "\.(html|well-known|bak|py|svn|rb|env)$">
+	<FilesMatch "\.(html|well-known|bak|py|svn|rb|env|sh|log|sql)$">
 	    RewriteRule ^ /denied.php [L,R=301]
 	</FilesMatch>
 
-    RewriteCond %{REQUEST_URI} \.(jpe?g|gif|png|pdf|docx|xlsx|css|js)$ [NC]
-    RewriteRule ^build/admin/ security.php [QSA,L]
+#    RewriteCond %{REQUEST_URI} \.(jpe?g|gif|png|pdf|docx|xlsx|css|js)$ [NC]
+#    RewriteRule ^build/admin/ security.php [QSA,L]
 
     RewriteCond %{REQUEST_URI} \.(jpe?g|gif|png|pdf|docx|xlsx|css|js)$ [NC]
     RewriteRule ^uploads/emails/ security.php [QSA,L]

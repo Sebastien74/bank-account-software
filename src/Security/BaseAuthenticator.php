@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\Core\Website;
 use App\Entity\Security\User;
-use App\Model\Core\WebsiteModel;
 use App\Repository\Security\UserRepository;
-use App\Service\Content\CryptService;
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CryptService;
+use App\Service\CoreLocatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use KnpU\OAuth2ClientBundle\Security\Exception\IdentityProviderAuthenticationException;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
@@ -68,7 +67,6 @@ class BaseAuthenticator
         private readonly CoreLocatorInterface $coreLocator,
         private readonly CryptService $cryptService,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
-        private readonly UserChecker $userChecker,
     ) {
         $this->translator = $this->coreLocator->translator();
         $this->entityManager = $this->coreLocator->em();
@@ -97,7 +95,7 @@ class BaseAuthenticator
     /**
      * authenticate.
      *
-     * @throws \Exception|InvalidArgumentException
+     * @throws Exception|InvalidArgumentException
      */
     public function authenticate(Request $request): Passport
     {
@@ -111,10 +109,8 @@ class BaseAuthenticator
         }
 
         if ($request->get('_route') !== $this->registerRoute) {
-            $website = $this->entityManager->getRepository(Website::class)->findOneByHost($request->getHost());
-            $this->checkRecaptcha($website, $request);
-            $this->checkPassword($website);
-            $this->checkActive($website);
+            $this->checkRecaptcha($request);
+            $this->checkActive();
             $this->checkCsrfToken($request);
         }
 
@@ -223,7 +219,7 @@ class BaseAuthenticator
     /**
      * To get credentials.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCredentials(): array
     {
@@ -296,11 +292,11 @@ class BaseAuthenticator
     /**
      * Check recaptcha.
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function checkRecaptcha(WebsiteModel $website, Request $request, bool $asResponse = false)
+    public function checkRecaptcha(Request $request, bool $asResponse = false)
     {
-        $formSecurityKey = $website->entity->getSecurity()->getSecurityKey();
+        $formSecurityKey = $_ENV['SECRET_KEY'];
         $fieldHo = $request->request->get('field_ho');
         $fieldHoEntitled = $request->request->get('field_ho_entitled');
         if (!$fieldHo) {
@@ -317,12 +313,11 @@ class BaseAuthenticator
         $session = $this->coreLocator->request()->getSession();
 
         if (!empty($fieldHo) && empty($fieldHoEntitled)) {
-            $honeyPost = $this->cryptService->execute($website, $fieldHo, 'd');
+            $honeyPost = $this->cryptService->execute($fieldHo, 'd');
             if ($honeyPost && urldecode($honeyPost) != $formSecurityKey) {
                 $this->logger($request);
                 if ($asResponse) {
                     $session->getFlashBag()->add('error', $message);
-
                     return false;
                 } else {
                     throw new SecurityException\CustomUserMessageAccountStatusException($message);
@@ -345,29 +340,13 @@ class BaseAuthenticator
     }
 
     /**
-     * To check password.
-     *
-     * @throws \Exception
-     */
-    public function checkPassword(WebsiteModel $website): void
-    {
-        if ($this->user instanceof User) {
-            $passwordExpire = $this->userChecker->passwordExpired($website, $this->user);
-            if ($passwordExpire) {
-                $message = $this->translator->trans('Votre mot de passe a expiré, vous devez le réinitialiser.', [], 'security_cms');
-                throw new SecurityException\CustomUserMessageAccountStatusException($message);
-            }
-        }
-    }
-
-    /**
      * To check if account is active.
      */
-    public function checkActive(WebsiteModel $website): void
+    public function checkActive(): void
     {
         $isUser = $this->user instanceof User;
         if ($isUser && !$this->user->isActive()) {
-            $message = $this->getInactiveMessage($website);
+            $message = $this->getInactiveMessage();
             throw new SecurityException\CustomUserMessageAccountStatusException($message);
         }
     }
@@ -375,7 +354,7 @@ class BaseAuthenticator
     /**
      * To get inactive message.
      */
-    public function getInactiveMessage(WebsiteModel $website): string
+    public function getInactiveMessage(): string
     {
         return $this->translator->trans("Votre compte n'est pas activé.", [], 'security_cms');
     }

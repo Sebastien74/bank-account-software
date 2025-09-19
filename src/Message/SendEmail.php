@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Entity\Core\Website;
-use App\Model\Core\WebsiteModel;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
 /**
@@ -137,11 +135,5 @@ class SendEmail
     public function getWebsiteId(): int
     {
         return $this->websiteId;
-    }
-
-    public function setWebsite(mixed $website): void
-    {
-        $this->websiteId = $website instanceof Website ? $website->getId()
-            : ($website instanceof WebsiteModel ? $website->id : null);
     }
 }

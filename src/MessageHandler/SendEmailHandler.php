@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Core\Website;
 use App\Message\SendEmail;
-use App\Model\Core\WebsiteModel;
-use App\Service\Core\MailerService;
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CoreLocatorInterface;
+use App\Service\MailerService;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -21,30 +18,27 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[AsMessageHandler]
-final class SendEmailHandler
+final readonly class SendEmailHandler
 {
     /**
      * SendEmailHandler constructor.
      */
     public function __construct(
-        private readonly CoreLocatorInterface $coreLocator,
-        private readonly MailerService $mailer,
+        private CoreLocatorInterface $coreLocator,
+        private MailerService $mailer,
     ) {
 
     }
 
     /**
-     * @throws InvalidArgumentException
+     * __invoke.
      */
     public function __invoke(SendEmail $message): void
     {
         $logger = new Logger('send_mailer_handler');
         if ($message->getTo()) {
             try {
-                $website = $this->coreLocator->em()->getRepository(Website::class)->find($message->getWebsiteId());
-                $websiteModel = WebsiteModel::fromEntity($website, $this->coreLocator, $message->getLocale());
                 $this->mailer->setLocale($message->getLocale());
-                $this->mailer->setWebsite($websiteModel);
                 $this->mailer->setSubject($message->getSubject());
                 $this->mailer->setTo($message->getTo());
                 $this->mailer->setCc($message->getCc());

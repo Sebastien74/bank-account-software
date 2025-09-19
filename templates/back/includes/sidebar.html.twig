@@ -1,0 +1,24 @@
+<div class="sidebar bg-dark py-4">
+    <div id="sidebar-menu" tabindex="-1">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="{{ path('admin_dashboard') }}" class="nav-link d-flex align-items-center text-white py-3">
+                    {{ 'fal tachometer-alt-average'|icon(null, 20, 'me-2 white') }}
+                    {{ "Tableau de bord"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('admin_wallet_index') }}" class="nav-link d-flex align-items-center text-white py-3">
+                    {{ 'fal wallet'|icon(null, 20, 'me-2 white') }}
+                    {{ "Gérer mes comptes"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('admin_categorytype_index') }}" class="nav-link d-flex align-items-center text-white py-3">
+                    {{ 'fal list'|icon(null, 20, 'me-2 white') }}
+                    {{ "Catégories"|trans|raw }}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

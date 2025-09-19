@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CoreLocatorInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * BaseFixtures.
  *
- * Base Fixtures management
+ * Base Fixtures management.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */

@@ -67,24 +67,6 @@ export default function () {
         }
     });
 
-    /** Lazy loading background */
-    let backgrounds = document.querySelectorAll("*[data-background]");
-    let styles = document.querySelectorAll("*[data-style]");
-    if (backgrounds.length > 0 || styles.length > 0) {
-        import('./lazy-backgrounds').then(({default: lazyBackgrounds}) => {
-            new lazyBackgrounds(backgrounds, styles);
-        }).catch(error => console.error(error.message));
-    }
-
-    /** Lazy loading videos */
-    let videosYoutube = document.querySelectorAll('.embed-youtube')
-    let videosEl = document.querySelectorAll(".lazy-video")
-    if (videosYoutube.length > 0 || videosEl.length > 0) {
-        import('./lazy-videos').then(({lazyVideos: LazyVideos}) => {
-            new LazyVideos(videosYoutube, videosEl);
-        }).catch(error => console.error(error.message));
-    }
-
     /** Videos not lazy */
     document.querySelectorAll("video:not(.lazy-video)").forEach(function (video) {
         let hideElementSelector = video.dataset.hideEnded
@@ -96,15 +78,5 @@ export default function () {
             }
             body.classList.remove('overflow-hidden')
         }
-    });
-
-    /** Generated files */
-    document.querySelectorAll('.spinner-wrap.as-placeholder').forEach(el => {
-        el.classList.add('d-none')
-    });
-
-    /** Larges files */
-    document.querySelectorAll('.large-file-container').forEach(el => {
-        el.parentNode.style = 'position: relative !important; display: inline-block !important; width: 100% !important';
     });
 }

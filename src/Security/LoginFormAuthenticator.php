@@ -6,7 +6,7 @@ namespace App\Security;
 
 use App\Entity\Security\User;
 use App\Repository\Security\UserRepository;
-use App\Service\Interface\CoreLocatorInterface;
+use App\Service\CoreLocatorInterface;
 use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -82,10 +82,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $this->baseAuthenticator->onAuthenticationSuccess($request);
-
-        /** @var User $user */
-        $user = $token->getUser();
-
         $this->clearAdminSession();
 
         if (self::REGISTER_ROUTE === $request->get('_route')) {
@@ -96,13 +92,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
             return new RedirectResponse($targetPath);
         }
 
-        $website = $this->coreLocator->website();
-        $groupRedirection = $user->getGroup()->getLoginRedirection();
-        $routeRedirection = $groupRedirection ?: 'admin_dashboard';
-
-        return new RedirectResponse($this->coreLocator->router()->generate($routeRedirection, [
-            'website' => $website->id,
-        ]));
+        return new RedirectResponse($this->coreLocator->router()->generate('admin_dashboard'));
     }
 
     /**

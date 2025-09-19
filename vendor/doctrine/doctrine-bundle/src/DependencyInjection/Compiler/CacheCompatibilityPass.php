@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Cache\Psr6\CacheAdapter;
+use Doctrine\Deprecations\Deprecation;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -14,7 +15,6 @@ use function array_keys;
 use function assert;
 use function in_array;
 use function is_a;
-use function trigger_deprecation;
 
 /** @internal  */
 final class CacheCompatibilityPass implements CompilerPassInterface
@@ -99,9 +99,9 @@ final class CacheCompatibilityPass implements CompilerPassInterface
             return null;
         }
 
-        trigger_deprecation(
+        Deprecation::trigger(
             'doctrine/doctrine-bundle',
-            '2.4',
+            'https://github.com/doctrine/DoctrineBundle/pull/1365',
             'Configuring doctrine/cache is deprecated. Please update the cache service "%s" to use a PSR-6 cache.',
             $definitionId,
         );

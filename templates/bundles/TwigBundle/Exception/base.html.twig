@@ -1,46 +1,40 @@
 {% trans_default_domain 'exception' %}
 
-{% set isPreview = 'preview' in app.request.uri %}
-{% set website = website is not defined or not website ? website() : website %}
-
-{% set template = isPreview ? website().configuration.template : template %}
-{% set websiteTemplate = websiteTemplate is not defined or not websiteTemplate ? website.configuration.template : websiteTemplate %}
-{% set webpack = webpack is not defined or not webpack ? 'front_'~website.configuration.template : webpack %}
-{% set webpack = 'front_'~websiteTemplate|replace({'-': '_'}) %}
-{% set websiteInformation = website.information %}
-{% set information = websiteInformation|intl %}
-{% set companyName = information.title is defined and information.title ? information.title : "Bank Account Software"|trans|raw %}
-{% set assetAdmin = not isPreview and template == 'admin' and app.user or not isPreview and '/admin-' in app.request.uri and app.user %}
-
-{% set base = template == "admin" and not isPreview or '/admin-' in app.request.uri and not isPreview
-    ? 'admin/base.html.twig' : 'front/'~template~'/base.html.twig' %}
-{% extends base %}
-
 {% set errorTitle = "Erreur"|trans|raw~" "~status_code %}
 {% set seoTitle = errorTitle~" | "~companyName %}
 {% block pageTitle %}{{ errorTitle }}{% endblock %}
 {% block title %}{{ errorTitle }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% if assetAdmin %}
-        {{ encore_entry_link_tags('admin-error', null, 'admin') }}
-    {% else %}
-        {{ encore_entry_link_tags('front-'~websiteTemplate~'-error', null, webpack) }}
-    {% endif %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% if not assetAdmin %}
-        {{ encore_entry_script_tags('front-'~websiteTemplate~'-error', null,  webpack) }}
-    {% endif %}
-{% endblock %}
-
-{% block body %}
-    {% if template != "admin" %}
-        {% include 'front/'~template~'/template/error.html.twig' %}
-    {% else %}
-        {% include 'admin/error.html.twig' %}
-    {% endif %}
-{% endblock %}
+<!doctype html>
+<html lang="{{ app.request.locale }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Bootstrap demo</title>
+        {% block stylesheets %}
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            {% set status_code = status_code is defined ? status_code : 'Erreur'|trans %}
+            <h2 class="h1">{{ status_code|raw }}</h2>
+            {% if status_code == 404 %}
+                <h2 class="mb-3">{{ "Oups! Page non trouvée."|trans|raw }}</h2>
+                <p class="message">{{ "Désolé, la page que vous recherchez n'existe pas, a été supprimée, son nom a été modifié ou est temporairement indisponible."|trans|raw }}</p>
+            {% elseif status_code == 401 %}
+                <h2 class="mb-3">{{ "Oups! Accès refusé."|trans|raw }}</h2>
+                <p class="message">{{ "Vous n'avez pas accès à cette page."|trans|raw }}</p>
+            {% elseif status_code == 403 %}
+                <h2 class="mb-3">{{ "Accès refusé !!!"|trans|raw }}</h2>
+                <p class="text-danger fw-300 message">{{ exception.message }}</p>
+            {% else %}
+                <h2 class="mb-3">{{ "Oups! Une erreur interne est survenue."|trans|raw }}</h2>
+                <p class="text-danger fw-300 message">{{ exception.message }}</p>
+            {% endif %}
+        {% endblock %}
+        {% block javascripts %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        {% endblock %}
+    </body>
+</html>

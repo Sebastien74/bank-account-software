@@ -1,8 +1,0 @@
-imports:
-    - { resource: entity/core.yaml }
-    - { resource: entity/layout.yaml }
-    - { resource: entity/media.yaml }
-    - { resource: entity/security.yaml }
-    - { resource: entity/seo.yaml }
-    - { resource: entity/todo.yaml }
-    - { resource: entity/translation.yaml }

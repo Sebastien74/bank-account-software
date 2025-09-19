@@ -1,0 +1,28 @@
+{% trans_default_domain 'admin' %}
+
+{% set icons = {
+    success: {icon: 'far check', color: 'success'},
+    info: {icon: 'far info', color: 'info'},
+    warning: {icon: 'far exclamation', color: 'warning'},
+    danger: {icon: 'far exclamation-triangle', color: 'danger'},
+    error: {icon: 'far exclamation-triangle', color: 'danger'},
+    undefined: {icon: 'far info', color: 'info'},
+} %}
+
+{% for alert, messages in app.session.flashbag.all %}
+    {% set icon = icons[alert].icon is defined ? icons[alert].icon : icons['undefined'].icon %}
+    {% set color = icons[alert].color is defined ? icons[alert].color : icons['undefined'].color %}
+    {% for message in messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div class="toast toast-alert fade show border-0 bg-{{ color }}" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header d-flex border-0 no-radius py-3 px-3">
+                    <div class="inner d-flex align-items-center">
+                        {{ icon|icon(null, 17, alert~' me-2') }}
+                        <div class="message">{{ message|raw }}</div>
+                    </div>
+                    <button type="button" class="btn-close ms-3" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}

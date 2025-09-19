@@ -19,24 +19,15 @@ ROLE_EXPORT:
 ROLE_USERS:
     en: 'Users management'
     fr: 'Gestion des utilisateurs'
-ROLE_USERS_GROUP:
-    en: 'Users groups management'
-    fr: "Gestion des groupes d'utilisateurs"
-ROLE_MEDIA:
-    en: 'Medias management'
-    fr: 'Gestion des médias'
-ROLE_MEDIA_COMPRESS:
-    en: 'Medias compression management'
-    fr: 'Gestion de la compression des médias'
+ROLE_SLIDER:
+    en: 'Sliders management'
+    fr: 'Gestion des carousels'
 ROLE_TRANSLATION:
     en: 'Translations management'
     fr: 'Gestion des traductions'
-ROLE_TRANSLATOR:
-    en: 'Translation management only'
-    fr: 'Gestion des traductions (uniquement)'
+ROLE_SEARCH_ENGINE:
+    en: 'Search engines management'
+    fr: 'Gestion des moteurs de recherche'
 ROLE_INTERNAL:
     en: 'Internal role (agency)'
     fr: 'Rôle interne (agence)'
-ROLE_ALLOWED_TO_SWITCH:
-    en: 'Allowed to switch users'
-    fr: "Autorisé à changer d'utilisateur"

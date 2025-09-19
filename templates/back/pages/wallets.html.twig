@@ -1,0 +1,37 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'admin' %}
+
+{% set pageIcon = 'fal wallet' %}
+{% set pageTitle = "Mes comptes"|trans %}
+{% set excludes = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
+
+{% block stylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}
+
+{% block body %}
+    <div id="wallets-dashboard" class="container-fluid pt-4 pb-5 position-relative">
+        {% include 'back/new-modal.html.twig' %}
+        <div id="wallets-index" class="row mt-5">
+            {% for wallet in wallets %}
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="h4 mb-0">{{ wallet.adminName|raw }}</h3>
+                        </div>
+                        <div class="card-body">
+
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('admin_wallet_edit', {wallet: wallet.id}) }}">{{ 'Configuration du compte'|trans|raw }}</a>
+                            <a href="{{ path('admin_wallet_operations', {wallet: wallet.id}) }}">{{ 'Mes opérations'|trans|raw }}</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

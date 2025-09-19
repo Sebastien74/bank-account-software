@@ -20,10 +20,9 @@ class BaseInterface extends BaseUserAction
     /**
      * Configurations.
      */
-    protected static string $masterField = '';
-    protected static string $parentMasterField = '';
     protected static array $interface = [];
-    protected static array $labels = [];
+
+    protected static array $buttons = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $createdAt = null;
@@ -51,24 +50,14 @@ class BaseInterface extends BaseUserAction
         parent::prePersist();
     }
 
-    public static function getMasterField(): ?string
-    {
-        return static::$masterField;
-    }
-
-    public static function getParentMasterField(): ?string
-    {
-        return static::$parentMasterField;
-    }
-
     public static function getInterface(): array
     {
         return static::$interface;
     }
 
-    public static function getLabels(): array
+    public static function getButtons(): array
     {
-        return static::$labels;
+        return static::$buttons;
     }
 
     public function setCreatedAt(?\DateTimeInterface $createdAt = null): static

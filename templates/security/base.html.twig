@@ -2,25 +2,7 @@
 
 {% trans_default_domain 'security_cms' %}
 
-{% set website = website is defined ? website : website() %}
-{% set configuration = website.configuration %}
-{% set adminTheme = configuration.adminTheme %}
-{% set logos = website.configuration.logos %}
-{% set information = website.information %}
-{% set cacheClearDate = website.cacheClearDate is defined and website.cacheClearDate ? website.cacheClearDate|date('Y-m-d') : null %}
-{% set isCustomPath = logos['security-logo'] is defined and logos['security-logo'] or not adminTheme %}
-{% set companyName = isCustomPath and information.title is defined and information.title ? information.title : "Bank Account Software"|trans|striptags %}
-{#{% set faviconPath = isCustomPath and logos['favicon'] is defined and logos['favicon'] ? asset(logos['favicon']) : asset('build/security/images/favicon.ico', 'security') %}#}
-{% set faviconPath = asset('build/security/images/favicon.ico', 'security') %}
-{% set logoPath = isCustomPath and logos['security-logo'] is defined and logos['security-logo'] and 'placeholder' not in logos['security-logo'] ? asset(logos['security-logo'])
-    : (not adminTheme ? asset('build/security/images/security.svg', 'security') : asset('build/security/images/felix-logo.svg', 'security')) %}
-{% set bgPath = logos['security-bg'] is defined and logos['security-bg'] and 'placeholder' not in logos['security-bg'] ? asset(logos['security-bg'])
-    : (adminTheme ? asset('build/security/images/background-security.jpg', 'security') : asset('build/security/images/login-register.jpg', 'security')) %}
-{% set bgImgStyle = bgPath|file({}, {style: true, maxWidth: 1520, maxHeight: 919, placeholder: true }) %}
-
-<html lang="{{ app.request.locale }}"
-      data-cache="{{ cacheClearDate }}"
-      data-nonce="{{ csp_nonce() }}">
+<html lang="{{ app.request.locale }}">
 
     <head>
 
@@ -28,21 +10,16 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <title>{% block title %}{{ "Bienvenue !!"|trans|htmlEntities }}{% endblock %} - {{ companyName }}</title>
+        <title>{% block title %}{{ "Bienvenue !!"|trans|striptags }}{% endblock %} - {{ companyName }}</title>
         <meta name="description" content="{{ companyName }}" />
         <meta name="author" content="{{ companyName }}" />
 
-        {% if website.logos is defined %}
-            {% include 'core/favicon.html.twig' with {website: website, logos: website.logos, microDataActive: false} only %}
-        {% else %}
-            <link rel="icon" type="image/png" sizes="16x16" href="{{ faviconPath }}" />
-        {% endif %}
-
-        {% if logos.share is defined and logos.share %}
-            <meta property="og:image" content="{{ asset(logos.share) }}">
-        {% else %}
-            <meta property="og:image" content="{{ asset('build/security/images/share-felix.jpg', 'security') }}">
-        {% endif %}
+        <link rel="icon" type="image/png" href="{{ asset('favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}" />
+        <meta name="apple-mobile-web-app-title" content="{{ companyName }}" />
+        <link rel="manifest" href="{{ asset('site.webmanifest') }}" />
 
         {% block stylesheets %}
             <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,14 +30,15 @@
 
     </head>
 
-    <body{% if not adminTheme %} class="base-theme"{% endif %}>
-{#        {% include 'security/includes/preloader.html.twig' %}#}
+    <body class="base-theme">
+
+        {% include 'security/includes/preloader.html.twig' %}
         <section id="wrapper" class="login-register login-sidebar">
-            <div id="bg-container" data-style="{{ bgImgStyle }}"></div>
+            <div id="bg-container" data-style="{{ asset('build/security/images/background-security.jpg', 'security') }}"></div>
             <aside class="login-box row">
                 <header id="content" class="col-12 p-3 p-sm-4 my-auto bg-white">
                     <a href="{{ app.request.getSchemeAndHttpHost() }}" class="header w-100 d-inline-block text-center mb-5 mt-5 mt-md-0">
-                        {{ logoPath|file({}, {id: 'logo', maxHeight: 130}) }}
+                        {{ 'cms piggy-bank'|icon(null, 120) }}
                     </a>
                     <div class="row">
                         <div class="col-sm-8 col-md-6 col-lg-12 offset-sm-2 offset-md-3 offset-lg-0">
@@ -68,29 +46,12 @@
                         </div>
                     </div>
                 </header>
-                {% if adminTheme is not empty %}
-                    <div id="contact-info" class="col-12 text-center p-3 p-sm-4 align-self-end">
-                        <address>
-                            <b>{{ "Bank Account Software"|trans|raw }}</b> <br>
-                            <small class="d-inline-block">{{ "4BIS Avenue du Pont de Tasset <br/> 74960 Cran-Gevrier / Annecy <br/> FRANCE"|trans|raw }}</small>
-                        </address>
-                        <ul class="reset">
-                            <li><a href="tel:{{ "+33450671855"|trans|raw }}" id="website-phone">{{ 'fal phone-rotary'|icon(15, 15, 'primary me-2') }}{{ "+33(0)4 50 67 18 55"|trans|raw }}</a></li>
-                            <li><a href="{{ "https://www.felix-creation.fr"|trans|raw }}" id="website-url" target="_blank" rel="noopener noreferrer">{{ 'fal desktop'|icon(14, 12, 'primary me-2') }}{{ "felix-creation.fr"|trans|raw }}</a></li>
-                            <li><a href="mailto:{{ "support@agence-felix.fr"|trans|raw }}" id="website-support">{{ 'fal at'|icon(null, 12, 'primary me-2') }}{{ "support@agence-felix.fr"|trans|raw }}</a></li>
-                        </ul>
-                    </div>
-                {% endif %}
             </aside>
         </section>
 
-        {% include "security/includes/recaptcha.html.twig" %}
         {% include 'core/data-path.html.twig' only %}
 
         {% block javascripts %}
-            {% if isIE() %}
-                {{ encore_entry_script_tags('browsers', null,  'vendor') }}
-            {% endif %}
             {{ encore_entry_script_tags('security', null, 'security') }}
         {% endblock %}
 
