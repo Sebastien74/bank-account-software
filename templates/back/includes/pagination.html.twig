@@ -1,7 +1,7 @@
 {% trans_default_domain 'admin' %}
 
 {% if pagination.getTotalItemCount is defined and (pagination.getTotalItemCount / pagination.itemNumberPerPage) > 0 %}
-    <div class="card-footer border-top">
+    <div class="pagination-nav">
         <div class="row">
             <div class="col-md-4 my-auto d-flex justify-content-start">
                 {% set delta = (pagination.itemNumberPerPage - pagination|length) %}
@@ -12,7 +12,7 @@
                     '%countEnd%': itemsCountEnd,
                     '%totalCount%': pagination.getTotalItemCount,
                 }) %}
-                <span class="text-white">{{ count|raw }}</span>
+                <span class="pagination-counter text-white">{{ count|raw }}</span>
             </div>
             <div class="col-md-8 my-auto d-flex justify-content-end">{{ knp_pagination_render(pagination) }}</div>
         </div>

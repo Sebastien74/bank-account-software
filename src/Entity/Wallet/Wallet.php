@@ -21,6 +21,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: WalletRepository::class)]
 class Wallet extends BaseEntity
 {
+    /**
+     * Configurations.
+     */
+    protected static array $interface = [
+        'name' => 'wallet',
+    ];
+
     #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: Operation::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['date' => 'DESC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]

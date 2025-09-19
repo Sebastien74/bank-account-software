@@ -49,7 +49,7 @@ class GlobalManager implements GlobalManagerInterface
             $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
             $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
             $masterFieldSetter = $masterField ? 'set'.ucfirst($masterField) : false;
-            if (method_exists($entity, $masterFieldSetter) && $this->coreLocator->request()->get($masterField)) {
+            if ($masterFieldSetter && method_exists($entity, $masterFieldSetter) && $this->coreLocator->request()->get($masterField)) {
                 $metadata = $this->coreLocator->em()->getClassMetadata(get_class($entity));
                 $masterClassname = $metadata->associationMappings[$masterField]['targetEntity'];
                 $masterEntity = $this->coreLocator->em()->getRepository($masterClassname)->find($this->coreLocator->request()->get($masterField));
@@ -62,7 +62,7 @@ class GlobalManager implements GlobalManagerInterface
             }
             $this->coreLocator->em()->persist($entity);
             $this->coreLocator->em()->flush();
-            $session = new Session();
+            $session = $this->coreLocator->request()->getSession();
             $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Créé avec succès !", [], 'admin'));
             if (!empty($interface['name'])) {
                 $submitName = $this->form->getClickedButton()->getName();
@@ -81,24 +81,28 @@ class GlobalManager implements GlobalManagerInterface
     /**
      * To delete entity.
      */
-    public function delete(string $entityClassname): ?string
+    public function delete(mixed $entityToDelete): ?string
     {
-        $session = new Session();
+        $session = $this->coreLocator->request()->getSession();
         $allowed = $this->coreLocator->authorizationChecker()->isGranted('ROLE_DELETE');
+        $this->redirection = $this->coreLocator->request()->headers->get('referer');
+
+        if (!is_object($entityToDelete)) {
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Une erreur est survenue !", [], 'admin'));
+            return $this->redirection;
+        }
 
         if ($allowed) {
-            $referEntity = $entityClassname ? new $entityClassname : false;
-            $interface = $referEntity && method_exists($referEntity, 'getInterface') ? $referEntity::getInterface() : [];
-            $interfaceName = !empty($interface['name']) ? $interface['name'] : false;
-            $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
+            $interface = $entityToDelete && method_exists($entityToDelete, 'getInterface') ? $entityToDelete::getInterface() : [];
+            $interfaceName = !empty($interface['name']) ? $interface['name'] : null;
+            $masterField = !empty($interface['masterField']) ? $interface['masterField'] : null;
             if ($interfaceName) {
-                $repository = $this->coreLocator->em()->getRepository($entityClassname);
-                $entity = $repository->find($this->coreLocator->request()->get($interfaceName));
-                $currentPosition = method_exists($entity, 'getPosition') ? $entity->getPosition() : false;
-                $this->coreLocator->em()->remove($entity);
+                $repository = $this->coreLocator->em()->getRepository(get_class($entityToDelete));
+                $currentPosition = method_exists($entityToDelete, 'getPosition') ? $entityToDelete->getPosition() : false;
+                $this->coreLocator->em()->remove($entityToDelete);
                 if (is_numeric($currentPosition)) {
                     $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
-                    $entities = $masterField ? $repository->findBy([$masterField => $entity->$masterFieldGetter()]) : $repository->findAll();
+                    $entities = $masterField ? $repository->findBy([$masterField => $entityToDelete->$masterFieldGetter()]) : $repository->findAll();
                     foreach ($entities as $entity) {
                         if ($entity->getPosition() > $currentPosition) {
                             $entity->setPosition($entity->getPosition() - 1);
@@ -112,8 +116,6 @@ class GlobalManager implements GlobalManagerInterface
         } else {
             $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Vous n'êtes pas autorisé à supprimer !", [], 'admin'));
         }
-
-        $this->redirection = $this->coreLocator->request()->headers->get('referer');
 
         return $this->redirection;
     }

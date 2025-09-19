@@ -28,7 +28,7 @@ class Operation extends BaseEntity
     private ?Wallet $wallet = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Category $category = null;
 
     public function getDate(): ?\DateTimeInterface

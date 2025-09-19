@@ -8,7 +8,6 @@ use App\Controller\BaseController;
 use App\Entity\Wallet\CategoryType;
 use App\Form\Type\Wallet\CategoryTypeType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -46,7 +45,7 @@ class CategoryTypeController extends BaseController
     }
 
     #[Route('/edit/{categorytype}', name: 'admin_categorytype_edit', methods: 'GET|POST')]
-    public function edit(Request $request, CategoryType $categorytype): Response
+    public function edit(CategoryType $categorytype): Response
     {
         $formManager = $this->globalFormManager;
         $formManager->setForm(CategoryTypeType::class, $categorytype);
@@ -62,8 +61,8 @@ class CategoryTypeController extends BaseController
     }
 
     #[Route('/delete/{categorytype}', name: 'admin_categorytype_delete', methods: 'GET')]
-    public function delete(): RedirectResponse
+    public function delete(CategoryType $categorytype): RedirectResponse
     {
-        return $this->redirect($this->globalFormManager->delete($this->entityClassname));
+        return $this->redirect($this->globalFormManager->delete($categorytype));
     }
 }

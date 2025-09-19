@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form\Type\Wallet;
 
-use App\Entity\Wallet\Wallet;
+use App\Entity\Wallet\Operation;
 use App\Service\CoreLocatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -14,16 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * WalletType.
+ * OperationType.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class WalletType extends AbstractType
+class OperationType extends AbstractType
 {
     private TranslatorInterface $translator;
 
     /**
-     * WalletType constructor.
+     * OperationType constructor.
      */
     public function __construct(private readonly CoreLocatorInterface $coreLocator)
     {
@@ -35,24 +35,25 @@ class WalletType extends AbstractType
         $isNew = !$builder->getData()->getId();
 
         $builder->add('adminName', Type\TextType::class, [
-            'label' => $this->translator->trans('Nom du compte', [], 'admin'),
+            'label' => $this->translator->trans('Intitulé', [], 'admin'),
             'attr' => [
-                'placeholder' => $this->translator->trans('Saisissez un nom', [], 'admin'),
+                'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'admin'),
             ],
             'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez saisir un nom pour votre compte.', [], 'admin'),
+                'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'admin'),
             ])],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
         ]);
 
-        $btnName = $isNew ? 'saveEdit' : 'saveBack';
-        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'admin') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'admin');
-        $builder->add($btnName, Type\SubmitType::class, [
-            'label' => $btnLabel,
-            'attr' => [
-                'class' => $isNew ? 'btn-secondary-dark' : 'btn-dark',
-            ],
-            'row_attr' => ['class' => $isNew ? 'me-2' : 'ms-2'],
-        ]);
+        if (!$isNew) {
+            $builder->add('saveBack', Type\SubmitType::class, [
+                'label' => $this->translator->trans('Enregistrer et retourner aux opérations', [], 'admin'),
+                'attr' => [
+                    'class' => 'btn-dark',
+                ],
+                'row_attr' => ['class' => 'ms-2'],
+            ]);
+        }
 
         $builder->add('save', Type\SubmitType::class, [
             'label' => $this->translator->trans('Enregistrer', [], 'admin'),
@@ -65,7 +66,7 @@ class WalletType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Wallet::class,
+            'data_class' => Operation::class,
             'translation_domain' => 'form',
         ]);
     }

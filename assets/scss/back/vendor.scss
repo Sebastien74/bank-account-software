@@ -1,11 +1,15 @@
 @import '../../lib/fonts/google-poppins';
 
 @import 'bootstrap/bootstrap';
+@import 'variables';
+
+@import '../vendor/mixin/media-queries';
 
 @import 'layout/header';
 @import 'layout/sidebar';
 @import 'layout/modal';
 @import 'layout/toast';
+@import 'layout/pagination';
 
 $fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
 

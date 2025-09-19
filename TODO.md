@@ -7,3 +7,5 @@ Factoriser les forms view modal (Titre par exemple) et qu'un seul temple de moda
 Factoriser les forms submit
 
 Breadcrumbs
+
+Suppression multiple

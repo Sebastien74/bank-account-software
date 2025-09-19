@@ -11,5 +11,5 @@ interface GlobalManagerInterface
     public function setForm(string $formClassname, mixed $entity);
     public function getForm(): ?FormInterface;
     public function getRedirection(): ?string;
-    public function delete(string $entityClassname): ?string;
+    public function delete(mixed $entityToDelete): ?string;
 }

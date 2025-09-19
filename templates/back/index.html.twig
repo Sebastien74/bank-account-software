@@ -48,33 +48,7 @@
                                    data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
                                     {{ 'fas pencil'|icon(null, 20, 'white') }}
                                 </a>
-                                <span data-bs-toggle="tooltip" data-bs-title="{{ "Supprimer"|trans|striptags }}">
-                                    <button class="btn btn-circle btn-black d-inline-flex justify-content-center align-items-center me-1"
-                                            data-bs-toggle="modal" data-bs-target="#delete-modal-{{ entity.id }}">
-                                        {{ 'fas trash'|icon(null, 20, 'danger') }}
-                                    </button>
-                                </span>
-                                <div class="modal fade" id="delete-modal-{{ entity.id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content bg-dark">
-                                            <div class="modal-header pt-4 pb-0">
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
-                                            </div>
-                                            <div class="modal-body text-center pb-3 pt-0">
-                                                {{ 'far exclamation-triangle'|icon(null, 60, 'warning') }}
-                                                <p class="mb-0 delete-alert fw-600 mt-4">{{ "Êtes-vous sûr de vouloir supprimer ?"|trans|raw }}</p>
-                                            </div>
-                                            <div class="modal-footer pb-4">
-                                                <button type="button" class="btn btn-dark me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
-                                                {% set route = 'admin_'~interface.name~'_delete' %}
-                                                {% set routeArgs = route|routeArgs(entity) %}
-                                                <a href="{{ path(route, routeArgs) }}" class="btn btn-warning d-inline-flex justify-content-center align-items-center me-1">
-                                                    {{ "Confirmer"|trans|raw }}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% include 'back/delete-modal.html.twig' %}
                             </td>
                         </tr>
                     {% endfor %}

@@ -6,9 +6,8 @@ namespace App\Controller\Back;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\Category;
-use App\Form\Type\Wallet\CategoryType;
+use App\Entity\Wallet\CategoryType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -25,7 +24,7 @@ class CategoryController extends BaseController
     protected mixed $entityClassname = Category::class;
 
     #[Route('/index/{categorytype}', name: 'admin_category_index', methods: 'GET|POST')]
-    public function index($categorytype): Response
+    public function index(CategoryType $categorytype): Response
     {
         $paginator = $this->getPagination();
         if ($paginator instanceof RedirectResponse) {
@@ -33,15 +32,10 @@ class CategoryController extends BaseController
         }
 
         $formManager = $this->globalFormManager;
-        $formManager->setForm(CategoryType::class, new Category());
+        $formManager->setForm(\App\Form\Type\Wallet\CategoryType::class, new Category());
         $form = $formManager->getForm();
         if ($formManager->getRedirection()) {
             return $this->redirect($formManager->getRedirection());
-        }
-
-        $categorytype = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\CategoryType::class)->find($categorytype);
-        if (!$categorytype) {
-            throw $this->createNotFoundException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'admin'));
         }
 
         return $this->render('back/index.html.twig', array_merge($this->defaultArguments(), [
@@ -52,10 +46,10 @@ class CategoryController extends BaseController
     }
 
     #[Route('/edit/{category}', name: 'admin_category_edit', methods: 'GET|POST')]
-    public function edit(Request $request, Category $category): Response
+    public function edit(Category $category): Response
     {
         $formManager = $this->globalFormManager;
-        $formManager->setForm(CategoryType::class, $category);
+        $formManager->setForm(\App\Form\Type\Wallet\CategoryType::class, $category);
         $form = $formManager->getForm();
         if ($formManager->getRedirection()) {
             return $this->redirect($formManager->getRedirection());
@@ -68,8 +62,8 @@ class CategoryController extends BaseController
     }
 
     #[Route('/delete/{category}', name: 'admin_category_delete', methods: 'GET')]
-    public function delete(): RedirectResponse
+    public function delete(Category $category): RedirectResponse
     {
-        return $this->redirect($this->globalFormManager->delete($this->entityClassname));
+        return $this->redirect($this->globalFormManager->delete($category));
     }
 }

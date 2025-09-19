@@ -9,7 +9,6 @@ use App\Entity\Wallet\Category;
 use App\Entity\Wallet\SubCategory;
 use App\Form\Type\Wallet\SubCategoryType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -26,7 +25,7 @@ class SubCategoryController extends BaseController
     protected mixed $entityClassname = SubCategory::class;
 
     #[Route('/index/{category}', name: 'admin_subcategory_index', methods: 'GET|POST')]
-    public function index(Request $request, $category): Response
+    public function index(Category $category): Response
     {
         $paginator = $this->getPagination();
         if ($paginator instanceof RedirectResponse) {
@@ -53,9 +52,8 @@ class SubCategoryController extends BaseController
     }
 
     #[Route('/edit/{subcategory}', name: 'admin_subcategory_edit', methods: 'GET|POST')]
-    public function edit($subcategory): Response
+    public function edit(SubCategory $subcategory): Response
     {
-        $subcategory = $this->coreLocator->em()->getRepository(SubCategory::class)->find($subcategory);
         $formManager = $this->globalFormManager;
         $formManager->setForm(SubCategoryType::class, $subcategory);
         $form = $formManager->getForm();
@@ -70,8 +68,8 @@ class SubCategoryController extends BaseController
     }
 
     #[Route('/delete/{subcategory}', name: 'admin_subcategory_delete', methods: 'GET')]
-    public function delete(): RedirectResponse
+    public function delete(SubCategory $subcategory): RedirectResponse
     {
-        return $this->redirect($this->globalFormManager->delete($this->entityClassname));
+        return $this->redirect($this->globalFormManager->delete($subcategory));
     }
 }

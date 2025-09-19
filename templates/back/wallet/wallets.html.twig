@@ -23,11 +23,12 @@
                             <h3 class="h4 mb-0">{{ wallet.adminName|raw }}</h3>
                         </div>
                         <div class="card-body">
-
+                            Solde. dernieres opérations...
                         </div>
                         <div class="card-footer">
                             <a href="{{ path('admin_wallet_edit', {wallet: wallet.id}) }}">{{ 'Configuration du compte'|trans|raw }}</a>
                             <a href="{{ path('admin_wallet_operations', {wallet: wallet.id}) }}">{{ 'Mes opérations'|trans|raw }}</a>
+                            {% include 'back/delete-modal.html.twig' with {entity: wallet} %}
                         </div>
                     </div>
                 </div>
