@@ -8,6 +8,12 @@ parameters:
 	ignoreErrors:
 		# False positive: clients are not dependencies of this project.
 		-
+			message: '#Method KnpU\\OAuth2ClientBundle\\Client\\Provider\\Pkce\\\w+::fetchUserFromToken\(\) has invalid return type .+#'
+			path: ./src/Client/Provider/Pkce/
+		-
+			message: '#Method KnpU\\OAuth2ClientBundle\\Client\\Provider\\Pkce\\\w+::fetchUser\(\) has invalid return type .+#'
+			path: ./src/Client/Provider/Pkce/
+		-
 			message: '#Method KnpU\\OAuth2ClientBundle\\Client\\Provider\\\w+::fetchUserFromToken\(\) has invalid return type .+#'
 			path: ./src/Client/Provider/
 		-
@@ -26,12 +32,6 @@ parameters:
 			path: ./src/DependencyInjection/Providers
 
 		# The DependencyInjection returns are very complex to deal with
-		-
-			message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface::scalarNode\(\)\.#'
-			path: ./src/DependencyInjection/Providers
-		-
-			message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface::arrayNode\(\)\.#'
-			path: ./src/DependencyInjection/Providers
 		-
 			message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)\.#'
 			path: ./src/DependencyInjection
