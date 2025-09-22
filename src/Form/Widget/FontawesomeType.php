@@ -34,8 +34,8 @@ class FontawesomeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label' => $this->translator->trans('Icône', [], 'admin'),
-            'placeholder' => $this->translator->trans('Sélectionnez', [], 'admin'),
+            'label' => $this->translator->trans('Icône', [], 'back'),
+            'placeholder' => $this->translator->trans('Sélectionnez', [], 'back'),
             'required' => false,
             'choices' => $this->getIcons(),
             'dropdown_class' => 'icons-selector',
@@ -60,7 +60,7 @@ class FontawesomeType extends AbstractType
         if ($filesystem->exists($dirname)) {
             $finder = Finder::create();
             $finder->in($dirname);
-            $choices[$this->translator->trans('Séléctionnez', [], 'admin')] = '';
+            $choices[$this->translator->trans('Séléctionnez', [], 'back')] = '';
             foreach ($finder as $file) {
                 if (!empty($file->getRelativePath())) {
                     $path = str_replace(['/', DIRECTORY_SEPARATOR], '\\', $file->getRelativePathname());

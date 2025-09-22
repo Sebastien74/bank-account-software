@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Form\Manager;
 
 use App\Service\CoreLocatorInterface;
+use App\Service\Urlizer;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -37,7 +37,7 @@ class GlobalManager implements GlobalManagerInterface
     public function setForm(string $formClassname, mixed $entity = null, array $options = []): void
     {
         if (!$entity) {
-            throw new NotFoundHttpException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'admin'));
+            throw new NotFoundHttpException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'back'));
         }
 
         $this->form = $this->formFactory->create($formClassname, $entity, $options);
@@ -49,6 +49,9 @@ class GlobalManager implements GlobalManagerInterface
             $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
             $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
             $masterFieldSetter = $masterField ? 'set'.ucfirst($masterField) : false;
+            if (method_exists($entity, 'getAdminName') && method_exists($entity, 'setSlug')) {
+                $entity->setSlug(Urlizer::urlize($entity->getAdminName()));
+            }
             if ($masterFieldSetter && method_exists($entity, $masterFieldSetter) && $this->coreLocator->request()->get($masterField)) {
                 $metadata = $this->coreLocator->em()->getClassMetadata(get_class($entity));
                 $masterClassname = $metadata->associationMappings[$masterField]['targetEntity'];
@@ -63,7 +66,7 @@ class GlobalManager implements GlobalManagerInterface
             $this->coreLocator->em()->persist($entity);
             $this->coreLocator->em()->flush();
             $session = $this->coreLocator->request()->getSession();
-            $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Créé avec succès !", [], 'admin'));
+            $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Créé avec succès !", [], 'back'));
             if (!empty($interface['name'])) {
                 $submitName = $this->form->getClickedButton()->getName();
                 $redirections = [
@@ -88,7 +91,7 @@ class GlobalManager implements GlobalManagerInterface
         $this->redirection = $this->coreLocator->request()->headers->get('referer');
 
         if (!is_object($entityToDelete)) {
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Une erreur est survenue !", [], 'admin'));
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Une erreur est survenue !", [], 'back'));
             return $this->redirection;
         }
 
@@ -111,10 +114,10 @@ class GlobalManager implements GlobalManagerInterface
                     }
                 }
                 $this->coreLocator->em()->flush();
-                $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Supprimé avec succès !", [], 'admin'));
+                $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Supprimé avec succès !", [], 'back'));
             }
         } else {
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Vous n'êtes pas autorisé à supprimer !", [], 'admin'));
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Vous n'êtes pas autorisé à supprimer !", [], 'back'));
         }
 
         return $this->redirection;

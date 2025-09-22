@@ -26,12 +26,27 @@ class SubCategory extends BaseEntity
         'masterField' => 'category',
     ];
 
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    private ?string $type = null;
+
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $icon = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['persist'], inversedBy: 'subCategories')]
     #[ORM\JoinColumn(onDelete: 'cascade')]
     private ?Category $category = null;
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
 
     public function getIcon(): ?string
     {

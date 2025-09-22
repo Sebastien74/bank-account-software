@@ -1,3 +1,5 @@
+{% trans_default_domain 'back' %}
+
 <!doctype html>
 <html lang="{{ app.request.locale }}" data-bs-theme="auto">
     <head>
@@ -12,11 +14,8 @@
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}" />
         <meta name="apple-mobile-web-app-title" content="{{ companyName|striptags }}" />
         <link rel="manifest" href="{{ asset('site.webmanifest') }}" />
-        <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/dashboard/" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-        {{ encore_entry_link_tags('back-vendor', null, 'back') }}
+        <link rel="canonical" href="{{ app.request.uri }}" />
+        {{ encore_entry_link_tags('back-vendor', null, 'back', {nonce: csp_nonce()}) }}
         <meta name="theme-color" content="#712cf9" />
     </head>
     <body>
@@ -25,10 +24,13 @@
         <div class="d-flex">
             {% include 'back/includes/sidebar.html.twig' %}
             <main id="main-container" class="px-5">
+                {% include 'back/includes/breadcrumb.html.twig' with {
+
+                } only %}
                 {% block body %}{% endblock %}
             </main>
         </div>
-        {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false}) }}
+        {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false, nonce: csp_nonce()}) }}
         <div id="data-translation" class="d-none"
              data-search="{{ "Chercher"|trans|striptags }}"
         ></div>

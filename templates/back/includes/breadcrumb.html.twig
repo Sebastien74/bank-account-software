@@ -1,0 +1,11 @@
+{% trans_default_domain 'back' %}
+
+{% if breadcrumb is defined and breadcrumb is not empty %}
+    <nav aria-label="breadcrumb">
+        <ol class="page-breadcrumb breadcrumb">
+            {% for item, path in breadcrumb %}
+                <li class="breadcrumb-item"><a href="{{ path }}">{{ item }}</a></li>
+            {% endfor %}
+        </ol>
+    </nav>
+{% endif %}

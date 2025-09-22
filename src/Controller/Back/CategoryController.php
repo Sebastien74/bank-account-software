@@ -31,6 +31,8 @@ class CategoryController extends BaseController
             return $paginator;
         }
 
+        $category = new Category();
+        $category->setType($categorytype->getType());
         $formManager = $this->globalFormManager;
         $formManager->setForm(\App\Form\Type\Wallet\CategoryType::class, new Category());
         $form = $formManager->getForm();

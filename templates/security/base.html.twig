@@ -1,7 +1,6 @@
+{% trans_default_domain 'security' %}
+
 <!DOCTYPE html>
-
-{% trans_default_domain 'security_cms' %}
-
 <html lang="{{ app.request.locale }}">
 
     <head>
@@ -25,7 +24,7 @@
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-            {{ encore_entry_link_tags('security', null, 'security') }}
+            {{ encore_entry_link_tags('security', null, 'security', {nonce: csp_nonce()}) }}
         {% endblock %}
 
     </head>
@@ -52,7 +51,7 @@
         {% include 'core/data-path.html.twig' only %}
 
         {% block javascripts %}
-            {{ encore_entry_script_tags('security', null, 'security') }}
+            {{ encore_entry_script_tags('security', null, 'security', {nonce: csp_nonce()}) }}
         {% endblock %}
 
     </body>

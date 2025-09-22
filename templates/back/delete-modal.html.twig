@@ -1,3 +1,5 @@
+{% trans_default_domain 'back' %}
+
 <span data-bs-toggle="tooltip" data-bs-title="{{ "Supprimer"|trans|striptags }}">
     <button class="btn btn-circle btn-black d-inline-flex justify-content-center align-items-center me-1"
             data-bs-toggle="modal" data-bs-target="#delete-modal-{{ entity.id }}">

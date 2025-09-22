@@ -35,19 +35,19 @@ class OperationType extends AbstractType
         $isNew = !$builder->getData()->getId();
 
         $builder->add('adminName', Type\TextType::class, [
-            'label' => $this->translator->trans('Intitulé', [], 'admin'),
+            'label' => $this->translator->trans('Intitulé', [], 'back'),
             'attr' => [
-                'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'admin'),
+                'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'back'),
             ],
             'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'admin'),
+                'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back'),
             ])],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
         ]);
 
         if (!$isNew) {
             $builder->add('saveBack', Type\SubmitType::class, [
-                'label' => $this->translator->trans('Enregistrer et retourner aux opérations', [], 'admin'),
+                'label' => $this->translator->trans('Enregistrer et retourner aux opérations', [], 'back'),
                 'attr' => [
                     'class' => 'btn-dark',
                 ],
@@ -56,7 +56,7 @@ class OperationType extends AbstractType
         }
 
         $builder->add('save', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Enregistrer', [], 'admin'),
+            'label' => $this->translator->trans('Enregistrer', [], 'back'),
             'attr' => [
                 'class' => 'btn-secondary ms-2',
             ],

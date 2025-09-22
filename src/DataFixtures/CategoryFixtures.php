@@ -125,6 +125,7 @@ class CategoryFixtures extends BaseFixtures
             $categoryType->setSlug($categoryTypeSlug);
             $categoryType->setAdminName($categoryTypeName);
             $categoryType->setPosition($categoryTypePosition);
+            $categoryType->setType($categoryTypeSlug);
             $this->manager->persist($categoryType);
             ++$categoryTypePosition;
 
@@ -135,7 +136,8 @@ class CategoryFixtures extends BaseFixtures
                 $category->setSlug($categoryType->getSlug().'-'.$categorySlug);
                 $category->setAdminName($categoryName);
                 $category->setPosition($categoryPosition);
-                $category->setType($categoryType);
+                $category->setCategorytype($categoryType);
+                $category->setType($categoryTypeSlug);
                 $this->manager->persist($category);
                 ++$categoryPosition;
 
@@ -146,6 +148,7 @@ class CategoryFixtures extends BaseFixtures
                     $subCategory->setAdminName($subCategoryName);
                     $subCategory->setPosition($subCategoryPosition);
                     $subCategory->setCategory($category);
+                    $subCategory->setType($categoryTypeSlug);
                     $this->manager->persist($subCategory);
                     ++$subCategoryPosition;
                 }

@@ -32,6 +32,8 @@ class SubCategoryController extends BaseController
             return $paginator;
         }
 
+        $subCategory = new SubCategory();
+        $subCategory->setType($category->getType());
         $formManager = $this->globalFormManager;
         $formManager->setForm(SubCategoryType::class, new SubCategory());
         $form = $formManager->getForm();
@@ -41,7 +43,7 @@ class SubCategoryController extends BaseController
 
         $categorytype = $this->coreLocator->em()->getRepository(Category::class)->find($category);
         if (!$categorytype) {
-            throw $this->createNotFoundException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'admin'));
+            throw $this->createNotFoundException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'back'));
         }
 
         return $this->render('back/index.html.twig', array_merge($this->defaultArguments(), [

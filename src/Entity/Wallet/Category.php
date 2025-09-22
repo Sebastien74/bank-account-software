@@ -34,6 +34,9 @@ class Category extends BaseEntity
         'admin_subcategory_index' => 'adminName',
     ];
 
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    private ?string $type = null;
+
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $icon = null;
 
@@ -49,6 +52,18 @@ class Category extends BaseEntity
     public function __construct()
     {
         $this->subCategories = new ArrayCollection();
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     public function getIcon(): ?string

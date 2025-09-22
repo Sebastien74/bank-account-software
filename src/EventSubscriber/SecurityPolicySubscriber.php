@@ -7,6 +7,7 @@ namespace App\EventSubscriber;
 use App\Entity\Security\User;
 use App\Service\CspNonceGenerator;
 use App\Service\CoreLocatorInterface;
+use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Random\RandomException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class SecurityPolicySubscriber implements EventSubscriberInterface
 {
     private const bool CSP_DISABLED_FOR_DEV = false;
+    private const bool CSP_ADMIN = true;
     private const bool XSS_DENIED = true;
     private const string XSS_PATTERN = '/(<\s*script|on\w+\s*=|javascript:|<svg|<img|<iframe|<object|data:text\/html)/i';
 
@@ -57,7 +59,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
     /**
      * Adds the Content Security Policy header.
      *
-     * @throws \Exception|InvalidArgumentException
+     * @throws Exception
      */
     public function addSecurityToResponse(ResponseEvent $event): void
     {
@@ -76,12 +78,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
             $response->headers->clearCookie('SECURITY_ERROR');
         }
 
-        if ('front_clear_cache' === $this->routeName) {
-            $nonce = $this->session->get('app_nonce');
-            if ($nonce === $this->request->get('token')) {
-                return;
-            }
-        } elseif (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
+        if (!$this->isMainRequest || str_contains($this->uri, '_wdt') || !$this->isMainRequest()) {
             return;
         }
 
@@ -273,7 +270,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
      */
     private function header(string $header): array
     {
-        if ($this->inAdmin) {
+        if (!self::CSP_ADMIN && $this->inAdmin) {
             return [];
         }
 

@@ -91,6 +91,10 @@ if (enableNotification) {
 }
 
 const back = Encore.getWebpackConfig();
+back.output.trustedTypes = {
+    policyName: 'webpack-policy', // nom de la policy TT utilisée par le runtime
+    onPolicyCreationFailure: 'continue', // évite de casser en cas d’échec (ex: vieux navigateurs)
+};
 back.name = 'back';
 back.target = target;
 back.cache = cache;
@@ -161,6 +165,10 @@ if (enableNotification) {
 }
 
 const security = Encore.getWebpackConfig();
+security.output.trustedTypes = {
+    policyName: 'webpack-policy', // nom de la policy TT utilisée par le runtime
+    onPolicyCreationFailure: 'continue', // évite de casser en cas d’échec (ex: vieux navigateurs)
+};
 security.name = 'security';
 security.target = target;
 security.cache = cache;

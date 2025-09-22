@@ -35,17 +35,17 @@ class WalletType extends AbstractType
         $isNew = !$builder->getData()->getId();
 
         $builder->add('adminName', Type\TextType::class, [
-            'label' => $this->translator->trans('Nom du compte', [], 'admin'),
+            'label' => $this->translator->trans('Nom du compte', [], 'back'),
             'attr' => [
-                'placeholder' => $this->translator->trans('Saisissez un nom', [], 'admin'),
+                'placeholder' => $this->translator->trans('Saisissez un nom', [], 'back'),
             ],
             'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez saisir un nom pour votre compte.', [], 'admin'),
+                'message' => $this->translator->trans('Veuillez saisir un nom pour votre compte.', [], 'back'),
             ])],
         ]);
 
         $btnName = $isNew ? 'saveEdit' : 'saveBack';
-        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'admin') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'admin');
+        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'back') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'back');
         $builder->add($btnName, Type\SubmitType::class, [
             'label' => $btnLabel,
             'attr' => [
@@ -55,7 +55,7 @@ class WalletType extends AbstractType
         ]);
 
         $builder->add('save', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Enregistrer', [], 'admin'),
+            'label' => $this->translator->trans('Enregistrer', [], 'back'),
             'attr' => [
                 'class' => 'btn-secondary ms-2',
             ],
