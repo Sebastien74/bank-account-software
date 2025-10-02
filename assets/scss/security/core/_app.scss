@@ -1,30 +1,34 @@
 @charset "UTF-8";
 
-/* -----------------------------------------------------------------
+/* --------------------------------------------------------------------------------------
 
-    Created on : 2019-02-05, 2:56 PM
-    Author     : Sébastien FOURNIER <fournier.sebastien@outlook.com>
-
-    SECURITY APP :
-    =============
+    Module : Security app
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
     1 ) Core
     2 ) Contact infos
     3 ) Base theme
     4 ) Responsive
 
------------------------------------------------------------------- */
+----------------------------------------------------------------------------------------- */
 
 /*-----------------------------------
    1 ) Core
 -----------------------------------*/
 
 body {
-    font-family: 'Fira Sans', sans-serif;
+
+    font-family: $font-family;
     font-size: 15px;
     overflow-x: hidden;
     background-color: $bg-body;
     min-height: 100dvh;
+
+    #content {
+        background-color: $bg-body;
+    }
 }
 
 * {
@@ -62,6 +66,10 @@ a {
     color: $link-color;
 }
 
+h2 {
+    font-size: 25px;
+}
+
 .login-register {
 
     padding: 0;
@@ -88,19 +96,19 @@ a {
         left: 0;
         bottom: 0;
         width: calc(100% - 400px);
-        background-color: transparentize($primary, .5);
+        background-color: transparentize($bg-body, .3);
     }
 
     .btn {
-        font-weight: 300;
-        border-radius: 0;
+        font-weight: 500;
+        border-radius: .25rem;
     }
 
     .login-box {
 
         width: 400px;
         margin: 0 auto;
-        background-color: $white;
+        background-color: $bg-body;
         min-height: 100%;
         position: absolute;
         right: 0;
@@ -144,12 +152,18 @@ a {
 
     .header {
 
-        svg, svg * {
-            fill: $theme-color;
-        }
+        .icon-wrap {
 
-        #logo {
-            min-height: 100px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            background-color: $primary;
+
+            i {
+                color: $white;
+                font-size: 75px;
+            }
         }
     }
 

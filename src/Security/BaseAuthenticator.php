@@ -6,8 +6,8 @@ namespace App\Security;
 
 use App\Entity\Security\User;
 use App\Repository\Security\UserRepository;
-use App\Service\CryptService;
 use App\Service\CoreLocatorInterface;
+use App\Service\CryptServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use KnpU\OAuth2ClientBundle\Security\Exception\IdentityProviderAuthenticationException;
@@ -65,7 +65,7 @@ class BaseAuthenticator
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly CryptService $cryptService,
+        private readonly CryptServiceInterface $cryptService,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
         $this->translator = $this->coreLocator->translator();

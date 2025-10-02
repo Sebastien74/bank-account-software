@@ -30,7 +30,7 @@
             {% if field.vars.name == '_remember_me' %}
                     </div>
                     <div class="col-sm-6 text-center text-sm-end">
-                        <a href="{{ path("security_password_request", {_locale: app.request.locale}) }}" id="to-recover" class="text-dark" data-toggle="preloader">
+                        <a href="{{ path("security_password_request", {_locale: app.request.locale}) }}" id="to-recover" class="text-white" data-toggle="preloader">
                             <small class="text-italic">{{ 'Mot de passe oublié ?'|trans|raw }}</small>
                         </a>
                     </div>

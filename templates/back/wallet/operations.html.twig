@@ -2,9 +2,6 @@
 
 {% trans_default_domain 'back' %}
 
-{% set pageIcon = 'fal wallet' %}
-{% set pageTitle = "Mes opérations"|trans %}
-
 {% block stylesheets %}
 {% endblock %}
 
@@ -14,6 +11,6 @@
 {% block body %}
     <div id="operations-index" class="container-fluid pt-4 pb-5 position-relative">
         {% include 'back/new-modal.html.twig' %}
-        {{ dump() }}
+{#        {{ dump() }}#}
     </div>
 {% endblock %}

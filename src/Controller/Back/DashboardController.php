@@ -24,7 +24,10 @@ class DashboardController extends BaseController
     #[Route('/dashboard/{website}', name: 'admin_dashboard', defaults: ['website' => null], methods: 'GET')]
     public function view(): Response
     {
-        return $this->render('back/dashboard/dashboard.html.twig', array_merge($this->defaultArguments(), [
+        $this->pageTitle = $this->coreLocator->translator()->trans('Tableau de bord', [], 'back');
+        $this->pageIcon = 'fal tachometer-alt-average';
+
+        return $this->render('back/pages/dashboard.html.twig', array_merge($this->defaultArguments(), [
 
         ]));
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Service\CryptService;
+use App\Service\CryptServiceInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -27,7 +27,7 @@ class RecaptchaAuthenticator
      * RecaptchaAuthenticator constructor.
      */
     public function __construct(
-        private readonly CryptService $cryptService,
+        private readonly CryptServiceInterface $cryptService,
         private readonly TranslatorInterface $translator,
         private readonly string $logDir,
     ) {

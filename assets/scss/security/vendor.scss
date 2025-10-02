@@ -1,21 +1,52 @@
 @charset "UTF-8";
 
-/* -----------------------------------------------------------------
+/* --------------------------------------------------------------------------------------
 
-    Created on : 2019-08-07, 9:43 AM
-    Author     : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Module : Security vendor
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
-    SECURITY VENDOR :
-    =================
+    1 ) Variables
+    2 ) Imports
+    3 ) Breakpoints
+    4 ) Layout
 
-    1 ) Breakpoints
-    2 ) Colors
-    3 ) Imports
-
------------------------------------------------------------------- */
+----------------------------------------------------------------------------------------- */
 
 /*-----------------------------------
-   1 ) Breakpoints
+   1 ) Variables
+-----------------------------------*/
+
+$bg-body: #0e0e0e !default;
+
+$white: #fff !default;
+$primary: #6f42c1 !default;
+$info: $primary !default;
+$danger: #7f1200 !default;
+$danger-color: #7f1200 !default;
+$link-color: $primary !default;
+$success: #5D7808 !default;
+$ribbon-danger-bookmark: $primary !default;
+$ribbon-danger-color: $white !default;
+
+$font-family: 'Poppins', sans-serif !default;
+
+$input-placeholder-color: transparentize($white, .4) !default;
+$input-color: $white !default;
+$form-check-label-color: $white !default;
+
+/*-----------------------------------
+   2 ) Imports
+-----------------------------------*/
+
+@import '../../lib/fonts/google-poppins';
+@import '../../lib/fonts/icomoon';
+@import './bootstrap/bootstrap';
+@import './bootstrap/variables';
+
+/*-----------------------------------
+   3 ) Breakpoints
 -----------------------------------*/
 
 $xs: 320px;
@@ -26,24 +57,9 @@ $xl: 1200px;
 $xxl: 1600px;
 
 /*-----------------------------------
-   2 ) Colors
+   4 ) Layout
 -----------------------------------*/
 
-$bg-body: #24252e;
-$primary: #24252e;
-$info: $primary;
-$danger: #7f1200;
-$danger-color: #7f1200;
-$link-color: $primary;
-$success: #5D7808;
-$ribbon-danger-bookmark: $primary;
-$ribbon-danger-color: #fff;
-
-/*-----------------------------------
-   3 ) Imports
------------------------------------*/
-
-@import "~bootstrap/scss/bootstrap";
 @import 'core/app';
 @import 'core/preloader';
 @import 'core/form';

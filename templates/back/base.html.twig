@@ -1,5 +1,8 @@
 {% trans_default_domain 'back' %}
 
+{% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'fal wallet' %}
+{% set pageTitle = pageTitle is defined and pageTitle ? pageTitle : "Mes comptes"|trans %}
+
 <!doctype html>
 <html lang="{{ app.request.locale }}" data-bs-theme="auto">
     <head>
@@ -23,11 +26,13 @@
         {% include 'back/includes/header.html.twig' %}
         <div class="d-flex">
             {% include 'back/includes/sidebar.html.twig' %}
-            <main id="main-container" class="px-5">
+            <main id="main-container">
                 {% include 'back/includes/breadcrumb.html.twig' with {
-
+                    breadcrumb: breadcrumb is defined ? breadcrumb : []
                 } only %}
-                {% block body %}{% endblock %}
+                <div id="main-container-inner" class="px-5">
+                    {% block body %}{% endblock %}
+                </div>
             </main>
         </div>
         {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false, nonce: csp_nonce()}) }}

@@ -7,7 +7,6 @@ namespace App\Form\Manager\Security;
 use App\Entity\Security\User;
 use App\Form\Model\Security\Admin\PasswordResetModel;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**

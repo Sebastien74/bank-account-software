@@ -1,21 +1,92 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back vendor
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+    1 ) Variables
+    2 ) Imports
+    3 ) Core
+
+----------------------------------------------------------------------------------------- */
+
+/*-----------------------------------
+   1 ) Variables
+-----------------------------------*/
+
+$xs: 320px !default;
+$sm: 576px !default;
+$md: 768px !default;
+$lg: 992px !default;
+$xl: 1200px !default;
+$xxl: 1400px !default;
+$xxxl: 1600px !default;
+
+$fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
+
+$primary: #6f42c1 !default;
+$gray-300: #dee2e6 !default;
+$gray-600: #6c757d !default;
+$gray-800: #292929 !default;
+
+$breadcrumb-divider-color: $gray-300 !default;
+$breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='#{$breadcrumb-divider-color}'/></svg>");
+
+$btn-padding-y: .65rem !default;
+$btn-padding-x: 1.5rem !default;
+
+$form-label-color: $gray-800 !default;
+$input-bg: $gray-300 !default;
+$input-border-color: $input-bg !default;
+$input-placeholder-color: $gray-600 !default;
+$form-invalid-border-color: $input-bg !default;
+$input-font-size: 15px !default;
+
+$card-inner-border-radius: .25rem !default;
+
+/*-----------------------------------
+   2 ) Imports
+-----------------------------------*/
+
 @import '../../lib/fonts/google-poppins';
+@import '../../lib/fonts/icomoon';
 
 @import 'bootstrap/bootstrap';
-@import 'variables';
+@import 'bootstrap/variables';
 
 @import '../vendor/mixin/media-queries';
 
 @import 'layout/header';
 @import 'layout/sidebar';
-@import 'layout/modal';
-@import 'layout/toast';
+@import 'layout/breadcrumb';
 @import 'layout/pagination';
 
-$fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
+@import 'components/modal';
+@import 'components/toast';
+@import 'components/form';
+@import 'components/table';
+@import 'components/button';
+@import 'components/card';
+
+/*-----------------------------------
+   3 ) Core
+-----------------------------------*/
 
 body {
 
     font-family: $font-family;
+
+    #main-container {
+        width: calc(100% - 350px);
+        background-color: $gray-800;
+    }
+
+    .text-white {
+        opacity: .9;
+    }
 
     @each $size in $fonts-weights {
         .fw-#{$size}, .fw-#{$size} *:not(strong):not(b) {
@@ -28,76 +99,6 @@ body {
             &.#{$color} {
                 fill: $hexadecimal;
             }
-        }
-    }
-
-    .btn-circle {
-        border-radius: 50%;
-        aspect-ratio: 1;
-    }
-
-    .btn-square {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-    }
-
-    #main-container {
-        width: calc(100% - 350px);
-        background-color: $gray-800;
-    }
-
-    form {
-
-        .form-label {
-            color: transparentize($white, 0.3);
-        }
-
-        .choices__item--selectable img {
-            max-height: 20px;
-        }
-
-        .form-control {
-            min-height: 45px;
-            border-radius: .25rem;
-        }
-
-        .choices__inner {
-            height: 45px;
-            border-radius: .25rem;
-        }
-    }
-
-    table {
-
-        .media-col {
-
-            width: 60px;
-
-            svg {
-                max-width: 40px;
-            }
-        }
-
-        a {
-            text-decoration: none;
-
-            &.index-link {
-
-                color: transparentize($white, .3);
-                font-size: 15px;
-                transition: all .3s ease-in-out;
-
-                &:hover {
-                    color: transparentize($white, 0);
-                    transition: all .3s ease-in-out;
-                }
-            }
-        }
-
-        .btn-circle {
-            width: 40px;
-            height: 40px;
         }
     }
 }

@@ -1,11 +1,13 @@
 {% trans_default_domain 'back' %}
 
-{% if breadcrumb is defined and breadcrumb is not empty %}
-    <nav aria-label="breadcrumb">
-        <ol class="page-breadcrumb breadcrumb">
-            {% for item, path in breadcrumb %}
-                <li class="breadcrumb-item"><a href="{{ path }}">{{ item }}</a></li>
-            {% endfor %}
-        </ol>
+{% if breadcrumb is not empty %}
+    <nav class="py-3 px-4 breadcrumb-container bg-secondary" aria-label="breadcrumb">
+        <div class="container-fluid">
+            <ol class="page-breadcrumb breadcrumb mb-0">
+                {% for item, path in breadcrumb %}
+                    <li class="breadcrumb-item"><a href="{{ path }}" class="text-white">{{ item }}</a></li>
+                {% endfor %}
+            </ol>
+        </div>
     </nav>
 {% endif %}

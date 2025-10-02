@@ -21,44 +21,38 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin-%security_token%/wallets', schemes: '%protocol%')]
 class WalletController extends BaseController
 {
-    protected mixed $entityClassname = Wallet::class;
+    protected ?string $classname = Wallet::class;
+    protected ?string $formType = WalletType::class;
 
+    /**
+     * Wallet index.
+     */
     #[Route('/index', name: 'admin_wallet_index', methods: 'GET|POST')]
     public function index(): Response
     {
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(WalletType::class, new Wallet());
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des comptes', [], 'back');
+        $this->template = 'back/wallet/wallets.html.twig';
 
-        return $this->render('back/wallet/wallets.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'formErrors' => $form->isSubmitted() && !$form->isValid(),
-            'wallets' => $this->coreLocator->em()->getRepository(Wallet::class)->findAll(),
-        ]));
+        return parent::index();
     }
 
+    /**
+     * Wallet edit.
+     */
     #[Route('/edit/{wallet}', name: 'admin_wallet_edit', methods: 'GET|POST')]
-    public function edit(Wallet $wallet): Response
+    public function edit(): Response
     {
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(WalletType::class, $wallet);
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des comptes', [], 'back');
 
-        return $this->render('back/edit.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'entity' => $wallet,
-        ]));
+        return parent::edit();
     }
 
+    /**
+     * Wallet delete.
+     */
     #[Route('/delete/{wallet}', name: 'admin_wallet_delete', methods: 'GET')]
-    public function delete(): RedirectResponse
+    public function delete(Wallet $wallet): RedirectResponse
     {
-        return $this->redirect($this->globalFormManager->delete($this->entityClassname));
+        return $this->redirect($this->globalFormManager->delete($wallet));
     }
 }

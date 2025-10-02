@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back button
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+.btn-circle {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    padding: 0 !important;
+}
+
+.btn-square {
+
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+        font-size: 20px;
+    }
+}

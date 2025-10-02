@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\Back;
 
 use App\Controller\BaseController;
-use App\Entity\Wallet\Category;
 use App\Entity\Wallet\SubCategory;
 use App\Form\Type\Wallet\SubCategoryType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,53 +21,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin-%security_token%/sub-categories', schemes: '%protocol%')]
 class SubCategoryController extends BaseController
 {
-    protected mixed $entityClassname = SubCategory::class;
+    protected ?string $classname = SubCategory::class;
+    protected ?string $formType = SubCategoryType::class;
 
+    /**
+     * SubCategory index.
+     */
     #[Route('/index/{category}', name: 'admin_subcategory_index', methods: 'GET|POST')]
-    public function index(Category $category): Response
+    public function index(): Response
     {
-        $paginator = $this->getPagination();
-        if ($paginator instanceof RedirectResponse) {
-            return $paginator;
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        $subCategory = new SubCategory();
-        $subCategory->setType($category->getType());
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(SubCategoryType::class, new SubCategory());
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
-
-        $categorytype = $this->coreLocator->em()->getRepository(Category::class)->find($category);
-        if (!$categorytype) {
-            throw $this->createNotFoundException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'back'));
-        }
-
-        return $this->render('back/index.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'formErrors' => $form->isSubmitted() && !$form->isValid(),
-            'pagination' => $paginator,
-        ]));
+        return parent::index();
     }
 
+    /**
+     * SubCategory edit.
+     */
     #[Route('/edit/{subcategory}', name: 'admin_subcategory_edit', methods: 'GET|POST')]
-    public function edit(SubCategory $subcategory): Response
+    public function edit(): Response
     {
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(SubCategoryType::class, $subcategory);
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return $this->render('back/edit.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'entity' => $subcategory,
-        ]));
+        return parent::edit();
     }
 
+    /**
+     * SubCategory delete.
+     */
     #[Route('/delete/{subcategory}', name: 'admin_subcategory_delete', methods: 'GET')]
     public function delete(SubCategory $subcategory): RedirectResponse
     {

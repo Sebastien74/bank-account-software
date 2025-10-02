@@ -1,12 +1,12 @@
 {% trans_default_domain 'back' %}
 
 {% set icons = {
-    success: {icon: 'far check', color: 'success'},
-    info: {icon: 'far info', color: 'info'},
-    warning: {icon: 'far exclamation', color: 'warning'},
-    danger: {icon: 'far exclamation-triangle', color: 'danger'},
-    error: {icon: 'far exclamation-triangle', color: 'danger'},
-    undefined: {icon: 'far info', color: 'info'},
+    success: {icon: 'check', color: 'success'},
+    info: {icon: 'info', color: 'info'},
+    warning: {icon: 'exclamation', color: 'warning'},
+    danger: {icon: 'exclamation-triangle', color: 'danger'},
+    error: {icon: 'exclamation-triangle', color: 'danger'},
+    undefined: {icon: 'info', color: 'info'},
 } %}
 
 {% for alert, messages in app.session.flashbag.all %}
@@ -15,9 +15,9 @@
     {% for message in messages %}
         <div class="toast-container position-fixed top-0 end-0 p-3">
             <div class="toast toast-alert fade show border-0 bg-{{ color }}" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header d-flex border-0 no-radius py-3 px-3">
+                <div class="toast-header text-white d-flex border-0 no-radius py-3 px-3">
                     <div class="inner d-flex align-items-center">
-                        {{ icon|icon(null, 17, alert~' me-2') }}
+                        <i class="icon-{{ icon }} me-2"></i>
                         <div class="message">{{ message|raw }}</div>
                     </div>
                     <button type="button" class="btn-close ms-3" data-bs-dismiss="toast" aria-label="Close"></button>

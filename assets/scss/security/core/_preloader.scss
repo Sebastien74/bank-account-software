@@ -1,14 +1,13 @@
 @charset "UTF-8";
 
-/* -----------------------------------------------------------------
+/* --------------------------------------------------------------------------------------
 
-    Created on : 2019-08-07, 10:25 AM
-    Author     : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Module : Back preloader
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
-    SECURITY PRELOADER :
-    ====================
-
------------------------------------------------------------------- */
+----------------------------------------------------------------------------------------- */
 
 #main-preloader {
 
@@ -18,10 +17,20 @@
     bottom: 0;
     right: 0;
     z-index: 100000;
-    background-color: $primary;
+    background-color: $bg-body;
 
-    svg.piggy-bank {
-        fill: $white !important;
+    .icon-wrap {
+
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        aspect-ratio: 1;
+        background-color: $primary;
+
+        i {
+            color: $white;
+            font-size: 75px;
+        }
     }
 }
 
@@ -105,7 +114,7 @@
 
     #main-preloader {
 
-        background-color: $theme-color;
+        background-color: $bg-body;
 
         img {
             min-height: 100px;

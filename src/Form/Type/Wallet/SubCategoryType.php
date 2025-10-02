@@ -6,6 +6,7 @@ namespace App\Form\Type\Wallet;
 
 use App\Entity\Wallet\SubCategory;
 use App\Form\Widget\FontawesomeType;
+use App\Form\Widget\SubmitType;
 use App\Service\CoreLocatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -43,33 +44,19 @@ class SubCategoryType extends AbstractType
             'constraints' => [new Assert\NotBlank([
                 'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back'),
             ])],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-12 form-floating' : 'col-lg-9 form-floating'],
         ]);
 
         if (!$isNew) {
             $builder->add('icon', FontawesomeType::class, [
                 'required' => false,
                 'attr' => ['class' => 'select-icons'],
-                'row_attr' => ['class' => 'col-lg-3'],
+                'row_attr' => ['class' => 'col-lg-3 form-floating'],
             ]);
         }
 
-        $btnName = $isNew ? 'saveEdit' : 'saveBack';
-        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'back') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'back');
-        $builder->add($btnName, Type\SubmitType::class, [
-            'label' => $btnLabel,
-            'attr' => [
-                'class' => 'btn-dark',
-            ],
-            'row_attr' => ['class' => $isNew ? 'me-2' : 'ms-2'],
-        ]);
-
-        $builder->add('save', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Enregistrer', [], 'back'),
-            'attr' => [
-                'class' => 'btn-secondary ms-2',
-            ],
-        ]);
+        $save = new SubmitType($this->coreLocator);
+        $save->add($builder);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -78,5 +65,10 @@ class SubCategoryType extends AbstractType
             'data_class' => SubCategory::class,
             'translation_domain' => 'form',
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'wallet_sub_category';
     }
 }

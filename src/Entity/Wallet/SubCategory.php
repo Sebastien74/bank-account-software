@@ -36,6 +36,14 @@ class SubCategory extends BaseEntity
     #[ORM\JoinColumn(onDelete: 'cascade')]
     private ?Category $category = null;
 
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->type = $this->category->getType();
+
+        parent::prePersist();
+    }
+
     public function getType(): ?string
     {
         return $this->type;

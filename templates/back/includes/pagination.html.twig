@@ -1,7 +1,8 @@
 {% trans_default_domain 'back' %}
 
 {% if pagination.getTotalItemCount is defined and (pagination.getTotalItemCount / pagination.itemNumberPerPage) > 0 %}
-    <div class="pagination-nav">
+    {% set class = class is defined and class ? class : false %}
+    <div class="pagination-nav{% if class %} {{ class }}{% endif %}">
         <div class="row">
             <div class="col-md-4 my-auto d-flex justify-content-start">
                 {% set delta = (pagination.itemNumberPerPage - pagination|length) %}

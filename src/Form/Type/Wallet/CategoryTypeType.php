@@ -6,6 +6,7 @@ namespace App\Form\Type\Wallet;
 
 use App\Entity\Wallet\CategoryType;
 use App\Form\Widget\FontawesomeType;
+use App\Form\Widget\SubmitType;
 use App\Service\CoreLocatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -43,45 +44,31 @@ class CategoryTypeType extends AbstractType
             'constraints' => [new Assert\NotBlank([
                 'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back'),
             ])],
-            'row_attr' => ['class' => $isNew ? 'col-lg-9' : 'col-lg-6'],
-        ]);
-
-        $builder->add('type', Type\ChoiceType::class, [
-            'placeholder' => $this->translator->trans('Sélectionnez', [], 'back'),
-            'choices' => [
-                $this->translator->trans('Débit', [], 'back') => 'expenses',
-                $this->translator->trans('Crédit', [], 'back') => 'incomes',
-            ],
-            'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez sélectionner un type.', [], 'back'),
-            ])],
-            'row_attr' => ['class' => 'col-lg-3'],
+            'row_attr' => ['class' => $isNew ? 'col-lg-8 form-floating' : 'col-lg-9 form-floating'],
         ]);
 
         if (!$isNew) {
             $builder->add('icon', FontawesomeType::class, [
                 'required' => false,
                 'attr' => ['class' => 'select-icons'],
-                'row_attr' => ['class' => 'col-lg-3'],
+                'row_attr' => ['class' => 'col-lg-3 form-floating'],
+            ]);
+        } else {
+            $builder->add('type', Type\ChoiceType::class, [
+                'placeholder' => $this->translator->trans('Sélectionnez', [], 'back'),
+                'choices' => [
+                    $this->translator->trans('Débit', [], 'back') => 'expenses',
+                    $this->translator->trans('Crédit', [], 'back') => 'incomes',
+                ],
+                'constraints' => [new Assert\NotBlank([
+                    'message' => $this->translator->trans('Veuillez sélectionner un type.', [], 'back'),
+                ])],
+                'row_attr' => ['class' => 'col-lg-4 form-floating'],
             ]);
         }
 
-        $btnName = $isNew ? 'saveEdit' : 'saveBack';
-        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'back') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'back');
-        $builder->add($btnName, Type\SubmitType::class, [
-            'label' => $btnLabel,
-            'attr' => [
-                'class' => 'btn-dark',
-            ],
-            'row_attr' => ['class' => $isNew ? 'me-2' : 'ms-2'],
-        ]);
-
-        $builder->add('save', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Enregistrer', [], 'back'),
-            'attr' => [
-                'class' => 'btn-secondary ms-2',
-            ],
-        ]);
+        $save = new SubmitType($this->coreLocator);
+        $save->add($builder);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -90,5 +77,10 @@ class CategoryTypeType extends AbstractType
             'data_class' => CategoryType::class,
             'translation_domain' => 'form',
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'wallet_category_type';
     }
 }

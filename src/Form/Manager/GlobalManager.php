@@ -43,6 +43,9 @@ class GlobalManager implements GlobalManagerInterface
         $this->form = $this->formFactory->create($formClassname, $entity, $options);
         $this->form->handleRequest($this->coreLocator->request());
         if ($this->form->isSubmitted() && $this->form->isValid()) {
+
+            dd('Faire de fonctions pour faire plus propre');
+
             $entity = $this->form->getData();
             $repository = $this->coreLocator->em()->getRepository(get_class($entity));
             $interface = $entity && method_exists($entity, 'getInterface') ? $entity::getInterface() : [];
@@ -63,10 +66,18 @@ class GlobalManager implements GlobalManagerInterface
                 $position = count($entities) + 1;
                 $entity->setPosition($position);
             }
+            $isNew = !$entity->getId();
+            if ($isNew) {
+                $entity->setCreatedBy($this->coreLocator->user());
+            } else {
+                $entity->setUpdatedBy($this->coreLocator->user());
+            }
             $this->coreLocator->em()->persist($entity);
             $this->coreLocator->em()->flush();
             $session = $this->coreLocator->request()->getSession();
-            $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Créé avec succès !", [], 'back'));
+            $message = $isNew ? $this->coreLocator->translator()->trans("Créé avec succès !", [], 'back')
+                : $this->coreLocator->translator()->trans("Modifié avec succès !", [], 'back');
+            $session->getFlashBag()->add('success', $message);
             if (!empty($interface['name'])) {
                 $submitName = $this->form->getClickedButton()->getName();
                 $redirections = [

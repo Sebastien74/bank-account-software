@@ -1,7 +1,100 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back pagination
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
 .pagination-counter {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .pagination-nav {
 
+    max-width: 100%;
+
+    .pagination {
+
+        margin-bottom: 0;
+
+        li {
+
+            padding-left: 0 !important;
+
+            &:before {
+                display: none;
+            }
+
+            &:not(:last-child) {
+                padding-right: .75rem !important;
+            }
+
+            a {
+                border: 0;
+            }
+
+            .page-link {
+
+                font-size: 14px;
+                color: transparentize($white, .25);
+                border: 0 !important;
+                box-shadow: none !important;
+                font-weight: 500;
+                padding: 0 !important;
+                background-color: transparent !important;
+
+                @include mediaQuery(max-md) {
+                    padding: $pagination-padding-y $pagination-padding-y;
+                }
+
+                &:hover {
+                    color: transparentize($white, 0);
+                }
+            }
+
+            &:first-child > .page-link,
+            &:last-child > .page-link {
+
+                text-transform: uppercase;
+                color: transparentize($white, .25);
+
+                &:hover {
+                    color: transparentize($white, 0);
+                }
+            }
+
+            &.active > .page-link {
+                color: transparentize($white, .75);
+            }
+
+            &:not(.disabled) > .page-link {
+                > svg {
+                    fill: $primary;
+                }
+            }
+
+            &.disabled {
+
+                display: none !important;
+
+                > .page-link {
+                    color: $gray-500;
+
+                    > svg {
+                        fill: $gray-500;
+                    }
+                }
+            }
+
+            @include mediaQuery(max-md) {
+                &:nth-last-child(2) {
+                    display: none !important;
+                }
+            }
+        }
+    }
 }

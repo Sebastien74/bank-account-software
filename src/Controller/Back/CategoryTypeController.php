@@ -21,48 +21,45 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin-%security_token%/categories-types', schemes: '%protocol%')]
 class CategoryTypeController extends BaseController
 {
-    protected mixed $entityClassname = CategoryType::class;
+    protected ?string $classname = CategoryType::class;
+    protected ?string $formType = CategoryTypeType::class;
 
+    /**
+     * CategoryType index.
+     */
     #[Route('/index', name: 'admin_categorytype_index', methods: 'GET|POST')]
     public function index(): Response
     {
-        $paginator = $this->getPagination();
-        if ($paginator instanceof RedirectResponse) {
-            return $paginator;
-        }
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(CategoryTypeType::class, new CategoryType());
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return $this->render('back/index.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'formErrors' => $form->isSubmitted() && !$form->isValid(),
-            'pagination' => $paginator,
-        ]));
+        return parent::index();
     }
 
+    /**
+     * CategoryType edit.
+     */
     #[Route('/edit/{categorytype}', name: 'admin_categorytype_edit', methods: 'GET|POST')]
-    public function edit(CategoryType $categorytype): Response
+    public function edit(): Response
     {
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(CategoryTypeType::class, $categorytype);
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return $this->render('back/edit.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'entity' => $categorytype,
-        ]));
+        return parent::edit();
     }
 
+    /**
+     * CategoryType delete.
+     */
     #[Route('/delete/{categorytype}', name: 'admin_categorytype_delete', methods: 'GET')]
     public function delete(CategoryType $categorytype): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($categorytype));
+    }
+
+    /**
+     * To set CategoryType breadcrumb.
+     */
+    protected function breadcrumb(array $items = []): void
+    {
+        parent::breadcrumb($items);
     }
 }

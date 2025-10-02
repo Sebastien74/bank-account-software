@@ -1,0 +1,51 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back form
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+form {
+
+    .form-control {
+
+        min-height: 45px;
+        border-radius: .25rem;
+
+        &.is-invalid {
+            background-image: none !important;
+        }
+    }
+
+    .form-floating .form-label {
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    .choices__item--selectable img {
+        max-height: 20px;
+    }
+
+    .choices {
+        margin-bottom: 0;
+    }
+
+    .choices__inner {
+        height: 58px;
+        border-radius: .25rem;
+        background-color: $input-bg;
+    }
+
+    .choices__list--single {
+        position: relative;
+        top: 16px;
+    }
+
+    .invalid-feedback {
+        font-size: 12px;
+        color: $red-400 !important;
+    }
+}

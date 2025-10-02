@@ -6,7 +6,7 @@ namespace App\Controller\Back;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\Category;
-use App\Entity\Wallet\CategoryType;
+use App\Form\Type\Wallet\CategoryType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,48 +21,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin-%security_token%/categories', schemes: '%protocol%')]
 class CategoryController extends BaseController
 {
-    protected mixed $entityClassname = Category::class;
+    protected ?string $classname = Category::class;
+    protected ?string $formType = CategoryType::class;
 
+    /**
+     * Category index.
+     */
     #[Route('/index/{categorytype}', name: 'admin_category_index', methods: 'GET|POST')]
-    public function index(CategoryType $categorytype): Response
+    public function index(): Response
     {
-        $paginator = $this->getPagination();
-        if ($paginator instanceof RedirectResponse) {
-            return $paginator;
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        $category = new Category();
-        $category->setType($categorytype->getType());
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(\App\Form\Type\Wallet\CategoryType::class, new Category());
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
-
-        return $this->render('back/index.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'formErrors' => $form->isSubmitted() && !$form->isValid(),
-            'pagination' => $paginator,
-        ]));
+        return parent::index();
     }
 
+    /**
+     * Category edit.
+     */
     #[Route('/edit/{category}', name: 'admin_category_edit', methods: 'GET|POST')]
-    public function edit(Category $category): Response
+    public function edit(): Response
     {
-        $formManager = $this->globalFormManager;
-        $formManager->setForm(\App\Form\Type\Wallet\CategoryType::class, $category);
-        $form = $formManager->getForm();
-        if ($formManager->getRedirection()) {
-            return $this->redirect($formManager->getRedirection());
-        }
+        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return $this->render('back/edit.html.twig', array_merge($this->defaultArguments(), [
-            'form' => $form->createView(),
-            'entity' => $category,
-        ]));
+        return parent::edit();
     }
 
+    /**
+     * Category delete.
+     */
     #[Route('/delete/{category}', name: 'admin_category_delete', methods: 'GET')]
     public function delete(Category $category): RedirectResponse
     {

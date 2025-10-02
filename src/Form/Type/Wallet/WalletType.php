@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Type\Wallet;
 
 use App\Entity\Wallet\Wallet;
+use App\Form\Widget\SubmitType;
 use App\Service\CoreLocatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -42,24 +43,11 @@ class WalletType extends AbstractType
             'constraints' => [new Assert\NotBlank([
                 'message' => $this->translator->trans('Veuillez saisir un nom pour votre compte.', [], 'back'),
             ])],
+            'row_attr' => ['class' => 'col-12 form-floating'],
         ]);
 
-        $btnName = $isNew ? 'saveEdit' : 'saveBack';
-        $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'back') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'back');
-        $builder->add($btnName, Type\SubmitType::class, [
-            'label' => $btnLabel,
-            'attr' => [
-                'class' => $isNew ? 'btn-secondary-dark' : 'btn-dark',
-            ],
-            'row_attr' => ['class' => $isNew ? 'me-2' : 'ms-2'],
-        ]);
-
-        $builder->add('save', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Enregistrer', [], 'back'),
-            'attr' => [
-                'class' => 'btn-secondary ms-2',
-            ],
-        ]);
+        $save = new SubmitType($this->coreLocator);
+        $save->add($builder);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -68,5 +56,10 @@ class WalletType extends AbstractType
             'data_class' => Wallet::class,
             'translation_domain' => 'form',
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'wallet_wallet';
     }
 }

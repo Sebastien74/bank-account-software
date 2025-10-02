@@ -11,7 +11,7 @@ namespace App\Service;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class CryptService
+class CryptService implements CryptServiceInterface
 {
     private const string SECRET_KEY = '4d5d63a83bb68c298be7a212b2d939ab2b28fe39';
     private const string SECRET_IV = '06efe6843c7322ef3c39aead28be85f4581bc567';

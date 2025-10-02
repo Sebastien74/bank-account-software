@@ -2,22 +2,58 @@
 
 <div class="sidebar bg-dark py-4">
     <div id="sidebar-menu" tabindex="-1">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a href="{{ path('admin_dashboard') }}" class="nav-link d-flex align-items-center text-white py-3">
-                    {{ 'fal tachometer-alt-average'|icon(null, 20, 'me-2 white') }}
+        <ul class="nav flex-column mt-4">
+            {% set active = 'dashboard' in app.request.uri %}
+            <li class="nav-item d-flex">
+                <a href="{{ path('admin_dashboard') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-tachometer-alt"></i>
+                    </span>
                     {{ "Tableau de bord"|trans|raw }}
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ path('admin_wallet_index') }}" class="nav-link d-flex align-items-center text-white py-3">
-                    {{ 'fal wallet'|icon(null, 20, 'me-2 white') }}
+            <li class="nav-item d-flex">
+                {% set active = 'wallet' in app.request.uri %}
+                <a href="{{ path('admin_wallet_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-wallet"></i>
+                    </span>
                     {{ "Gestion des comptes"|trans|raw }}
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ path('admin_categorytype_index') }}" class="nav-link d-flex align-items-center text-white py-3">
-                    {{ 'fal list'|icon(null, 20, 'me-2 white') }}
+            <li class="nav-item d-flex">
+                {% set active = 'statistics' in app.request.uri %}
+                <a href="{{ path('admin_statistics') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-chart-bar"></i>
+                    </span>
+                    {{ "Mes statistiques"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item d-flex">
+                {% set active = 'budgets' in app.request.uri %}
+                <a href="{{ path('admin_budget_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-envelope-open-dollar"></i>
+                    </span>
+                    {{ "Gestion des budgets"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item d-flex">
+                {% set active = 'objectives' in app.request.uri %}
+                <a href="{{ path('admin_objective_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-bullseye-arrow"></i>
+                    </span>
+                    {{ "Gestion des objectifs"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item d-flex">
+                {% set active = 'categories' in app.request.uri %}
+                <a href="{{ path('admin_categorytype_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-list-alt"></i>
+                    </span>
                     {{ "Gestion des catégories"|trans|raw }}
                 </a>
             </li>

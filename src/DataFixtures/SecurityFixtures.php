@@ -85,13 +85,12 @@ class SecurityFixtures extends BaseFixtures
     private function getUsers(): array
     {
         $users[] = [
-            'markup' => '232',
             'email' => 'fournier.sebastien@outlook.com',
-            'login' => 'webmaster',
+            'login' => 'seybi',
             'roles' => $this->getYamlRoles(true),
             'lastname' => 'Bank Account Software',
             'group' => 'Interne',
-            'password' => '$2y$10$yzsckDg/ad8P/MiLzuOPCehisJDkLKfO45LB4u9KtUd.T.LDjFVTq',
+            'password' => '$2y$10$4GzLv5tTdcM8Q7u1F0NIz.eVDyO/pKAL0rZOwdb5ACoSCcw3OfAbK',
             'code' => 'internal',
             'active' => true,
             'picture' => 'webmaster.svg',
@@ -105,7 +104,7 @@ class SecurityFixtures extends BaseFixtures
      *
      * @throws Exception
      */
-    private function addUser(array $userConfig): User
+    private function addUser(array $userConfig): void
     {
         $userConfig = (object) $userConfig;
 
@@ -127,7 +126,7 @@ class SecurityFixtures extends BaseFixtures
             $user->setTheme($userConfig->theme);
         }
 
-        if ('webmaster' === $user->getLogin()) {
+        if ('seybi' === $user->getLogin()) {
             $this->createdBy = $user;
         }
 
@@ -136,7 +135,6 @@ class SecurityFixtures extends BaseFixtures
 
         $this->manager->persist($user);
 
-        return $user;
     }
 
     /**

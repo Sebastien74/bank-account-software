@@ -42,14 +42,14 @@ class OperationType extends AbstractType
             'constraints' => [new Assert\NotBlank([
                 'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back'),
             ])],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-12 form-floating' : 'col-lg-9 form-floating'],
         ]);
 
         if (!$isNew) {
             $builder->add('saveBack', Type\SubmitType::class, [
                 'label' => $this->translator->trans('Enregistrer et retourner aux opérations', [], 'back'),
                 'attr' => [
-                    'class' => 'btn-dark',
+                    'class' => 'btn-secondary',
                 ],
                 'row_attr' => ['class' => 'ms-2'],
             ]);
@@ -58,7 +58,7 @@ class OperationType extends AbstractType
         $builder->add('save', Type\SubmitType::class, [
             'label' => $this->translator->trans('Enregistrer', [], 'back'),
             'attr' => [
-                'class' => 'btn-secondary ms-2',
+                'class' => 'btn-primary ms-2',
             ],
         ]);
     }
@@ -69,5 +69,10 @@ class OperationType extends AbstractType
             'data_class' => Operation::class,
             'translation_domain' => 'form',
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'wallet_operation';
     }
 }

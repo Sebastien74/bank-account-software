@@ -1,3 +1,14 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back header
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
 header.navbar {
 
     height: 70px;
@@ -5,7 +16,7 @@ header.navbar {
     .navbar-brand {
 
         font-weight: 900;
-        background-color: $success;
+        background-color: $purple-600;
         width: 350px;
         font-size: 14px !important;
         border-left: 3px solid transparentize($white, 0.5);

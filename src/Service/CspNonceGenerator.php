@@ -11,7 +11,7 @@ use Random\RandomException;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class CspNonceGenerator
+class CspNonceGenerator implements CspNonceInterface
 {
     private const string ATTRIBUTE_KEY = '_csp_nonce';
     private array $cache = [];

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
-use App\Service\CspNonceGenerator;
+use App\Service\CspNonceInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 /**
@@ -19,7 +19,7 @@ class NonceRuntime implements RuntimeExtensionInterface
     /**
      * NonceRuntime constructor.
      */
-    public function __construct(private readonly CspNonceGenerator $nonceGenerator)
+    public function __construct(private readonly CspNonceInterface $nonceGenerator)
     {
     }
 

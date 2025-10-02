@@ -17,6 +17,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: OperationRepository::class)]
 class Operation extends BaseEntity
 {
+    /**
+     * Configurations.
+     */
+    protected static array $interface = [
+        'name' => 'operation',
+        'masterField' => 'wallet',
+    ];
+
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $date = null;
 

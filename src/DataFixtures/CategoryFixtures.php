@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Security\User;
 use App\Entity\Wallet\Category;
 use App\Entity\Wallet\CategoryType;
 use App\Entity\Wallet\SubCategory;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
 /**
@@ -16,7 +18,7 @@ use Doctrine\Persistence\ObjectManager;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class CategoryFixtures extends BaseFixtures
+class CategoryFixtures extends BaseFixtures implements DependentFixtureInterface
 {
     private const array CATEGORIES_TYPES = [
         'expenses' => 'Dépenses',
@@ -117,6 +119,7 @@ class CategoryFixtures extends BaseFixtures
     protected function loadData(ObjectManager $manager): void
     {
         $this->manager = $manager;
+        $user = $this->getReference('seybi', User::class);
 
         $categoryTypePosition = 1;
         foreach (self::CATEGORIES_TYPES as $categoryTypeSlug => $categoryTypeName) {
@@ -126,6 +129,7 @@ class CategoryFixtures extends BaseFixtures
             $categoryType->setAdminName($categoryTypeName);
             $categoryType->setPosition($categoryTypePosition);
             $categoryType->setType($categoryTypeSlug);
+            $categoryType->setCreatedBy($user);
             $this->manager->persist($categoryType);
             ++$categoryTypePosition;
 
@@ -138,6 +142,7 @@ class CategoryFixtures extends BaseFixtures
                 $category->setPosition($categoryPosition);
                 $category->setCategorytype($categoryType);
                 $category->setType($categoryTypeSlug);
+                $category->setCreatedBy($user);
                 $this->manager->persist($category);
                 ++$categoryPosition;
 
@@ -149,6 +154,7 @@ class CategoryFixtures extends BaseFixtures
                     $subCategory->setPosition($subCategoryPosition);
                     $subCategory->setCategory($category);
                     $subCategory->setType($categoryTypeSlug);
+                    $subCategory->setCreatedBy($user);
                     $this->manager->persist($subCategory);
                     ++$subCategoryPosition;
                 }
@@ -157,5 +163,12 @@ class CategoryFixtures extends BaseFixtures
         }
 
         $this->manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            SecurityFixtures::class,
+        ];
     }
 }

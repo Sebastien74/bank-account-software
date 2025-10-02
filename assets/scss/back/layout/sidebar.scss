@@ -1,13 +1,57 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back sidebar
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
 .sidebar {
 
     width: 350px;
     min-height: calc(100dvh - 70px);
 
+    .nav-item {
+        width: 100%;
+    }
+
     .nav-link {
 
-        opacity: .7;
+        border-radius: .25rem;
         font-size: 15px;
         transition: all .3s ease-in-out;
+        width: 300px;
+
+        &:not(.active) {
+
+            background-color: $black;
+            opacity: .7;
+
+            span {
+                background-color: $purple-600;
+            }
+        }
+
+        &.active {
+
+            background-color: $purple-600;
+            opacity: 1;
+
+            span {
+                background-color: $black;
+            }
+        }
+
+        span {
+            width: 37px;
+            height: 37px;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            background-color: $purple-600;
+        }
 
         &:hover {
             opacity: 1;

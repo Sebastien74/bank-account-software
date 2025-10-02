@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Entity\Security\User;
-use App\Service\CspNonceGenerator;
 use App\Service\CoreLocatorInterface;
+use App\Service\CspNonceInterface;
 use Exception;
-use Psr\Cache\InvalidArgumentException;
 use Random\RandomException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -28,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class SecurityPolicySubscriber implements EventSubscriberInterface
 {
-    private const bool CSP_DISABLED_FOR_DEV = false;
+    private const bool CSP_DISABLED_FOR_DEV = true;
     private const bool CSP_ADMIN = true;
     private const bool XSS_DENIED = true;
     private const string XSS_PATTERN = '/(<\s*script|on\w+\s*=|javascript:|<svg|<img|<iframe|<object|data:text\/html)/i';
@@ -37,7 +36,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
     private ?string $uri = null;
     private ?string $requestUri = null;
     private ?string $schemeAndHttpHost = null;
-    private ?string $routeName = null;
     private Session $session;
     private bool $isMainRequest;
     private bool $inAdmin;
@@ -47,7 +45,7 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly CspNonceGenerator $nonceGenerator,
+        private readonly CspNonceInterface $nonceGenerator,
     ) {
     }
 
@@ -67,7 +65,6 @@ class SecurityPolicySubscriber implements EventSubscriberInterface
         $this->uri = $this->request->getUri();
         $this->requestUri = $this->request->getRequestUri();
         $this->schemeAndHttpHost = $this->request->getSchemeAndHttpHost();
-        $this->routeName = $this->request->get('_route');
         $this->session = $this->request->getSession();
         $this->isMainRequest = $event->isMainRequest();
         $this->inAdmin = (bool) preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $this->uri);

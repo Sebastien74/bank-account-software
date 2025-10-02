@@ -54,6 +54,14 @@ class Category extends BaseEntity
         $this->subCategories = new ArrayCollection();
     }
 
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->type = $this->categorytype->getType();
+
+        parent::prePersist();
+    }
+
     public function getType(): ?string
     {
         return $this->type;

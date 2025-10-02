@@ -1,14 +1,14 @@
 @charset "UTF-8";
 
-/* -----------------------------------------------------------------
+/* --------------------------------------------------------------------------------------
 
-    Created on : 2019-02-05, 2:58 PM
-    Author     : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Module : Back form
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
-    SECURITY FORM :
-    ===============
+----------------------------------------------------------------------------------------- */
 
------------------------------------------------------------------- */
 
 input.material:-webkit-autofill,
 input.material:-webkit-autofill:hover,
@@ -145,6 +145,18 @@ form {
 
         .badge {
             display: none;
+        }
+    }
+
+    &#login-form {
+
+        #_remember_me {
+            position: relative;
+            top: 1px;
+        }
+
+        .form-check-label, #to-recover small {
+            font-size: 12px;
         }
     }
 }
