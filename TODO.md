@@ -4,8 +4,6 @@ Page 404
 
 Factoriser les forms view modal (Titre par exemple) et qu'un seul temple de modal
 
-Factoriser les forms submit
-
 Breadcrumbs
 
 Suppression multiple
@@ -35,3 +33,9 @@ Voir si des functions trop longues et les raccourcir ou faire des services
 Dans edit changer le titre avec le nom de l'entité
 
 Voir aussi pour le titre de la modal Ajouter
+
+Trait focus en double sur le formulaire de connexion au defocus
+
+Show password ne fonctionne pas
+
+Vérifier aussi la force du MDP au reset
