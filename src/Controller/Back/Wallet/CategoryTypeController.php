@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Back;
+namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\CategoryType;
@@ -56,10 +56,15 @@ class CategoryTypeController extends BaseController
     }
 
     /**
-     * To set CategoryType breadcrumb.
+     * To set breadcrumb.
      */
     protected function breadcrumb(array $items = []): void
     {
+        $items[$this->coreLocator->translator()->trans('Types', [], 'breadcrumb')] = 'admin_categorytype_index';
+        if ($this->coreLocator->request()->get('categorytype')) {
+            $items[$this->coreLocator->translator()->trans('Édition', [], 'admin_breadcrumb')] = 'admin_categorytype_edit';
+        }
+
         parent::breadcrumb($items);
     }
 }

@@ -31,7 +31,19 @@
             opacity: .7;
 
             span {
+                transition: all .3s ease-in-out;
                 background-color: $purple-600;
+            }
+        }
+
+        &:hover:not(.active) {
+
+            background-color: $purple-800;
+            opacity: 1;
+
+            span {
+                transition: all .3s ease-in-out;
+                background-color: $black;
             }
         }
 
@@ -41,6 +53,7 @@
             opacity: 1;
 
             span {
+                transition: all .3s ease-in-out;
                 background-color: $black;
             }
         }

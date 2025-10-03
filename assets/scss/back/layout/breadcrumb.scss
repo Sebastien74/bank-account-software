@@ -12,7 +12,22 @@
 .breadcrumb-container {
 
     a {
+
         text-decoration: none;
-        font-size: 14px;
+        font-size: 12px;
+        transition: all .3s ease-in-out;
+        opacity: .7 !important;
+
+        &:hover {
+            opacity: 1 !important;
+            transition: all .3s ease-in-out;
+        }
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: '>';
+        top: 6px;
+        position: relative;
+        font-size: 11px;
     }
 }

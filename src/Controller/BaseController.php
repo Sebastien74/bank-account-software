@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * BaseController.
@@ -25,6 +26,8 @@ abstract class BaseController extends AbstractController
     protected int $paginationLimit = 15;
     protected ?string $classname = null;
     protected ?string $formType = null;
+
+    protected mixed $entity = null;
 
     protected ?string $template = null;
 
@@ -68,7 +71,6 @@ abstract class BaseController extends AbstractController
     private function viewRender(string $view): Response
     {
         $arguments = $this->defaultArguments();
-        $interface = $arguments['interface'];
 
         $paginator = $this->getPagination($this->paginationLimit);
         if ($paginator instanceof RedirectResponse) {
@@ -77,10 +79,8 @@ abstract class BaseController extends AbstractController
 
         $form = null;
         if ($this->formType && $this->classname) {
-            $entityRequest = $this->requestStack->getMainRequest()->get($interface['name']);
-            $entity = !$entityRequest ? new $this->classname() : $this->coreLocator->em()->getRepository($this->classname)->find(intval($entityRequest));
             $formManager = $this->globalFormManager;
-            $formManager->setForm($this->formType, $entity);
+            $formManager->setForm($this->formType, $this->entity);
             $form = $formManager->getForm();
             if ($formManager->getRedirection()) {
                 return $this->redirect($formManager->getRedirection());
@@ -128,6 +128,10 @@ abstract class BaseController extends AbstractController
      */
     protected function defaultArguments(): array
     {
+        $interface = $this->classname && method_exists($this->classname, 'getInterface') ? $this->classname::getInterface() : [];
+        $entityRequest = !empty($interface['name']) ? $this->requestStack->getMainRequest()->get($interface['name']) : false;
+        $this->entity = !$entityRequest && $this->classname ? new $this->classname() : ($this->classname ? $this->coreLocator->em()->getRepository($this->classname)->find(intval($entityRequest)) : false);
+
         if (empty($this->arguments['breadcrumb'])) {
             $this->breadcrumb();
         }
@@ -139,6 +143,7 @@ abstract class BaseController extends AbstractController
             'referClass' => $this->classname ? new $this->classname() : [],
             'interface' => $this->classname && method_exists($this->classname, 'getInterface') ? $this->classname::getInterface() : [],
             'buttons' => $this->classname && method_exists($this->classname, 'getButtons') ? $this->classname::getButtons() : [],
+            'entity' => $this->entity,
             'pageTitle' => $this->pageTitle,
             'pageIcon' => $this->pageIcon,
             'breadcrumb' => $this->breadcrumb,
@@ -150,32 +155,16 @@ abstract class BaseController extends AbstractController
      */
     protected function breadcrumb(array $items = []): void
     {
-        $request = $this->coreLocator->request();
-
-        if ('admin_dashboard' !== $request->get('_route')) {
+        if ('admin_dashboard' !== $this->coreLocator->request()->get('_route')) {
             $label = $this->coreLocator->translator()->trans('Tableau de bord', [], 'admin_breadcrumb');
             $dashboardArgs = $this->coreLocator->routeArgs('admin_dashboard');
-            $this->breadcrumb[$label] = $this->coreLocator->router()->generate('admin_dashboard', $dashboardArgs);
+            $this->breadcrumb[$label] = $this->coreLocator->router()->generate('admin_dashboard', $dashboardArgs, UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
-//        if (empty($items)) {
-//            $interface = $this->class ? $this->getInterface($this->class) : [];
-//            if (!empty($interface['classname']) && !empty($interface['name']) && $request->get($interface['name']) && $this->coreLocator->routeExist('admin_'.$interface['name'].'_index')) {
-//                $entityConfiguration = $this->coreLocator->em()->getRepository(Entity::class)->findOneBy([
-//                    'website' => $request->get('website'),
-//                    'className' => $interface['classname'],
-//                ]);
-//                $breadcrumb = $this->coreLocator->translator()->trans('breadcrumb', [], 'entity_'.$interface['name']);
-//                $plural = $this->coreLocator->translator()->trans('plural', [], 'entity_'.$interface['name']);
-//                $title = 'breadcrumb' !== $breadcrumb ? $breadcrumb : ('plural' !== $plural ? $plural : $entityConfiguration->getAdminName());
-//                $items[$title] = 'admin_'.$interface['name'].'_index';
-//            }
-//        }
-//
-//        foreach ($items as $label => $route) {
-//            $asUrl = str_contains($route, '/');
-//            $routeArgs = !$asUrl ? $this->coreLocator->routeArgs($route) : false;
-//            $this->arguments['breadcrumb'][$label] = $asUrl ? $route : $this->coreLocator->router()->generate($route, $routeArgs);
-//        }
+        foreach ($items as $label => $route) {
+            $asUrl = str_contains($route, '/');
+            $routeArgs = !$asUrl ? $this->coreLocator->routeArgs($route, $this->entity) : false;
+            $this->breadcrumb[$label] = $asUrl ? $route : $this->coreLocator->router()->generate($route, $routeArgs, UrlGeneratorInterface::ABSOLUTE_URL);
+        }
     }
 }

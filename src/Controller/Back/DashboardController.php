@@ -18,6 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin-%security_token%', schemes: '%protocol%')]
 class DashboardController extends BaseController
 {
+    protected ?string $pageIcon = 'fal tachometer-alt-average';
+
     /**
      * Dashboard view.
      */
@@ -25,7 +27,6 @@ class DashboardController extends BaseController
     public function view(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Tableau de bord', [], 'back');
-        $this->pageIcon = 'fal tachometer-alt-average';
 
         return $this->render('back/pages/dashboard.html.twig', array_merge($this->defaultArguments(), [
 

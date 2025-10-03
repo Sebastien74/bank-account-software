@@ -4,7 +4,7 @@
 
 {% if form is defined and form %}
     <span data-bs-toggle="tooltip" data-bs-title="{{ "Ajouter"|trans|striptags }}">
-        <button type="button" class="btn btn-primary btn-square{% if formErrors is defined and formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
+        <button type="button" class="btn btn-primary add-btn btn-square{% if formErrors is defined and formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
             <i class="icon-plus-circle"></i>
         </button>
     </span>

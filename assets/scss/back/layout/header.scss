@@ -27,9 +27,22 @@ header.navbar {
         }
     }
 
-    .btn {
-        border-radius: 0;
-        min-width: 70px;
-        height: 100%;
+    .right {
+
+        width: calc(100% - 350px);
+
+        .title-wrap {
+
+            .title {
+                font-size: 20px;
+                opacity: .7;
+            }
+        }
+
+        .btn {
+            border-radius: 0;
+            min-width: 70px;
+            height: 100%;
+        }
     }
 }

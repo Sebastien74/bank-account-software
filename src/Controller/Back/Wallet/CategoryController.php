@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Back;
+namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\Category;
@@ -53,5 +53,19 @@ class CategoryController extends BaseController
     public function delete(Category $category): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($category));
+    }
+
+    /**
+     * To set breadcrumb.
+     */
+    protected function breadcrumb(array $items = []): void
+    {
+        $items[$this->coreLocator->translator()->trans('Types', [], 'breadcrumb')] = 'admin_categorytype_index';
+        $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = 'admin_category_index';
+        if ($this->coreLocator->request()->get('category')) {
+            $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'admin_category_edit';
+        }
+
+        parent::breadcrumb($items);
     }
 }

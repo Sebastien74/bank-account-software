@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Back;
+namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,7 @@ class StatisticController extends BaseController
     #[Route('index', name: 'admin_statistics', defaults: ['website' => null], methods: 'GET')]
     public function statistics(): Response
     {
-        $this->pageTitle = $this->coreLocator->translator()->trans('Mes statistiques', [], 'back');
+        $this->pageTitle = $this->coreLocator->translator()->trans('Statistiques', [], 'back');
 
         return $this->render('back/pages/statistics.html.twig', array_merge($this->defaultArguments(), [
 

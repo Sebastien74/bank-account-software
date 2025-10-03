@@ -23,7 +23,10 @@
     </head>
     <body>
         {% include 'back/includes/flashbag.html.twig' %}
-        {% include 'back/includes/header.html.twig' %}
+        {% include 'back/includes/header.html.twig' with {
+            companyName: companyName,
+            pageTitle: pageTitle,
+        } only %}
         <div class="d-flex">
             {% include 'back/includes/sidebar.html.twig' %}
             <main id="main-container">
