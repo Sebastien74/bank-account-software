@@ -14,7 +14,6 @@
 {% set alert = "error" in alert  ? "danger" : alert %}
 {% set icon = icons[alert] is defined ? icons[alert] : icons['undefined'] %}
 
-<!-- .alert -->
 <div class="ribbon-vwrapper alert alert-{{ alert }}">
     <div class="ribbon ribbon-bookmark ribbon-vertical-l ribbon-{{ alert }}">
         {{ icon|icon(null, 14) }}
@@ -26,4 +25,3 @@
         {{ "Que se passe-t-il ?"|trans|raw }}
     {% endif %}
 </div>
-<!-- /.alert -->

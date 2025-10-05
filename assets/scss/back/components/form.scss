@@ -11,7 +11,7 @@
 
 form {
 
-    .form-control {
+    .form-control, .form-select {
 
         min-height: 45px;
         border-radius: .25rem;
@@ -23,6 +23,10 @@ form {
 
     .form-floating .form-label {
         transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    .choices[data-type*="select-one"]::after {
+        border-color: $input-color transparent transparent transparent;
     }
 
     .choices__item--selectable img {
@@ -37,15 +41,52 @@ form {
         height: 58px;
         border-radius: .25rem;
         background-color: $input-bg;
+        border: 0;
+        color: $input-color;
+    }
+
+    .choices__heading {
+        background-color: $input-bg;
+        border: 0;
+        color: $input-color;
     }
 
     .choices__list--single {
         position: relative;
         top: 16px;
+        font-size: $input-font-size;
+    }
+
+    .choices__list--dropdown .choices__placeholder,
+    .is-open .choices__list--dropdown,
+    .is-open .choices__list[aria-expanded] {
+        background-color: $gray-500 !important;
+        color: $white !important;
+        border: 0 !important;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: $gray-600 !important;
+        color: $white !important;
+    }
+
+    .choices[data-type*="select-one"] .choices__input {
+        background-color: $gray-400;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJtNTA4LjUgNDgxLjYtMTI5LTEyOWMtMi4zLTIuMy01LjMtMy41LTguNS0zLjVoLTEwLjNDMzk1IDMxMiA0MTYgMjYyLjUgNDE2IDIwOCA0MTYgOTMuMSAzMjIuOSAwIDIwOCAwUzAgOTMuMSAwIDIwOHM5My4xIDIwOCAyMDggMjA4YzU0LjUgMCAxMDQtMjEgMTQxLjEtNTUuMlYzNzFjMCAzLjIgMS4zIDYuMiAzLjUgOC41bDEyOSAxMjljNC43IDQuNyAxMi4zIDQuNyAxNyAwbDkuOS05LjljNC43LTQuNyA0LjctMTIuMyAwLTE3TTIwOCAzODRjLTk3LjMgMC0xNzYtNzguNy0xNzYtMTc2UzExMC43IDMyIDIwOCAzMnMxNzYgNzguNyAxNzYgMTc2LTc4LjcgMTc2LTE3NiAxNzYiLz48L3N2Zz4=);
+        color: $gray-700;
+        border: 0;
+        background-repeat: no-repeat;
+        background-position-x: 97%;
+        background-position-y: 11px;
+        background-size: 20px;
     }
 
     .invalid-feedback {
         font-size: 12px;
         color: $red-400 !important;
+    }
+
+    .btn {
+        font-size: 14px;
     }
 }

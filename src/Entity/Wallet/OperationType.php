@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Wallet;
 
 use App\Entity\BaseEntity;
-use App\Repository\Wallet\CategoryTypeRepository;
+use App\Repository\Wallet\OperationTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -14,23 +14,23 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * CategoryType.
+ * OperationType.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-#[ORM\Table(name: 'wallet_category_type')]
-#[ORM\Entity(repositoryClass: CategoryTypeRepository::class)]
-class CategoryType extends BaseEntity
+#[ORM\Table(name: 'wallet_operation_type')]
+#[ORM\Entity(repositoryClass: OperationTypeRepository::class)]
+class OperationType extends BaseEntity
 {
     /**
      * Configurations.
      */
     protected static array $interface = [
-        'name' => 'categorytype',
+        'name' => 'operationtype',
     ];
 
     protected static array $buttons = [
-        'admin_category_index' => 'adminName',
+        'back_category_index' => 'adminName',
     ];
 
     #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
@@ -39,11 +39,14 @@ class CategoryType extends BaseEntity
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $icon = null;
 
-    #[ORM\OneToMany(mappedBy: 'categorytype', targetEntity: Category::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'operationtype', targetEntity: Category::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $categories;
 
+    /**
+     * OperationType constructor.
+     */
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -85,7 +88,7 @@ class CategoryType extends BaseEntity
     {
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
-            $category->setType($this);
+            $category->setOperationtype($this);
         }
 
         return $this;
@@ -95,8 +98,8 @@ class CategoryType extends BaseEntity
     {
         if ($this->categories->removeElement($category)) {
             // set the owning side to null (unless already changed)
-            if ($category->getType() === $this) {
-                $category->setType(null);
+            if ($category->getOperationtype() === $this) {
+                $category->setOperationtype(null);
             }
         }
 

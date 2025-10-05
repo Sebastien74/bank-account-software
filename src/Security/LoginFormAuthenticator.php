@@ -92,7 +92,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->coreLocator->router()->generate('admin_dashboard'));
+        return new RedirectResponse($this->coreLocator->router()->generate('back_dashboard'));
     }
 
     /**

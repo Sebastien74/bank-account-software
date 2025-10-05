@@ -20,16 +20,18 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[IsGranted('ROLE_ADMIN')]
-#[Route('/admin-%security_token%/sub-categories', schemes: '%protocol%')]
+#[Route('/back-%security_token%/sub-categories', schemes: '%protocol%')]
 class SubCategoryController extends BaseController
 {
+    protected ?string $pageIcon = 'list-alt';
+
     protected ?string $classname = SubCategory::class;
     protected ?string $formType = SubCategoryType::class;
 
     /**
      * SubCategory index.
      */
-    #[Route('/index/{category}', name: 'admin_subcategory_index', methods: 'GET|POST')]
+    #[Route('/index/{category}', name: 'back_subcategory_index', methods: 'GET|POST')]
     public function index(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
@@ -40,7 +42,7 @@ class SubCategoryController extends BaseController
     /**
      * SubCategory edit.
      */
-    #[Route('/edit/{subcategory}', name: 'admin_subcategory_edit', methods: 'GET|POST')]
+    #[Route('/edit/{subcategory}', name: 'back_subcategory_edit', methods: 'GET|POST')]
     public function edit(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
@@ -51,7 +53,7 @@ class SubCategoryController extends BaseController
     /**
      * SubCategory delete.
      */
-    #[Route('/delete/{subcategory}', name: 'admin_subcategory_delete', methods: 'GET')]
+    #[Route('/delete/{subcategory}', name: 'back_subcategory_delete', methods: 'GET')]
     public function delete(SubCategory $subcategory): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($subcategory));
@@ -64,14 +66,14 @@ class SubCategoryController extends BaseController
     {
         $categoryRequest = $this->coreLocator->request()->get('category');
         $category = $categoryRequest ? $this->coreLocator->em()->getRepository(Category::class)->find($categoryRequest) : false;
-        $categoryTypeId = $category ? $category->getCategorytype()->getId() : ($this->entity ? $this->entity->getCategory()->getCategorytype()->getId() : false);
+        $categoryTypeId = $category ? $category->getOperationtype()->getId() : ($this->entity ? $this->entity->getCategory()->getOperationtype()->getId() : false);
 
-        $items[$this->coreLocator->translator()->trans('Types', [], 'breadcrumb')] = 'admin_categorytype_index';
-        $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = $this->coreLocator->router()->generate('admin_category_index', ['categorytype' => $categoryTypeId], UrlGeneratorInterface::ABSOLUTE_URL);
-        $items[$this->coreLocator->translator()->trans('Sous-catégories', [], 'breadcrumb')] = 'admin_subcategory_index';
+        $items[$this->coreLocator->translator()->trans("Types d'opérations", [], 'breadcrumb')] = 'back_operationtype_index';
+        $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = $this->coreLocator->router()->generate('back_category_index', ['operationtype' => $categoryTypeId], UrlGeneratorInterface::ABSOLUTE_URL);
+        $items[$this->coreLocator->translator()->trans('Sous-catégories', [], 'breadcrumb')] = 'back_subcategory_index';
 
         if ($this->coreLocator->request()->get('subcategory')) {
-            $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'admin_subcategory_edit';
+            $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'back_subcategory_edit';
         }
 
         parent::breadcrumb($items);

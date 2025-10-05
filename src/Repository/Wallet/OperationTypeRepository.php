@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace App\Repository\Wallet;
 
-use App\Entity\Wallet\CategoryType;
+use App\Entity\Wallet\OperationType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * CategoryTypeRepository.
+ * OperationTypeRepository.
  *
- * @extends ServiceEntityRepository<CategoryType>
+ * @extends ServiceEntityRepository<OperationType>
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class CategoryTypeRepository extends ServiceEntityRepository
+class OperationTypeRepository extends ServiceEntityRepository
 {
     /**
-     * CategoryTypeRepository constructor.
+     * OperationTypeRepository constructor.
      */
     public function __construct(private readonly ManagerRegistry $registry)
     {
-        parent::__construct($this->registry, CategoryType::class);
+        parent::__construct($this->registry, OperationType::class);
     }
 }

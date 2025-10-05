@@ -20,7 +20,7 @@
             </div>
             <div class="modal-footer pt-0 pb-4">
                 <button type="button" class="btn btn-primary me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
-                {% set route = 'admin_'~interface.name~'_delete' %}
+                {% set route = 'back_'~interface.name~'_delete' %}
                 {% set routeArgs = route|routeArgs(entity) %}
                 <a href="{{ path(route, routeArgs) }}" class="btn btn-secondary d-inline-flex justify-content-center align-items-center">
                     {{ "Confirmer"|trans|raw }}

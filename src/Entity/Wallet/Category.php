@@ -27,11 +27,11 @@ class Category extends BaseEntity
      */
     protected static array $interface = [
         'name' => 'category',
-        'masterField' => 'categorytype',
+        'masterField' => 'operationtype',
     ];
 
     protected static array $buttons = [
-        'admin_subcategory_index' => 'adminName',
+        'back_subcategory_index' => 'adminName',
     ];
 
     #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
@@ -45,10 +45,13 @@ class Category extends BaseEntity
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $subCategories;
 
-    #[ORM\ManyToOne(targetEntity: CategoryType::class, cascade: ['persist'], inversedBy: 'categories')]
+    #[ORM\ManyToOne(targetEntity: OperationType::class, cascade: ['persist'], inversedBy: 'categories')]
     #[ORM\JoinColumn(onDelete: 'cascade')]
-    private ?CategoryType $categorytype = null;
+    private ?OperationType $operationtype = null;
 
+    /**
+     * Category constructor.
+     */
     public function __construct()
     {
         $this->subCategories = new ArrayCollection();
@@ -57,7 +60,7 @@ class Category extends BaseEntity
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->type = $this->categorytype->getType();
+        $this->type = $this->operationtype->getType();
 
         parent::prePersist();
     }
@@ -116,14 +119,14 @@ class Category extends BaseEntity
         return $this;
     }
 
-    public function getCategorytype(): ?CategoryType
+    public function getOperationtype(): ?OperationType
     {
-        return $this->categorytype;
+        return $this->operationtype;
     }
 
-    public function setCategorytype(?CategoryType $categorytype): static
+    public function setOperationtype(?OperationType $operationtype): static
     {
-        $this->categorytype = $categorytype;
+        $this->operationtype = $operationtype;
 
         return $this;
     }

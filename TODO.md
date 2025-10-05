@@ -1,3 +1,5 @@
+Nettoyer sous le frigo
+
 CMS : FORMS STATS YEARS COMME SAINT JEAN et faire par moi d'années aussi sur une page dev
 
 Enregistrer la label de la valeur dans ContactValue  
@@ -21,6 +23,8 @@ Faire des budget par type de dépenses
 Faire des prévisions annuelle en fonction des dépenses ex abonnement EDF * 12
 
 Revoir les initulé des rubriques back sidebar
+
+Opération de type commune couple
 
 Mettre stimulus
 
@@ -52,8 +56,12 @@ Refaire le mail reset PW
 
 A la suppression désactiver le double clique. SI on clique deux fois 404
 
-Mettre la gestion de profile comme sur me CMS et donc revoir le bouton de déconnexion avec un dropdown
+Mettre la gestion de profile comme sur me CMS et donc revoir le bouton de déconnexion avec un dropdown plus foncé que primary
+
+Détecteur de MDP !==
 
 Passer les fichiers autres que base dans /core
 
 Responsive parfait même les forms
+
+Loader forms

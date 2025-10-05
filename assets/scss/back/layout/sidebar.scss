@@ -9,10 +9,27 @@
 
 ----------------------------------------------------------------------------------------- */
 
+@include mediaQuery(max-lg) {
+    body.menu-open .sidebar {
+        left: 0;
+        transition: left .3s ease-in-out;
+    }
+}
+
 .sidebar {
 
-    width: 350px;
     min-height: calc(100dvh - 70px);
+
+    @include mediaQuery(max-lg) {
+        width: 100%;
+        position: absolute;
+        left: -100%;
+        transition: left .3s ease-in-out;
+    }
+
+    @include mediaQuery(min-lg) {
+        width: 350px;
+    }
 
     .nav-item {
         width: 100%;

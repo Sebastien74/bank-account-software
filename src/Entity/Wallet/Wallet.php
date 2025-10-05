@@ -33,6 +33,9 @@ class Wallet extends BaseEntity
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $operations;
 
+    /**
+     * Wallet constructor.
+     */
     public function __construct()
     {
         $this->operations = new ArrayCollection();

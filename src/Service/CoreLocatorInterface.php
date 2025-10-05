@@ -29,6 +29,8 @@ interface CoreLocatorInterface
 
     public function locale(): ?string;
 
+    public function inAdmin(): bool;
+
     public function router(): RouterInterface;
 
     public function lastRoute(): LastRouteService;

@@ -23,7 +23,7 @@ security:
             security: false
 
         user:
-            pattern: ^/(secure/user|admin-%env(SECURITY_TOKEN)%)
+            pattern: ^/(secure/user|back-%env(SECURITY_TOKEN)%)
             lazy: true
             provider: user_provider
             form_login:

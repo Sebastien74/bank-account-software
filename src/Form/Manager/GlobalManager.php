@@ -50,11 +50,13 @@ class GlobalManager implements GlobalManagerInterface
             $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
             $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
             $masterFieldSetter = $masterField ? 'set'.ucfirst($masterField) : false;
-            if (method_exists($entity, 'getAdminName') && method_exists($entity, 'setSlug')) {
+            if (method_exists($entity, 'getAdminName') && method_exists($entity, 'setSlug') && !$entity->getSlug()) {
                 $entity->setSlug(Urlizer::urlize($entity->getAdminName()));
             }
-            $this->setMasterField($entity, $masterField, $masterFieldSetter);
-            $this->setPosition($entity, $masterField, $masterFieldGetter);
+            if ($masterField) {
+                $this->setMasterField($entity, $masterField, $masterFieldSetter);
+                $this->setPosition($entity, $masterField, $masterFieldGetter);
+            }
             $isNew = !$entity->getId();
             if ($isNew) {
                 $entity->setCreatedBy($this->coreLocator->user());
@@ -172,8 +174,8 @@ class GlobalManager implements GlobalManagerInterface
             $submitName = $this->form->getClickedButton()->getName();
             $redirections = [
                 'save' => $this->coreLocator->request()->headers->get('referer'),
-                'saveEdit' => $this->coreLocator->router()->generate('admin_'.$interface['name'].'_edit', $this->coreLocator->routeArgs('admin_'.$interface['name'].'_edit', $entity)),
-                'saveBack' => $this->coreLocator->router()->generate('admin_'.$interface['name'].'_index', $this->coreLocator->routeArgs('admin_'.$interface['name'].'_index', $entity)),
+                'saveEdit' => $this->coreLocator->router()->generate('back_'.$interface['name'].'_edit', $this->coreLocator->routeArgs('back_'.$interface['name'].'_edit', $entity)),
+                'saveBack' => $this->coreLocator->router()->generate('back_'.$interface['name'].'_index', $this->coreLocator->routeArgs('back_'.$interface['name'].'_index', $entity)),
             ];
             $this->redirection = !empty($redirections[$submitName]) ? $redirections[$submitName] : $redirections['save'];
         } else {

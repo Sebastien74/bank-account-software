@@ -50,7 +50,7 @@ class RequestListener
         }
 
         $isLogin = str_contains($this->uri, '/secure/user');
-        $isFront = !str_contains($this->uri, '/admin-'.$_ENV['SECURITY_TOKEN'].'/') && !$isLogin || str_contains($this->uri, '/preview/');
+        $isFront = !str_contains($this->uri, '/back-'.$_ENV['SECURITY_TOKEN'].'/') && !$isLogin || str_contains($this->uri, '/preview/');
         if ($isFront) {
             $this->checkDisabledUris();
         }

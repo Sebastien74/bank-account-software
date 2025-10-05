@@ -40,7 +40,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end px-4">
-                                    {% set route = 'admin_'~interface.name~'_edit' %}
+                                    {% set route = 'back_'~interface.name~'_edit' %}
                                     {% set routeArgs = route|routeArgs(entity) %}
                                     <a href="{{ path(route, routeArgs) }}" class="btn btn-primary btn-square small-btn p-0 me-3 d-inline-flex justify-content-center align-items-center"
                                        data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">

@@ -18,6 +18,8 @@
    1 ) Variables
 -----------------------------------*/
 
+$fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
+
 $bg-body: #0e0e0e !default;
 
 $white: #fff !default;
@@ -44,6 +46,7 @@ $form-check-label-color: $white !default;
 @import '../../lib/fonts/icomoon';
 @import './bootstrap/bootstrap';
 @import './bootstrap/variables';
+@import '../vendor/mixin/media-queries';
 
 /*-----------------------------------
    3 ) Breakpoints

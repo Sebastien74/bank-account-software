@@ -1,40 +1,15 @@
 {% trans_default_domain 'exception' %}
 
+{% set base = app.user or inAdmin ? 'back' : 'security' %}
+{% extends base~'/base.html.twig' %}
+
 {% set errorTitle = "Erreur"|trans|raw~" "~status_code %}
-{% set seoTitle = errorTitle~" | "~companyName %}
+{% set pageTitle = errorTitle %}
+{% set pageIcon = 'bug' %}
+
 {% block pageTitle %}{{ errorTitle }}{% endblock %}
 {% block title %}{{ errorTitle }}{% endblock %}
 
-<!doctype html>
-<html lang="{{ app.request.locale }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Bootstrap demo</title>
-        {% block stylesheets %}
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}
-            {% set status_code = status_code is defined ? status_code : 'Erreur'|trans %}
-            <h2 class="h1">{{ status_code|raw }}</h2>
-            {% if status_code == 404 %}
-                <h2 class="mb-3">{{ "Oups! Page non trouvée."|trans|raw }}</h2>
-                <p class="message">{{ "Désolé, la page que vous recherchez n'existe pas, a été supprimée, son nom a été modifié ou est temporairement indisponible."|trans|raw }}</p>
-            {% elseif status_code == 401 %}
-                <h2 class="mb-3">{{ "Oups! Accès refusé."|trans|raw }}</h2>
-                <p class="message">{{ "Vous n'avez pas accès à cette page."|trans|raw }}</p>
-            {% elseif status_code == 403 %}
-                <h2 class="mb-3">{{ "Accès refusé !!!"|trans|raw }}</h2>
-                <p class="text-danger fw-300 message">{{ exception.message }}</p>
-            {% else %}
-                <h2 class="mb-3">{{ "Oups! Une erreur interne est survenue."|trans|raw }}</h2>
-                <p class="text-danger fw-300 message">{{ exception.message }}</p>
-            {% endif %}
-        {% endblock %}
-        {% block javascripts %}
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-        {% endblock %}
-    </body>
-</html>
+{% block body %}
+    {% include 'core/error.html.twig' %}
+{% endblock %}

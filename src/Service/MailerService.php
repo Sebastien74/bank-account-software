@@ -9,10 +9,12 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Twig\Environment;
 
 /**
  * MailerService.
@@ -47,6 +49,7 @@ class MailerService
      */
     public function __construct(
         private readonly MailerInterface $mailer,
+        private readonly Environment $templating,
         private readonly CoreLocatorInterface $coreLocator,
     ) {
         $this->envName = 'prod' !== $_ENV['APP_ENV'] ? strtoupper($_ENV['APP_ENV']) : null;
@@ -64,25 +67,31 @@ class MailerService
         /** To send email */
         $logger = new Logger('symfony_mailer');
 
-//        try {
+        try {
             $email = (new TemplatedEmail());
+            $this->setMessage($email);
             if (self::SET_HEADER) {
                 $this->setHeaders($email);
             }
-            $this->setMessage($email);
-            $this->mailer->send($email);
-//        } catch (TransportExceptionInterface|Exception $exception) {
-//            dd($exception);
-//            $logger->pushHandler(new RotatingFileHandler($this->coreLocator->logDir().'/mailer-critical.log', 10, Level::Info));
-//            $logger->critical($exception->getMessage().' at '.get_class($this));
-//            $message = $this->coreLocator->isDebug() ? $exception->getMessage().' at '.get_class($this)
-//                : $this->coreLocator->translator()->trans('Une erreur est survenue. Veuillez réessayer.', [], 'front');
-//            return (object) [
-//                'success' => false,
-//                'exception' => $exception,
-//                'message' => $message,
-//            ];
-//        }
+            $bounce = new Address($this->from, 'Bounce Handler');
+            foreach ($this->to as $emailAddress) {
+                $rcpt = new Address($emailAddress);
+                $msg = clone $email;
+                $msg->to($rcpt);
+                $envelope = new Envelope($bounce, [$rcpt]);
+                $this->mailer->send($msg, $envelope);
+            }
+        } catch (TransportExceptionInterface|Exception $exception) {
+            $logger->pushHandler(new RotatingFileHandler($this->coreLocator->logDir().'/mailer-critical.log', 10, Level::Info));
+            $logger->critical($exception->getMessage().' at '.get_class($this));
+            $message = $this->coreLocator->isDebug() ? $exception->getMessage().' at '.get_class($this)
+                : $this->coreLocator->translator()->trans('Une erreur est survenue. Veuillez réessayer.', [], 'front');
+            return (object) [
+                'success' => false,
+                'exception' => $exception,
+                'message' => $message,
+            ];
+        }
         foreach ($this->to as $emailAddress) {
             $logger->pushHandler(new RotatingFileHandler($this->coreLocator->logDir().'/mailer.log', 10, Level::Info));
             $logger->info('Send to '.$emailAddress.' from '.$this->from.' at '.(new \DateTime('now', new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s'));
@@ -137,6 +146,7 @@ class MailerService
         $this->arguments['host'] = $this->host;
         $this->arguments['schemeAndHttpHost'] = $this->schemeAndHttpHost;
         $this->arguments['locale'] = $this->locale;
+        $this->arguments['companyName'] = $_ENV['APP_COMPANY_NAME'];
 
         if (empty($this->to)) {
             $this->to = $_ENV['EMAIL_TO'];
@@ -147,10 +157,6 @@ class MailerService
         $email->subject($subject);
         $email->date(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $email->from(new Address($this->from, $this->name));
-        foreach ($this->to as $key => $emailAddress) {
-            $method = $key > 0 ? 'addTo' : 'to';
-            $email->$method(new Address($emailAddress));
-        }
         foreach ($this->cc as $key => $emailAddress) {
             $method = $key > 0 ? 'addCc' : 'cc';
             $email->$method(new Address($emailAddress));
@@ -159,9 +165,9 @@ class MailerService
             $email->replyTo(new Address($this->replyTo));
         }
         $email->generateMessageId();
-        $email->priority(Email::PRIORITY_HIGH);
         $email->htmlTemplate($this->template);
-        $email->textTemplate(strip_tags(html_entity_decode($this->template)));
+        $html = $this->templating->render($this->template, array_merge($this->arguments, ['isText' => true]));
+        $email->text($this->minifyHtml($html));
         $email->context($this->arguments);
 
         foreach ($this->attachments as $attachment) {
@@ -269,5 +275,40 @@ class MailerService
     public function setLocale(?string $locale = null): void
     {
         $this->locale = $locale;
+    }
+
+    /**
+     * To minify Html.
+     */
+    private function minifyHtml(string $html): string
+    {
+        // 0) Decode HTML entities (&nbsp; -> real NBSP, etc.)
+        $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // 1) Strip all HTML tags -> plain text
+        $html = strip_tags($html);
+
+        // 2) Normalize newlines to \n
+        $html = str_replace(["\r\n", "\r"], "\n", $html);
+
+        // 3) Collapse spaces/tabs/NBSP into a single space (UTF-8 aware)
+        $html = preg_replace('/[ \t\x{00A0}]+/u', ' ', $html);
+
+        // 4) Trim spaces around newlines: "  \n  " -> "\n"
+        $html = preg_replace('/[ \t\x{00A0}]*\n[ \t\x{00A0}]*/u', "\n", $html);
+
+        // 5) Collapse multiple newlines: "\n\n\n" -> "\n"
+        $html = preg_replace("/\n{2,}/", "\n", $html);
+
+        // 6) FIX: remove the exact pattern "space(s) + : + newline(s)" -> keep colon on the same line
+        //    Examples fixed: "Nom :\nFélix" -> "Nom: Félix"  (you can choose ": Félix" or " : Félix" as you prefer)
+        //    Here we standardize to ": " (colon plus space) with no newline.
+        $html = preg_replace('/[ \t\x{00A0}]*:\s*\n+/u', ': ', $html);
+
+        // Optional extras (uncomment if you also want to fix other punctuation-before-newline cases):
+        // $html = preg_replace('/[ \t\x{00A0}]*(;|!|\?)\s*\n+/u', '$1 ', $html);
+
+        // 7) Final trim
+        return trim($html);
     }
 }

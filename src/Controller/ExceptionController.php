@@ -36,7 +36,7 @@ class ExceptionController extends BaseController
 
         $this->isDebug = $isDebug;
 
-        if (!$this->isDebug && preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri()) && !$this->getUser() instanceof User) {
+        if (!$this->isDebug && preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri()) && !$this->getUser() instanceof User) {
             return $this->redirect($request->getSchemeAndHttpHost());
         }
 

@@ -49,7 +49,7 @@ class LocaleSubscriber implements EventSubscriberInterface
         }
 
         $uri = $request->getUri();
-        $inAdmin = preg_match('/\/admin-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
+        $inAdmin = preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
         $session = $request->getSession();
         $asSwitch = !empty($request->get('_switch_user'));
 

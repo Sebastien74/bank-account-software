@@ -24,12 +24,12 @@
         {% for field in form.children %}
             {% if field.vars.name == '_remember_me' %}
                 <div class="row mb-4">
-                    <div class="col-sm-6 text-center text-sm-start">
+                    <div id="remember-me-wrap" class="col-sm-6 d-flex justify-content-center justify-content-sm-start text-center text-sm-start">
             {% endif %}
                 {{ form_row(form[field.vars.name]) }}
             {% if field.vars.name == '_remember_me' %}
                     </div>
-                    <div class="col-sm-6 text-center text-sm-end">
+                    <div class="col-sm-6 d-flex justify-content-center justify-content-sm-start text-center text-sm-end">
                         <a href="{{ path("security_password_request", {_locale: app.request.locale}) }}" id="to-recover" class="text-white" data-toggle="preloader">
                             <small class="text-italic">{{ 'Mot de passe oublié ?'|trans|raw }}</small>
                         </a>

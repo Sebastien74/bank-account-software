@@ -35,7 +35,7 @@ class SecurityController extends BaseController
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser() instanceof User && $this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_dashboard');
+            return $this->redirectToRoute('back_dashboard');
         }
 
         $form = $this->createForm(LoginType::class);

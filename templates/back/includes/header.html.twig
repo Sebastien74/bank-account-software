@@ -1,15 +1,27 @@
 {% trans_default_domain 'back' %}
 
 <header class="navbar bg-dark p-0" data-bs-theme="dark">
-    <a href="{{ path('admin_dashboard') }}" class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white d-flex align-items-center text-uppercase h-100">
-        <i class="icon-piggy-bank me-3"></i>{{ companyName|striptags }}
+    <a href="{{ path('back_dashboard') }}" class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white d-flex align-items-center text-uppercase h-100">
+        <span class="icon-wrap d-flex align-items-center justify-content-center me-3 bg-white">
+            <i class="icon-piggy-bank"></i>
+        </span>
+        <span>{{ companyName|striptags }}</span>
     </a>
     <div class="right d-flex align-items-center h-100">
-        <div class="title-wrap d-flex align-items-center px-4">
-            <h2 class="title fw-400 text-white mb-0">Icone ronde  + {{ pageTitle }}</h2>
+        <button class="navbar-toggler nav-toggler-icon-wrap d-flex d-lg-none flex-column" aria-label="{{ "Menu"|trans|raw }}">
+            <span class="nav-toggler-icon" aria-label="{{ "Menu"|trans|raw }}">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+        <div class="title-wrap d-none d-lg-inline-flex align-items-center px-4">
+            {% if pageIcon %}
+                <span class="icon-wrap d-flex align-items-center justify-content-center me-2 bg-primary">
+                    <i class="icon-{{ pageIcon }} text-white"></i>
+                </span>
+            {% endif %}
+            <h2 class="title fw-400 text-white mb-0">{{ pageTitle }}</h2>
         </div>
-        <a href="{{ path('app_logout') }}" class="btn btn-primary d-flex align-items-center justify-content-center ms-auto">
-            <i class="icon-power-off"></i>
-        </a>
     </div>
 </header>

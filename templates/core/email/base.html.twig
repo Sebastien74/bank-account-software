@@ -14,6 +14,8 @@
         <title>{% block metaTitle %}{{ "Nouveau message site Internet"|trans|raw }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+        {% set isText = isText is defined ? isText : false %}
+
         {% set host = null %}
         {% if schemeAndHttpHost is defined %}
             {% set host = schemeAndHttpHost %}
@@ -21,9 +23,11 @@
             {% set host = app.request.getSchemeAndHttpHost() %}
         {% endif %}
 
-        {% block stylesheets %}
-            {% include 'core/email/style.html.twig' %}
-        {% endblock %}
+        {% if not isText %}
+            {% block stylesheets %}
+                {% include 'core/email/style.html.twig' %}
+            {% endblock %}
+        {% endif %}
 
     </head>
 
@@ -49,8 +53,9 @@
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
                             <td align="center" valign="top" style="padding: 36px 24px;">
-                                <a href="https://www.felix-creation.fr/" target="_blank" style="display: inline-block;">
-                                    {{ 'cms piggy-bank'|icon(null, 120) }}
+                                <a href="https://www.felix-creation.fr/" target="_blank" style="display: inline-block; text-decoration: none;">
+                                    {{ 'cms piggy-bank'|icon(null, 120, 'logo') }}<br>
+                                    <strong style="color: #000; font-size: 20px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-weight: 800; text-transform: uppercase;">{{ companyName }}</strong>
                                 </a>
                             </td>
                         </tr>
@@ -74,7 +79,7 @@
                     <![endif]-->
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
-                            <td align="center" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+                            <td align="center" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #6f42c1;">
                                 <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -1px; line-height: 40px;">
                                     {% block title %}{% endblock %}
                                 </h1>

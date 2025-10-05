@@ -15,15 +15,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[IsGranted('ROLE_ADMIN')]
-#[Route('/admin-%security_token%', schemes: '%protocol%')]
+#[Route('/back-%security_token%', schemes: '%protocol%')]
 class DashboardController extends BaseController
 {
-    protected ?string $pageIcon = 'fal tachometer-alt-average';
+    protected ?string $pageIcon = 'tachometer-alt';
 
     /**
      * Dashboard view.
      */
-    #[Route('/dashboard/{website}', name: 'admin_dashboard', defaults: ['website' => null], methods: 'GET')]
+    #[Route('/dashboard/{website}', name: 'back_dashboard', defaults: ['website' => null], methods: 'GET')]
     public function view(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Tableau de bord', [], 'back');

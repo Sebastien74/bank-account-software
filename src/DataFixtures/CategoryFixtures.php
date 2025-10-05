@@ -6,7 +6,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Security\User;
 use App\Entity\Wallet\Category;
-use App\Entity\Wallet\CategoryType;
+use App\Entity\Wallet\OperationType;
 use App\Entity\Wallet\SubCategory;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -124,7 +124,7 @@ class CategoryFixtures extends BaseFixtures implements DependentFixtureInterface
         $categoryTypePosition = 1;
         foreach (self::CATEGORIES_TYPES as $categoryTypeSlug => $categoryTypeName) {
 
-            $categoryType = new CategoryType();
+            $categoryType = new OperationType();
             $categoryType->setSlug($categoryTypeSlug);
             $categoryType->setAdminName($categoryTypeName);
             $categoryType->setPosition($categoryTypePosition);
@@ -140,7 +140,7 @@ class CategoryFixtures extends BaseFixtures implements DependentFixtureInterface
                 $category->setSlug($categoryType->getSlug().'-'.$categorySlug);
                 $category->setAdminName($categoryName);
                 $category->setPosition($categoryPosition);
-                $category->setCategorytype($categoryType);
+                $category->setOperationtype($categoryType);
                 $category->setType($categoryTypeSlug);
                 $category->setCreatedBy($user);
                 $this->manager->persist($category);

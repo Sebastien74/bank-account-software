@@ -84,7 +84,7 @@ class ResetPasswordController extends BaseController
         }
 
         if (!$user && $authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_dashboard', ['website' => $this->getWebsite()->id]);
+            return $this->redirectToRoute('back_dashboard');
         } elseif (!$user) {
             throw $this->createAccessDeniedException($this->coreLocator->translator()->trans('Accès refusé.', [], 'security_cms'));
         }

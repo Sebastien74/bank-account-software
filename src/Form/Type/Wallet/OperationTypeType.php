@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form\Type\Wallet;
 
-use App\Entity\Wallet\CategoryType;
+use App\Entity\Wallet\OperationType;
 use App\Form\Widget\FontawesomeType;
 use App\Form\Widget\SubmitType;
 use App\Service\CoreLocatorInterface;
@@ -16,16 +16,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * CategoryType.
+ * OperationTypeType.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class CategoryTypeType extends AbstractType
+class OperationTypeType extends AbstractType
 {
     private TranslatorInterface $translator;
 
     /**
-     * CategoryType constructor.
+     * OperationTypeType constructor.
      */
     public function __construct(private readonly CoreLocatorInterface $coreLocator)
     {
@@ -74,7 +74,7 @@ class CategoryTypeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => CategoryType::class,
+            'data_class' => OperationType::class,
             'translation_domain' => 'form',
         ]);
     }

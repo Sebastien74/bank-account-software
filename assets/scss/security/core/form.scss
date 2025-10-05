@@ -2,7 +2,7 @@
 
 /* --------------------------------------------------------------------------------------
 
-    Module : Back form
+    Module : Security form
     Copyright : 2025
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
@@ -47,9 +47,6 @@ button[type="submit"] {
 }
 
 .filled-group {
-
-    border-bottom: 1px $gray-200 solid;
-
     .input-group-text.show-password::after {
         display: none !important;
     }
@@ -65,14 +62,8 @@ button[type="submit"] {
         cursor: pointer;
         position: relative;
 
-        &:after {
-            content: '';
-            position: absolute;
-            bottom: 1px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background-color: #e9ecef;
+        svg {
+            fill: $white;
         }
     }
 }
@@ -84,6 +75,8 @@ button[type="submit"] {
     background-size: 0 2px, 100% 1px;
     padding: 0;
     transition: background 0s ease-out 0s;
+    border-radius: 0;
+    border: none !important;
 }
 
 .form-material .form-control,
@@ -94,6 +87,7 @@ button[type="submit"] {
     border-radius: 0;
     box-shadow: none;
     float: none;
+    transition-duration: .3s;
 }
 
 .form-control.is-invalid,
@@ -157,6 +151,12 @@ form {
 
         .form-check-label, #to-recover small {
             font-size: 12px;
+        }
+    }
+
+    @include mediaQuery(max-sm) {
+        #remember-me-wrap > .mb-3 {
+            margin-bottom: .25rem !important;
         }
     }
 }

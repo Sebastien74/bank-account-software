@@ -32,7 +32,7 @@ abstract class BaseController extends AbstractController
     protected ?string $template = null;
 
     protected ?string $pageTitle = null;
-    protected ?string $pageIcon = null;
+    protected ?string $pageIcon = 'wallet';
 
     protected array $breadcrumb = [];
 
@@ -117,7 +117,7 @@ abstract class BaseController extends AbstractController
 
         $currentPage = $this->coreLocator->request()->query->getInt('page', 1);
         if ($paginator->count() === 0 && $currentPage > 1) {
-            return $this->redirectToRoute('admin_'.$interface['name'].'_index');
+            return $this->redirectToRoute('back_'.$interface['name'].'_index');
         }
 
         return $paginator;
@@ -139,6 +139,7 @@ abstract class BaseController extends AbstractController
         return [
             'companyName' => $_ENV['APP_COMPANY_NAME'],
             'securityKey' => $_ENV['SECRET_KEY'],
+            'inAdmin' => $this->coreLocator->inAdmin(),
             'allowedIP' => $this->coreLocator->checkIP(),
             'referClass' => $this->classname ? new $this->classname() : [],
             'interface' => $this->classname && method_exists($this->classname, 'getInterface') ? $this->classname::getInterface() : [],
@@ -155,10 +156,10 @@ abstract class BaseController extends AbstractController
      */
     protected function breadcrumb(array $items = []): void
     {
-        if ('admin_dashboard' !== $this->coreLocator->request()->get('_route')) {
-            $label = $this->coreLocator->translator()->trans('Tableau de bord', [], 'admin_breadcrumb');
-            $dashboardArgs = $this->coreLocator->routeArgs('admin_dashboard');
-            $this->breadcrumb[$label] = $this->coreLocator->router()->generate('admin_dashboard', $dashboardArgs, UrlGeneratorInterface::ABSOLUTE_URL);
+        if ('back_dashboard' !== $this->coreLocator->request()->get('_route')) {
+            $label = $this->coreLocator->translator()->trans('Tableau de bord', [], 'back_breadcrumb');
+            $dashboardArgs = $this->coreLocator->routeArgs('back_dashboard');
+            $this->breadcrumb[$label] = $this->coreLocator->router()->generate('back_dashboard', $dashboardArgs, UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         foreach ($items as $label => $route) {

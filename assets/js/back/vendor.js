@@ -5,6 +5,8 @@ import '../../scss/back/vendor.scss';
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    const body = document.body;
+
     import(/* webpackPreload: true */ './bootstrap/tooltip').then(({default: Tooltip}) => {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
             if (!tooltip.classList.contains('tooltip-loaded')) {
@@ -45,6 +47,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }).catch(error => console.error(error.message));
+
+    const togglerNav = document.querySelector('button.nav-toggler-icon-wrap');
+    togglerNav.onclick = function (e) {
+        e.preventDefault();
+        togglerNav.querySelector('.nav-toggler-icon').classList.toggle('open');
+        body.classList.toggle('menu-open');
+    }
 
     const selects = document.querySelectorAll('select');
     if (selects.length > 0) {

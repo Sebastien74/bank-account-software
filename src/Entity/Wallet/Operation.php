@@ -39,12 +39,12 @@ class Operation extends BaseEntity
     #[ORM\JoinColumn(nullable: true)]
     private ?Category $category = null;
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(?\DateTimeInterface $date): static
+    public function setDate(?\DateTime $date): static
     {
         $this->date = $date;
 

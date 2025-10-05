@@ -21,7 +21,7 @@ class UtilityController extends BaseController
     /**
      * Password generator.
      */
-    #[Route('/admin-%security_token%/security/utility/password-generator', name: 'security_password_generator', options: ['expose' => true], methods: 'GET', schemes: '%protocol%')]
+    #[Route('/back-%security_token%/security/utility/password-generator', name: 'security_password_generator', options: ['expose' => true], methods: 'GET', schemes: '%protocol%')]
     public function passwordGenerator(KeyGeneratorInterface $keyGenerator): JsonResponse
     {
         return new JsonResponse(['password' => $keyGenerator->generate(4, 4, 4, 2)]);

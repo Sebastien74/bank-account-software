@@ -15,13 +15,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[IsGranted('ROLE_ADMIN')]
-#[Route('/admin-%security_token%/statistics/', schemes: '%protocol%')]
+#[Route('/back-%security_token%/statistics/', schemes: '%protocol%')]
 class StatisticController extends BaseController
 {
+    protected ?string $pageIcon = 'chart-bar';
+
     /**
      * Statistics view.
      */
-    #[Route('index', name: 'admin_statistics', defaults: ['website' => null], methods: 'GET')]
+    #[Route('index', name: 'back_statistics', defaults: ['website' => null], methods: 'GET')]
     public function statistics(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Statistiques', [], 'back');
@@ -29,5 +31,15 @@ class StatisticController extends BaseController
         return $this->render('back/pages/statistics.html.twig', array_merge($this->defaultArguments(), [
 
         ]));
+    }
+
+    /**
+     * To set breadcrumb.
+     */
+    protected function breadcrumb(array $items = []): void
+    {
+        $items[$this->coreLocator->translator()->trans('Statistiques', [], 'breadcrumb')] = 'back_statistics';
+
+        parent::breadcrumb($items);
     }
 }

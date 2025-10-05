@@ -7,34 +7,61 @@
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
+    1 ) Main
+    2 ) Burger icon
+
 ----------------------------------------------------------------------------------------- */
+
+/*-----------------------------------
+   1 ) Main
+-----------------------------------*/
 
 header.navbar {
 
     height: 70px;
 
+    .icon-wrap {
+        width: 37px;
+        height: 37px;
+        border-radius: 50%;
+        aspect-ratio: 1;
+    }
+
     .navbar-brand {
 
         font-weight: 900;
         background-color: $purple-600;
-        width: 350px;
-        font-size: 14px !important;
+        font-size: clamp(12px, 1vw, 14px) !important;
         border-left: 3px solid transparentize($white, 0.5);
 
-        svg.piggy {
-            fill: $white;
-            max-height: 35px;
+        @include mediaQuery(max-lg) {
+            width: calc(100% - 70px);
+        }
+
+        @include mediaQuery(min-lg) {
+            width: 350px;
+        }
+
+        i {
+            color: $primary;
+            font-size: 30px;
+        }
+
+        i, span {
+            opacity: .8;
         }
     }
 
     .right {
 
-        width: calc(100% - 350px);
+        @include mediaQuery(min-lg) {
+            width: calc(100% - 350px);
+        }
 
         .title-wrap {
 
             .title {
-                font-size: 20px;
+                font-size: 15px;
                 opacity: .7;
             }
         }
@@ -43,6 +70,86 @@ header.navbar {
             border-radius: 0;
             min-width: 70px;
             height: 100%;
+        }
+    }
+}
+
+/*-----------------------------------
+   2 ) Burger icon
+-----------------------------------*/
+
+@include mediaQuery(max-lg) {
+
+    .navbar-toggler {
+
+        height: 70px;
+        width: 70px;
+        padding: 0;
+        box-shadow: none !important;
+        border-radius: 0;
+        border: 0;
+        background-color: transparentize($white, 0.2);
+        z-index: 3000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        .label {
+            font-size: 11px;
+        }
+    }
+
+    .nav-toggler-icon {
+
+        width: 30px;
+        height: 23px;
+        display: inline-block;
+        position: relative;
+        transform: rotate(0deg);
+        transition: .5s ease-in-out;
+
+        span {
+
+            display: block;
+            position: absolute;
+            height: 4px;
+            width: 100%;
+            background: $primary;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: .25s ease-in-out;
+
+            &:nth-child(1) {
+                top: 0;
+            }
+
+            &:nth-child(2) {
+                top: 10px;
+            }
+
+            &:nth-child(3) {
+                top: 20px;
+            }
+        }
+
+        &.open span {
+
+            &:nth-child(1) {
+                top: 10px;
+                transform: rotate(135deg);
+            }
+
+            &:nth-child(2) {
+                opacity: 0;
+                left: -100px;
+            }
+
+            &:nth-child(3) {
+                top: 10px;
+                transform: rotate(-135deg);
+            }
         }
     }
 }

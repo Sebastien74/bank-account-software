@@ -1,6 +1,6 @@
 {% trans_default_domain 'back' %}
 
-{% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'fal wallet' %}
+{% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'wallet' %}
 {% set pageTitle = pageTitle is defined and pageTitle ? pageTitle : "Mes comptes"|trans %}
 
 <!doctype html>
@@ -25,6 +25,7 @@
         {% include 'back/includes/flashbag.html.twig' %}
         {% include 'back/includes/header.html.twig' with {
             companyName: companyName,
+            pageIcon: pageIcon,
             pageTitle: pageTitle,
         } only %}
         <div class="d-flex">

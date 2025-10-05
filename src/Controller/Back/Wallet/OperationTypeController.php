@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
-use App\Entity\Wallet\Category;
-use App\Form\Type\Wallet\CategoryType;
+use App\Entity\Wallet\OperationType;
+use App\Form\Type\Wallet\OperationTypeType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,18 +18,18 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[IsGranted('ROLE_ADMIN')]
-#[Route('/back-%security_token%/categories', schemes: '%protocol%')]
-class CategoryController extends BaseController
+#[Route('/back-%security_token%/categories-types', schemes: '%protocol%')]
+class OperationTypeController extends BaseController
 {
     protected ?string $pageIcon = 'list-alt';
 
-    protected ?string $classname = Category::class;
-    protected ?string $formType = CategoryType::class;
+    protected ?string $classname = OperationType::class;
+    protected ?string $formType = OperationTypeType::class;
 
     /**
-     * Category index.
+     * OperationType index.
      */
-    #[Route('/index/{operationtype}', name: 'back_category_index', methods: 'GET|POST')]
+    #[Route('/index', name: 'back_operationtype_index', methods: 'GET|POST')]
     public function index(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
@@ -38,9 +38,9 @@ class CategoryController extends BaseController
     }
 
     /**
-     * Category edit.
+     * OperationType edit.
      */
-    #[Route('/edit/{category}', name: 'back_category_edit', methods: 'GET|POST')]
+    #[Route('/edit/{operationtype}', name: 'back_operationtype_edit', methods: 'GET|POST')]
     public function edit(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
@@ -49,12 +49,12 @@ class CategoryController extends BaseController
     }
 
     /**
-     * Category delete.
+     * OperationType delete.
      */
-    #[Route('/delete/{category}', name: 'back_category_delete', methods: 'GET')]
-    public function delete(Category $category): RedirectResponse
+    #[Route('/delete/{operationtype}', name: 'back_operationtype_delete', methods: 'GET')]
+    public function delete(OperationType $operationtype): RedirectResponse
     {
-        return $this->redirect($this->globalFormManager->delete($category));
+        return $this->redirect($this->globalFormManager->delete($operationtype));
     }
 
     /**
@@ -63,9 +63,8 @@ class CategoryController extends BaseController
     protected function breadcrumb(array $items = []): void
     {
         $items[$this->coreLocator->translator()->trans("Types d'opérations", [], 'breadcrumb')] = 'back_operationtype_index';
-        $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = 'back_category_index';
-        if ($this->coreLocator->request()->get('category')) {
-            $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'back_category_edit';
+        if ($this->coreLocator->request()->get('operationtype')) {
+            $items[$this->coreLocator->translator()->trans('Édition', [], 'back_breadcrumb')] = 'back_operationtype_edit';
         }
 
         parent::breadcrumb($items);

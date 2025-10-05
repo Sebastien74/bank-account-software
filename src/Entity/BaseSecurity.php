@@ -561,4 +561,24 @@ abstract class BaseSecurity extends BaseInterface implements UserInterface, Pass
 
         return $this;
     }
+
+    public function isOnline(): ?bool
+    {
+        return $this->isOnline;
+    }
+
+    public function isConfirmEmail(): ?bool
+    {
+        return $this->confirmEmail;
+    }
+
+    public function isAgreeTerms(): ?bool
+    {
+        return $this->agreeTerms;
+    }
+
+    public function isResetPassword(): ?bool
+    {
+        return $this->resetPassword;
+    }
 }

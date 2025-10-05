@@ -29,6 +29,12 @@ body {
     #content {
         background-color: $bg-body;
     }
+
+    @each $size in $fonts-weights {
+        .fw-#{$size}, .fw-#{$size} *:not(strong):not(b) {
+            font-weight: $size !important;
+        }
+    }
 }
 
 * {
@@ -139,6 +145,7 @@ h2 {
     .alert {
         margin-top: 1.25rem;
         font-size: 14px;
+        line-height: 1.3;
     }
 }
 

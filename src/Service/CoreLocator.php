@@ -95,6 +95,15 @@ class CoreLocator implements CoreLocatorInterface
     }
 
     /**
+     * To check if url is in admin render.
+     */
+    public function inAdmin(): bool
+    {
+        $uri = $this->request() instanceof HttpFoundation\Request ? $this->request()->getUri() : false;
+        return $uri && preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
+    }
+
+    /**
      * To get RouterInterface.
      */
     public function router(): RouterInterface

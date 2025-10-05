@@ -190,7 +190,17 @@
         {# Attribute "required" is not supported #}
         {% set required = false %}
     {% endif -%}
-    {{- parent() -}}
+    {%- if type is defined and type == 'password'-%}
+        <div class="input-group">
+    {%- endif -%}
+        {{- parent() -}}
+    {%- if type is defined and type == 'password' -%}
+        <span class="input-group-text show-password">
+                <span class="show-icon">{{ 'fad eye'|icon(null, 14) }}</span>
+                <span class="hide-icon d-none">{{ 'fad eye-slash'|icon(null, 14) }}</span>
+            </span>
+        </div>
+    {%- endif -%}
 {%- endblock form_widget_simple %}
 
 {%- block widget_attributes -%}
