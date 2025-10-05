@@ -7,6 +7,7 @@ namespace App\Controller\Back\Wallet;
 use App\Controller\BaseController;
 use App\Entity\Wallet\OperationType;
 use App\Form\Type\Wallet\OperationTypeType;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,11 +31,11 @@ class OperationTypeController extends BaseController
      * OperationType index.
      */
     #[Route('/index', name: 'back_operationtype_index', methods: 'GET|POST')]
-    public function index(): Response
+    public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return parent::index();
+        return parent::index($paginator);
     }
 
     /**

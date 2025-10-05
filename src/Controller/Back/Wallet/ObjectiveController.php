@@ -7,6 +7,7 @@ namespace App\Controller\Back\Wallet;
 use App\Controller\BaseController;
 use App\Entity\Wallet\Objective;
 use App\Form\Type\Wallet\ObjectiveType;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -29,11 +30,11 @@ class ObjectiveController extends BaseController
      * Objective index.
      */
     #[Route('index', name: 'back_objective_index', methods: 'GET|POST')]
-    public function index(): Response
+    public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des objectifs', [], 'back');
 
-        return parent::index();
+        return parent::index($paginator);
     }
 
     /**

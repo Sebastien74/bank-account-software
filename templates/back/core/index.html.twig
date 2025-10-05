@@ -10,7 +10,11 @@
 
 {% block body %}
     <div id="entities-index-page" class="container-fluid pt-4 pb-5 position-relative">
-        {% include 'back/new-modal.html.twig' %}
+        {% include 'back/core/new-modal.html.twig' with {
+            addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+            form: form is defined and form ? form : false,
+            formErrors: formErrors is defined and formErrors ? formErrors : false,
+        } only %}
         {% if pagination is defined %}
             <div id="entities-index" class="mt-4">
                 <table class="table table-striped table-dark">
@@ -46,7 +50,7 @@
                                        data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
                                         <i class="icon-pencil text-white"></i>
                                     </a>
-                                    {% include 'back/delete-modal.html.twig' %}
+                                    {% include 'back/core/delete-modal.html.twig' %}
                                 </td>
                             </tr>
                         {% endfor %}

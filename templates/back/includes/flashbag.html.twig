@@ -1,28 +1,10 @@
 {% trans_default_domain 'back' %}
 
-{% set icons = {
-    success: {icon: 'check', color: 'success'},
-    info: {icon: 'info', color: 'info'},
-    warning: {icon: 'exclamation', color: 'warning'},
-    danger: {icon: 'exclamation-triangle', color: 'danger'},
-    error: {icon: 'exclamation-triangle', color: 'danger'},
-    undefined: {icon: 'info', color: 'info'},
-} %}
-
 {% for alert, messages in app.session.flashbag.all %}
-    {% set icon = icons[alert].icon is defined ? icons[alert].icon : icons['undefined'].icon %}
-    {% set color = icons[alert].color is defined ? icons[alert].color : icons['undefined'].color %}
     {% for message in messages %}
-        <div class="toast-container position-fixed top-0 end-0 p-3">
-            <div class="toast toast-alert fade show border-0 bg-{{ color }}" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header text-white d-flex border-0 no-radius py-3 px-3">
-                    <div class="inner d-flex align-items-center">
-                        <i class="icon-{{ icon }} me-2"></i>
-                        <div class="message">{{ message|raw }}</div>
-                    </div>
-                    <button type="button" class="btn-close ms-3" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
+        {% include 'back/includes/alert.html.twig' with {
+            alert: alert,
+            message: message
+        } only %}
     {% endfor %}
 {% endfor %}

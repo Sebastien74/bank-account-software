@@ -1,8 +1,10 @@
 /**
- * Lazy load
- *
- * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Module : Vendor Lazy load
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  */
+
 export default function () {
 
     let body = document.body;
@@ -42,14 +44,6 @@ export default function () {
                 }
             }
         });
-    }
-
-    /** Medias loader */
-    let hx = document.querySelector('hx\\:include');
-    if (hx) {
-        import('../../vendor/components/medias-loader').then(({default: mediaLoader}) => {
-            new mediaLoader();
-        }).catch(error => console.error(error.message));
     }
 
     /** Images loader generating */

@@ -10,4 +10,5 @@ parameters:
     cacheDir: '%kernel.cache_dir%'
     debugMode: '%env(APP_DEBUG)%'
     isDebug: '%kernel.debug%'
+    formManager: null
     debug.container.dump: false

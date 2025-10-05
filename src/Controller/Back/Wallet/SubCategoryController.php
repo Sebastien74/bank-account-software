@@ -8,6 +8,7 @@ use App\Controller\BaseController;
 use App\Entity\Wallet\Category;
 use App\Entity\Wallet\SubCategory;
 use App\Form\Type\Wallet\SubCategoryType;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,11 +33,11 @@ class SubCategoryController extends BaseController
      * SubCategory index.
      */
     #[Route('/index/{category}', name: 'back_subcategory_index', methods: 'GET|POST')]
-    public function index(): Response
+    public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des catégories', [], 'back');
 
-        return parent::index();
+        return parent::index($paginator);
     }
 
     /**

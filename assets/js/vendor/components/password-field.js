@@ -1,6 +1,10 @@
 /**
- * Show password btn field
+ * Module : Vendor show password field
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  */
+
 export default function (showPasswordButtons) {
     for (let i = 0; i < showPasswordButtons.length; i++) {
         let btn = showPasswordButtons[i]

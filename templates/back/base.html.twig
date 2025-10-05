@@ -40,8 +40,13 @@
             </main>
         </div>
         {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false, nonce: csp_nonce()}) }}
+        {% set formatDate = app.request.locale|formatDate %}
         <div id="data-translation" class="d-none"
              data-search="{{ "Chercher"|trans|striptags }}"
+             data-format-date="{{ formatDate.dateLarge }}"
+             data-close="{{ "Fermer"|trans|raw }}"
+             data-deselect="{{ "Désélectionner"|trans|raw }}"
+             data-ok="{{ "OK"|trans|raw }}"
         ></div>
     </body>
 </html>

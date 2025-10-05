@@ -36,14 +36,15 @@ class WalletType extends AbstractType
         $isNew = !$builder->getData()->getId();
 
         $builder->add('adminName', Type\TextType::class, [
+            'label_html' => true,
             'label' => $this->translator->trans('Nom du compte', [], 'back'),
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un nom', [], 'back'),
             ],
-            'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez saisir un nom pour votre compte.', [], 'back'),
-            ])],
-            'row_attr' => ['class' => 'col-12 form-floating'],
+            'constraints' => [
+                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
+            ],
+            'row_attr' => ['class' => 'col-12'],
         ]);
 
         $save = new SubmitType($this->coreLocator);

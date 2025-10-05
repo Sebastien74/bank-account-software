@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class GlobalManager implements GlobalManagerInterface
 {
     private ?FormInterface $form;
-    private ?string $masterField;
     private ?string $redirection;
 
     /**
@@ -35,13 +34,13 @@ class GlobalManager implements GlobalManagerInterface
     /**
      * To set form and process.
      */
-    public function setForm(string $formClassname, mixed $entity = null, array $options = []): void
+    public function setForm(string $formClassname, mixed $entity = null, mixed $formManager = null, array $formOptions = []): void
     {
         if (!$entity) {
             throw new NotFoundHttpException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'back'));
         }
 
-        $this->form = $this->formFactory->create($formClassname, $entity, $options);
+        $this->form = $this->formFactory->create($formClassname, $entity, $formOptions);
         $this->form->handleRequest($this->coreLocator->request());
 
         if ($this->form->isSubmitted() && $this->form->isValid()) {
@@ -62,6 +61,9 @@ class GlobalManager implements GlobalManagerInterface
                 $entity->setCreatedBy($this->coreLocator->user());
             } else {
                 $entity->setUpdatedBy($this->coreLocator->user());
+            }
+            if (is_object($formManager) && method_exists($formManager, 'execute')) {
+                $formManager->execute($entity);
             }
             $this->coreLocator->em()->persist($entity);
             $this->coreLocator->em()->flush();

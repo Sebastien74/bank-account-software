@@ -37,21 +37,23 @@ class CategoryType extends AbstractType
         $isNew = !$builder->getData()->getId();
 
         $builder->add('adminName', Type\TextType::class, [
+            'label_html' => true,
             'label' => $this->translator->trans('Intitulé', [], 'back'),
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'back'),
             ],
-            'constraints' => [new Assert\NotBlank([
-                'message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back'),
-            ])],
-            'row_attr' => ['class' => $isNew ? 'col-12 form-floating' : 'col-lg-9 form-floating'],
+            'constraints' => [
+                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
+            ],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
         ]);
 
         if (!$isNew) {
             $builder->add('icon', FontawesomeType::class, [
+                'label_html' => true,
                 'required' => false,
                 'attr' => ['class' => 'select-icons'],
-                'row_attr' => ['class' => 'col-lg-3 form-floating'],
+                'row_attr' => ['class' => 'col-lg-3'],
             ]);
         }
 

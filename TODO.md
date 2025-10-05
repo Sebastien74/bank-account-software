@@ -65,3 +65,5 @@ Passer les fichiers autres que base dans /core
 Responsive parfait même les forms
 
 Loader forms
+
+CMS : Reprendre le style alert et le tableau dans twig pour alléger le css Front back etc

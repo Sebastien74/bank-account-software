@@ -1,7 +1,8 @@
 /**
- * Preloader
- *
- * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Module : Security Preloader
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  */
 
 const body = document.body;

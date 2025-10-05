@@ -1,8 +1,9 @@
 /**
- * Scroll to errors
- *
- * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
- * @inheritDoc https://github.com/jshjohnson/Choices
+ * Module : Back Choices
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+ * Doc : https://github.com/jshjohnson/Choices
  */
 
 import Choices from "choices.js";

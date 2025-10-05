@@ -12,7 +12,11 @@
 
 {% block body %}
     <div id="wallets-dashboard" class="container-fluid pt-4 pb-5 position-relative">
-        {% include 'back/new-modal.html.twig' %}
+        {% include 'back/core/new-modal.html.twig' with {
+            addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+            form: form is defined and form ? form : false,
+            formErrors: formErrors is defined and formErrors ? formErrors : false,
+        } only %}
         <div id="wallets-index" class="row mt-4">
             {% for wallet in pagination %}
                 <div class="col-lg-4">
@@ -32,7 +36,7 @@
                                data-bs-toggle="tooltip" data-bs-title="{{ "Mes opérations"|trans|striptags }}">
                                 <i class="icon-list-alt"></i>
                             </a>
-                            <span class="ms-auto">{% include 'back/delete-modal.html.twig' with {entity: wallet} %}</span>
+                            <span class="ms-auto">{% include 'back/core/delete-modal.html.twig' with {entity: wallet} %}</span>
                         </div>
                     </div>
                 </div>

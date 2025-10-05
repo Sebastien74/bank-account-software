@@ -57,17 +57,21 @@ form {
         font-size: $input-font-size;
     }
 
+    .choices__list--dropdown {
+        z-index: 500 !important;
+    }
+
     .choices__list--dropdown .choices__placeholder,
     .is-open .choices__list--dropdown,
     .is-open .choices__list[aria-expanded] {
         background-color: $gray-500 !important;
-        color: $white !important;
+        color: $gray-900 !important;
         border: 0 !important;
     }
 
     .choices__list--dropdown .choices__item--selectable.is-highlighted {
         background-color: $gray-600 !important;
-        color: $white !important;
+        color: $gray-900 !important;
     }
 
     .choices[data-type*="select-one"] .choices__input {
@@ -89,4 +93,36 @@ form {
     .btn {
         font-size: 14px;
     }
+
+    .asterisk {
+        color: $red;
+        font-size: 14px;
+        top: -.2em;
+    }
+}
+
+.mc-picker {
+    background-color: $gray-800 !important;
+}
+
+.mc-table__weekday,
+.mc-btn--success {
+    color: $purple-400 !important;
+}
+
+.mc-picker.mc-date--today {
+    color: $gray-800 !important;
+}
+
+.mc-date--active.mc-date--today {
+    background-color: $gray-900 !important;
+}
+
+.mc-picker.mc-date--today,
+.mc-date--active {
+    color: $gray-300 !important;
+}
+
+.mc-calendar--modal.mc-calendar--opened {
+    z-index: 5000
 }

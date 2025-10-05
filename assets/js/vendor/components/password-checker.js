@@ -1,3 +1,10 @@
+/**
+ * Module : Vendor Password checker
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+ */
+
 import zxcvbn from 'zxcvbn';
 
 export default function (input) {

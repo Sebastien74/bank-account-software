@@ -19,6 +19,7 @@ class VendorExtension extends AbstractExtension
     {
         return [
             new TwigFilter('routeArgs', [CoreExtension::class, 'routeArgs']),
+            new TwigFilter('formatDate', [CoreExtension::class, 'formatDate']),
             new TwigFilter('icon', [IconRuntime::class, 'icon']),
             new TwigFilter('csp_nonce', [NonceRuntime::class, 'getNonce']),
             new TwigFilter('img', [MediaRuntime::class, 'img']),
@@ -29,6 +30,7 @@ class VendorExtension extends AbstractExtension
     {
         return [
             new TwigFunction('routeArgs', [CoreExtension::class, 'routeArgs']),
+            new TwigFunction('formatDate', [CoreExtension::class, 'formatDate']),
             new TwigFunction('icon', [IconRuntime::class, 'icon']),
             new TwigFunction('csp_nonce', [NonceRuntime::class, 'getNonce']),
             new TwigFunction('img', [MediaRuntime::class, 'img']),

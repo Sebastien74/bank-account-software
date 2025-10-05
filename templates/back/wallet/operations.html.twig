@@ -9,8 +9,49 @@
 {% endblock %}
 
 {% block body %}
+
     <div id="operations-index" class="container-fluid pt-4 pb-5 position-relative">
-        {% include 'back/new-modal.html.twig' %}
-{#        {{ dump() }}#}
+
+        {% include 'back/core/new-modal.html.twig' with {
+            addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+            form: form is defined and form ? form : false,
+            formErrors: formErrors is defined and formErrors ? formErrors : false,
+        } only %}
+
+        <table class="table mt-4 table-dark table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">{{ "Date"|trans|striptags }}</th>
+                    <th scope="col">{{ "État"|trans|striptags }}</th>
+                    <th scope="col">{{ "Catégorie"|trans|striptags }}</th>
+                    <th scope="col">{{ "Tiers"|trans|striptags }}</th>
+                    <th scope="col text-end">{{ "Montant"|trans|striptags }}</th>
+                    <th scope="col">{{ "Solde"|trans|striptags }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entity in pagination %}
+                    <tr>
+                        <td scope="row">{% if entity.date %}{{ entity.date|format_datetime(pattern="dd/M/Y"|trans, locale=app.request.locale) }}{% endif %}</td>
+                        <td></td>
+                        <td>{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
+                        <td>{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</td>
+                        <td>{% if entity.amount %}{{ entity.amount|number_format(2) }}{% endif %}</td>
+                        <td>0</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if pagination is empty %}
+            {% include 'back/includes/alert.html.twig' with {
+                display: 'alert',
+                size: 'small',
+                alert: 'info',
+                message: 'Aucune opération.'
+            } only %}
+        {% endif %}
+
     </div>
+
 {% endblock %}

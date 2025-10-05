@@ -26,35 +26,32 @@ abstract class BaseController extends AbstractController
     protected int $paginationLimit = 15;
     protected ?string $classname = null;
     protected ?string $formType = null;
-
     protected mixed $entity = null;
-
+    protected bool $forceEntities = false;
+    protected array $entities = [];
     protected ?string $template = null;
-
+    protected ?string $addBtnLabel = null;
     protected ?string $pageTitle = null;
     protected ?string $pageIcon = 'wallet';
-
     protected array $breadcrumb = [];
-
     protected array $arguments = [];
 
     /**
      * BaseController constructor.
      */
     public function __construct(
-        protected readonly RequestStack $requestStack,
-        protected readonly CoreLocatorInterface $coreLocator,
-        protected readonly PaginatorInterface $paginator,
-        protected readonly GlobalManagerInterface $globalFormManager,
+        protected CoreLocatorInterface $coreLocator,
+        protected GlobalManagerInterface $globalFormManager,
+        protected mixed $formManager,
     ) {
     }
 
     /**
      * Index.
      */
-    protected function index(): Response
+    protected function index(PaginatorInterface $paginator): Response
     {
-        return $this->viewRender('index');
+        return $this->viewRender('index', $paginator);
     }
 
     /**
@@ -68,11 +65,11 @@ abstract class BaseController extends AbstractController
     /**
      * Render view.
      */
-    private function viewRender(string $view): Response
+    private function viewRender(string $view, ?PaginatorInterface $paginator = null): Response
     {
         $arguments = $this->defaultArguments();
 
-        $paginator = $this->getPagination($this->paginationLimit);
+        $paginator = $paginator ? $this->getPagination($paginator, $this->paginationLimit) : false;
         if ($paginator instanceof RedirectResponse) {
             return $paginator;
         }
@@ -80,14 +77,14 @@ abstract class BaseController extends AbstractController
         $form = null;
         if ($this->formType && $this->classname) {
             $formManager = $this->globalFormManager;
-            $formManager->setForm($this->formType, $this->entity);
+            $formManager->setForm($this->formType, $this->entity, $this->formManager);
             $form = $formManager->getForm();
             if ($formManager->getRedirection()) {
                 return $this->redirect($formManager->getRedirection());
             }
         }
 
-        $template = $this->template ?: 'back/'.$view.'.html.twig';
+        $template = $this->template ?: 'back/core/'.$view.'.html.twig';
 
         return $this->render($template, array_merge($arguments, [
             'form' => $form ? $form->createView() : false,
@@ -99,17 +96,22 @@ abstract class BaseController extends AbstractController
     /**
      * To get entities Pagination.
      */
-    protected function getPagination(int $limit = 15): PaginationInterface|RedirectResponse
+    protected function getPagination(PaginatorInterface $paginator, int $limit = 15): PaginationInterface|RedirectResponse
     {
         $referEntity = $this->classname ? new $this->classname() : false;
         $interface = $referEntity && method_exists($referEntity, 'getInterface') ? $referEntity::getInterface() : [];
         $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
-        $repository = $this->classname ? $this->coreLocator->em()->getRepository($this->classname) : false;
-        $entities = $masterField && $repository ? $repository->findBy([$masterField => $this->coreLocator->request()->get($masterField)], ['adminName' => 'ASC'])
-            : ($repository ? $repository->findBy([], ['adminName' => 'ASC']) : []);
+        $orderBy = !empty($interface['orderBy']) ? $interface['orderBy'] : 'adminName';
+        $orderSort = !empty($interface['orderSort']) ? $interface['orderSort'] : 'ASC';
 
-        $paginator = $this->paginator->paginate(
-            $entities,
+        $repository = $this->classname ? $this->coreLocator->em()->getRepository($this->classname) : false;
+        if (!$this->forceEntities) {
+            $this->entities = $masterField && $repository ? $repository->findBy([$masterField => $this->coreLocator->request()->get($masterField)], [$orderBy => $orderSort])
+                : ($repository ? $repository->findBy([], [$orderBy => $orderSort]) : []);
+        }
+
+        $paginator = $paginator->paginate(
+            $this->entities,
             $this->coreLocator->request()->query->getInt('page', 1),
             $limit,
             ['wrap-queries' => true]
@@ -129,7 +131,7 @@ abstract class BaseController extends AbstractController
     protected function defaultArguments(): array
     {
         $interface = $this->classname && method_exists($this->classname, 'getInterface') ? $this->classname::getInterface() : [];
-        $entityRequest = !empty($interface['name']) ? $this->requestStack->getMainRequest()->get($interface['name']) : false;
+        $entityRequest = !empty($interface['name']) ? $this->coreLocator->request()->get($interface['name']) : false;
         $this->entity = !$entityRequest && $this->classname ? new $this->classname() : ($this->classname ? $this->coreLocator->em()->getRepository($this->classname)->find(intval($entityRequest)) : false);
 
         if (empty($this->arguments['breadcrumb'])) {
@@ -145,6 +147,8 @@ abstract class BaseController extends AbstractController
             'interface' => $this->classname && method_exists($this->classname, 'getInterface') ? $this->classname::getInterface() : [],
             'buttons' => $this->classname && method_exists($this->classname, 'getButtons') ? $this->classname::getButtons() : [],
             'entity' => $this->entity,
+            'paginationLimit' => $this->paginationLimit,
+            'addBtnLabel' => $this->addBtnLabel,
             'pageTitle' => $this->pageTitle,
             'pageIcon' => $this->pageIcon,
             'breadcrumb' => $this->breadcrumb,

@@ -1,8 +1,10 @@
 /**
- * Recaptcha
- *
- * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Module : Vendor Recaptcha
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  */
+
 export function generate() {
 
     let dataEl = document.getElementById('data-path');

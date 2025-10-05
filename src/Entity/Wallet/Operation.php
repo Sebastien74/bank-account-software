@@ -23,6 +23,8 @@ class Operation extends BaseEntity
     protected static array $interface = [
         'name' => 'operation',
         'masterField' => 'wallet',
+        'orderBy' => 'date',
+        'orderSort' => 'ASC',
     ];
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -31,20 +33,27 @@ class Operation extends BaseEntity
     #[ORM\Column(type: 'boolean')]
     private bool $pointed = false;
 
+    #[ORM\Column(type: 'float')]
+    private ?float $amount = null;
+
     #[ORM\ManyToOne(targetEntity: Wallet::class, cascade: ['persist'], inversedBy: 'operations')]
     #[ORM\JoinColumn(onDelete: 'cascade')]
     private ?Wallet $wallet = null;
 
-    #[ORM\ManyToOne(targetEntity: Category::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Category $category = null;
+    #[ORM\ManyToOne(targetEntity: SubCategory::class)]
+    #[ORM\JoinColumn(name: 'sub_category_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?SubCategory $subCategory = null;
 
-    public function getDate(): ?\DateTime
+    #[ORM\ManyToOne(targetEntity: Outsider::class)]
+    #[ORM\JoinColumn(name: 'outsider_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Outsider $outsider = null;
+
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(?\DateTime $date): static
+    public function setDate(?\DateTimeInterface $date): static
     {
         $this->date = $date;
 
@@ -63,6 +72,18 @@ class Operation extends BaseEntity
         return $this;
     }
 
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(float $amount): static
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
     public function getWallet(): ?Wallet
     {
         return $this->wallet;
@@ -75,14 +96,26 @@ class Operation extends BaseEntity
         return $this;
     }
 
-    public function getCategory(): ?Category
+    public function getSubCategory(): ?SubCategory
     {
-        return $this->category;
+        return $this->subCategory;
     }
 
-    public function setCategory(?Category $category): static
+    public function setSubCategory(?SubCategory $subCategory): static
     {
-        $this->category = $category;
+        $this->subCategory = $subCategory;
+
+        return $this;
+    }
+
+    public function getOutsider(): ?Outsider
+    {
+        return $this->outsider;
+    }
+
+    public function setOutsider(?Outsider $outsider): static
+    {
+        $this->outsider = $outsider;
 
         return $this;
     }

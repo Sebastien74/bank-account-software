@@ -7,6 +7,7 @@ namespace App\Controller\Back\Wallet;
 use App\Controller\BaseController;
 use App\Entity\Wallet\Wallet;
 use App\Form\Type\Wallet\WalletType;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,12 +31,13 @@ class WalletController extends BaseController
      * Wallet index.
      */
     #[Route('/index', name: 'back_wallet_index', methods: 'GET|POST')]
-    public function index(): Response
+    public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des comptes', [], 'back');
+        $this->addBtnLabel = $this->coreLocator->translator()->trans('Ajouter un compte', [], 'back');
         $this->template = 'back/wallet/wallets.html.twig';
 
-        return parent::index();
+        return parent::index($paginator);
     }
 
     /**

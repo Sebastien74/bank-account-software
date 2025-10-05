@@ -1,12 +1,10 @@
 import '../../scss/security/vendor.scss';
 
 /**
- * Security Vendor
- *
- * @copyright 2020
- * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
- * @version 1.0
- * @licence under the MIT License (LICENSE.txt)
+ * Module : Security Vendor
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  *
  *  1 - Preloader
  *  2 - Lazy load

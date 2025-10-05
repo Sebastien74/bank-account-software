@@ -1,52 +1,16 @@
+/**
+ * Module : Back Vendor
+ * Copyright : 2025
+ * Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+ * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+ */
+
 /** Import CSS */
 import '../../scss/back/vendor.scss';
-
-/** Import JS */
 
 document.addEventListener('DOMContentLoaded', function () {
 
     const body = document.body;
-
-    import(/* webpackPreload: true */ './bootstrap/tooltip').then(({default: Tooltip}) => {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
-            if (!tooltip.classList.contains('tooltip-loaded')) {
-                let bsTooltip = new Tooltip(tooltip);
-                tooltip.addEventListener('click', event => {
-                    bsTooltip.update();
-                    bsTooltip.hide();
-                });
-                tooltip.classList.add('tooltip-loaded');
-            }
-        });
-    }).catch(error => console.error(error.message));
-
-    import(/* webpackPreload: true */ './bootstrap/modal').then(({default: Modal}) => {
-        document.querySelectorAll('.modal').forEach(modal => {
-            if (!modal.classList.contains('modal-loaded')) {
-                let bsModal = new Modal(modal);
-                modal.classList.add('modal-loaded');
-                document.querySelectorAll('.btn-form-errors').forEach(btn => {
-                    btn.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
-                });
-            }
-        });
-    }).catch(error => console.error(error.message));
-
-    import(/* webpackPreload: true */ './bootstrap/toast').then(({default: Toast}) => {
-        document.querySelectorAll('.toast').forEach(toast => {
-            if (!toast.classList.contains('toast-loaded')) {
-                let bsToast = new Toast(toast);
-                const toastElList = document.querySelectorAll('.toast');
-                toastElList.forEach(function (el) {
-                    if (!el.classList.contains('always-show')) {
-                        setTimeout(function () {
-                            el.remove();
-                        }, 5000);
-                    }
-                });
-            }
-        });
-    }).catch(error => console.error(error.message));
 
     const togglerNav = document.querySelector('button.nav-toggler-icon-wrap');
     togglerNav.onclick = function (e) {
@@ -55,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         body.classList.toggle('menu-open');
     }
 
+    import('./bootstrap');
+
     const selects = document.querySelectorAll('select');
     if (selects.length > 0) {
         import('./choice').then(({default: Choice}) => {
@@ -62,4 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }).catch(error => console.error(error.message));
     }
 
+    const datepickers = document.querySelectorAll('.js-datepicker');
+    if (datepickers.length > 0) {
+        import('./datepicker').then(({default: Datepicker}) => {
+            new Datepicker(datepickers);
+        }).catch(error => console.error(error.message));
+    }
 });

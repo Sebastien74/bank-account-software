@@ -6,7 +6,11 @@ namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\Operation;
+use App\Form\Manager\GlobalManagerInterface;
+use App\Form\Manager\Wallet\OperationInterface;
 use App\Form\Type\Wallet\OperationType;
+use App\Service\CoreLocatorInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -20,21 +24,35 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/back-%security_token%/wallets/operations', schemes: '%protocol%')]
 class OperationController extends BaseController
 {
+    protected int $paginationLimit = 50;
+    protected bool $forceEntities = true;
+
     protected ?string $pageIcon = 'wallet';
 
     protected ?string $classname = Operation::class;
     protected ?string $formType = OperationType::class;
 
     /**
+     * OperationController constructor.
+     */
+    public function __construct(
+        protected CoreLocatorInterface $coreLocator,
+        protected GlobalManagerInterface $globalFormManager,
+        protected OperationInterface $operation,
+    ) {
+        parent::__construct($coreLocator, $globalFormManager, $operation);
+    }
+
+    /**
      * Operation index.
      */
     #[Route('/index/{wallet}', name: 'back_operation_index', methods: 'GET|POST')]
-    public function index(): Response
+    public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
         $this->template = 'back/wallet/operations.html.twig';
 
-        return parent::index();
+        return parent::index($paginator);
     }
 
     /**
@@ -45,7 +63,7 @@ class OperationController extends BaseController
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
 
-        return parent::index();
+        return parent::edit();
     }
 
     /**
