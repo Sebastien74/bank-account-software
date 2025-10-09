@@ -63,7 +63,7 @@
             }
         }
 
-        &.active {
+        &.active:not(.logout) {
 
             background-color: $purple-600;
             opacity: 1;

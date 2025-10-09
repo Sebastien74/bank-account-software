@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/back-%security_token%/cryptocurrencies/', schemes: '%protocol%')]
 class CryptocurrencyController extends BaseController
 {
-    protected ?string $pageIcon = 'envelope-open-dollar';
+    protected ?string $pageIcon = 'btc';
 
     /**
      * Cryptocurrency index.
@@ -27,7 +27,7 @@ class CryptocurrencyController extends BaseController
     #[Route('index', name: 'back_cryptocurrency_index', methods: 'GET|POST')]
     public function index(PaginatorInterface $paginator): Response
     {
-        $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des budgets', [], 'back');
+        $this->pageTitle = $this->coreLocator->translator()->trans('Cryptomonnaies', [], 'back');
 
         return parent::index($paginator);
     }
