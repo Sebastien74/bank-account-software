@@ -31,7 +31,7 @@
         <env name="DATABASE_URL" value="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=15&amp;charset=utf8"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
         <!-- ###+ symfony/mailer ### -->
-        <!-- MAILER_DSN=null://null -->
+        <env name="MAILER_DSN" value="null://null"/>
         <!-- ###- symfony/mailer ### -->
         <!-- ###+ symfony/framework-bundle ### -->
         <env name="APP_ENV" value="dev"/>
