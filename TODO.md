@@ -77,3 +77,10 @@ https://www.youtube.com/watch?v=vOiQLX5vNFY&t=1s
 https://www.youtube.com/watch?v=CWAmf48cAxA
 
 Faire extraction des trads avec messenger et utiliser Symfony notification pour dire que c'est terminé
+
+php composer.phar recipes:update
+php composer.phar recipes:update
+php composer.phar recipes:update
+php composer.phar recipes:update
+php composer.phar recipes:update
+php composer.phar recipes:update SUR CMS
