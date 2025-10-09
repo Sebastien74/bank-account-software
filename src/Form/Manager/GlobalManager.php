@@ -63,7 +63,7 @@ class GlobalManager implements GlobalManagerInterface
                 $entity->setUpdatedBy($this->coreLocator->user());
             }
             if (is_object($formManager) && method_exists($formManager, 'execute')) {
-                $formManager->execute($entity);
+                $formManager->execute($entity, $this->form);
             }
             $this->coreLocator->em()->persist($entity);
             $this->coreLocator->em()->flush();

@@ -35,7 +35,7 @@ class WalletController extends BaseController
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des comptes', [], 'back');
         $this->addBtnLabel = $this->coreLocator->translator()->trans('Ajouter un compte', [], 'back');
-        $this->template = 'back/wallet/wallets.html.twig';
+        $this->template = 'back/pages/wallets.html.twig';
 
         return parent::index($paginator);
     }

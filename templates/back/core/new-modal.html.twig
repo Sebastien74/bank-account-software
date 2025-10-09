@@ -1,7 +1,5 @@
 {% trans_default_domain 'back' %}
 
-{% set excludes = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
-
 {% if form %}
     <button type="button" class="btn btn-dark p-0 d-flex align-items-center text-white add-btn btn-icon{% if formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
         <i class="icon-plus-circle btn-square bg-primary"></i><span class="btn text-white py-0 px-3">{{ addBtnLabel|striptags }}</span>
@@ -19,7 +17,7 @@
                     <div class="modal-body pt-4 pb-0">
                         <div class="row">
                             {% for field in form.children %}
-                                {% set notExcluded = field.vars.name not in excludes %}
+                                {% set notExcluded = field.vars.name not in excludedFields %}
                                 {% if notExcluded %}
                                     {{ form_row(form[field.vars.name]) }}
                                 {% endif %}

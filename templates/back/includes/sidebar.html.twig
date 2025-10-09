@@ -49,6 +49,15 @@
                 </a>
             </li>
             <li class="nav-item d-flex">
+                {% set active = 'objectives' in app.request.uri %}
+                <a href="{{ path('back_cryptocurrency_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
+                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">
+                        <i class="icon-icon-btc"></i>
+                    </span>
+                    {{ "Cryptomonnaies"|trans|raw }}
+                </a>
+            </li>
+            <li class="nav-item d-flex">
                 {% set active = 'categories' in app.request.uri %}
                 <a href="{{ path('back_operationtype_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">
                     <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">

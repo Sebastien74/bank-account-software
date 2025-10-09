@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form\Manager\Wallet;
 
 use App\Entity\Wallet\Operation;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * OperationInterface.
@@ -13,5 +14,5 @@ use App\Entity\Wallet\Operation;
  */
 interface OperationInterface
 {
-    public function execute(Operation $operation): void;
+    public function execute(Operation $operation, FormInterface $form): void;
 }

@@ -1,0 +1,9 @@
+{% trans_default_domain 'back' %}
+
+{% set btnColor = btnColor is defined and btnColor ? btnColor : 'primary' %}
+{% set route = 'back_'~interface.name~'_edit' %}
+{% set routeArgs = route|routeArgs(entity) %}
+<a href="{{ path(route, routeArgs) }}" class="btn btn-{{ btnColor }} btn-square small-btn p-0 me-3 d-inline-flex justify-content-center align-items-center"
+   data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
+    <i class="icon-pencil text-white"></i>
+</a>

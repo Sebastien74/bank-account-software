@@ -3,14 +3,17 @@
 {% trans_default_domain 'back' %}
 
 {% block stylesheets %}
+    {{ parent() }}
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
 {% endblock %}
 
 {% block body %}
     <div id="entities-index-page" class="container-fluid pt-4 pb-5 position-relative">
         {% include 'back/core/new-modal.html.twig' with {
+            excludedFields: excludedFields,
             addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
             form: form is defined and form ? form : false,
             formErrors: formErrors is defined and formErrors ? formErrors : false,
@@ -44,13 +47,8 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end px-4">
-                                    {% set route = 'back_'~interface.name~'_edit' %}
-                                    {% set routeArgs = route|routeArgs(entity) %}
-                                    <a href="{{ path(route, routeArgs) }}" class="btn btn-primary btn-square small-btn p-0 me-3 d-inline-flex justify-content-center align-items-center"
-                                       data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
-                                        <i class="icon-pencil text-white"></i>
-                                    </a>
-                                    {% include 'back/core/delete-modal.html.twig' %}
+                                    {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity} only %}
+                                    {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
                                 </td>
                             </tr>
                         {% endfor %}

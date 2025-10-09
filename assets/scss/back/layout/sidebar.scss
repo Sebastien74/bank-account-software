@@ -49,11 +49,10 @@
 
             span {
                 transition: all .3s ease-in-out;
-                background-color: $purple-600;
             }
         }
 
-        &:hover:not(.active) {
+        &:hover:not(.active):not(.logout) {
 
             background-color: $purple-800;
             opacity: 1;
@@ -75,12 +74,19 @@
             }
         }
 
+        &:not(.logout) span {
+            background-color: $purple-600;
+        }
+
+        &.logout span {
+            background-color: $danger;
+        }
+
         span {
             width: 37px;
             height: 37px;
             border-radius: 50%;
             aspect-ratio: 1;
-            background-color: $purple-600;
         }
 
         &:hover {

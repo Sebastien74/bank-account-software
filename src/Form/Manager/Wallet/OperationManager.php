@@ -8,6 +8,7 @@ use App\Entity\Wallet\Operation;
 use App\Entity\Wallet\Outsider;
 use App\Service\CoreLocatorInterface;
 use App\Service\Urlizer;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * OperationManager.
@@ -23,27 +24,26 @@ class OperationManager implements OperationInterface
     {
     }
 
-    public function execute(Operation $operation): void
+    public function execute(Operation $operation, FormInterface $form): void
     {
-        if (!$operation->getOutsider() && $operation->getAdminName()) {
+        $adminName = $form->get('adminName')->getData();
+        if ($adminName) {
             $position = count($this->coreLocator->em()->getRepository(Outsider::class)->findBy([
                 'createdBy' => $this->coreLocator->user()
             ])) + 1;
             $outsider = $this->coreLocator->em()->getRepository(Outsider::class)->findOneBy([
                 'createdBy' => $this->coreLocator->user(),
-                'adminName' => $operation->getAdminName(),
+                'adminName' => $adminName,
             ]);
-            if ($outsider) {
-                $operation->setOutsider($outsider);
-            } else {
+            if (!$outsider) {
                 $outsider = new Outsider();
-                $outsider->setAdminName($operation->getAdminName());
-                $outsider->setSlug(Urlizer::urlize($operation->getAdminName()));
+                $outsider->setAdminName($adminName);
+                $outsider->setSlug(Urlizer::urlize($adminName));
                 $outsider->setCreatedBy($this->coreLocator->user());
                 $outsider->setPosition($position);
                 $this->coreLocator->em()->persist($outsider);
-                $this->coreLocator->em()->flush();
             }
+            $operation->setOutsider($outsider);
         }
     }
 }

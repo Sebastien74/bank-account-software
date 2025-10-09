@@ -1,0 +1,141 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'back' %}
+
+{% import _self as macro %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('back-operations', null, 'back', {nonce: csp_nonce()}) }}
+    <link rel="modulepreload" href="{{ preload(asset('build/back/back-operations.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('back-operations', null, 'back', {defer: true, nonce: csp_nonce()}) }}
+{% endblock %}
+
+{% macro sort(wallet, label, sort, date) %}
+    <div class="d-flex w-100 align-items-center">
+        <span class="th-label me-3">{{ label|striptags }}</span>
+        <span class="sort-controls ms-auto" role="group" aria-label="Trier la colonne Tiers">
+            <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'asc'}) }}"
+               class="sort sort-asc{% if ('asc' == app.request.get('order') and sort == app.request.get('sort')) or (not app.request.get('sort') and 'dt' == sort) %} is-active{% endif %}"
+               data-bs-toggle="tooltip"
+               data-bs-title="{{ "Trier par ordre croissant"|trans|striptags }}"
+               aria-label="{{ "Trier par ordre croissant"|trans|striptags }}">
+            </a>
+            <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'desc'}) }}"
+               class="sort sort-desc{% if 'desc' == app.request.get('order') and sort == app.request.get('sort') %} is-active{% endif %}"
+               data-bs-toggle="tooltip"
+               data-bs-title="{{ "Trier par ordre décroissant"|trans|striptags }}"
+               aria-label="{{ "Trier par ordre décroissant"|trans|striptags }}">
+            </a>
+        </span>
+    </div>
+{% endmacro %}
+
+{% block body %}
+
+    <div id="operations-index" class="container-fluid pt-4 pb-5 position-relative">
+
+        <div class="top d-flex align-items-center">
+            {% include 'back/core/new-modal.html.twig' with {
+                excludedFields: excludedFields,
+                addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+                form: form is defined and form ? form : false,
+                formErrors: formErrors is defined and formErrors ? formErrors : false,
+            } only %}
+            <div class="dates-controls d-flex align-items-center ms-4">
+                <a href="{{ path('back_operation_index', {wallet: wallet.id, month: previousMonth, year: previousYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
+                   class="icon-wrap prev bg-dark d-flex align-items-center justify-content-center h-100"
+                   data-bs-toggle="tooltip"
+                   data-bs-title="{{ "Mois précedent"|trans|striptags }}">
+                    <i class="icon-chevron-left text-white"></i>
+                </a>
+                <span class="date bg-dark d-flex align-items-center justify-content-center px-3 h-100"><span class="text-white">{{ date|format_datetime(pattern="MMMM Y"|trans, locale=app.request.locale)|capitalize }}</span></span>
+                <div class="years-controls d-flex flex-column">
+                    <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: nextYear - 1, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
+                       class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="{{ "Année précedente"|trans|striptags }}">
+                        <i class="icon-chevron-up text-white"></i>
+                    </a>
+                    <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: nextYear + 1, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
+                       class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="{{ "Année suivante"|trans|striptags }}">
+                        <i class="icon-chevron-down text-white"></i>
+                    </a>
+                </div>
+                <a href="{{ path('back_operation_index', {wallet: wallet.id, month: nextMonth, year: nextYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
+                   class="icon-wrap next bg-dark d-flex align-items-center justify-content-center h-100"
+                   data-bs-toggle="tooltip"
+                   data-bs-title="{{ "Mois suivant"|trans|striptags }}">
+                    <i class="icon-chevron-right text-white"></i>
+                </a>
+                {% set asCurrent = (app.request.get('year') == 'now'|date('Y') and app.request.get('month') == 'now'|date('m')) or (not app.request.get('month') and not app.request.get('year')) %}
+                {% if not asCurrent %}
+                    <a href="{{ path('back_operation_index', {wallet: wallet.id, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
+                       class="icon-wrap now bg-primary d-flex align-items-center justify-content-center h-100 ms-2"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="{{ "Mois en cours"|trans|striptags }}">
+                        <i class="icon-calendar-star text-white"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <table class="table mt-4 table-dark table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Date'|trans, 'dt', date) }}</th>
+                    <th scope="col" class="th-sortable bg-black text-center px-3">{{ macro.sort(wallet, 'État'|trans, 'pt', date) }}</th>
+                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Catégorie'|trans, 'ct', date) }}</th>
+                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Tiers'|trans, 'os', date) }}</th>
+                    <th scope="col" class="th-sortable bg-black px-3 text-end">{{ macro.sort(wallet, 'Montant'|trans, 'at', date) }}</th>
+                    <th scope="col" class="text-end bg-black px-3">{{ "Solde"|trans|striptags }}</th>
+                    <th scope="col" class="text-end bg-black"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entity in pagination %}
+                    <tr>
+                        <td class="align-middle px-3">{% if entity.date %}{{ entity.date|format_datetime(pattern="dd/M/Y"|trans, locale=app.request.locale) }}{% endif %}</td>
+                        <td class="align-middle px-3 text-center">
+                            <div class="form-check">
+                                <label class="form-check-label" for="checkDefault">
+                                <input class="form-check-input" type="checkbox" value="" id="checkDefault">
+                                    Default checkbox
+                                </label>
+                            </div>
+                        </td>
+                        <td class="align-middle px-3">{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
+                        <td class="align-middle px-3">{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</td>
+                        <td class="text-end align-middle px-3">{% if entity.amount %}{{ entity.amount|number_format(2) }}{% endif %}</td>
+                        <td class="text-end align-middle px-3">
+                            {% if wallet.currentOperations[entity.id].balance is defined %}
+                                {{ wallet.currentOperations[entity.id].balance }}
+                            {% endif %}
+                        </td>
+                        <td class="text-end align-middle">
+                            {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity, btnColor: 'transparent'} only %}
+                            {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if pagination is empty %}
+            {% include 'back/includes/alert.html.twig' with {
+                display: 'alert',
+                size: 'small',
+                alert: 'info',
+                message: 'Aucune opération.'
+            } only %}
+        {% endif %}
+
+    </div>
+
+{% endblock %}

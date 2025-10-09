@@ -61,17 +61,18 @@ class OperationType extends AbstractType
             'choice_label' => function ($entity) {
                 return strip_tags($entity->getAdminName());
             },
-            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-5'],
         ]);
 
         $builder->add('adminName', Type\TextType::class, [
             'label_html' => true,
             'required' => false,
+            'mapped' => false,
             'label' => $this->translator->trans('Nouveau tiers', [], 'back'),
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un tiers', [], 'back'),
             ],
-            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-7'],
         ]);
 
         $builder->add('date', Type\DateType::class, [
@@ -116,6 +117,9 @@ class OperationType extends AbstractType
             'choice_label' => function ($entity) {
                 return strip_tags($entity->getAdminName());
             },
+            'constraints' => [
+                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez sélectionne une catégorie.', [], 'back'),]),
+            ],
         ]);
 
         $save = new SubmitType($this->coreLocator);

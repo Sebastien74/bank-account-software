@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler;
 
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;

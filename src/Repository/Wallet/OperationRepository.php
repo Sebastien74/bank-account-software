@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace App\Repository\Wallet;
 
 use App\Entity\Wallet\Operation;
+use App\Entity\Wallet\Wallet;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * OperationRepository.
@@ -23,5 +28,132 @@ class OperationRepository extends ServiceEntityRepository
     public function __construct(private readonly ManagerRegistry $registry)
     {
         parent::__construct($this->registry, Operation::class);
+    }
+
+    /**
+     * sumBalance.
+     *
+     * @throws NonUniqueResultException|NoResultException|Exception
+     */
+    public function sumBalance(Wallet $wallet, bool $pointed = false, ?\DateTimeInterface $limitDate = null): ?float
+    {
+        $initial = $wallet->getInitialAmount() ?? 0;
+
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sc')
+            ->andWhere('o.wallet = :wallet')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('initial', $initial)
+            ->select("
+                (
+                    COALESCE(SUM(
+                        CASE WHEN sc.type = 'incomes' THEN o.amount
+                             ELSE (0 - o.amount)
+                        END
+                    ), 0)
+                    + :initial
+                ) AS balance
+            ");
+
+        if ($pointed) {
+            $qb->andWhere('o.pointed = :pointed')
+                ->setParameter('pointed', true);
+        }
+
+        if ($limitDate instanceof DateTimeInterface) {
+            $limitDate  = (new \DateTimeImmutable($limitDate->format('Y-m-01 00:00:00'), new \DateTimeZone('UTC')));
+            $qb->andWhere('o.date < :end')
+                ->setParameter('end', $limitDate, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE);
+        }
+
+        $balance = $qb->getQuery()->getSingleScalarResult();
+
+        return floatval($balance);
+    }
+
+    /**
+     * sumPerMonthNet.=
+     *
+     * @throws Exception
+     */
+    public function sumPerMonth(
+        Wallet $wallet,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        ?\DateTimeZone $tz = null
+    ): array
+    {
+        $results = [];
+        $tz ??= new \DateTimeZone('UTC');
+        $cursor = (new \DateTimeImmutable($from->format('Y-m-01 00:00:00'), $tz));
+        $limit  = (new \DateTimeImmutable($to->format('Y-m-01 00:00:00'), $tz));
+
+        while ($cursor < $limit) {
+            $next = $cursor->modify('first day of next month')->setTime(0, 0, 0);
+            $qb = $this->createQueryBuilder('o')
+                ->leftJoin('o.subCategory', 'sc')
+                ->andWhere('o.wallet = :wallet')->setParameter('wallet', $wallet)
+                ->andWhere('o.date IS NOT NULL')
+                ->andWhere('o.date >= :start')->setParameter('start', $cursor, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+                ->andWhere('o.date < :end')->setParameter('end', $next, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+                ->andWhere('sc.type = :type')->setParameter('type', 'expenses')
+                ->select('COALESCE(SUM(o.amount), 0)');
+            $total = (string) $qb->getQuery()->getSingleScalarResult();
+            $results[] = [
+                'period' => $cursor->format('Y-m'),
+                'total'  => floatval($total),
+            ];
+            $cursor = $next;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Find Operation by month and year.
+     *
+     * @throws Exception
+     */
+    public function findByYearMonth(
+        string $year,
+        string $month,
+        string $sort = 'date',
+        string $order = 'ASC',
+        ?\DateTimeZone $tz = null): array
+    {
+        if (!preg_match('/^(0[1-9]|1[0-2])$/', $month)) {
+            throw new \InvalidArgumentException('Invalid month format, expected "01".."12".');
+        }
+        if (!preg_match('/^\d{4}$/', $year)) {
+            throw new \InvalidArgumentException('Invalid year format, expected "YYYY".');
+        }
+
+        $tz ??= new \DateTimeZone('UTC');
+        $start = (new \DateTimeImmutable("$year-$month-01 00:00:00", $tz));
+        $nextStart = $start->modify('first day of next month')->setTime(0, 0, 0);
+
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sb')
+            ->leftJoin('o.outsider', 'os')
+            ->andWhere('o.date IS NOT NULL')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date < :end')
+            ->setParameter('start', $start, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->setParameter('end', $nextStart, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->addSelect('sb')
+            ->addSelect('os');
+
+        $sort = 'dt' === $sort ? 'date' : ('pt' === $sort ? 'pointed': ('ct' === $sort ? 'category' : ('os' === $sort ? 'outsider' : ('at' === $sort ? 'amount' : $sort))));
+        $order = strtoupper($order);
+
+        if ('date' === $sort or 'amount' === $sort or 'pointed' === $sort) {
+            $qb->orderBy('o.'.$sort, $order);
+        } elseif ('category' === $sort) {
+            $qb->orderBy('sb.adminName', $order);
+        } elseif ('outsider' === $sort) {
+            $qb->orderBy('os.adminName', $order);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

@@ -2,6 +2,7 @@
 
 {% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'wallet' %}
 {% set pageTitle = pageTitle is defined and pageTitle ? pageTitle : "Mes comptes"|trans %}
+{% set excludedFields = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
 
 <!doctype html>
 <html lang="{{ app.request.locale }}" data-bs-theme="auto">
@@ -18,8 +19,11 @@
         <meta name="apple-mobile-web-app-title" content="{{ companyName|striptags }}" />
         <link rel="manifest" href="{{ asset('site.webmanifest') }}" />
         <link rel="canonical" href="{{ app.request.uri }}" />
-        {{ encore_entry_link_tags('back-vendor', null, 'back', {nonce: csp_nonce()}) }}
         <meta name="theme-color" content="#712cf9" />
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('back-vendor', null, 'back', {nonce: csp_nonce()}) }}
+            <link rel="modulepreload" href="{{ preload(asset('build/back/back-vendor.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">
+        {% endblock %}
     </head>
     <body>
         {% include 'back/includes/flashbag.html.twig' %}
@@ -39,7 +43,9 @@
                 </div>
             </main>
         </div>
-        {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: false, nonce: csp_nonce()}) }}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: true, nonce: csp_nonce()}) }}
+        {% endblock %}
         {% set formatDate = app.request.locale|formatDate %}
         <div id="data-translation" class="d-none"
              data-search="{{ "Chercher"|trans|striptags }}"

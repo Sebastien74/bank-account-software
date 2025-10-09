@@ -25,6 +25,10 @@
     font-size: 17px;
 }
 
+.icon-btc:before {
+    content: "\e91a";
+}
+
 .icon-bug:before {
     content: "\e912";
 }
@@ -33,12 +37,32 @@
     content: "\e90e";
 }
 
+.icon-calendar-star:before {
+    content: "\e917";
+}
+
 .icon-chart-bar:before {
     content: "\e90f";
 }
 
 .icon-check:before {
     content: "\e900";
+}
+
+.icon-chevron-down:before {
+    content: "\e918";
+}
+
+.icon-chevron-left:before {
+    content: "\e913";
+}
+
+.icon-chevron-right:before {
+    content: "\e914";
+}
+
+.icon-chevron-up:before {
+    content: "\e919";
 }
 
 .icon-cog:before {
@@ -91,6 +115,14 @@
 
 .icon-tachometer-alt:before {
     content: "\e90b";
+}
+
+.icon-times:before {
+    content: "\e915";
+}
+
+.icon-times-circle:before {
+    content: "\e916";
 }
 
 .icon-trash:before {

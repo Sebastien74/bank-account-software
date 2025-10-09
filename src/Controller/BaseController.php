@@ -113,7 +113,7 @@ abstract class BaseController extends AbstractController
         $paginator = $paginator->paginate(
             $this->entities,
             $this->coreLocator->request()->query->getInt('page', 1),
-            $limit,
+            -1 === $limit ? 1000000000 : $limit,
             ['wrap-queries' => true]
         );
 
@@ -138,7 +138,7 @@ abstract class BaseController extends AbstractController
             $this->breadcrumb();
         }
 
-        return [
+        return array_merge($this->arguments, [
             'companyName' => $_ENV['APP_COMPANY_NAME'],
             'securityKey' => $_ENV['SECRET_KEY'],
             'inAdmin' => $this->coreLocator->inAdmin(),
@@ -152,7 +152,7 @@ abstract class BaseController extends AbstractController
             'pageTitle' => $this->pageTitle,
             'pageIcon' => $this->pageIcon,
             'breadcrumb' => $this->breadcrumb,
-        ];
+        ]);
     }
 
     /**

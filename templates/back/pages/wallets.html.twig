@@ -2,17 +2,18 @@
 
 {% trans_default_domain 'back' %}
 
-{% set excludes = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
-
 {% block stylesheets %}
+    {{ parent() }}
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
 {% endblock %}
 
 {% block body %}
     <div id="wallets-dashboard" class="container-fluid pt-4 pb-5 position-relative">
         {% include 'back/core/new-modal.html.twig' with {
+            excludedFields: excludedFields,
             addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
             form: form is defined and form ? form : false,
             formErrors: formErrors is defined and formErrors ? formErrors : false,

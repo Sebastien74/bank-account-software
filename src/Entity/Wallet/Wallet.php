@@ -28,6 +28,9 @@ class Wallet extends BaseEntity
         'name' => 'wallet',
     ];
 
+    #[ORM\Column(type: 'float')]
+    private ?float $initialAmount = null;
+
     #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: Operation::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['date' => 'DESC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
@@ -39,6 +42,18 @@ class Wallet extends BaseEntity
     public function __construct()
     {
         $this->operations = new ArrayCollection();
+    }
+
+    public function getInitialAmount(): ?float
+    {
+        return $this->initialAmount;
+    }
+
+    public function setInitialAmount(float $initialAmount): static
+    {
+        $this->initialAmount = $initialAmount;
+
+        return $this;
     }
 
     /**

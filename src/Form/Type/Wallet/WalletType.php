@@ -47,6 +47,18 @@ class WalletType extends AbstractType
             'row_attr' => ['class' => 'col-12'],
         ]);
 
+        $builder->add('initialAmount', Type\NumberType::class, [
+            'label_html' => true,
+            'label' => $this->translator->trans('Montant initial', [], 'back'),
+            'attr' => [
+                'placeholder' => $this->translator->trans('Saisissez un montant', [], 'back'),
+            ],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'constraints' => [
+                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un montant.', [], 'back'),]),
+            ],
+        ]);
+
         $save = new SubmitType($this->coreLocator);
         $save->add($builder);
     }

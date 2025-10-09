@@ -6,11 +6,15 @@ namespace App\Controller\Back\Wallet;
 
 use App\Controller\BaseController;
 use App\Entity\Wallet\Operation;
+use App\Entity\Wallet\Wallet;
 use App\Form\Manager\GlobalManagerInterface;
 use App\Form\Manager\Wallet\OperationInterface;
 use App\Form\Type\Wallet\OperationType;
+use App\Model\Wallet\WalletModel;
 use App\Service\CoreLocatorInterface;
+use Exception;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -24,7 +28,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/back-%security_token%/wallets/operations', schemes: '%protocol%')]
 class OperationController extends BaseController
 {
-    protected int $paginationLimit = 50;
+    protected int $paginationLimit = -1;
     protected bool $forceEntities = true;
 
     protected ?string $pageIcon = 'wallet';
@@ -45,12 +49,34 @@ class OperationController extends BaseController
 
     /**
      * Operation index.
+     *
+     * @throws Exception
      */
     #[Route('/index/{wallet}', name: 'back_operation_index', methods: 'GET|POST')]
     public function index(PaginatorInterface $paginator): Response
     {
-        $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
-        $this->template = 'back/wallet/operations.html.twig';
+        $this->template = 'back/pages/operations.html.twig';
+        $wallet = $this->coreLocator->em()->getRepository(Wallet::class)->find($this->coreLocator->request()->get('wallet'));
+
+        $yearRequest = $this->coreLocator->request()->get('year');
+        $monthRequest = $this->coreLocator->request()->get('month');
+        $date = $this->arguments['date'] = $yearRequest && $monthRequest ? new \DateTime($yearRequest.'/'.$monthRequest.'/01')
+            : new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+        $this->arguments['currentYear'] = $year = !$this->coreLocator->request()->get('year') ? $date->format('Y') : $this->coreLocator->request()->get('year');
+        $this->arguments['currentMonth'] = $month = !$this->coreLocator->request()->get('month') ? $date->format('m') : $this->coreLocator->request()->get('month');
+        $prev = (clone $date)->modify('first day of last month');
+        $next = (clone $date)->modify('first day of next month');
+        $this->arguments['previousYear']  = $prev->format('Y');
+        $this->arguments['previousMonth'] = $prev->format('m');
+        $this->arguments['nextYear']  = $next->format('Y');
+        $this->arguments['nextMonth'] = $next->format('m');
+
+        $sort = $this->arguments['sort'] = !$this->coreLocator->request()->get('sort') ? 'date' : $this->coreLocator->request()->get('sort');
+        $order = $this->arguments['order'] = !$this->coreLocator->request()->get('order') ? 'ASC' : $this->coreLocator->request()->get('order');
+
+        $this->entities = $this->coreLocator->em()->getRepository(Operation::class)->findByYearMonth($year, $month, $sort, $order, new \DateTimeZone('Europe/Paris'));
+        $this->arguments['wallet'] = $wallet = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);
+        $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations :', [], 'back').' '.$wallet->title;
 
         return parent::index($paginator);
     }
@@ -64,6 +90,15 @@ class OperationController extends BaseController
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
 
         return parent::edit();
+    }
+
+    /**
+     * Operation delete.
+     */
+    #[Route('/delete/{operation}', name: 'back_operation_delete', methods: 'GET')]
+    public function delete(Operation $operation): RedirectResponse
+    {
+        return $this->redirect($this->globalFormManager->delete($operation));
     }
 
     /**

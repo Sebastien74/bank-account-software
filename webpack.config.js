@@ -41,6 +41,7 @@ Encore.reset();
 Encore.setOutputPath('public/build/back')
     .setPublicPath('/build/back')
     .addEntry('back-vendor', './assets/js/back/vendor.js')
+    .addEntry('back-operations', './assets/js/back/operations.js')
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(enableSourceMaps)
     .enableVersioning(enableVersioning)

@@ -67,3 +67,8 @@ Responsive parfait même les forms
 Loader forms
 
 CMS : Reprendre le style alert et le tableau dans twig pour alléger le css Front back etc
+
+Faire des modal edit plutot qu'une page et récuprer la modal new pour faire ça
+
+
+UNIFORMISATION DES MEDIAS DANS CARD CMS VOIR LE CERCLE
