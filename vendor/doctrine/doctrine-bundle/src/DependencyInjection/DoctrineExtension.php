@@ -58,6 +58,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -82,12 +83,15 @@ use function array_values;
 use function assert;
 use function class_exists;
 use function dirname;
+use function file_get_contents;
 use function glob;
 use function in_array;
 use function interface_exists;
 use function is_bool;
 use function is_dir;
 use function method_exists;
+use function preg_match;
+use function preg_quote;
 use function realpath;
 use function reset;
 use function sprintf;
@@ -127,9 +131,11 @@ class DoctrineExtension extends Extension
     /**
      * @param array<string, mixed> $objectManager A configured object manager
      *
+     * @return void
+     *
      * @throws InvalidArgumentException
      */
-    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container): void
+    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
@@ -183,7 +189,7 @@ class DoctrineExtension extends Extension
                     continue;
                 }
             } elseif (! $mappingConfig['type']) {
-                $mappingConfig['type'] = 'attribute';
+                $mappingConfig['type'] = $this->detectMappingType($mappingConfig['dir'], $container);
             }
 
             $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
@@ -198,8 +204,10 @@ class DoctrineExtension extends Extension
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
      *
      * @param array<string, mixed> $mappingConfig
+     *
+     * @return void
      */
-    protected function setMappingDriverAlias(array $mappingConfig, string $mappingName): void
+    protected function setMappingDriverAlias(array $mappingConfig, string $mappingName)
     {
         if (isset($mappingConfig['alias'])) {
             $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
@@ -213,9 +221,11 @@ class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $mappingConfig
      *
+     * @return void
+     *
      * @throws InvalidArgumentException
      */
-    protected function setMappingDriverConfig(array $mappingConfig, string $mappingName): void
+    protected function setMappingDriverConfig(array $mappingConfig, string $mappingName)
     {
         $mappingDirectory = $mappingConfig['dir'];
         if (! is_dir($mappingDirectory)) {
@@ -255,7 +265,7 @@ class DoctrineExtension extends Extension
         }
 
         if (! $bundleConfig['dir']) {
-            if (in_array($bundleConfig['type'], ['staticphp', 'attribute'])) {
+            if (in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
                 $bundleConfig['dir'] = $bundleClassDir . '/' . $this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir . '/' . $this->getMappingResourceConfigDirectory($bundleDir);
@@ -275,8 +285,10 @@ class DoctrineExtension extends Extension
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
      * @param array<string, mixed> $objectManager
+     *
+     * @return void
      */
-    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
+    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container)
     {
         // configure metadata driver for each bundle based on the type of mapping files found
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
@@ -290,7 +302,12 @@ class DoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args             = $mappingDriverDef->getArguments();
-                $args[0]          = array_merge(array_values($driverPaths), $args[0]);
+                if ($driverType === 'attribute') {
+                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
+                } else {
+                    $args[0] = array_merge(array_values($driverPaths), $args[0]);
+                }
+
                 $mappingDriverDef->setArguments($args);
             } else {
                 $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
@@ -321,9 +338,11 @@ class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $mappingConfig
      *
+     * @return void
+     *
      * @throws InvalidArgumentException
      */
-    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
+    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName)
     {
         if (! $mappingConfig['type'] || ! $mappingConfig['dir'] || ! $mappingConfig['prefix']) {
             throw new InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
@@ -333,8 +352,8 @@ class DoctrineExtension extends Extension
             throw new InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (! in_array($mappingConfig['type'], ['xml', 'yml', 'php', 'staticphp', 'attribute'])) {
-            throw new InvalidArgumentException(sprintf('Can only configure "xml", "yml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
+        if (! in_array($mappingConfig['type'], ['xml', 'yml', 'annotation', 'php', 'staticphp', 'attribute'])) {
+            throw new InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
         }
     }
 
@@ -361,8 +380,9 @@ class DoctrineExtension extends Extension
 
             $container->fileExists($resource, false);
 
-            if ($container->fileExists($dir . '/' . $this->getMappingObjectDefaultName(), false)) {
-                return 'attribute';
+            $discoveryPath = $dir . '/' . $this->getMappingObjectDefaultName();
+            if ($container->fileExists($discoveryPath, false)) {
+                 return $this->detectMappingType($discoveryPath, $container);
             }
 
             return null;
@@ -371,6 +391,42 @@ class DoctrineExtension extends Extension
         $container->fileExists($dir . '/' . $configPath, false);
 
         return $driver;
+    }
+
+    /**
+     * Detects what mapping type to use for the supplied directory.
+     *
+     * @return string A mapping type 'attribute' or 'annotation'
+     */
+    private function detectMappingType(string $directory, ContainerBuilder $container): string
+    {
+        $type = 'attribute';
+
+        $glob = new GlobResource($directory, '*', true);
+        $container->addResource($glob);
+
+        $quotedMappingObjectName = preg_quote($this->getMappingObjectDefaultName(), '/');
+
+        foreach ($glob as $file) {
+            $content = file_get_contents((string) $file);
+
+            if (
+                preg_match('/^#\[.*' . $quotedMappingObjectName . '\b/m', $content)
+                || preg_match('/^#\[.*Embeddable\b/m', $content)
+            ) {
+                break;
+            }
+
+            if (
+                preg_match('/^(?: \*|\/\*\*) @.*' . $quotedMappingObjectName . '\b/m', $content)
+                || preg_match('/^(?: \*|\/\*\*) @.*Embeddable\b/m', $content)
+            ) {
+                $type = 'annotation';
+                break;
+            }
+        }
+
+        return $type;
     }
 
     /**
