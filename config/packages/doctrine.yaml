@@ -11,12 +11,11 @@ doctrine:
                     collate: utf8mb4_general_ci
                 #server_version: '15'
                 profiling_collect_backtrace: '%kernel.debug%'
+                use_savepoints: true
 #                platform_service: 'mmi.dbal.mysql_platform'
 
     orm:
         default_entity_manager: default
-        controller_resolver:
-            auto_mapping: false
         entity_managers:
             default:
                 query_cache_driver:
@@ -24,8 +23,12 @@ doctrine:
                     pool: doctrine.query_cache_pool
                 connection: default
                 report_fields_where_declared: true
-                naming_strategy: doctrine.orm.naming_strategy.default
+#                naming_strategy: doctrine.orm.naming_strategy.default
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
                 auto_mapping: true
+                validate_xml_mapping: true
+                identity_generation_preferences:
+                    Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
                 mappings:
                     App:
                         type: attribute
@@ -41,6 +44,8 @@ doctrine:
 #                        # https://github.com/oroinc/doctrine-extensions
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
+        controller_resolver:
+            auto_mapping: false
 
 when@test:
     doctrine:
