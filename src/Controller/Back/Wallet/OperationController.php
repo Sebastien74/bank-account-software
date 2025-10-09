@@ -14,7 +14,9 @@ use App\Model\Wallet\WalletModel;
 use App\Service\CoreLocatorInterface;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -90,6 +92,19 @@ class OperationController extends BaseController
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
 
         return parent::edit();
+    }
+
+    /**
+     * Operation pointed.
+     */
+    #[Route('/pointed/{operation}', name: 'back_operation_pointed', methods: 'POST')]
+    public function pointed(Request $request, Operation $operation): JsonResponse
+    {
+        $operation->setPointed((bool) $request->get('status'));
+        $this->coreLocator->em()->persist($operation);
+        $this->coreLocator->em()->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**

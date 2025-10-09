@@ -12,8 +12,6 @@
 
 #### Preprod:
 
-#### Bundles Packagist : https://packagist.org/users/seybi74/packages
-
 ---
 
 ### Getting started

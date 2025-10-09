@@ -1,10 +1,12 @@
 {% trans_default_domain 'back' %}
 
+{% set asBtn = asBtn is defined ? asBtn : true %}
+
 <span data-bs-toggle="tooltip" data-bs-title="{{ "Supprimer"|trans|striptags }}">
-    <button class="btn btn-transparent p-0 d-inline-flex justify-content-center align-items-center me-1"
+    <span class="{% if asBtn %}btn btn-transparent {% endif %}delete-btn p-0 d-inline-flex justify-content-center align-items-center me-1 cursor"
             data-bs-toggle="modal" data-bs-target="#delete-modal-{{ entity.id }}">
         <i class="icon-trash text-danger"></i>
-    </button>
+    </span>
 </span>
 
 <div class="modal fade" id="delete-modal-{{ entity.id }}" tabindex="-1" aria-hidden="true">

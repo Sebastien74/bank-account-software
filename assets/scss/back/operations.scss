@@ -161,4 +161,30 @@
             }
         }
     }
+
+    .form-check  {
+
+        display: block;
+        min-height: initial;
+        padding-left: initial;
+        margin: 0;
+        width: 14px;
+        height: 14px;
+
+        label {
+            top: 3px;
+        }
+
+        .form-check-input {
+            margin: 0 0 0 0;
+            float: initial;
+        }
+    }
+
+    .edit-btn,
+    .delete-btn {
+        i {
+            font-size: 14px;
+        }
+    }
 }

@@ -34,4 +34,14 @@ document.addEventListener('DOMContentLoaded', function () {
             new Datepicker(datepickers);
         }).catch(error => console.error(error.message));
     }
+
+    document.querySelectorAll('.checkbox-ajax').forEach(el => {
+        el.addEventListener('change', () => {
+            const checked = el.checked ? '1' : '0';
+            const form = el.closest('form');
+            const xHttp = new XMLHttpRequest();
+            xHttp.open('POST', form.getAttribute('action') + '?status=' + checked, true);
+            xHttp.send(new FormData(form));
+        });
+    });
 });

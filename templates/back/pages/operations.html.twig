@@ -103,12 +103,13 @@
                     <tr>
                         <td class="align-middle px-3">{% if entity.date %}{{ entity.date|format_datetime(pattern="dd/M/Y"|trans, locale=app.request.locale) }}{% endif %}</td>
                         <td class="align-middle px-3 text-center">
-                            <div class="form-check">
-                                <label class="form-check-label" for="checkDefault">
-                                <input class="form-check-input" type="checkbox" value="" id="checkDefault">
-                                    Default checkbox
-                                </label>
-                            </div>
+                            <form action="{{ path('back_operation_pointed', {operation: entity.id}) }}" class="d-inline-flex">
+                                <div class="form-check">
+                                    <label class="form-check-label position-relative" for="pointed-{{ entity.id }}">
+                                        <input class="form-check-input checkbox-ajax" type="checkbox" value="{{ entity.pointed }}" id="pointed-{{ entity.id }}" {% if entity.pointed %} checked{% endif %}>
+                                    </label>
+                                </div>
+                            </form>
                         </td>
                         <td class="align-middle px-3">{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
                         <td class="align-middle px-3">{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</td>
@@ -119,8 +120,8 @@
                             {% endif %}
                         </td>
                         <td class="text-end align-middle">
-                            {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity, btnColor: 'transparent'} only %}
-                            {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
+                            {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity, asBtn: false} only %}
+                            {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity, asBtn: false} only %}
                         </td>
                     </tr>
                 {% endfor %}
