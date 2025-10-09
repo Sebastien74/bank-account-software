@@ -35,7 +35,9 @@
         <!-- ###- symfony/mailer ### -->
         <!-- ###+ symfony/framework-bundle ### -->
         <env name="APP_ENV" value="dev"/>
-        <env name="APP_SECRET" value="d943448f27e6fcbbdb2adf949bd026df"/>
+
+        <env name="APP_SECRET" value=""/>
+
         <!-- ###- symfony/framework-bundle ### -->
 
         <!-- ###+ symfony/messenger ### -->
