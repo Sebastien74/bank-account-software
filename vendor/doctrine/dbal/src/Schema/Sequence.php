@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Schema;
 
-use Doctrine\DBAL\Schema\Visitor\Visitor;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
+use Doctrine\DBAL\Schema\Name\Parser\OptionallyQualifiedNameParser;
+use Doctrine\DBAL\Schema\Name\Parsers;
 use Doctrine\Deprecations\Deprecation;
 
 use function count;
@@ -10,88 +14,62 @@ use function sprintf;
 
 /**
  * Sequence structure.
+ *
+ * @extends AbstractNamedObject<OptionallyQualifiedName>
  */
-class Sequence extends AbstractAsset
+class Sequence extends AbstractNamedObject
 {
-    /** @var int */
-    protected $allocationSize = 1;
+    protected int $allocationSize = 1;
 
-    /** @var int */
-    protected $initialValue = 1;
+    protected int $initialValue = 1;
 
-    /** @var int|null */
-    protected $cache;
+    public function __construct(
+        string $name,
+        int $allocationSize = 1,
+        int $initialValue = 1,
+        protected ?int $cache = null,
+    ) {
+        parent::__construct($name);
 
-    /**
-     * @param string   $name
-     * @param int      $allocationSize
-     * @param int      $initialValue
-     * @param int|null $cache
-     */
-    public function __construct($name, $allocationSize = 1, $initialValue = 1, $cache = null)
-    {
-        $this->_setName($name);
         $this->setAllocationSize($allocationSize);
         $this->setInitialValue($initialValue);
-        $this->cache = $cache;
     }
 
-    /** @return int */
-    public function getAllocationSize()
+    protected function getNameParser(): OptionallyQualifiedNameParser
+    {
+        return Parsers::getOptionallyQualifiedNameParser();
+    }
+
+    public function getAllocationSize(): int
     {
         return $this->allocationSize;
     }
 
-    /** @return int */
-    public function getInitialValue()
+    public function getInitialValue(): int
     {
         return $this->initialValue;
     }
 
-    /** @return int|null */
-    public function getCache()
+    public function getCache(): ?int
     {
         return $this->cache;
     }
 
-    /**
-     * @param int $allocationSize
-     *
-     * @return Sequence
-     */
-    public function setAllocationSize($allocationSize)
+    public function setAllocationSize(int $allocationSize): self
     {
-        if ($allocationSize > 0) {
-            $this->allocationSize = $allocationSize;
-        } else {
-            $this->allocationSize = 1;
-        }
+        $this->allocationSize = $allocationSize;
 
         return $this;
     }
 
-    /**
-     * @param int $initialValue
-     *
-     * @return Sequence
-     */
-    public function setInitialValue($initialValue)
+    public function setInitialValue(int $initialValue): self
     {
-        if ($initialValue > 0) {
-            $this->initialValue = $initialValue;
-        } else {
-            $this->initialValue = 1;
-        }
+        $this->initialValue = $initialValue;
 
         return $this;
     }
 
-    /**
-     * @param int $cache
-     *
-     * @return Sequence
-     */
-    public function setCache($cache)
+    public function setCache(int $cache): self
     {
         $this->cache = $cache;
 
@@ -104,10 +82,17 @@ class Sequence extends AbstractAsset
      * This is used inside the comparator to not report sequences as missing,
      * when the "from" schema implicitly creates the sequences.
      *
-     * @return bool
+     * @deprecated
      */
-    public function isAutoIncrementsFor(Table $table)
+    public function isAutoIncrementsFor(Table $table): bool
     {
+        Deprecation::triggerIfCalledFromOutside(
+            'doctrine/dbal',
+            'https://github.com/doctrine/dbal/pull/6654',
+            '%s is deprecated and will be removed in 5.0.',
+            __METHOD__,
+        );
+
         $primaryKey = $table->getPrimaryKey();
 
         if ($primaryKey === null) {
@@ -131,21 +116,5 @@ class Sequence extends AbstractAsset
         $tableSequenceName = sprintf('%s_%s_seq', $tableName, $column->getShortestName($table->getNamespaceName()));
 
         return $tableSequenceName === $sequenceName;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return void
-     */
-    public function visit(Visitor $visitor)
-    {
-        Deprecation::triggerIfCalledFromOutside(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/5435',
-            'Sequence::visit() is deprecated.',
-        );
-
-        $visitor->acceptSequence($this);
     }
 }

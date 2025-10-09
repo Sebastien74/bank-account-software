@@ -84,3 +84,5 @@ php composer.phar recipes:update
 php composer.phar recipes:update
 php composer.phar recipes:update
 php composer.phar recipes:update SUR CMS
+
+Mettre à jour composer CMS

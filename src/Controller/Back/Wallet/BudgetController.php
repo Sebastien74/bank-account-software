@@ -8,6 +8,7 @@ use App\Controller\BaseController;
 use App\Entity\Wallet\Budget;
 use App\Form\Type\Wallet\BudgetType;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -46,6 +47,15 @@ class BudgetController extends BaseController
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des budgets', [], 'back');
 
         return parent::edit();
+    }
+
+    /**
+     * Budget delete.
+     */
+    #[Route('/delete/{budget}', name: 'back_budget_delete', methods: 'GET')]
+    public function delete(Budget $budget): RedirectResponse
+    {
+        return $this->redirect($this->globalFormManager->delete($budget));
     }
 
     /**

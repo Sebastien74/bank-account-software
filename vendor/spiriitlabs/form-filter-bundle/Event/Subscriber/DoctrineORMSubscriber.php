@@ -16,8 +16,10 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Exception;
+use RuntimeException;
 use Spiriit\Bundle\FormFilterBundle\Event\GetFilterConditionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -28,9 +30,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class DoctrineORMSubscriber extends AbstractDoctrineSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -71,10 +70,9 @@ class DoctrineORMSubscriber extends AbstractDoctrineSubscriber implements EventS
     }
 
     /**
-     * @param GetFilterConditionEvent $event
-     * @throws \Exception
+     * @throws Exception
      */
-    public function filterEntity(GetFilterConditionEvent $event)
+    public function filterEntity(GetFilterConditionEvent $event): void
     {
         $expr = $event->getFilterQuery()->getExpr();
         $values = $event->getValues();
@@ -91,7 +89,7 @@ class DoctrineORMSubscriber extends AbstractDoctrineSubscriber implements EventS
                 $fieldName = \str_replace(\sprintf('%s.', $rootPart->getAlias()), '', $event->getField());
                 $metadata = $queryBuilder->getEntityManager()->getClassMetadata($rootPart->getFrom());
 
-                if (isset($metadata->associationMappings[$fieldName]) && (!$metadata->associationMappings[$fieldName]['isOwningSide'] || $metadata->associationMappings[$fieldName]['type'] === ClassMetadataInfo::MANY_TO_MANY)) {
+                if (isset($metadata->associationMappings[$fieldName]) && (!$metadata->associationMappings[$fieldName]['isOwningSide'] || $metadata->associationMappings[$fieldName]['type'] === ClassMetadata::MANY_TO_MANY)) {
                     if (!$event->getFilterQuery()->hasJoinAlias($fieldName)) {
                         $queryBuilder->leftJoin($event->getField(), $fieldName);
                     }
@@ -125,23 +123,22 @@ class DoctrineORMSubscriber extends AbstractDoctrineSubscriber implements EventS
     }
 
     /**
-     * @param object $value
      * @return integer
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    protected function getEntityIdentifier($value, EntityManagerInterface $em)
+    protected function getEntityIdentifier(object $value, EntityManagerInterface $em): mixed
     {
         $class = get_class($value);
         $metadata = $em->getClassMetadata($class);
 
         if ($metadata->isIdentifierComposite) {
-            throw new \RuntimeException(sprintf('Composite identifier is not supported by FilterEntityType.', $class));
+            throw new RuntimeException(sprintf('Composite identifier is not supported by FilterEntityType.', $class));
         }
 
         $identifierValues = $metadata->getIdentifierValues($value);
 
         if (empty($identifierValues)) {
-            throw new \RuntimeException(sprintf('Can\'t get identifier value for class "%s".', $class));
+            throw new RuntimeException(sprintf('Can\'t get identifier value for class "%s".', $class));
         }
 
         return array_shift($identifierValues);

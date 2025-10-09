@@ -34,7 +34,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('listeners')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('doctrine_dbal')->defaultFalse()->end()
                         ->booleanNode('doctrine_orm')->defaultTrue()->end()
                     ->end()
                 ->end()
@@ -59,7 +58,7 @@ class Configuration implements ConfigurationInterface
 
                 ->booleanNode('force_case_insensitivity')
                     ->info('Whether to do case insensitive LIKE comparisons.')
-                    ->defaultNull()
+                    ->defaultFalse()
                 ->end()
 
                 ->scalarNode('encoding')

@@ -1,27 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Schema;
+
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
+use Doctrine\DBAL\Schema\Name\Parser\OptionallyQualifiedNameParser;
+use Doctrine\DBAL\Schema\Name\Parsers;
 
 /**
  * Representation of a Database View.
+ *
+ * @extends AbstractNamedObject<OptionallyQualifiedName>
  */
-class View extends AbstractAsset
+class View extends AbstractNamedObject
 {
-    /** @var string */
-    private $sql;
-
-    /**
-     * @param string $name
-     * @param string $sql
-     */
-    public function __construct($name, $sql)
+    public function __construct(string $name, private readonly string $sql)
     {
-        $this->_setName($name);
-        $this->sql = $sql;
+        parent::__construct($name);
     }
 
-    /** @return string */
-    public function getSql()
+    protected function getNameParser(): OptionallyQualifiedNameParser
+    {
+        return Parsers::getOptionallyQualifiedNameParser();
+    }
+
+    public function getSql(): string
     {
         return $this->sql;
     }
