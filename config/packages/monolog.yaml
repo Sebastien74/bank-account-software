@@ -122,9 +122,14 @@ when@prod:
                 handler: symfony_mailer_critical
             symfony_mailer_critical:
                 type: symfony_mailer
-                from_email: 'dev@agence-felix.fr'
-                to_email: ['dev@agence-felix.fr']
+                from_email: 'fournier.sebastien@outlook.com'
+                to_email: ['fournier.sebastien@outlook.com']
                 subject: 'An Error Occurred! %%message%%'
                 level: critical
                 formatter:  monolog.formatter.html
                 content_type: text/html
+            deprecation:
+                type: stream
+                channels: [deprecation]
+                path: php://stderr
+                formatter: monolog.formatter.json
