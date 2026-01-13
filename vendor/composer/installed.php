@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1093b39c6690233f5608e5fd3488050f4b8942c9',
+        'reference' => '5342d5163d9d5a6ca170e15eb3d6ff3c27e589e5',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1093b39c6690233f5608e5fd3488050f4b8942c9',
+            'reference' => '5342d5163d9d5a6ca170e15eb3d6ff3c27e589e5',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -299,9 +299,9 @@
             'dev_requirement' => false,
         ),
         'giggsey/libphonenumber-for-php' => array(
-            'pretty_version' => '9.0.15',
-            'version' => '9.0.15.0',
-            'reference' => '6d0853d6cf4c7ea85dd6715c2742e2ab16210f32',
+            'pretty_version' => '9.0.16',
+            'version' => '9.0.16.0',
+            'reference' => 'c513a04df3824e9f19082d935bb8f331741252d1',
             'type' => 'library',
             'install_path' => __DIR__ . '/../giggsey/libphonenumber-for-php',
             'aliases' => array(),
@@ -310,7 +310,7 @@
         'giggsey/libphonenumber-for-php-lite' => array(
             'dev_requirement' => false,
             'replaced' => array(
-                0 => '9.0.15',
+                0 => '9.0.16',
             ),
         ),
         'giggsey/locale' => array(
@@ -371,9 +371,9 @@
             ),
         ),
         'justinrainbow/json-schema' => array(
-            'pretty_version' => '6.5.2',
-            'version' => '6.5.2.0',
-            'reference' => 'ac0d369c09653cf7af561f6d91a705bc617a87b8',
+            'pretty_version' => '6.6.0',
+            'version' => '6.6.0.0',
+            'reference' => '68ba7677532803cc0c5900dd5a4d730537f2b2f3',
             'type' => 'library',
             'install_path' => __DIR__ . '/../justinrainbow/json-schema',
             'aliases' => array(),

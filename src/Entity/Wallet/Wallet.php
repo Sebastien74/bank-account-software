@@ -31,7 +31,7 @@ class Wallet extends BaseEntity
     #[ORM\Column(type: 'float')]
     private ?float $initialAmount = null;
 
-    #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: Operation::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Operation::class, mappedBy: 'wallet', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['date' => 'DESC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $operations;

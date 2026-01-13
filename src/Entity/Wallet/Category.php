@@ -34,13 +34,13 @@ class Category extends BaseEntity
         'back_subcategory_index' => 'adminName',
     ];
 
-    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $icon = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: SubCategory::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $subCategories;

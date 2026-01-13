@@ -33,7 +33,7 @@
             pageTitle: pageTitle,
         } only %}
         <div class="d-flex">
-            {% include 'back/includes/sidebar.html.twig' %}
+            {% include 'back/includes/sidebar.html.twig' with {} only %}
             <main id="main-container">
                 {% include 'back/includes/breadcrumb.html.twig' with {
                     breadcrumb: breadcrumb is defined ? breadcrumb : []

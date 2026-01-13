@@ -91,6 +91,8 @@ class OperationController extends BaseController
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
 
+        dd('Mettre pointed dans fom pas new');
+
         return parent::edit();
     }
 

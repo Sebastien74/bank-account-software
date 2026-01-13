@@ -26,7 +26,7 @@ class SubCategory extends BaseEntity
         'masterField' => 'category',
     ];
 
-    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]

@@ -23,7 +23,7 @@ class DashboardController extends BaseController
     /**
      * Dashboard view.
      */
-    #[Route('/dashboard/{website}', name: 'back_dashboard', defaults: ['website' => null], methods: 'GET')]
+    #[Route('/dashboard', name: 'back_dashboard', methods: 'GET')]
     public function view(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Tableau de bord', [], 'back');

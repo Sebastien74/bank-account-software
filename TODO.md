@@ -10,6 +10,10 @@ Page 404 : https://bank-account-software.local/admin-8ce49dce83cb97b384b928a5c4e
 
 Factoriser les forms view modal (Titre par exemple) et qu'un seul temple de modal
 
+Import compte
+
+Récuperer backup DB sit sqlite
+
 Breadcrumbs
 
 Suppression multiple
@@ -70,7 +74,6 @@ CMS : Reprendre le style alert et le tableau dans twig pour alléger le css Fron
 
 Faire des modal edit plutot qu'une page et récuprer la modal new pour faire ça
 
-
 UNIFORMISATION DES MEDIAS DANS CARD CMS VOIR LE CERCLE
 
 https://www.youtube.com/watch?v=vOiQLX5vNFY&t=1s
@@ -86,3 +89,12 @@ php composer.phar recipes:update
 php composer.phar recipes:update SUR CMS et mettre dans le README
 
 Mettre à jour composer CMS
+
+Supprimer le domaine annecy sur OVH
+
+CMS Reduire à 72 les image à l'upload 
+
+CMS Faire en sorte d'afficher toutes vidéos en modal et mettre un bouton "Ne pas afficher dans la modal"
+
+CMS
+#[\Attribute] Dans les form validators

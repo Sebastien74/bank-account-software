@@ -33,13 +33,13 @@ class OperationType extends BaseEntity
         'back_category_index' => 'adminName',
     ];
 
-    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $icon = null;
 
-    #[ORM\OneToMany(mappedBy: 'operationtype', targetEntity: Category::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'operationtype', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     #[Assert\Valid(['groups' => ['form_submission']])]
     private ArrayCollection|PersistentCollection $categories;
