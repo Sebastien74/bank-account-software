@@ -388,10 +388,7 @@ readonly class OperationManager implements OperationInterface
 
         $targetBalance = null;
         if (!empty($rows[7]['C'])) {
-            $targetBalanceStr = $rows[7]['C'];
-            $targetBalanceStr = str_replace([' ', '€', "\u{00A0}"], '', $targetBalanceStr);
-            $targetBalanceStr = str_replace(',', '.', $targetBalanceStr);
-            $targetBalance = (float) $targetBalanceStr;
+            $targetBalance = $this->cleanAmount($rows[7]['C']);
         }
 
         $outsiders = [];
@@ -408,15 +405,8 @@ readonly class OperationManager implements OperationInterface
             $dateStr = $row['A'];
             $adminName = trim($row['B']);
             $cleanAdminName = $this->cleanOutsiderName($adminName);
-            $debitStr = (string) $row['C'];
-            $creditStr = (string) $row['D'];
-
-            // Nettoyage des montants (gestion des espaces, espaces insécables, symboles €)
-            $debitStr = str_replace([' ', '€', "\u{00A0}"], '', $debitStr);
-            $creditStr = str_replace([' ', '€', "\u{00A0}"], '', $creditStr);
-
-            $debit = $debitStr !== '' ? (float) str_replace(',', '.', $debitStr) : 0.0;
-            $credit = $creditStr !== '' ? (float) str_replace(',', '.', $creditStr) : 0.0;
+            $debit = $this->cleanAmount((string) $row['C']);
+            $credit = $this->cleanAmount((string) $row['D']);
 
             // Si aucun montant n'est présent, on ignore la ligne
             if ($debit <= 0 && $credit <= 0) {
@@ -550,6 +540,56 @@ readonly class OperationManager implements OperationInterface
         }
     }
 
+
+    /**
+     * Nettoie le montant pour le convertir en float.
+     */
+    private function cleanAmount(mixed $amount): float
+    {
+        // 1. Suppression de tous les types d'espaces (y compris insécables) et du symbole €
+        $amountStr = (string) $amount;
+        $amountStr = preg_replace('/\s+|€|\x{00A0}|\x{202F}/u', '', $amountStr);
+
+        if ($amountStr === '' || $amountStr === null) {
+            return 0.0;
+        }
+
+        $hasComma = str_contains($amountStr, ',');
+        $hasDot   = str_contains($amountStr, '.');
+
+        // 2. Si les deux séparateurs sont présents, on détermine le séparateur décimal comme étant le dernier qui apparaît
+        if ($hasComma && $hasDot) {
+            $lastComma = strrpos($amountStr, ',');
+            $lastDot   = strrpos($amountStr, '.');
+            $decimalSep   = ($lastDot !== false && $lastDot > (int) $lastComma) ? '.' : ',';
+            $thousandSep  = $decimalSep === '.' ? ',' : '.';
+
+            // Supprimer tous les séparateurs de milliers
+            $amountStr = str_replace($thousandSep, '', $amountStr);
+            // Remplacer le séparateur décimal par un point
+            if ($decimalSep === ',') {
+                $amountStr = str_replace(',', '.', $amountStr);
+            }
+        } elseif ($hasComma) {
+            // 3. Si une virgule est présente (format FR):
+            //    - les points restants sont des séparateurs de milliers
+            //    - la virgule est le séparateur décimal
+            $amountStr = str_replace('.', '', $amountStr);
+            $amountStr = str_replace(',', '.', $amountStr);
+        } elseif ($hasDot) {
+            // 4. Pas de virgule, mais un/des points
+            //    - Plusieurs points => séparateurs de milliers
+            //    - Un seul point avec exactement 3 chiffres après => probablement milliers
+            $parts = explode('.', $amountStr);
+            if (count($parts) > 2) {
+                $amountStr = str_replace('.', '', $amountStr);
+            } elseif (count($parts) === 2 && strlen($parts[1]) === 3) {
+                $amountStr = str_replace('.', '', $amountStr);
+            }
+        }
+
+        return (float) $amountStr;
+    }
 
     /**
      * Nettoie le nom du tiers pour éviter les doublons.
