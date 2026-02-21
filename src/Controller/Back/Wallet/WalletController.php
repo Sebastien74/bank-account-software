@@ -100,10 +100,48 @@ class WalletController extends BaseController
         $prevPeriodStatsRaw = $operationRepository->getStats($wallet, $startPrevPeriod, $endPrevPeriod);
 
         $monthStats = $this->formatStats($monthStatsRaw);
-        $hasPrevOperations = $operationRepository->hasOperations($wallet, $startPrevPeriod, $endPrevPeriod);
+        $hasPrevMonthOperations = $operationRepository->hasOperations($wallet, $startPrevPeriod, $endPrevPeriod);
 
-        if ($hasPrevOperations) {
+        if ($hasPrevMonthOperations) {
             $this->computeTrends($monthStats, $currentPeriodStatsRaw, $prevPeriodStatsRaw);
+        }
+
+        // Calculate comparison periods for annual trends
+        $isCurrentYear = $selectedYear === $now->format('Y');
+        $comparisonYearDay = $isCurrentYear ? $currentDay : 31;
+        $comparisonYearMonth = $isCurrentYear ? (int) $now->format('m') : 12;
+
+        $endCurrentYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-$comparisonYearMonth-$comparisonYearDay 23:59:59");
+        $startPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-01-01 00:00:00");
+        $endPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-$comparisonYearMonth-$comparisonYearDay 23:59:59");
+
+        $hasPrevYearOperations = $operationRepository->hasOperations($wallet, $startPrevYearPeriod, $endPrevYearPeriod);
+
+        $comparisonYearStartMonth = 1;
+        $comparisonYearStartDay = 1;
+        $excludedMonths = [];
+        if ($hasPrevYearOperations) {
+            $firstOpPrevYear = $operationRepository->getFirstOperationDateInYear($wallet, (int) $selectedYear - 1);
+            if ($firstOpPrevYear) {
+                $comparisonYearStartMonth = (int) $firstOpPrevYear->format('m');
+                $comparisonYearStartDay = (int) $firstOpPrevYear->format('d');
+                $startYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-" . $firstOpPrevYear->format('m-d') . " 00:00:00");
+                $startPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-" . $firstOpPrevYear->format('m-d') . " 00:00:00");
+
+                for ($m = 1; $m < $comparisonYearStartMonth; $m++) {
+                    $excludedMonths[] = sprintf('%02d', $m);
+                }
+            }
+        }
+
+        // We use the same start date for both main stats and trend comparison to be consistent
+        $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
+        $yearStats = $this->formatStats($yearStatsRaw);
+
+        if ($hasPrevYearOperations) {
+            $currentYearPeriodStatsRaw = $operationRepository->getStats($wallet, $startYear, $endCurrentYearPeriod);
+            $prevYearPeriodStatsRaw = $operationRepository->getStats($wallet, $startPrevYearPeriod, $endPrevYearPeriod);
+            $this->computeTrends($yearStats, $currentYearPeriodStatsRaw, $prevYearPeriodStatsRaw);
         }
 
         $availableYears = $operationRepository->getAvailableYears($wallet);
@@ -114,12 +152,18 @@ class WalletController extends BaseController
 
         return $this->render($this->template, $this->defaultArguments() + [
             'wallet' => $wallet,
-            'yearStats' => $this->formatStats($yearStatsRaw),
+            'yearStats' => $yearStats,
             'monthStats' => $monthStats,
             'selectedYear' => $selectedYear,
             'selectedMonth' => $selectedMonth,
+            'endMonth' => $endMonth,
             'isCurrentMonthAndYear' => $isCurrentMonthAndYear,
             'comparisonDay' => $comparisonDay,
+            'comparisonYearDay' => $comparisonYearDay,
+            'comparisonYearMonth' => $comparisonYearMonth,
+            'comparisonYearStartDay' => $comparisonYearStartDay ?? 1,
+            'comparisonYearStartMonth' => $comparisonYearStartMonth,
+            'excludedMonths' => $excludedMonths,
             'years' => $availableYears,
             'months' => [
                 '01' => 'Janvier', '02' => 'Février', '03' => 'Mars', '04' => 'Avril',
@@ -129,29 +173,21 @@ class WalletController extends BaseController
         ]);
     }
 
-    private function computeTrends(array &$monthStats, array $currentPeriodRaw, array $prevPeriodRaw): void
+    private function computeTrends(array &$mainStats, array $currentPeriodRaw, array $prevPeriodRaw): void
     {
         $currentPeriod = $this->formatStats($currentPeriodRaw);
         $prevPeriod = $this->formatStats($prevPeriodRaw);
 
-        foreach ($monthStats as $catId => &$category) {
+        foreach ($mainStats as $catId => &$category) {
             $currCatTotal = $currentPeriod[$catId]['total'] ?? 0;
             $prevCatTotal = $prevPeriod[$catId]['total'] ?? 0;
+            $category['prevTotal'] = $prevCatTotal;
             $category['trend'] = $this->calculateTrend($currCatTotal, $prevCatTotal);
 
-            foreach ($category['subCategories'] as &$subCategory) {
-                $subCatId = $this->findSubCategoryId($subCategory['name'], $currentPeriod[$catId]['subCategories'] ?? []);
-                $currSubTotal = 0;
-                if ($subCatId !== null) {
-                    $currSubTotal = $currentPeriod[$catId]['subCategories'][$subCatId]['total'] ?? 0;
-                }
-
-                $prevSubCatId = $this->findSubCategoryId($subCategory['name'], $prevPeriod[$catId]['subCategories'] ?? []);
-                $prevSubTotal = 0;
-                if ($prevSubCatId !== null) {
-                    $prevSubTotal = $prevPeriod[$catId]['subCategories'][$prevSubCatId]['total'] ?? 0;
-                }
-
+            foreach ($category['subCategories'] as $subCatId => &$subCategory) {
+                $currSubTotal = $currentPeriod[$catId]['subCategories'][$subCatId]['total'] ?? 0;
+                $prevSubTotal = $prevPeriod[$catId]['subCategories'][$subCatId]['total'] ?? 0;
+                $subCategory['prevTotal'] = $prevSubTotal;
                 $subCategory['trend'] = $this->calculateTrend($currSubTotal, $prevSubTotal);
             }
         }
@@ -173,17 +209,17 @@ class WalletController extends BaseController
             return $current > 0 ? ['direction' => 'up', 'percentage' => 100, 'color' => 'danger'] : null;
         }
 
-        $diff = $current - $previous;
+        $diff = round($current, 2) - round($previous, 2);
         $percentage = ($diff / $previous) * 100;
 
-        if ($diff == 0) {
+        if (abs($diff) < 0.01) {
             return ['direction' => 'stable', 'percentage' => 0, 'color' => 'secondary'];
         }
 
         return [
             'direction' => $diff > 0 ? 'up' : 'down',
             'percentage' => abs($percentage),
-            'color' => $diff > 0 ? 'danger' : 'success', // For expenses, up is bad (red/danger), down is good (green/success)
+            'color' => $diff > 0 ? 'danger' : 'success',
         ];
     }
 
@@ -199,10 +235,11 @@ class WalletController extends BaseController
                     'subCategories' => [],
                 ];
             }
-            $stats[$catId]['total'] += $row['total'];
-            $stats[$catId]['subCategories'][] = [
+            $stats[$catId]['total'] += (float) $row['total'];
+            $subCatId = $row['subCategoryId'];
+            $stats[$catId]['subCategories'][$subCatId] = [
                 'name' => $row['subCategoryName'],
-                'total' => $row['total'],
+                'total' => (float) $row['total'],
             ];
         }
 

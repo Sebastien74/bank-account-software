@@ -6,13 +6,18 @@
                     <span class="flex-grow-1">
                         {{ category.name }}
                         {% if category.trend is defined and category.trend is not null %}
-                            <span class="ms-2 badge bg-{{ category.trend.color }} d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-title="{{ "Tendance par rapport au %day% du même mois l'année précédente"|trans({'%day%': comparisonDay}) }}">
+                            <span class="ms-2 badge bg-{{ category.trend.color }} d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-title="{{ tooltipTitle|default("Tendance par rapport au %day% du même mois l'année précédente"|trans({'%day%': comparisonDay|default(1)})) }}">
                                 <i class="icon-arrow-{{ category.trend.direction == 'stable' ? 'right' : category.trend.direction }} me-1"></i>
                                 {{ category.trend.percentage|number_format(0) }}%
                             </span>
                         {% endif %}
                     </span>
-                    <span class="badge bg-primary me-3">{{ category.total|number_format(2, ',', ' ') }} €</span>
+                    <div class="d-flex align-items-center me-3">
+                        {% if category.prevTotal is defined %}
+                            <span class="badge bg-secondary opacity-50 me-2" data-bs-toggle="tooltip" data-bs-title="{{ "Année précédente"|trans }}">{{ category.prevTotal|number_format(2, ',', ' ') }} €</span>
+                        {% endif %}
+                        <span class="badge bg-primary">{{ category.total|number_format(2, ',', ' ') }} €</span>
+                    </div>
                 </button>
             </h2>
             <div id="collapse-{{ idPrefix }}-{{ catId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ idPrefix }}-{{ catId }}" data-bs-parent="#accordion-{{ idPrefix }}">
@@ -23,13 +28,18 @@
                                 <div class="d-flex align-items-center">
                                     <small class="me-2">{{ subCategory.name }}</small>
                                     {% if subCategory.trend is defined and subCategory.trend is not null %}
-                                        <small class="text-{{ subCategory.trend.color }} d-inline-flex align-items-center" style="font-size: 0.75rem;" data-bs-toggle="tooltip" data-bs-title="{{ "Tendance par rapport au %day% du même mois l'année précédente"|trans({'%day%': comparisonDay}) }}">
+                                        <small class="text-{{ subCategory.trend.color }} d-inline-flex align-items-center" style="font-size: 0.75rem;" data-bs-toggle="tooltip" data-bs-title="{{ tooltipTitle|default("Tendance par rapport au %day% du même mois l'année précédente"|trans({'%day%': comparisonDay|default(1)})) }}">
                                             <i class="icon-arrow-{{ subCategory.trend.direction == 'stable' ? 'right' : subCategory.trend.direction }} me-1"></i>
                                             {{ subCategory.trend.percentage|number_format(0) }}%
                                         </small>
                                     {% endif %}
                                 </div>
-                                <small class="text-muted">{{ subCategory.total|number_format(2, ',', ' ') }} €</small>
+                                <div class="d-flex align-items-center">
+                                    {% if subCategory.prevTotal is defined %}
+                                        <small class="text-muted opacity-50 me-2" style="font-size: 0.75rem;">({{ subCategory.prevTotal|number_format(2, ',', ' ') }} €)</small>
+                                    {% endif %}
+                                    <small class="text-muted">{{ subCategory.total|number_format(2, ',', ' ') }} €</small>
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>

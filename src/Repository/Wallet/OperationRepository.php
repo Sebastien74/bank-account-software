@@ -234,4 +234,34 @@ class OperationRepository extends ServiceEntityRepository
 
         return $years;
     }
+
+    /**
+     * Get the first operation date for a wallet in a specific year.
+     */
+    public function getFirstOperationDateInYear(Wallet $wallet, int $year): ?\DateTimeInterface
+    {
+        $start = \DateTime::createFromFormat('Y-m-d H:i:s', "$year-01-01 00:00:00");
+        $end = \DateTime::createFromFormat('Y-m-d H:i:s', "$year-12-31 23:59:59");
+
+        $qb = $this->createQueryBuilder('o')
+            ->select('MIN(o.date)')
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date <= :end')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        if ($result === null) {
+            return null;
+        }
+
+        if (is_string($result)) {
+            return new \DateTime($result);
+        }
+
+        return $result;
+    }
 }

@@ -45,9 +45,23 @@
                         {% else %}
                             <div class="alert alert-info py-2 px-3 mb-3" style="font-size: 0.85rem;">
                                 <i class="icon-info-sign me-1"></i>
-                                {{ "Les tendances sont calculées du 1er au %day% du mois par rapport à la même période l'année précédente."|trans({'%day%': comparisonDay}) }}
+                                {{ "Les tendances sont calculées du 1er au %day% %month% par rapport à la même période l'année précédente."|trans({'%day%': comparisonDay == 1 ? '1er' : comparisonDay, '%month%': months[selectedMonth]|trans}) }}
+                                {% if comparisonDay < (endMonth|date('d')) %}
+                                    <br>
+                                    <strong class="text-warning">
+                                        <i class="icon-warning-sign me-1"></i>
+                                        {{ "Les jours du %start% au %end% sont exclus car sans données l'année précédente."|trans({
+                                            '%start%': (comparisonDay + 1),
+                                            '%end%': endMonth|date('d')
+                                        }) }}
+                                    </strong>
+                                {% endif %}
                             </div>
-                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {stats: monthStats, idPrefix: 'month'} %}
+                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {
+                                stats: monthStats,
+                                idPrefix: 'month',
+                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonDay, '%month%': months[selectedMonth]|trans})
+                            } %}
                         {% endif %}
                     </div>
                 </div>
@@ -61,7 +75,31 @@
                         {% if yearStats is empty %}
                             <p class="text-muted mb-0">{{ "Aucune donnée disponible pour cette année."|trans }}</p>
                         {% else %}
-                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {stats: yearStats, idPrefix: 'year'} %}
+                            <div class="alert alert-info py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                                <i class="icon-info-sign me-1"></i>
+                                {{ "Les tendances sont calculées du %startDay% %startMonth% au %day% %month% par rapport à la même période l'année précédente."|trans({
+                                    '%startDay%': comparisonYearStartDay == 1 ? '1er' : comparisonYearStartDay,
+                                    '%startMonth%': months[comparisonYearStartMonth|format('%02d')]|default('Janvier')|trans,
+                                    '%day%': comparisonYearDay == 1 ? '1er' : comparisonYearDay,
+                                    '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans
+                                }) }}
+                                {% if excludedMonths is not empty %}
+                                    <br>
+                                    <strong class="text-warning">
+                                        <i class="icon-warning-sign me-1"></i>
+                                        {% set excludedNames = [] %}
+                                        {% for m in excludedMonths %}
+                                            {% set excludedNames = excludedNames|merge([months[m]|trans]) %}
+                                        {% endfor %}
+                                        {{ "Mois exclus des calculs car sans données l'année précédente :"|trans }} {{ excludedNames|join(', ') }}
+                                    </strong>
+                                {% endif %}
+                            </div>
+                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {
+                                stats: yearStats,
+                                idPrefix: 'year',
+                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonYearDay, '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans})
+                            } %}
                         {% endif %}
                     </div>
                 </div>
