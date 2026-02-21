@@ -39,6 +39,10 @@
                                data-bs-toggle="tooltip" data-bs-title="{{ "Mes opérations"|trans|striptags }}">
                                 <i class="icon-list-alt"></i>
                             </a>
+                            <a href="{{ path('back_operation_statistics', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-3"
+                               data-bs-toggle="tooltip" data-bs-title="{{ "Statistiques"|trans|striptags }}">
+                                <i class="icon-bar-chart"></i>
+                            </a>
                             <span class="ms-auto">{% include 'back/core/delete-modal.html.twig' with {entity: wallet} %}</span>
                         </div>
                     </div>

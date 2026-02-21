@@ -160,4 +160,28 @@ class OperationRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Get statistics for a wallet.
+     *
+     * @return array
+     */
+    public function getStats(Wallet $wallet, \DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('c.id as categoryId, c.adminName as categoryName, sc.id as subCategoryId, sc.adminName as subCategoryName, SUM(o.amount) as total')
+            ->join('o.subCategory', 'sc')
+            ->join('sc.category', 'c')
+            ->leftJoin('o.operationType', 'ot')
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date <= :end')
+            ->andWhere("ot.type = 'expenses' OR (ot.id IS NULL AND sc.type = 'expenses')")
+            ->groupBy('c.id', 'sc.id')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        return $qb->getQuery()->getResult();
+    }
 }

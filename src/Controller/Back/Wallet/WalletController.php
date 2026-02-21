@@ -61,13 +61,71 @@ class WalletController extends BaseController
     }
 
     /**
+     * Wallet statistics.
+     */
+    #[Route('/statistics/{wallet}', name: 'back_operation_statistics', methods: 'GET')]
+    public function statistics(Wallet $wallet): Response
+    {
+        $this->pageTitle = $this->coreLocator->translator()->trans('Statistiques', [], 'back');
+        $this->template = 'back/pages/wallet_statistics.html.twig';
+
+        $operationRepository = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\Operation::class);
+
+        $now = new \DateTime();
+        $startYear = (clone $now)->modify('first day of January 00:00:00');
+        $endYear = (clone $now)->modify('last day of December 23:59:59');
+
+        $startMonth = (clone $now)->modify('first day of this month 00:00:00');
+        $endMonth = (clone $now)->modify('last day of this month 23:59:59');
+
+        $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
+        $monthStatsRaw = $operationRepository->getStats($wallet, $startMonth, $endMonth);
+
+        return $this->render($this->template, $this->defaultArguments() + [
+            'wallet' => $wallet,
+            'yearStats' => $this->formatStats($yearStatsRaw),
+            'monthStats' => $this->formatStats($monthStatsRaw),
+        ]);
+    }
+
+    private function formatStats(array $rawStats): array
+    {
+        $stats = [];
+        foreach ($rawStats as $row) {
+            $catId = $row['categoryId'];
+            if (!isset($stats[$catId])) {
+                $stats[$catId] = [
+                    'name' => $row['categoryName'],
+                    'total' => 0,
+                    'subCategories' => [],
+                ];
+            }
+            $stats[$catId]['total'] += $row['total'];
+            $stats[$catId]['subCategories'][] = [
+                'name' => $row['subCategoryName'],
+                'total' => $row['total'],
+            ];
+        }
+
+        return $stats;
+    }
+
+    /**
      * To set breadcrumb.
      */
     protected function breadcrumb(array $items = []): void
     {
-        $items[$this->coreLocator->translator()->trans('Mes comptes', [], 'breadcrumb')] = 'back_wallet_index';
-        if ($this->coreLocator->request()->get('wallet')) {
-            $items[$this->coreLocator->translator()->trans('Édition', [], 'back_breadcrumb')] = 'back_wallet_edit';
+        $translator = $this->coreLocator->translator();
+        $items[$translator->trans('Mes comptes', [], 'breadcrumb')] = 'back_wallet_index';
+
+        $walletId = $this->coreLocator->request()->get('wallet');
+        if ($walletId) {
+            $routeName = $this->coreLocator->request()->get('_route');
+            if ($routeName === 'back_wallet_edit') {
+                $items[$translator->trans('Édition', [], 'back_breadcrumb')] = 'back_wallet_edit';
+            } elseif ($routeName === 'back_operation_statistics') {
+                $items[$translator->trans('Statistiques', [], 'back_breadcrumb')] = 'back_operation_statistics';
+            }
         }
 
         parent::breadcrumb($items);

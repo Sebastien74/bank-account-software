@@ -1,0 +1,51 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'back' %}
+
+{% block body %}
+    <div id="wallet-statistics" class="container-fluid pt-4 pb-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                        <h3 class="title h5 mb-0">{{ wallet.adminName|raw }} - {{ "Statistiques"|trans }}</h3>
+                        <a href="{{ path('back_wallet_index') }}" class="btn btn-primary btn-sm">
+                            <i class="icon-arrow-left me-1"></i> {{ "Retour"|trans }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-header py-3">
+                        <h4 class="h6 mb-0">{{ "Mois en cours"|trans }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if monthStats is empty %}
+                            <p class="text-muted mb-0">{{ "Aucune donnée disponible pour ce mois."|trans }}</p>
+                        {% else %}
+                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {stats: monthStats, idPrefix: 'month'} %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-header py-3">
+                        <h4 class="h6 mb-0">{{ "Année en cours"|trans }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if yearStats is empty %}
+                            <p class="text-muted mb-0">{{ "Aucune donnée disponible pour cette année."|trans }}</p>
+                        {% else %}
+                            {% include 'back/pages/includes/_stats_accordion.html.twig' with {stats: yearStats, idPrefix: 'year'} %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
