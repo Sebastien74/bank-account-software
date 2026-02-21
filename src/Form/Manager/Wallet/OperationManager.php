@@ -230,6 +230,7 @@ readonly class OperationManager implements OperationInterface
         'pousada-palaci-estoi' => 'expenses-leisure-activities-vacation', // POUSADA PALACI ESTOI
         'ppg-passion-sport-o' => 'expenses-leisure-activities-sport', // PPG*PASSION SPORT O
         'pralo-sports' => 'expenses-leisure-activities-sport', // PRALO SPORTS
+        'combepine' => 'expenses-housing-rent', // VIREMENT EMIS VIR INST VERS NATHALIE COMBEPINE
         'prelevement-ca-des-savoie-credit-agricole-assurance-habitation' => 'expenses-housing-home-insurance', // PRELEVEMENT CA DES SAVOIE CREDIT AGRICOLE ASSURANCE HABITATION
         'prelevement-bouygues-telecom' => 'expenses-phone-phone-internet', // PRELEVEMENT BOUYGUES TELECOM
         'prelevement-engie' => 'expenses-housing-energy', // PRELEVEMENT ENGIE S.A. MANDAT 00S017296083 00S017296083 FR03SYM002381 50004591297700051361141520250422
@@ -315,8 +316,6 @@ readonly class OperationManager implements OperationInterface
         'virement-emis-vir-inst-vers-magali-belmonte' => 'expenses-leisure-activities-vacation', // VIREMENT EMIS VIR INST VERS MAGALI BELMONTE
         'virement-emis-vir-inst-vers-magali-belmonte-billets-avion' => 'expenses-leisure-activities-vacation', // VIREMENT EMIS VIR INST VERS MAGALI BELMONTE BILLETS AVION
         'virement-emis-vir-inst-vers-magali-belmonte-vacances' => 'expenses-leisure-activities-vacation', // VIREMENT EMIS VIR INST VERS MAGALI BELMONTE VACANCES
-        'virement-emis-vir-inst-vers-nathalie-combepine' => 'expenses-housing-rent', // VIREMENT EMIS VIR INST VERS NATHALIE COMBEPINE
-        'virement-emis-vir-inst-vers-nathalie-combepine-loyer' => 'expenses-housing-rent', // VIREMENT EMIS VIR INST VERS NATHALIE COMBEPINE LOYER
         'virement-emis-web-bruyere-nicolas-mariage-mariage' => 'expenses-other', // VIREMENT EMIS WEB BRUYERE NICOLAS MARIAGE MARIAGE
         'virement-emis-web-fournier-chantal' => '', // VIREMENT EMIS WEB FOURNIER CHANTAL
         'virement-emis-web-fournier-sebastien' => '', // VIREMENT EMIS WEB FOURNIER SEBASTIEN
