@@ -21,6 +21,15 @@ use Symfony\Component\Form\FormInterface;
  */
 readonly class OperationManager implements OperationInterface
 {
+    private const PARTIAL_MATCH_KEYS = [
+        'combepine',
+        'assurance-habitation',
+        'bouygues-telecom',
+        'engie',
+        'pathe-cinepass-pathe-cinepass',
+        'interets-debiteurs',
+    ];
+
     private const CORRESPONDENCE = [
         '2m-annecy' => 'expenses-various-tobacco', // 2M ANNECY
         'a-r-e-a-npv-sqf3' => 'expenses-motorway', // A.R.E.A. NPV-SQF3
@@ -442,9 +451,9 @@ readonly class OperationManager implements OperationInterface
                 }
                 $operation->setOutsider($outsiders[$cleanAdminName]);
 
-                $outsiderSlug = $operation->getOutsider()->getSlug();
-                if (isset($subCategories[$outsiderSlug])) {
-                    $operation->setSubCategory($subCategories[$outsiderSlug]);
+                $subCategory = $this->findSubCategoryForOutsider($operation->getOutsider());
+                if ($subCategory) {
+                    $operation->setSubCategory($subCategory);
                 }
 
                 $em->persist($operation);
@@ -491,14 +500,9 @@ readonly class OperationManager implements OperationInterface
             $operation->setOutsider($outsider);
 
             if (!$operation->getSubCategory()) {
-                $outsiderSlug = $outsider->getSlug();
-                if (isset(self::CORRESPONDENCE[$outsiderSlug]) && self::CORRESPONDENCE[$outsiderSlug]) {
-                    $subCategory = $this->coreLocator->em()->getRepository(SubCategory::class)->findOneBy([
-                        'slug' => self::CORRESPONDENCE[$outsiderSlug]
-                    ]);
-                    if ($subCategory) {
-                        $operation->setSubCategory($subCategory);
-                    }
+                $subCategory = $this->findSubCategoryForOutsider($outsider);
+                if ($subCategory) {
+                    $operation->setSubCategory($subCategory);
                 }
             }
         }
@@ -521,7 +525,7 @@ readonly class OperationManager implements OperationInterface
         $adminName = mb_strtoupper($adminName, 'UTF-8');
 
         // Suppression des préfixes de paiement courants
-        $adminName = str_replace(['PAIEMENT PAR CARTE', 'PAIEMENT PAR', 'VIREMENT DE', 'VIREMENT POUR'], '', $adminName);
+        $adminName = str_replace(['PAIEMENT PAR CARTE', 'PAIEMENT PAR', 'VIREMENT DE', 'VIREMENT POUR', 'PRELEVEMENT'], '', $adminName);
 
         // Suppression des codes de transaction (ex: X9322)
         $adminName = preg_replace('/X\d{4,}/', '', $adminName);
@@ -531,5 +535,31 @@ readonly class OperationManager implements OperationInterface
 
         // Nettoyage des espaces multiples et trim
         return trim(preg_replace('/\s+/', ' ', $adminName));
+    }
+
+    /**
+     * Recherche la sous-catégorie correspondante pour un tiers.
+     */
+    private function findSubCategoryForOutsider(Outsider $outsider): ?SubCategory
+    {
+        $slug = $outsider->getSlug();
+        $subCategorySlug = null;
+
+        if (isset(self::CORRESPONDENCE[$slug]) && self::CORRESPONDENCE[$slug]) {
+            $subCategorySlug = self::CORRESPONDENCE[$slug];
+        } else {
+            foreach (self::PARTIAL_MATCH_KEYS as $partialKey) {
+                if (str_contains($slug, $partialKey) && isset(self::CORRESPONDENCE[$partialKey]) && self::CORRESPONDENCE[$partialKey]) {
+                    $subCategorySlug = self::CORRESPONDENCE[$partialKey];
+                    break;
+                }
+            }
+        }
+
+        if ($subCategorySlug) {
+            return $this->coreLocator->em()->getRepository(SubCategory::class)->findOneBy(['slug' => $subCategorySlug]);
+        }
+
+        return null;
     }
 }

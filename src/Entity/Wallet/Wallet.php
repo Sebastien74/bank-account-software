@@ -85,4 +85,64 @@ class Wallet extends BaseEntity
 
         return $this;
     }
+
+    public function getBalance(): float
+    {
+        $balance = $this->initialAmount;
+
+        foreach ($this->operations as $operation) {
+            $amount = $operation->getAmount();
+            $operationType = $operation->getOperationType();
+            $subCategory = $operation->getSubCategory();
+
+            $isIncome = ($operationType && $operationType->getType() === 'incomes')
+                || (!$operationType && $subCategory && $subCategory->getType() === 'incomes');
+
+            if ($isIncome) {
+                $balance += $amount;
+            } else {
+                $balance -= $amount;
+            }
+        }
+
+        return (float) $balance;
+    }
+
+    public function getDailyAverageExpenses(): float
+    {
+        $expenses = 0;
+        $now = new \DateTime();
+        $currentMonth = $now->format('m');
+        $currentYear = $now->format('Y');
+
+        foreach ($this->operations as $operation) {
+            if ($operation->getDate() && $operation->getDate()->format('m') === $currentMonth && $operation->getDate()->format('Y') === $currentYear) {
+                $operationType = $operation->getOperationType();
+                $subCategory = $operation->getSubCategory();
+
+                $isExpense = ($operationType && $operationType->getType() === 'expenses')
+                    || (!$operationType && $subCategory && $subCategory->getType() === 'expenses')
+                    || (!$operationType && !$subCategory); // Default to expense if not specified
+
+                if ($isExpense) {
+                    $expenses += $operation->getAmount();
+                }
+            }
+        }
+
+        $daysPassed = (int) $now->format('d');
+
+        return $daysPassed > 0 ? $expenses / $daysPassed : 0;
+    }
+
+    public function getRemainingDailyBudget(): float
+    {
+        $balance = $this->getBalance();
+        $now = new \DateTime();
+        $daysInMonth = (int) $now->format('t');
+        $currentDay = (int) $now->format('d');
+        $remainingDays = $daysInMonth - $currentDay + 1;
+
+        return $remainingDays > 0 ? $balance / $remainingDays : 0;
+    }
 }
