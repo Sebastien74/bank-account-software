@@ -30,6 +30,19 @@ import(/* webpackPreload: true */ './bootstrap/modal').then(({default: Modal}) =
     });
 }).catch(error => console.error(error.message));
 
+import(/* webpackPreload: true */ './bootstrap/collapse').then(({default: Collapse}) => {
+    document.querySelectorAll('.accordion').forEach(accordion => {
+        if (!accordion.classList.contains('accordion-loaded')) {
+            accordion.querySelectorAll('.accordion-collapse').forEach(collapse => {
+                new Collapse(collapse, {
+                    toggle: false
+                });
+            });
+            accordion.classList.add('accordion-loaded');
+        }
+    });
+}).catch(error => console.error(error.message));
+
 import(/* webpackPreload: true */ './bootstrap/toast').then(({default: Toast}) => {
     document.querySelectorAll('.toast').forEach(toast => {
         if (!toast.classList.contains('toast-loaded')) {
