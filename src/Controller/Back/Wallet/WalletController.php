@@ -70,13 +70,17 @@ class WalletController extends BaseController
         $this->template = 'back/pages/wallet_statistics.html.twig';
 
         $operationRepository = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\Operation::class);
+        $request = $this->coreLocator->request();
 
         $now = new \DateTime();
-        $startYear = (clone $now)->modify('first day of January 00:00:00');
-        $endYear = (clone $now)->modify('last day of December 23:59:59');
+        $selectedYear = $request->query->get('year', $now->format('Y'));
+        $selectedMonth = $request->query->get('month', $now->format('m'));
 
-        $startMonth = (clone $now)->modify('first day of this month 00:00:00');
-        $endMonth = (clone $now)->modify('last day of this month 23:59:59');
+        $startYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-01-01 00:00:00");
+        $endYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-12-31 23:59:59");
+
+        $startMonth = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-$selectedMonth-01 00:00:00");
+        $endMonth = (clone $startMonth)->modify('last day of this month 23:59:59');
 
         $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
         $monthStatsRaw = $operationRepository->getStats($wallet, $startMonth, $endMonth);
@@ -85,6 +89,14 @@ class WalletController extends BaseController
             'wallet' => $wallet,
             'yearStats' => $this->formatStats($yearStatsRaw),
             'monthStats' => $this->formatStats($monthStatsRaw),
+            'selectedYear' => $selectedYear,
+            'selectedMonth' => $selectedMonth,
+            'years' => range($now->format('Y'), $now->format('Y') - 5), // Les 5 dernières années
+            'months' => [
+                '01' => 'Janvier', '02' => 'Février', '03' => 'Mars', '04' => 'Avril',
+                '05' => 'Mai', '06' => 'Juin', '07' => 'Juillet', '08' => 'Août',
+                '09' => 'Septembre', '10' => 'Octobre', '11' => 'Novembre', '12' => 'Décembre'
+            ],
         ]);
     }
 

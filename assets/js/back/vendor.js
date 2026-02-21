@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     import('./bootstrap');
 
-    const selects = document.querySelectorAll('select');
+    const selects = document.querySelectorAll('select:not(.initial)');
     if (selects.length > 0) {
         import('./choice').then(({default: Choice}) => {
             new Choice(selects);
