@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Security;
 
-use App\Controller\BaseController;
 use App\Form\Manager\Security\ConfirmPasswordManager;
 use App\Form\Manager\Security\ResetPasswordManager;
 use App\Form\Type\Security\PasswordRequestType;
@@ -32,7 +31,10 @@ class ResetPasswordController extends BaseController
      *
      * @throws Exception
      */
-    #[Route('/request', name: 'security_password_request', methods: 'GET|POST')]
+    #[Route([
+        'fr' => '/request',
+        'en' => '/request',
+    ], name: 'security_password_request', methods: 'GET|POST')]
     public function request(
         Request $request,
         BaseAuthenticator $baseAuthenticator,
@@ -41,14 +43,14 @@ class ResetPasswordController extends BaseController
 
         $form = $this->createForm(PasswordRequestType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() && $baseAuthenticator->checkRecaptcha($request, true)) {
+        if ($form->isSubmitted() && $form->isValid() && $baseAuthenticator->checkRecaptcha($request, true, $form)) {
             $manager->send($form->getData());
             return $this->redirectToRoute('security_password_request');
         }
 
-        if ($request->get('expire')) {
+        if ($request->request->get('expire')) {
             $session = new Session();
-            $session->getFlashBag()->add('warning', $this->coreLocator->translator()->trans('Votre mot de passe a expiré, vous devez le réinitialiser.', [], 'security_cms'));
+            $session->getFlashBag()->add('warning', $this->coreLocator->translator()->trans('Your password has expired. You must reset it.', [], 'security_cms'));
         }
 
         return $this->render('security/password-request.html.twig', array_merge($this->defaultArguments(), [
@@ -61,7 +63,10 @@ class ResetPasswordController extends BaseController
      *
      * @throws Exception
      */
-    #[Route('/confirm/{token}', name: 'security_password_confirm', methods: 'GET|POST')]
+    #[Route([
+        'fr' => '/confirm/{token}',
+        'en' => '/confirm/{token}',
+    ], name: 'security_password_confirm', methods: 'GET|POST')]
     public function confirm(
         Request $request,
         string $token,
@@ -76,17 +81,16 @@ class ResetPasswordController extends BaseController
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && $baseAuthenticator->checkRecaptcha($request, true)) {
+        if ($form->isSubmitted() && $form->isValid() && $baseAuthenticator->checkRecaptcha($request, true, $form)) {
             $manager->confirm($form->getData(), $user);
-            $this->addFlash('success', $this->coreLocator->translator()->trans('Votre mot de passe a été modifié avec succès.', [], 'security_cms'));
-
+            $this->addFlash('success', $this->coreLocator->translator()->trans('Your password has been successfully updated.', [], 'security_cms'));
             return $this->redirectToRoute('security_login');
         }
 
-        if (!$user && $authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('back_dashboard');
+        if ($authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('back_wallet_index');
         } elseif (!$user) {
-            throw $this->createAccessDeniedException($this->coreLocator->translator()->trans('Accès refusé.', [], 'security_cms'));
+            throw $this->createAccessDeniedException($this->coreLocator->translator()->trans('Access denied.', [], 'security_cms'));
         }
 
         return $this->render('security/password-confirm.html.twig', array_merge($this->defaultArguments(), [

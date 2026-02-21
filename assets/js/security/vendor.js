@@ -34,26 +34,9 @@ if (inputPwd) {
     }).catch(error => console.error(error.message));
 }
 
-/** 4 - Recaptcha */
-let formSecurity = document.querySelectorAll('form.security')
-if (formSecurity.length > 0) {
-    import('../vendor/components/recaptcha').then(({generate: Generate}) => {
-        new Generate();
-    }).catch(error => console.error(error.message));
-}
-
-document.querySelectorAll('form.security').forEach(function (form) {
-    let submit = form.querySelector('[type="submit"]');
-    submit.onclick = function () {
-        import(/* webpackPreload: true */ '../vendor/components/recaptcha').then(({onSubmit: OnSubmit}) => {
-            new OnSubmit(form);
-        }).catch(error => console.error(error.message));
-    }
-});
-
 window.addEventListener('load', () => {
 
-    let filled = function(input) {
+    let filled = function (input) {
         if (input.value !== '') {
             input.classList.add('filled');
             input.parentNode.classList.add('filled-group');

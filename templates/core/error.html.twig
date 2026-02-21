@@ -1,8 +1,8 @@
 {% trans_default_domain 'core' %}
 
-{% set inAdmin = app.user or (inAdmin is defined and inAdmin) %}
+{% set inAdmin = inAdmin is defined and inAdmin %}
 
-<section id="exception-block" class="{% if inAdmin %}my-5{% else %}text-center{% endif %}">
+<section id="exception-block" class="min-content-height{% if inAdmin %} my-5{% endif %}">
     <div id="errorStatus">
         <div class="errorStatus">
             <div class="errorStatus-code"></div>

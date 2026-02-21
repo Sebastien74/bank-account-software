@@ -1,0 +1,26 @@
+{% trans_default_domain 'back' %}
+
+<div id="sidebar-opposite-menu" class="sidebar py-4">
+    <nav class="nav nav-pills flex-column pt-4 gap-3 h-100">
+        {% set active = 'symfony_requirements' == app.request.attributes.get('_route') %}
+{#        <a href="{{ path('symfony_requirements') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">#}
+{#            <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
+{#                <i class="icon-bug"></i>#}
+{#            </span>#}
+{#            <span class="mx-1 label">{{ 'Symfony requirements'|trans|raw }}</span>#}
+{#        </a>#}
+{#        {% set active = 'back_phpinfo' == app.request.attributes.get('_route') %}#}
+{#        <a href="{{ path('back_phpinfo') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">#}
+{#            <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
+{#                <i class="icon-php"></i>#}
+{#            </span>#}
+{#            <span class="mx-1 label">{{ 'PHP info'|trans|raw }}</span>#}
+{#        </a>#}
+{#        <a href="{{ path('api_front_domain_check', {token: getEnv('APP_API_TOKEN'), redirect: true}) }}" class="nav-link display-loader d-inline-flex align-items-center text-white mx-auto py-2 px-4">#}
+{#            <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
+{#                <i class="icon-fire-alt"></i>#}
+{#            </span>#}
+{#            <span class="mx-1 label">{{ 'Manual execution'|trans|raw }}</span>#}
+{#        </a>#}
+    </nav>
+</div>

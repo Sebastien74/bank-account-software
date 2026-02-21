@@ -5,14 +5,14 @@
 {% import _self as macro %}
 
 {% block stylesheets %}
-    {{ encore_entry_link_tags('back-operations', null, 'back', {nonce: csp_nonce()}) }}
-    <link rel="modulepreload" href="{{ preload(asset('build/back/back-operations.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">
+{#    {{ encore_entry_link_tags('back-operations', null, 'back', {nonce: csp_nonce()}) }}#}
+{#    <link rel="modulepreload" href="{{ preload(asset('build/back/back-operations.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">#}
     {{ parent() }}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('back-operations', null, 'back', {defer: true, nonce: csp_nonce()}) }}
+{#    {{ encore_entry_script_tags('back-operations', null, 'back', {defer: true, nonce: csp_nonce()}) }}#}
 {% endblock %}
 
 {% macro sort(wallet, label, sort, date) %}

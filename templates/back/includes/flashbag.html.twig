@@ -2,7 +2,7 @@
 
 {% for alert, messages in app.session.flashbag.all %}
     {% for message in messages %}
-        {% include 'back/includes/alert.html.twig' with {
+        {% include 'core/alert.html.twig' with {
             alert: alert,
             message: message
         } only %}

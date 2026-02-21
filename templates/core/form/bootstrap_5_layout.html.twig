@@ -1,6 +1,6 @@
 {% trans_default_domain 'core' %}
 
-{% use "bootstrap_base_layout.html.twig" %}
+{% use "core/form/bootstrap_base_layout.html.twig" %}
 
 {# Widgets #}
 
@@ -190,17 +190,7 @@
         {# Attribute "required" is not supported #}
         {% set required = false %}
     {% endif -%}
-    {%- if type is defined and type == 'password'-%}
-        <div class="input-group">
-    {%- endif -%}
-        {{- parent() -}}
-    {%- if type is defined and type == 'password' -%}
-        <span class="input-group-text show-password">
-                <span class="show-icon">{{ 'fad eye'|icon(null, 14) }}</span>
-                <span class="hide-icon d-none">{{ 'fad eye-slash'|icon(null, 14) }}</span>
-            </span>
-        </div>
-    {%- endif -%}
+    {{- parent() -}}
 {%- endblock form_widget_simple %}
 
 {%- block widget_attributes -%}
@@ -222,13 +212,19 @@
 
 {%- block checkbox_widget -%}
     {%- set attr_class = attr_class|default(attr.class|default('')) -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- set asButton = 'button' in parent_label_class -%}
+    {%- set attr_data = '' -%}
     {%- set row_class = '' -%}
-    {%- if 'btn-check' not in attr_class -%}
+    {%- if 'btn-check' not in attr_class and not asButton -%}
         {%- set attr_class = attr_class ~ ' form-check-input' -%}
         {%- set row_class = 'form-check' -%}
     {%- endif -%}
+    {%- if 'button' in parent_label_class %}
+        {%- set row_class = 'btn-group-toggle w-100' -%}
+        {%- set attr_data = ' data-bs-toggle="buttons"' -%}
+    {% endif -%}
     {%- set attr = attr|merge({class: attr_class|trim}) -%}
-    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {%- if 'checkbox-inline' in parent_label_class %}
         {%- set row_class = row_class ~ ' form-check-inline' -%}
     {% endif -%}
@@ -236,9 +232,18 @@
         {%- set row_class = row_class ~ ' form-switch' -%}
     {% endif -%}
     {%- if row_class is not empty -%}
-        <div class="{{ row_class }}">
+        <div class="{{ row_class }}"{{ attr_data|raw }}>
     {%- endif -%}
-    {{- form_label(form, null, { widget: parent() }) -}}
+    {%- if 'button' in parent_label_class -%}
+        {%- set color = attr['data-color'] is defined ? attr['data-color'] : 'primary' -%}
+        {%- set class = attr['class'] is defined ? attr['class'] : null -%}
+        <label for="{{ id }}" class="cursor d-flex align-items-center justify-content-center w-100 btn btn-{{ color }}{% if class %} {{ class }}{% endif %}{% if checked %} active{% endif %}">
+            <i class="icon-check me-2"></i>{{ label }}
+        </label>
+        <input id="{{ id }}" type="checkbox" class="btn-check" value="{{ checked }}" name="{{ full_name }}"{% if checked %} checked{% endif %}>
+    {%- else -%}
+        {{- form_label(form, null, { widget: parent() }) -}}
+    {%- endif -%}
     {%- if row_class is not empty -%}
         </div>
     {%- endif -%}
@@ -293,7 +298,7 @@
         {%- if compound is defined and compound -%}
             {%- set element = 'legend' -%}
             {%- if 'col-form-label' not in parent_label_class -%}
-                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label' )|trim}) -%}
+                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label' )|trim|replace({'form- ': ''})}) -%}
             {%- endif -%}
         {%- else -%}
             {%- set row_class = row_class|default(row_attr.class|default('')) -%}
@@ -323,7 +328,6 @@
         {%- if parent_label_class is defined -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) -%}
         {%- endif -%}
-
         {{ widget|raw }}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if label is not same as(false) -%}
@@ -336,18 +340,55 @@
 {# Rows #}
 
 {%- block form_row -%}
+    {%- set baseTypes = [
+        'text','textarea','file','choice','checkbox','radio','email','url','password',
+        'number','integer','range','date','datetime','time','hidden','collection','entity'
+    ] -%}
+    {%- set type = (form.vars.block_prefixes
+        |reverse
+        |filter(p => p in baseTypes)
+        |first) -%}
+    {%- set isExpanded = choices is defined and expanded is defined and expanded -%}
+    {%- set outsideError = 'choice' == type and expanded is defined and expanded -%}
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
+        {%- set row_class = 'fieldset-'~id|replace({'_': '-'}) -%}
+        {%- if 'secure' in id -%}
+            {%- set row_class = (row_class~' fieldset-secure')|trim -%}
+        {%- endif -%}
+        {%- if form.vars.row_attr.class is defined and 'fieldset-inline' in form.vars.row_attr.class -%}
+            {%- set row_class = (row_class~' fieldset-inline')|trim -%}
+        {%- endif -%}
     {%- endif -%}
     {%- set widget_attr = {} -%}
     {%- if help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     {%- set row_class = row_class|default(row_attr.class|default('mb-3')|trim) -%}
-    {%- if 'back-' in app.request.uri -%}
-        {%- set row_class = (row_class~' form-floating mb-3')|trim -%}
+    {%- set row_class = 'mb-' not in row_class ? row_class~' mb-3' : row_class -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- set asButton = 'button' in parent_label_class -%}
+    {%- set floating_view = 'back-' in app.request.uri or 'secure/user' in app.request.uri -%}
+    {%- if floating_view and not isExpanded and not asButton -%}
+        {%- set row_class = (row_class~' form-floating')|trim -%}
     {%- endif -%}
-    <{{ element|default('div') }}{% with {attr: row_attr|merge({class: row_class})} %}{{ block('attributes') }}{% endwith %}>
+    {%- set row_class = valid ? (row_class~' is-valid-group')|trim : (row_class~' is-invalid-group')|trim -%}
+    {%- set row_class = (row_class~' '~type)|trim -%}
+    {%- if outsideError -%}
+        {%- set marginBottom = 'mb-3' -%}
+        {%- for splitClass in row_class|split(' ') -%}
+            {%- if 'mb-' in splitClass -%}
+                {%- set marginBottom = splitClass -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {%- set row_class = row_class|replace({(marginBottom): ''})|trim -%}
+        <div class="outside-error {{ marginBottom }}">
+    {%- endif -%}
+    {% set hideEl = 'fieldset' == element|default('div') and fieldset is defined and not fieldset %}
+    {% set row_class = fieldset_row.class is defined and fieldset_row.class ? (row_class~' '~fieldset_row.class)|trim : row_class %}
+    {%- if not hideEl -%}
+        <{{ element|default('div') }}{% with {attr: row_attr|merge({class: row_class})} %}{{ block('attributes') }}{% endwith %}>
+    {%- endif -%}
     {%- if 'form-floating' in row_class -%}
         {{- form_widget(form, widget_attr) -}}
         {{- form_label(form) -}}
@@ -356,8 +397,16 @@
         {{- form_widget(form, widget_attr) -}}
     {%- endif -%}
     {{- form_help(form) -}}
-    {{- form_errors(form) -}}
-    </{{ element|default('div') }}>
+    {%- if not outsideError -%}
+        {{- form_errors(form) -}}
+    {%- endif -%}
+    {%- if not hideEl -%}
+        </{{ element|default('div') }}>
+    {%- endif -%}
+    {%- if outsideError -%}
+        {{- form_errors(form) -}}
+        </div>
+    {%- endif -%}
 {%- endblock form_row %}
 
 {%- block button_row -%}

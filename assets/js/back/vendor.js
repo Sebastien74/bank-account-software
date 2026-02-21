@@ -5,8 +5,15 @@
  * Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
  */
 
+import {lazyLoadComponent} from '../vendor/functions';
+import bootstrap from './bootstrap';
+import displayLoader from './display-loader';
+
 /** Import CSS */
 import '../../scss/back/vendor.scss';
+
+lazyLoadComponent('.collapse', () => import('./collapse'), (Collapse, els) => new Collapse(els));
+lazyLoadComponent('#index-filters-form', () => import('./form-filters'), (Filters, el) => new Filters(el));
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -19,9 +26,10 @@ document.addEventListener('DOMContentLoaded', function () {
         body.classList.toggle('menu-open');
     }
 
-    import('./bootstrap');
+    bootstrap();
+    displayLoader();
 
-    const selects = document.querySelectorAll('select:not(.initial)');
+    const selects = document.querySelectorAll('select');
     if (selects.length > 0) {
         import('./choice').then(({default: Choice}) => {
             new Choice(selects);
@@ -35,6 +43,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }).catch(error => console.error(error.message));
     }
 
+    const passwordFields = document.querySelectorAll('.show-password');
+    if (passwordFields.length > 0) {
+        import('../vendor/components/password-field').then(({default: PasswordFields}) => {
+            new PasswordFields(passwordFields);
+        }).catch(error => console.error(error.message));
+    }
+
+    const btnGroupToggle = document.querySelector('.btn-group-toggle');
+    if (btnGroupToggle) {
+        import('./btn-group-toggle').then(({default: BtnToggles}) => {
+            new BtnToggles();
+        }).catch(error => console.error(error.message));
+    }
+
+    const tagsInput = document.querySelector('[data-role="tags-input"]');
+    if (tagsInput) {
+        import('./bootstrap/tags-input').then(({default: TagInputs}) => {
+            new TagInputs();
+        }).catch(error => console.error(error.message));
+    }
+
     document.querySelectorAll('.checkbox-ajax').forEach(el => {
         el.addEventListener('change', () => {
             const checked = el.checked ? '1' : '0';
@@ -44,4 +73,38 @@ document.addEventListener('DOMContentLoaded', function () {
             xHttp.send(new FormData(form));
         });
     });
+
+    const oppositeBtn = document.querySelector('#open-btn-opposite');
+    if (oppositeBtn) {
+        oppositeBtn.onclick = function () {
+            const sidebar = document.querySelector('#sidebar-opposite-menu');
+            sidebar.classList.toggle('open');
+        }
+    }
+
+    const phpinfo = document.getElementById('phpinfo-container');
+    if (phpinfo) {
+        import('./phpinfo').then(({default: Phpinfo}) => {
+            new Phpinfo();
+        }).catch(error => console.error(error.message));
+    }
 });
+
+const showEl = document.querySelector('#show-entity');
+if (showEl) {
+    showEl.querySelectorAll('td.value').forEach(td => {
+        const text = (td.textContent || '')
+            .replace(/\u00A0/g, ' ') // Convert &nbsp; to regular space
+            .trim();
+        // HTML check: at least one real element inside (ignores text nodes)
+        const hasElement = td.querySelector('*') !== null;
+        // If no meaningful text AND no HTML element => remove
+        if (!text && !hasElement) {
+            td.closest('tr').remove();
+        }
+    });
+}
+
+import('../vendor/components/lazy-load').then(({default: lazyLoad}) => {
+    new lazyLoad();
+}).catch(error => console.error(error.message));

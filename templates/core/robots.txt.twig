@@ -1,0 +1,16 @@
+{% if disallow and not app.request.get('preview') %}
+User-agent: *
+Disallow: /
+{% else %}
+User-agent: *
+{% for url in noIndexes %}
+{% if url.uri is defined and url.uri %}
+Disallow: {{ url.uri }}
+{% endif %}
+{% else %}
+Allow: /
+{% endfor %}
+{% endif %}
+{% if sitemap %}
+Sitemap: {{ sitemap }}
+{% endif %}

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Back\Wallet;
 
-use App\Controller\BaseController;
+use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Category;
 use App\Entity\Wallet\SubCategory;
 use App\Form\Type\Wallet\SubCategoryType;

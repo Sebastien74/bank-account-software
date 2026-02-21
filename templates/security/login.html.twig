@@ -16,11 +16,10 @@
     {{ form_start(form, {attr: {
         novalidate: "novalidate",
         method: "POST",
-        class: 'form-horizontal form-material security',
+        class: 'form-horizontal security',
         action: path('security_login'),
         id: "login-form",
     }}) }}
-        <div class="form-data" data-id="{{ securityKey }}"></div>
         {% for field in form.children %}
             {% if field.vars.name == '_remember_me' %}
                 <div class="row mb-4">
@@ -29,17 +28,17 @@
                 {{ form_row(form[field.vars.name]) }}
             {% if field.vars.name == '_remember_me' %}
                     </div>
-                    <div class="col-sm-6 d-flex justify-content-center justify-content-sm-start text-center text-sm-end">
+                    <div class="col-sm-6 d-flex justify-content-center justify-content-sm-end text-center text-sm-end">
                         <a href="{{ path("security_password_request", {_locale: app.request.locale}) }}" id="to-recover" class="text-white" data-toggle="preloader">
-                            <small class="text-italic">{{ 'Mot de passe oublié ?'|trans|raw }}</small>
+                            <small class="text-italic lh-1 d-inline-block">{{ 'Forgot your password?'|trans|raw }}</small>
                         </a>
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
         {% if error %}
-            {% include 'security/includes/alert.html.twig' with {alert: 'danger', message: error.messageKey|trans(error.messageData, 'security')|raw} only %}
+            {% include 'core/alert.html.twig' with {alert: 'danger', display: 'alert', message: error.messageKey|trans(error.messageData, 'security')|raw} only %}
         {% endif %}
-        {% include "security/includes/flashbag.html.twig" %}
+        {% include 'core/flash-bag.html.twig' %}
     {{ form_end(form) }}
 {% endblock %}

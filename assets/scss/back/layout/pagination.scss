@@ -9,92 +9,123 @@
 
 ----------------------------------------------------------------------------------------- */
 
-.pagination-counter {
-    font-size: 13px;
+$dash-accent: $primary !default;
+
+$pg-surface: rgba(255, 255, 255, 0.02) !default;
+$pg-border: rgba(255, 255, 255, 0.07) !default;
+$pg-border-hover: rgba(255, 255, 255, 0.12) !default;
+
+$pg-text: rgba(255, 255, 255, 0.92) !default;
+$pg-muted: rgba(255, 255, 255, 0.70) !default;
+
+$pg-shadow: 0 18px 45px rgba(0, 0, 0, 0.45) !default;
+
+/* Remove Bootstrap defaults that clash */
+.pagination {
+    --bs-pagination-bg: transparent;
+    --bs-pagination-border-color: transparent;
+    --bs-pagination-hover-bg: transparent;
+    --bs-pagination-hover-border-color: transparent;
+    --bs-pagination-focus-bg: transparent;
+    --bs-pagination-focus-box-shadow: none;
 }
 
 .pagination-nav {
 
-    max-width: 100%;
+    /* Target Knp default output */
+    nav {
+        > .pagination {
+            margin: 0;
+            gap: 0.4rem; /* modern spacing */
+        }
+    }
 
-    .pagination {
+    .page-item {
+        &.disabled .page-link {
+            opacity: 0.45;
+            pointer-events: none;
+        }
 
-        margin-bottom: 0;
+        &.active .page-link {
+            background: rgba($dash-accent, 0.22);
+            border-color: rgba($dash-accent, 0.55);
+            color: #fff;
+            font-weight: 650;
 
-        li {
+            box-shadow: 0 0 0 4px rgba($dash-accent, 0.14);
+        }
+    }
 
-            padding-left: 0 !important;
+    .pagination-counter {
+        font-size: 13px;
+    }
 
-            &:before {
-                display: none;
-            }
+    .page-link {
 
-            &:not(:last-child) {
-                padding-right: .75rem !important;
-            }
+        /* Chip look */
+        min-width: 30px;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 12px;
+        border: 1px solid $pg-border;
+        background: rgba(255, 255, 255, 0.015);
+        color: $pg-text;
+        font-weight: 600;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
 
-            a {
-                border: 0;
-            }
+        transition: transform 140ms ease,
+        background-color 140ms ease,
+        border-color 140ms ease,
+        box-shadow 140ms ease;
 
-            .page-link {
+        &:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: $pg-border-hover;
+            transform: translateY(-1px);
+            box-shadow: $pg-shadow;
+            text-decoration: none;
+            color: $pg-text;
+        }
 
-                font-size: 14px;
-                color: transparentize($white, .25);
-                border: 0 !important;
-                box-shadow: none !important;
-                font-weight: 500;
-                padding: 0 !important;
-                background-color: transparent !important;
+        &:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 4px rgba($dash-accent, 0.18);
+        }
+    }
 
-                @include mediaQuery(max-md) {
-                    padding: $pagination-padding-y $pagination-padding-y;
-                }
+    /* Ellipsis (disabled item with …) should look neutral */
+    .page-item.disabled .page-link {
+        border-color: transparent;
+        background: transparent;
+        color: $pg-muted;
+        box-shadow: none;
+    }
 
-                &:hover {
-                    color: transparentize($white, 0);
-                }
-            }
+    /* Make prev/next wider automatically (matches your "Précédent/Suivant") */
+    .page-link[rel="next"],
+    .page-link[rel="prev"] {
+        padding-left: 14px;
+        padding-right: 14px;
+        font-weight: 500;
+        border-radius: 12px;
+    }
 
-            &:first-child > .page-link,
-            &:last-child > .page-link {
+    /* Optional: slightly emphasize "Suivant »" as a CTA without changing HTML */
+    .page-link[rel="next"] {
 
-                text-transform: uppercase;
-                color: transparentize($white, .25);
+        background: rgba($dash-accent, 0.10);
+        border-color: rgba($dash-accent, 0.28);
 
-                &:hover {
-                    color: transparentize($white, 0);
-                }
-            }
-
-            &.active > .page-link {
-                color: transparentize($white, .75);
-            }
-
-            &:not(.disabled) > .page-link {
-                > svg {
-                    fill: $primary;
-                }
-            }
-
-            &.disabled {
-
-                display: none !important;
-
-                > .page-link {
-                    color: $gray-500;
-
-                    > svg {
-                        fill: $gray-500;
-                    }
-                }
-            }
-
-            @include mediaQuery(max-md) {
-                &:nth-last-child(2) {
-                    display: none !important;
-                }
-            }
+        &:hover {
+            background: rgba($dash-accent, 0.16);
+            border-color: rgba($dash-accent, 0.45);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55),
+            0 0 0 4px rgba($dash-accent, 0.12);
         }
     }
 }

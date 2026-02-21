@@ -37,7 +37,7 @@ class GlobalManager implements GlobalManagerInterface
     public function setForm(string $formClassname, mixed $entity = null, mixed $formManager = null, array $formOptions = []): void
     {
         if (!$entity) {
-            throw new NotFoundHttpException($this->coreLocator->translator()->trans("Cette page n'existe pas !", [], 'back'));
+            throw new NotFoundHttpException($this->coreLocator->translator()->trans('This page does not exist!', [], 'back'));
         }
 
         $this->form = $this->formFactory->create($formClassname, $entity, $formOptions);
@@ -45,16 +45,13 @@ class GlobalManager implements GlobalManagerInterface
 
         if ($this->form->isSubmitted() && $this->form->isValid()) {
             $entity = $this->form->getData();
-            $interface = $entity && method_exists($entity, 'getInterface') ? $entity::getInterface() : [];
-            $masterField = !empty($interface['masterField']) ? $interface['masterField'] : false;
-            $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
-            $masterFieldSetter = $masterField ? 'set'.ucfirst($masterField) : false;
+            $interface = $this->coreLocator->entityInterface($entity);
             if (method_exists($entity, 'getAdminName') && method_exists($entity, 'setSlug') && !$entity->getSlug()) {
                 $entity->setSlug(Urlizer::urlize($entity->getAdminName()));
             }
-            if ($masterField) {
-                $this->setMasterField($entity, $masterField, $masterFieldSetter);
-                $this->setPosition($entity, $masterField, $masterFieldGetter);
+            if ($interface['masterField']) {
+                $this->setMasterField($entity, $interface['masterField'], $interface['masterFieldSetter']);
+                $this->setPosition($entity, $interface['masterField'], $interface['masterFieldGetter']);
             }
             $isNew = !$entity->getId();
             if ($isNew) {
@@ -82,21 +79,18 @@ class GlobalManager implements GlobalManagerInterface
         $this->redirection = $this->coreLocator->request()->headers->get('referer');
 
         if (!is_object($entityToDelete)) {
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Une erreur est survenue !", [], 'back'));
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('An error has occurred!', [], 'back'));
             return $this->redirection;
         }
 
         if ($allowed) {
-            $interface = $entityToDelete && method_exists($entityToDelete, 'getInterface') ? $entityToDelete::getInterface() : [];
-            $interfaceName = !empty($interface['name']) ? $interface['name'] : null;
-            $masterField = !empty($interface['masterField']) ? $interface['masterField'] : null;
-            if ($interfaceName) {
+            $interface = $this->coreLocator->entityInterface($entityToDelete);
+            if ($interface['name']) {
                 $repository = $this->coreLocator->em()->getRepository(get_class($entityToDelete));
                 $currentPosition = method_exists($entityToDelete, 'getPosition') ? $entityToDelete->getPosition() : false;
                 $this->coreLocator->em()->remove($entityToDelete);
                 if (is_numeric($currentPosition)) {
-                    $masterFieldGetter = $masterField ? 'get'.ucfirst($masterField) : false;
-                    $entities = $masterField ? $repository->findBy([$masterField => $entityToDelete->$masterFieldGetter()]) : $repository->findAll();
+                    $entities = $interface['masterField'] ? $repository->findBy([$interface['masterField'] => $entityToDelete->$interface['masterFieldGetter']()]) : $repository->findAll();
                     foreach ($entities as $entity) {
                         if ($entity->getPosition() > $currentPosition) {
                             $entity->setPosition($entity->getPosition() - 1);
@@ -105,10 +99,10 @@ class GlobalManager implements GlobalManagerInterface
                     }
                 }
                 $this->coreLocator->em()->flush();
-                $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Supprimé avec succès !", [], 'back'));
+                $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans('Successfully deleted!', [], 'back'));
             }
         } else {
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Vous n'êtes pas autorisé à supprimer !", [], 'back'));
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('You are not allowed to delete!', [], 'back'));
         }
 
         return $this->redirection;
@@ -123,7 +117,7 @@ class GlobalManager implements GlobalManagerInterface
     }
 
     /**
-     * To set master field.
+     * To set a master field.
      */
     public function setMasterField(mixed $entity, string $masterField, string $masterFieldSetter): void
     {
@@ -149,13 +143,13 @@ class GlobalManager implements GlobalManagerInterface
     }
 
     /**
-     * To set flash bag.
+     * To set a flash bag.
      */
     public function setFlashBag(bool $isNew): void
     {
         $session = $this->coreLocator->request()->getSession();
-        $message = $isNew ? $this->coreLocator->translator()->trans("Créé avec succès !", [], 'back')
-            : $this->coreLocator->translator()->trans("Modifié avec succès !", [], 'back');
+        $message = $isNew ? $this->coreLocator->translator()->trans('Successfully created!', [], 'back')
+            : $this->coreLocator->translator()->trans('Successfully updated!', [], 'back');
         $session->getFlashBag()->add('success', $message);
     }
 
@@ -176,8 +170,8 @@ class GlobalManager implements GlobalManagerInterface
             $submitName = $this->form->getClickedButton()->getName();
             $redirections = [
                 'save' => $this->coreLocator->request()->headers->get('referer'),
-                'saveEdit' => $this->coreLocator->router()->generate('back_'.$interface['name'].'_edit', $this->coreLocator->routeArgs('back_'.$interface['name'].'_edit', $entity)),
-                'saveBack' => $this->coreLocator->router()->generate('back_'.$interface['name'].'_index', $this->coreLocator->routeArgs('back_'.$interface['name'].'_index', $entity)),
+                'saveEdit' => 'saveEdit' === $submitName ?$this->coreLocator->router()->generate('back_'.$interface['name'].'_edit', $this->coreLocator->routeArgs('back_'.$interface['name'].'_edit', $entity)) : null,
+                'saveBack' => 'saveBack' === $submitName ? $this->coreLocator->router()->generate('back_'.$interface['name'].'_index', $this->coreLocator->routeArgs('back_'.$interface['name'].'_index', $entity)) : null,
             ];
             $this->redirection = !empty($redirections[$submitName]) ? $redirections[$submitName] : $redirections['save'];
         } else {

@@ -1,0 +1,566 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back form
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+html body form {
+    fieldset.mb-3 {
+        margin-bottom: 0 !important;
+    }
+}
+
+form {
+
+    .form-control, .form-select {
+
+        min-height: 45px;
+        border-radius: $input-border-radius;
+        box-shadow: none !important;
+
+        &:active, &:focus {
+            box-shadow: none !important;
+            border-color: $input-border-color !important;
+        }
+
+        &.is-invalid {
+            background-image: $input-invalid-bg !important;
+            background-size: initial !important;
+            background-position: initial !important;
+            border-color: $input-border-color !important;
+        }
+    }
+
+    .form-floating .form-label {
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    .choices[data-type*="select-one"]::after {
+        border-color: $input-color transparent transparent transparent;
+    }
+
+    .choices, .choices__inner {
+        overflow: initial;
+    }
+
+    .choices__item--selectable img {
+        max-height: 20px;
+    }
+
+    .choices {
+        margin-bottom: 0;
+    }
+
+    .btn-group-toggle {
+
+        label {
+            border: 1px solid $input-border-color !important;
+            border-radius: $input-border-radius !important;
+        }
+
+        .active {
+            background: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%),
+            linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !important;
+        }
+
+        label:not(.active) {
+
+            background-color: transparent !important;
+            color: transparentize($white, .3) !important;
+
+            i {
+                display: none;
+            }
+        }
+    }
+
+    .form-check-label {
+        color: $input-color;
+    }
+
+    .choices__inner {
+        border-radius: $input-border-radius;
+        background-color: $input-bg;
+        border: 0;
+        color: $input-color;
+    }
+
+    .choices:not([data-type="select-multiple"]) {
+        .choices__inner {
+            height: 58px;
+            border-radius: 12px;
+        }
+    }
+
+    .choices[data-type="select-multiple"] {
+        .choices__inner {
+            min-height: 58px;
+            height: auto;
+            padding-top: 1.75rem;
+        }
+    }
+
+    .choices__input {
+        background-color: $input-bg;
+        color: $gray-300;
+        opacity: 1;
+        padding-left: .25rem;
+        font-weight: 400;
+        font-size: 0.875rem;
+    }
+
+    .choices__list--multiple .choices__item {
+        background-color: $primary;
+        border: 1px solid $primary;
+        border-radius: $input-border-radius;
+    }
+
+    .choices__list--multiple .choices__item.is-highlighted {
+        background-color: $primary-darken;
+        border: 1px solid $primary-darken;
+    }
+
+    .choices__item[data-value=""]:not(.choices__placeholder) {
+        display: none !important;
+    }
+
+    .choices[data-type*="select-one"] .choices__button {
+        background: rgba(111, 66, 193, 0.5) url(../../../medias/images/back/times-white.svg) no-repeat center;
+        background-size: 8px !important;
+        position: absolute;
+        top: -2.75rem;
+        right: -3rem;
+        z-index: 1000;
+        opacity: 1;
+        border: 1px solid rgba(111, 66, 193, 0.28);
+        height: 23px;
+        width: 23px;
+        border-radius: 10px;
+        margin: 0 !important;
+    }
+
+    .choices[data-type*="select-multiple"] .choices__button,
+    .choices[data-type*="text"] .choices__button {
+        border-left: 1px solid transparentize($white, .85);
+        background-size: 9px;
+        width: 9px;
+    }
+
+    .choices__heading {
+        background-color: $input-bg;
+        border: 0;
+        color: $input-color;
+    }
+
+    .choices__list--single {
+        position: relative;
+        top: 20px;
+        font-size: $input-font-size;
+    }
+
+    .choices__list--dropdown {
+        z-index: 500 !important;
+    }
+
+    .choices__list--dropdown .choices__placeholder,
+    .is-open .choices__list--dropdown,
+    .is-open .choices__list[aria-expanded] {
+        background-color: #14161e !important;
+        color: $gray-900 !important;
+        border: 0 !important;
+        border-radius: 14px;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: $gray-600 !important;
+        color: $gray-900 !important;
+    }
+
+    .choices[data-type*="select-one"] .choices__input {
+        background-color: $gray-400;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJtNTA4LjUgNDgxLjYtMTI5LTEyOWMtMi4zLTIuMy01LjMtMy41LTguNS0zLjVoLTEwLjNDMzk1IDMxMiA0MTYgMjYyLjUgNDE2IDIwOCA0MTYgOTMuMSAzMjIuOSAwIDIwOCAwUzAgOTMuMSAwIDIwOHM5My4xIDIwOCAyMDggMjA4YzU0LjUgMCAxMDQtMjEgMTQxLjEtNTUuMlYzNzFjMCAzLjIgMS4zIDYuMiAzLjUgOC41bDEyOSAxMjljNC43IDQuNyAxMi4zIDQuNyAxNyAwbDkuOS05LjljNC43LTQuNyA0LjctMTIuMyAwLTE3TTIwOCAzODRjLTk3LjMgMC0xNzYtNzguNy0xNzYtMTc2UzExMC43IDMyIDIwOCAzMnMxNzYgNzguNyAxNzYgMTc2LTc4LjcgMTc2LTE3NiAxNzYiLz48L3N2Zz4=);
+        color: $gray-700;
+        border: 0;
+        background-repeat: no-repeat;
+        background-position-x: 97%;
+        background-position-y: 11px;
+        background-size: 20px;
+    }
+
+    .use-bootstrap-tag {
+
+        height: auto !important;
+        padding-top: 2.1rem !important;
+        background-color: $input-bg !important;
+
+        &.focus {
+            box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25) !important;
+        }
+
+        .input-wrapper {
+
+            margin-left: .25rem;
+
+            input[type="text"] {
+                color: transparentize($white, 0.3) !important;
+            }
+
+            input[type="text"]::placeholder {
+                color: transparentize($white, 0.3) !important;
+            }
+        }
+
+        button {
+            background-color: $primary;
+            padding: .3rem 1rem !important;
+            font-size: 14px;
+        }
+    }
+
+    .invalid-feedback {
+        font-size: 11px;
+        color: $red-400 !important;
+    }
+
+    .btn {
+        font-size: 14px;
+    }
+
+    .asterisk {
+        color: $red;
+        font-size: 14px;
+        top: -.2em;
+    }
+}
+
+.mc-picker {
+    background-color: $gray-800 !important;
+}
+
+.mc-table__weekday,
+.mc-btn--success {
+    color: $purple-400 !important;
+}
+
+.mc-picker.mc-date--today {
+    color: $gray-800 !important;
+}
+
+.mc-date--active.mc-date--today {
+    background-color: $gray-900 !important;
+}
+
+.mc-picker.mc-date--today,
+.mc-date--active {
+    color: $gray-300 !important;
+}
+
+.mc-calendar--modal.mc-calendar--opened {
+    z-index: 5000
+}
+
+/* --------------------------------------------------------------------------------------
+    Module : Back choices (Choices.js)
+    Copyright : 2025
+    Author : Sébastien FOURNIER
+----------------------------------------------------------------------------------------- */
+
+.choices {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.1;
+    margin-bottom: 0;
+
+    &,
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Keep aligned with your inputs */
+    .choices__inner {
+
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        padding: 10px 38px 10px 12px; /* right padding for arrow */
+        border-radius: 12px;
+        background: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%),
+        linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3);
+        border: 1px solid $dash-border;
+        color: $dash-text;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+    }
+
+    &:hover .choices__inner {
+        border-color: $dash-border-hover;
+    }
+
+    &.is-focused .choices__inner,
+    &.is-open .choices__inner {
+        border-color: $dash-border-focus;
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55),
+        0 0 0 2px rgba(124, 108, 255, 0.28);
+    }
+
+    &.is-disabled {
+        opacity: 0.55;
+        pointer-events: none;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Selected value (single)
+------------------------------------------------------------------- */
+
+.choices[data-type*="select-one"] {
+
+    .choices__list--single {
+        padding: 0;
+    }
+
+    .choices__item {
+
+        color: $dash-text;
+        font-weight: 300;
+        font-size: 12px;
+
+        &.choices__placeholder {
+            color: $dash-muted;
+            font-weight: 300;
+            font-size: 12px;
+        }
+    }
+
+    /* Arrow */
+    &:after {
+        content: "";
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        transform: translateY(-50%) rotate(45deg);
+        border-right: 2px solid rgba(255, 255, 255, 0.55);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.55);
+        pointer-events: none;
+        transition: transform .12s ease, border-color .12s ease;
+    }
+
+    &.is-open:after {
+        transform: translateY(-50%) rotate(-135deg);
+        border-color: rgba(255, 255, 255, 0.78);
+    }
+}
+
+/* ------------------------------------------------------------------
+   Dropdown panel (forced to match input width)
+------------------------------------------------------------------- */
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    right: auto !important;
+    margin-top: 8px;
+    border-radius: 12px;
+    background: $dash-surface;
+    border: 1px solid rgba(124, 108, 255, 0.22);
+    box-shadow: $dash-shadow;
+    overflow: hidden;
+
+    /* Avoid the bright default + control internal padding */
+    .choices__list {
+        background: $dash-surface;
+        padding: 6px;
+        max-height: 280px;
+        overflow: auto;
+    }
+}
+
+/* Sometimes Choices injects transform that shifts the dropdown */
+.choices.is-open .choices__list--dropdown,
+.choices.is-open .choices__list[aria-expanded] {
+    transform: none !important;
+}
+
+/* ------------------------------------------------------------------
+   Search input inside dropdown
+------------------------------------------------------------------- */
+
+.choices__input--cloned {
+
+    width: calc(100% - 16px) !important;
+
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+
+    color: $dash-text !important;
+
+    padding: 10px 12px !important;
+    margin: 8px 8px 6px 8px !important;
+
+    outline: none !important;
+    box-shadow: none !important;
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+        opacity: 1;
+    }
+
+    &:focus {
+        border-color: rgba(124, 108, 255, 0.55) !important;
+        box-shadow: 0 0 0 2px rgba(124, 108, 255, 0.22) !important;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Items
+------------------------------------------------------------------- */
+
+.choices__item--choice {
+
+    border-radius: 10px;
+    padding: 10px 10px;
+    color: rgba(255, 255, 255, 0.86);
+
+    transition: background-color .10s ease, color .10s ease;
+
+    /* hover / highlighted */
+    &.is-highlighted {
+        background: $dash-item-hover;
+        color: #fff;
+    }
+
+    /* selected (works for single + multi) */
+    &.is-selected {
+        background: $dash-item-active;
+        color: #fff;
+    }
+}
+
+/* Empty / disabled choices */
+.choices__item--choice.is-disabled {
+    opacity: 0.45;
+}
+
+/* ------------------------------------------------------------------
+   Scrollbar (optional, matches dark UI)
+------------------------------------------------------------------- */
+.choices__list--dropdown .choices__list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.choices__list--dropdown .choices__list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    border: 2px solid $dash-surface;
+}
+
+.choices__list--dropdown .choices__list::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 108, 255, 0.25);
+}
+
+/* ----------------------------------------------------------
+   AUTOFILL ONLY: replace underline with border-bottom
+   Prevent layout shift by keeping 2px border always,
+   and changing only the color on focus/invalid.
+----------------------------------------------------------- */
+
+
+$form-autofill-bg: $input-bg !default;                // same as your inputs
+$form-autofill-text: $input-color !default;           // same as your inputs
+$form-autofill-border: $dash-border !default;
+$form-autofill-border-hover: $dash-border-hover !default;
+$form-autofill-border-focus: $dash-border-focus !default;
+
+$form-autofill-ring: 0 0 0 2px rgba(124, 108, 255, 0.28) !default; // align with your choices focus
+$form-autofill-inset: 0 0 0 1000px $form-autofill-bg inset !default;
+
+/**
+ * Apply consistent autofill styles.
+ *
+ * @param string $selector
+ */
+@mixin dash-autofill($selector) {
+    #{$selector}:-webkit-autofill,
+    #{$selector}:-webkit-autofill:hover,
+    #{$selector}:-webkit-autofill:focus,
+    #{$selector}:-webkit-autofill:active {
+        /* Keep same background as normal field */
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+
+        /* Force text color (WebKit may force dark text otherwise) */
+        -webkit-text-fill-color: $form-autofill-text !important;
+        color: $form-autofill-text !important;
+
+        /* Keep caret visible */
+        caret-color: $form-autofill-text !important;
+
+        /* Prevent the “yellow flash” and unwanted transitions */
+        transition: background-color 9999s ease-out 0s, color 9999s ease-out 0s !important;
+
+        /* Keep geometry stable */
+        min-height: 45px; // match your global min-height
+        line-height: normal;
+        background-clip: padding-box;
+    }
+
+    /* Focus state (same ring as the rest of your UI) */
+    #{$selector}:-webkit-autofill:focus {
+        border-color: $form-autofill-border-focus !important;
+        box-shadow: none !important;
+    }
+
+    /* Hover state */
+    #{$selector}:-webkit-autofill:hover {
+        border-color: $form-autofill-border-hover !important;
+    }
+
+    /* Invalid state */
+    #{$selector}.is-invalid:-webkit-autofill,
+    #{$selector}:invalid:-webkit-autofill {
+        border-color: $input-border-color !important; // keep your existing logic
+        box-shadow: none !important;
+        background-image: none !important; // remove bootstrap invalid bg image in autofill
+    }
+
+    /* Disabled */
+    #{$selector}:disabled:-webkit-autofill {
+        opacity: 0.55;
+    }
+}
+
+/* Apply to common controls */
+@include dash-autofill('input.form-control');
+@include dash-autofill('textarea.form-control');
+@include dash-autofill('select.form-select');
+
+/* Floating labels: ensure label stays readable when field is autofilled */
+.form-floating {
+    > .form-control:-webkit-autofill ~ label,
+    > .form-select:-webkit-autofill ~ label {
+        color: rgba($white, 0.65) !important;
+    }
+}
+
+/* Placeholder consistency (autofill sometimes affects it visually) */
+.form-control::placeholder,
+.form-select::placeholder {
+    color: rgba($white, 0.45);
+    opacity: 1;
+}

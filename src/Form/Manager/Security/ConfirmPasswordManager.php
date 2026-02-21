@@ -7,30 +7,31 @@ namespace App\Form\Manager\Security;
 use App\Entity\Security\User;
 use App\Form\Model\Security\Admin\PasswordResetModel;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * ConfirmPasswordManager.
  *
- * Manage User security password
+ * Manage User security password.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class ConfirmPasswordManager
+readonly class ConfirmPasswordManager
 {
     /**
      * ConfirmPasswordManager constructor.
      */
     public function __construct(
-        private readonly UserPasswordHasherInterface $passwordEncoder,
-        private readonly EntityManagerInterface $entityManager,
+        private UserPasswordHasherInterface $passwordEncoder,
+        private EntityManagerInterface      $entityManager,
     ) {
     }
 
     /**
      * Set user password.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function confirm(PasswordResetModel $passwordResetModel, User $user): void
     {

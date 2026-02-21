@@ -1,7 +1,9 @@
 {% trans_default_domain 'back' %}
 
-{% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'wallet' %}
-{% set pageTitle = pageTitle is defined and pageTitle ? pageTitle : "Mes comptes"|trans %}
+{% set companyName = companyName is defined and companyName ? companyName : 'Agence Félix' %}
+{% set pageIcon = pageIcon is defined and pageIcon ? pageIcon : 'tachometer-alt' %}
+{% set pageTitle = pageTitle is defined and pageTitle ? pageTitle : "Administration"|trans %}
+{% set pageCode = pageCode is defined and pageCode ? pageCode : 'back' %}
 {% set excludedFields = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
 
 <!doctype html>
@@ -9,23 +11,22 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="noindex, nofollow" />
         <meta name="description" content="" />
         <meta name="author" content="{{ companyName|striptags }}" />
-        <title>{{ pageTitle|striptags ~' - '~companyName|striptags }}</title>
-        <link rel="icon" type="image/png" href="{{ asset('favicon-96x96.png') }}" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}" />
-        <meta name="apple-mobile-web-app-title" content="{{ companyName|striptags }}" />
-        <link rel="manifest" href="{{ asset('site.webmanifest') }}" />
-        <link rel="canonical" href="{{ app.request.uri }}" />
-        <meta name="theme-color" content="#712cf9" />
+        <title>{{ pageTitle|striptags ~' | '~companyName|striptags }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('medias/favicon-felix/favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('medias/favicon-felix/favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('medias/favicon-felix/favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('medias/favicon-felix/apple-touch-icon.png') }}" />
+        <meta name="apple-mobile-web-app-title" content="{{ companyName }}" />
+        <link rel="manifest" href="{{ asset('medias/favicon-felix/site.webmanifest') }}" />
         {% block stylesheets %}
             {{ encore_entry_link_tags('back-vendor', null, 'back', {nonce: csp_nonce()}) }}
             <link rel="modulepreload" href="{{ preload(asset('build/back/back-vendor.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">
         {% endblock %}
     </head>
-    <body>
+    <body id="body-{{ pageCode }}"{% if granted('ROLE_DEV') %} class="role-dev"{% endif %}>
         {% include 'back/includes/flashbag.html.twig' %}
         {% include 'back/includes/header.html.twig' with {
             companyName: companyName,
@@ -34,24 +35,27 @@
         } only %}
         <div class="d-flex">
             {% include 'back/includes/sidebar.html.twig' with {} only %}
+            {% include 'back/includes/sidebar-opposite.html.twig' with {} only %}
             <main id="main-container">
-                {% include 'back/includes/breadcrumb.html.twig' with {
-                    breadcrumb: breadcrumb is defined ? breadcrumb : []
-                } only %}
-                <div id="main-container-inner" class="px-5">
+                {% include 'back/includes/loader.html.twig' with {} only %}
+                <div id="main-container-inner" class="px-3 px-lg-3 px-xxl-5 position-relative">
+                    {% include 'back/includes/breadcrumb.html.twig' with {
+                        breadcrumb: breadcrumb is defined ? breadcrumb : []
+                    } only %}
                     {% block body %}{% endblock %}
                 </div>
             </main>
         </div>
         {% block javascripts %}
+            {{ encore_entry_script_tags('vendor-patch-csp', null, 'vendor', {nonce: csp_nonce()}) }}
             {{ encore_entry_script_tags('back-vendor', null, 'back', {defer: true, nonce: csp_nonce()}) }}
         {% endblock %}
         {% set formatDate = app.request.locale|formatDate %}
         <div id="data-translation" class="d-none"
-             data-search="{{ "Chercher"|trans|striptags }}"
+             data-search="{{ "Search"|trans|striptags }}"
              data-format-date="{{ formatDate.dateLarge }}"
-             data-close="{{ "Fermer"|trans|raw }}"
-             data-deselect="{{ "Désélectionner"|trans|raw }}"
+             data-close="{{ "Close"|trans|raw }}"
+             data-deselect="{{ "Deselect"|trans|raw }}"
              data-ok="{{ "OK"|trans|raw }}"
         ></div>
     </body>

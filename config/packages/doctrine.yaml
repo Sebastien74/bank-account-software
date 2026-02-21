@@ -4,15 +4,15 @@ doctrine:
         connections:
             default:
                 url: 'mysql://%env(DB_USER)%:%env(DB_PASSWORD)%@%env(DB_HOST)%:%env(DB_PORT)%/%env(DB_NAME)%?serverVersion=%env(DB_VERSION)%'
-                driver: 'pdo_mysql'
+                driver: pdo_mysql
                 charset: utf8mb4
                 default_table_options:
                     charset: utf8mb4
                     collate: utf8mb4_general_ci
+                    engine: InnoDB
                 #server_version: '15'
                 profiling_collect_backtrace: '%kernel.debug%'
                 use_savepoints: true
-#                platform_service: 'mmi.dbal.mysql_platform'
 
     orm:
         default_entity_manager: default
@@ -23,8 +23,7 @@ doctrine:
                     pool: doctrine.query_cache_pool
                 connection: default
                 report_fields_where_declared: true
-#                naming_strategy: doctrine.orm.naming_strategy.default
-                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                naming_strategy: doctrine.orm.naming_strategy.default
                 auto_mapping: true
                 validate_xml_mapping: true
                 identity_generation_preferences:
@@ -36,12 +35,9 @@ doctrine:
                         is_bundle: false
                         prefix: 'App\Entity'
                         alias: App
-                dql:
-                    string_functions:
-                        MATCH_AGAINST: App\Service\Doctrine\MatchAgainst
-#                        MONTH: Oro\ORM\Query\AST\Functions\SimpleFunction
-#                        YEAR: Oro\ORM\Query\AST\Functions\SimpleFunction
-#                        # https://github.com/oroinc/doctrine-extensions
+#                dql:
+#                    datetime_functions:
+#                        date_format: App\DoctrineExtensions\DateFormat
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
         controller_resolver:

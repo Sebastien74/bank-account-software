@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `input=date_point` to `DateTimeType`, `DateType` and `TimeType`
+ * Add support for guessing form type of enum properties
+ * Add `active_at`, `not_active_at` and `legal_tender`, `include_undated` options to `CurrencyType`
+ * Add `FormFlow` for multistep forms management
+
 7.3
 ---
 

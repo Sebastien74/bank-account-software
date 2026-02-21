@@ -1,0 +1,226 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back index
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+#index-search-form {
+
+
+    /* --------------------------------------------
+   Search input-group (refonte)
+   -------------------------------------------- */
+
+    .search-input-group {
+
+        --search-radius: 16px;
+        --search-h: 52px;
+        --search-bg: rgba(255, 255, 255, 0.06);
+        --search-bg-focus: rgba(255, 255, 255, 0.08);
+        --search-border: rgba(255, 255, 255, 0.08);
+        --search-accent: #7c6cff; /* violet refonte */
+        --search-text: #fff;
+        --search-placeholder: rgba(255, 255, 255, 0.45);
+        --search-icon: #9b9bff;
+
+        align-items: stretch;
+        height: var(--search-h);
+
+        border-radius: var(--search-radius);
+        background: var(--search-bg);
+        border: 1px solid var(--search-border);
+
+        overflow: hidden; /* important pour radius + input-group */
+        transition: border-color .2s ease, background-color .2s ease;
+
+        /* Bootstrap ajoute parfois des bordures entre items */
+        > .input-group-text,
+        > .form-control {
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        /* Hover global */
+        &:hover {
+            background: var(--search-bg-focus);
+        }
+
+        /* Focus global */
+        &:focus-within {
+            background: var(--search-bg-focus);
+            border-color: var(--search-accent);
+        }
+
+        /* Boutons (loupe + reset) */
+        .search-btn,
+        .search-reset {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            padding: 0 14px;
+            background: transparent !important;
+            color: var(--search-icon);
+            transition: color .2s ease, background-color .2s ease;
+        }
+
+        .search-btn {
+
+            cursor: pointer;
+
+            i {
+                font-size: 16px;
+                line-height: 1;
+            }
+
+            &:hover {
+                color: #fff;
+            }
+
+            &:active {
+                transform: translateY(0); /* neutralise certains styles */
+            }
+        }
+
+        .search-reset {
+            text-decoration: none;
+
+            i {
+                font-size: 16px;
+                line-height: 1;
+            }
+
+            &:hover {
+                color: #fff;
+            }
+        }
+
+        input.form-control {
+            height: calc(var(--search-h) - 2px); /* pas de jump */
+            padding: 0 14px;
+
+            background: transparent !important;
+            color: var(--search-text);
+
+            font-size: 14px;
+            font-weight: 500;
+
+            &::placeholder {
+                color: var(--search-placeholder);
+                opacity: 1;
+            }
+
+            &:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}
+
+#entities-index-page {
+
+    @include mediaQuery(max-lg) {
+        --bs-gutter-x: .75rem;
+    }
+
+    @include mediaQuery(min-lg) {
+        --bs-gutter-x: 1.5rem;
+    }
+
+    #index-header {
+
+        .inner {
+
+            margin-right: calc(-.5 * var(--bs-gutter-x));
+            margin-left: calc(-.5 * var(--bs-gutter-x));
+
+            > div.item-header {
+
+                padding-right: calc(var(--bs-gutter-x) * .5);
+                padding-left: calc(var(--bs-gutter-x) * .5);
+
+                @include mediaQuery(max-xs) {
+                    width: 100%;
+                }
+
+                @include mediaQuery(between-xs-lg) {
+                    width: 50%;
+                }
+
+                > .btn, form > .btn {
+                    width: 100%;
+                }
+
+                .btn-icon span {
+                    width: 100%;
+                }
+
+                @include mediaQuery(max-sm) {
+                    .btn-icon span {
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#entities-index {
+
+    table {
+        .small-btn {
+            flex: initial;
+        }
+    }
+
+    th, td {
+        font-size: 14px;
+    }
+
+    th {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    td {
+
+        padding-top: .5rem !important;
+        padding-bottom: .5rem !important;
+
+        .btn-icon {
+
+            i {
+                font-size: 1rem;
+            }
+
+            span.small-btn {
+                font-size: 10px;
+            }
+
+            span.label {
+                min-width: 27px;
+            }
+
+            .small-btn {
+                width: auto;
+                min-width: 30px;
+                min-height: 25px;
+            }
+        }
+
+        .show-btn i {
+            font-size: 15px;
+        }
+
+        .delete-btn i {
+            font-size: 13px;
+        }
+    }
+}

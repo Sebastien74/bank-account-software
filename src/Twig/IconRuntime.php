@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
+use App\Service\CoreLocatorInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Twig\Extension\RuntimeExtensionInterface;
 
@@ -17,7 +18,7 @@ readonly class IconRuntime implements RuntimeExtensionInterface
     /**
      * IconRuntime constructor.
      */
-    public function __construct(private string $projectDir)
+    public function __construct(private readonly CoreLocatorInterface $coreLocator)
     {
     }
 
@@ -63,10 +64,10 @@ readonly class IconRuntime implements RuntimeExtensionInterface
             return '';
         }
 
-        $iconPath = !str_contains($iconPath, $this->projectDir) ? str_replace(['medias/icons', 'medias\\icons'], '', $iconPath) : $iconPath;
-        $dirname = !str_contains($iconPath, $this->projectDir) ? $this->projectDir.'/public/medias/icons/'.ltrim($iconPath, '/, \\') : $iconPath;
+        $iconPath = !str_contains($iconPath, $this->coreLocator->projectDir()) ? str_replace(['medias/icons', 'medias\\icons'], '', $iconPath) : $iconPath;
+        $dirname = !str_contains($iconPath, $this->coreLocator->projectDir()) ? $this->coreLocator->projectDir().'/public/medias/icons/'.ltrim($iconPath, '/, \\') : $iconPath;
+        $dirname = $this->coreLocator->formatDirname($dirname);
         $fileSystem = new Filesystem();
-        $dirname = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dirname);
         $matches = explode('.', $dirname);
         $extension = !empty($matches[1]) ? $matches[1] : null;
         $dirname = $extension ? $dirname : $dirname.'.svg';

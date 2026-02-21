@@ -302,13 +302,22 @@ class DoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args             = $mappingDriverDef->getArguments();
-                if ($driverType === 'attribute') {
+                if ($driverType === 'annotation') {
                     $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
 
                 $mappingDriverDef->setArguments($args);
+            } elseif ($driverType === 'attribute') {
+                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                    array_values($driverPaths),
+                ]);
+            } elseif ($driverType === 'annotation') {
+                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                    new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
+                    array_values($driverPaths),
+                ]);
             } else {
                 $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
                     array_values($driverPaths),
@@ -413,13 +422,15 @@ class DoctrineExtension extends Extension
             if (
                 preg_match('/^#\[.*' . $quotedMappingObjectName . '\b/m', $content)
                 || preg_match('/^#\[.*Embeddable\b/m', $content)
+                || preg_match('/^#\[.*MappedSuperclass\b/m', $content)
             ) {
                 break;
             }
 
             if (
-                preg_match('/^(?: \*|\/\*\*) @.*' . $quotedMappingObjectName . '\b/m', $content)
-                || preg_match('/^(?: \*|\/\*\*) @.*Embeddable\b/m', $content)
+                self::textContainsAnnotation($quotedMappingObjectName, $content)
+                || self::textContainsAnnotation('Embeddable', $content)
+                || self::textContainsAnnotation('MappedSuperclass', $content)
             ) {
                 $type = 'annotation';
                 break;
@@ -427,6 +438,21 @@ class DoctrineExtension extends Extension
         }
 
         return $type;
+    }
+
+    /**
+     * Check if the file content contains a class-like annotation
+     *
+     * @internal
+     */
+    public static function textContainsAnnotation(string $quotedMappingObjectName, string $content): bool
+    {
+        return preg_match('/^(?:[ ]\*|\/\*\*)[ ]@               # Match phpdoc start or line with an at
+            \\\\?                                               # Can start with antislash
+            ([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\)*     # Match namespace components ending with antislash
+            ' . $quotedMappingObjectName . '                    # The target class
+            \b                                                  # Match word boundary
+            /mx', $content) === 1;
     }
 
     /**
@@ -695,12 +721,13 @@ class DoctrineExtension extends Extension
         $def = $container
             ->setDefinition($connectionId, new ChildDefinition('doctrine.dbal.connection'))
             ->setPublic(true)
-            ->setArguments(array_merge(
-                [$options, new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name))],
-                // event manager must only be passed for DBAL < 4
-                method_exists(Connection::class, 'getEventManager') ? [new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))] : [],
-                [$connection['mapping_types']],
-            ));
+            ->setArguments([
+                $options,
+                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+                // event manager is only supported on DBAL < 4
+                method_exists(Connection::class, 'getEventManager') ? new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)) : null,
+                $connection['mapping_types'],
+            ]);
 
         $container
             ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))

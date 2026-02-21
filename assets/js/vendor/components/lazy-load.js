@@ -10,7 +10,36 @@ export default function () {
     let body = document.body;
     let skinAdmin = body.classList.contains('skin-admin');
 
-    import(/* webpackPreload: true */ 'lazysizes').then(({default: lazySizes}) => {
+    /**
+     * To set screen sizes
+     */
+    const setSizes = function (els) {
+        const init = function (els) {
+            const width = window.innerWidth;
+            const screenType = width > 991 ? 'desktop' : (width < 768 ? 'mobile' : 'tablet');
+            els.forEach(function (el) {
+                const inMasonry = el.closest('.masonry');
+                const sizesDecode = JSON.parse(el.dataset.imgSizes);
+                if (!inMasonry) {
+                    sizesDecode.forEach(function (sizes) {
+                        if (sizes.screen === screenType && parseInt(el.width) !== sizes.width && sizes.width) {
+                            el.width = sizes.width;
+                        }
+                        if (sizes.screen === screenType && parseInt(el.height) !== sizes.height && sizes.height) {
+                            el.height = sizes.height;
+                        }
+                    });
+                }
+            });
+        };
+        init(els);
+        window.addEventListener("resize", function () {
+            init(els);
+        });
+    };
+    setSizes(document.querySelectorAll('[data-img-sizes]'));
+
+    import('lazysizes').then(({default: lazySizes}) => {
         lazySizes.cfg.lazyClass = 'lazy-load';
         lazySizes.loadMode = 1;
         lazySizes.preloadClass = 'lazy-preload';
@@ -22,6 +51,13 @@ export default function () {
             parent.classList.remove('loading');
         }, false);
     }).catch(error => console.error(error.message));
+
+    let styles = document.querySelectorAll("*[data-style]");
+    if (styles.length > 0) {
+        import(/* webpackPreload: true */'./lazy-backgrounds').then(({default: lazyBackgrounds}) => {
+            new lazyBackgrounds(styles);
+        }).catch(error => console.error(error.message));
+    }
 
     /** To set grow flex wrap to svg img **/
     if (!skinAdmin) {

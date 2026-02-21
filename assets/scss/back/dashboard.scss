@@ -1,0 +1,48 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back Dashboard
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+@import '../vendor/variables';
+
+#dashboard {
+
+    .dash-card {
+
+        i.rounded-4:not(.icon-github) {
+            font-size: 20px;
+        }
+
+        .dash-icon i.icon-github {
+            font-size: 27px;
+        }
+
+        a.not-set small {
+
+            font-size: 10px;
+            transition: color .3s ease-in-out;
+
+            i {
+                font-size: 11px;
+                transition: color .3s ease-in-out;
+            }
+
+            &:hover, &:hover i {
+                color: $primary-lighten !important;
+                transition: color .3s ease-in-out;
+            }
+        }
+
+        .btn-small {
+            i {
+                font-size: 14px;
+            }
+        }
+    }
+}

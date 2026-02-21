@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back button
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+.btn-circle {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    padding: 0 !important;
+}
+
+.btn-square {
+
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $btn-border-radius;
+
+    &.small-btn {
+
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+
+        i {
+            font-size: 14px;
+        }
+    }
+
+    &:not(.small-btn) {
+
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+
+        i {
+            font-size: 20px;
+        }
+    }
+}
+
+.btn-icon {
+
+    border: 0 !important;
+
+    .btn-square {
+        border-radius: $btn-border-radius 0 0 $btn-border-radius;
+        transition: all 0.15s ease-in-out;
+    }
+
+    span {
+        font-size: 13px;
+    }
+
+    span:not(.small-btn) {
+        line-height: 1;
+        word-wrap: anywhere;
+    }
+
+    &:not(.no-hover):not(.dash-btn):hover {
+        .btn-square {
+            opacity: .8;
+            transition: all 0.15s ease-in-out;
+        }
+    }
+}
+
+$dash-accent: $primary !default;
+
+$btn-surface: rgba(255, 255, 255, 0.02) !default;
+$btn-surface-hover: rgba(255, 255, 255, 0.04) !default;
+
+$btn-border: rgba(255, 255, 255, 0.07) !default;
+$btn-border-hover: rgba(255, 255, 255, 0.12) !default;
+
+$btn-text: transparentize($white, .3) !default;
+$btn-muted: rgba(255, 255, 255, 0.72) !default;
+
+$btn-shadow: 0 18px 45px rgba(0, 0, 0, 0.55) !default;
+
+.dash-btn {
+
+    border-radius: 16px;
+    padding: .5rem .75rem !important;
+
+    background: $btn-surface;
+    border: 1px solid $btn-border;
+    color: $btn-text;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    font-size: 14px;
+
+    transition: transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    filter 140ms ease;
+
+    &:hover {
+        background: $btn-surface-hover;
+        border-color: $btn-border-hover;
+        box-shadow: $btn-shadow;
+        transform: translateY(-1px);
+        color: $btn-text !important;
+    }
+
+    &:focus-visible {
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba($dash-accent, 0.18);
+    }
+}
+
+/* Icon tile (like your card icon) */
+.dash-btn-icon {
+
+    width: 34px;
+    height: 34px;
+    border-radius: 14px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba($dash-accent, 0.14);
+    border: 1px solid rgba($dash-accent, 0.28);
+    color: $btn-text;
+
+    i {
+        font-size: 1.05rem !important;
+    }
+}
+
+/* Accent variant for the main CTA (Synchroniser) */
+.dash-btn--accent {
+    background: rgba($dash-accent, 0.14);
+    border-color: rgba($dash-accent, 0.35);
+
+    &:hover {
+        background: rgba($dash-accent, 0.20);
+        border-color: rgba($dash-accent, 0.55);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.60),
+        0 0 0 4px rgba($dash-accent, 0.14);
+    }
+}
+
+/* Optional: disabled state that still looks premium */
+.dash-btn:disabled,
+.dash-btn.disabled {
+    opacity: 0.55;
+    pointer-events: none;
+    filter: grayscale(0.2);
+}

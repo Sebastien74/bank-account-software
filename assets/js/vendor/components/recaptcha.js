@@ -7,9 +7,9 @@
 
 export function generate() {
 
-    let dataEl = document.getElementById('data-path');
+    const dataEl = document.getElementById('data-path');
 
-    let recaptcha = function () {
+    const recaptcha = function () {
 
         let body = document.body;
 
@@ -31,12 +31,11 @@ export function generate() {
         }
 
         body.querySelectorAll('form.security').forEach(function (form) {
-            let data = form.querySelector('.form-data');
-            let string = encodeURIComponent(data.dataset.id);
+            const data = form.querySelector('.form-data');
+            const string = encodeURIComponent(data.dataset.id);
             if (string !== '') {
                 let xHttp = new XMLHttpRequest();
-                let url = dataEl.dataset.encrypt + '/' + string;
-                xHttp.open("GET", url, true);
+                xHttp.open("GET", dataEl.dataset.encrypt + '/' + string, true);
                 xHttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
                 xHttp.send();
                 xHttp.onload = function (e) {

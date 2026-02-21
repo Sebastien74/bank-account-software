@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Entity\Security\User;
+use App\Form\Manager\RecaptchaInterface;
 use App\Repository\Security\UserRepository;
 use App\Service\CoreLocatorInterface;
-use App\Service\CryptServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use KnpU\OAuth2ClientBundle\Security\Exception\IdentityProviderAuthenticationException;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -41,23 +40,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * BaseAuthenticator.
  *
- * Manage recaptcha security authenticate post
+ * Manage recaptcha security authenticate post.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 class BaseAuthenticator
 {
-    private const string SECRET_KEY = 'fc58fd900e20f8f9bfc5af9ac8a5c247';
-    private const string SECRET_IV = '2y10nlpXG3AbjE4Rt72AkKZRVu3IdRJZ395JXjlM05Wd4StMG7efwqi';
-
     private TranslatorInterface $translator;
+
     private EntityManagerInterface $entityManager;
+
     private string $loginRoute = '';
-    private string $registerRoute = '';
+
     private string $loginType = '';
+
     private string $classname = '';
+
     private ?object $userRepository;
+
     private ?object $user = null;
+
     private array $credentials = [];
 
     /**
@@ -65,7 +67,7 @@ class BaseAuthenticator
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly CryptServiceInterface $cryptService,
+        private readonly RecaptchaInterface $recaptcha,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
         $this->translator = $this->coreLocator->translator();
@@ -79,11 +81,12 @@ class BaseAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        $currentRoute = $request->get('_route');
+        // Le nom de route est toujours dans les attributs de la requête (pas dans le POST)
+        $currentRoute = $request->attributes->get('_route');
 
-        if (($currentRoute === $this->loginRoute || $currentRoute === $this->registerRoute) && $request->isMethod('POST')) {
+        if ($currentRoute === $this->loginRoute && $request->isMethod('POST')) {
             $this->setCredentials($request);
-            if ($currentRoute === $this->loginRoute && !$this->credentials['username']) {
+            if (!$this->credentials['username']) {
                 $message = $this->translator->trans('Authentication credentials could not be found.', [], 'security');
                 throw new SecurityException\AuthenticationCredentialsNotFoundException($message);
             }
@@ -108,11 +111,9 @@ class BaseAuthenticator
             }
         }
 
-        if ($request->get('_route') !== $this->registerRoute) {
-            $this->checkRecaptcha($request);
-            $this->checkActive();
-            $this->checkCsrfToken($request);
-        }
+        $this->checkRecaptcha($request);
+        $this->checkActive();
+        $this->checkCsrfToken($request);
 
         $passport = new Passport(
             new UserBadge($this->credentials['username'], [$this->userRepository, 'loadUserByIdentifier']),
@@ -146,8 +147,6 @@ class BaseAuthenticator
     {
         if ($exception instanceof SecurityException\TooManyLoginAttemptsAuthenticationException) {
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
-        } elseif ($exception instanceof IdentityProviderAuthenticationException) {
-            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new SecurityException\CustomUserMessageAccountStatusException($exception->getMessage()));
         } elseif (!$this->user) {
             $message = $this->translator->trans('Authentication credentials could not be found.', [], 'security');
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new SecurityException\AuthenticationCredentialsNotFoundException($message));
@@ -155,23 +154,7 @@ class BaseAuthenticator
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 
-        $response = $route ? new RedirectResponse($this->coreLocator->router()->generate($route)) : null;
-
-        if ($response && $request->get('_route') === $this->registerRoute) {
-            $response->headers->setCookie(Cookie::create('SECURITY_ERROR', $this->translator->trans('La connexion automatique a échouée.', [], 'security_cms')));
-        }
-
-        if (str_contains($request->get('_route'), 'security_front_connect')) {
-            foreach ($request->getSession()->all() as $key => $message) {
-                if ('_security.last_error' === $key) {
-                    $request->getSession()->remove($key);
-                }
-            }
-            $session = new Session();
-            $session->getFlashBag()->clear();
-        }
-
-        return $response;
+        return $route ? new RedirectResponse($this->coreLocator->router()->generate($route)) : null;
     }
 
     /**
@@ -179,33 +162,33 @@ class BaseAuthenticator
      *
      * @throws RouteNotFoundException|MissingMandatoryParametersException|InvalidParameterException
      */
-    public function start(Request $request, string $route, string $loginRoute, ?SecurityException\AuthenticationException $authException = null): RedirectResponse|JsonResponse
-    {
+    public function start(
+        Request $request,
+        string $route,
+        string $loginRoute,
+        ?SecurityException\AuthenticationException $authException = null
+    ): RedirectResponse|JsonResponse {
+
         $isInvalid = $authException instanceof SecurityException\InvalidCsrfTokenException
             || $authException instanceof SecurityException\CustomUserMessageAccountStatusException
             || $authException instanceof SecurityException\AuthenticationCredentialsNotFoundException;
 
-        if ($authException instanceof SecurityException\InsufficientAuthenticationException) {
+        if ($this->coreLocator->user() && $authException instanceof SecurityException\InsufficientAuthenticationException) {
             $indAmin = preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri());
             $routeName = $indAmin ? 'security_login' : 'security_front_login';
-
             return new RedirectResponse($this->coreLocator->router()->generate('app_logout', ['route_name' => $routeName]));
         }
 
         if ($isInvalid || is_object($authException) && !$request->getUser() && 403 === $authException->getPrevious()->getCode()) {
             if ($request->isMethod('POST') && $authException instanceof SecurityException\AuthenticationCredentialsNotFoundException) {
                 $response = new RedirectResponse($this->coreLocator->router()->generate($loginRoute));
-                $session = new Session();
-                $session->getFlashBag()->add('error', $authException->getMessageKey());
-
+                $this->coreLocator->request()->getSession()->getFlashBag()->add('error', $this->coreLocator->translator()->trans($authException->getMessage(), [], 'security'));
                 return $response;
             }
-
-            $response = new RedirectResponse($this->coreLocator->router()->generate($route));
+            $response = new RedirectResponse($this->coreLocator->schemeAndHttpHost().'/denied');
             if ('security_front_forms' === $route) {
-                $response->headers->setCookie(Cookie::create('SECURITY_ERROR', $authException->getMessageKey()));
+                $response->headers->setCookie(Cookie::create('SECURITY_ERROR', $this->coreLocator->translator()->trans($authException->getMessageKey(), [], 'security')));
             }
-
             return $response;
         }
 
@@ -250,7 +233,7 @@ class BaseAuthenticator
     }
 
     /**
-     * To set login route.
+     * To set a login route.
      */
     public function setLoginRoute(string $route): void
     {
@@ -258,15 +241,7 @@ class BaseAuthenticator
     }
 
     /**
-     * To set register route.
-     */
-    public function setRegisterRoute(string $route): void
-    {
-        $this->registerRoute = $route;
-    }
-
-    /**
-     * To set login type.
+     * To set a login type.
      */
     public function setLoginType(string $classname): void
     {
@@ -274,7 +249,7 @@ class BaseAuthenticator
     }
 
     /**
-     * To set classname.
+     * To set a classname.
      */
     public function setClassname(string $classname): void
     {
@@ -294,53 +269,21 @@ class BaseAuthenticator
      *
      * @throws Exception
      */
-    public function checkRecaptcha(Request $request, bool $asResponse = false)
+    public function checkRecaptcha(Request $request, bool $asResponse = false, ?FormInterface $form = null): bool
     {
-        $formSecurityKey = $_ENV['SECRET_KEY'];
-        $fieldHo = $request->request->get('field_ho');
-        $fieldHoEntitled = $request->request->get('field_ho_entitled');
-        if (!$fieldHo) {
-            foreach ($request->request->all() as $key => $value) {
-                if (!empty($request->request->all()[$key]['field_ho'])) {
-                    $fieldHo = $request->request->all()[$key]['field_ho'];
-                    $fieldHoEntitled = $request->request->all()[$key]['field_ho_entitled'];
-                    break;
-                }
-            }
-        }
-
-        $message = $this->translator->trans('Erreur de sécurité !! Rechargez la page et réessayez.', [], 'security_cms');
-        $session = $this->coreLocator->request()->getSession();
-
-        if (!empty($fieldHo) && empty($fieldHoEntitled)) {
-            $honeyPost = $this->cryptService->execute($fieldHo, 'd');
-            if ($honeyPost && urldecode($honeyPost) != $formSecurityKey) {
-                $this->logger($request);
-                if ($asResponse) {
-                    $session->getFlashBag()->add('error', $message);
-                    return false;
-                } else {
-                    throw new SecurityException\CustomUserMessageAccountStatusException($message);
-                }
-            }
-        } else {
-            $this->logger($request);
+        if (!$this->recaptcha->execute($request, true, $form)) {
             if ($asResponse) {
-                $session->getFlashBag()->add('error', $message);
-
                 return false;
-            } else {
-                throw new SecurityException\CustomUserMessageAccountStatusException($message);
             }
+            $message = $this->translator->trans('The captcha is invalid. Please reload the page and try again.', [], 'security_cms');
+            throw new SecurityException\CustomUserMessageAccountStatusException($message);
         }
 
-        if ($asResponse) {
-            return true;
-        }
+        return true;
     }
 
     /**
-     * To check if account is active.
+     * To check if an account is active.
      */
     public function checkActive(): void
     {
@@ -352,11 +295,11 @@ class BaseAuthenticator
     }
 
     /**
-     * To get inactive message.
+     * To get an inactive message.
      */
     public function getInactiveMessage(): string
     {
-        return $this->translator->trans("Votre compte n'est pas activé.", [], 'security_cms');
+        return $this->translator->trans('Your account is not activated.', [], 'security_cms');
     }
 
     /**
@@ -372,12 +315,12 @@ class BaseAuthenticator
     }
 
     /**
-     * To log message.
+     * To log a message.
      */
     private function logger(Request $request): void
     {
         $logger = new Logger('SECURITY_FORM');
-        $logger->pushHandler(new RotatingFileHandler($this->coreLocator->logDir().'/security-cms.log', 10, Level::Critical));
+        $logger->pushHandler(new RotatingFileHandler($this->coreLocator->logDir().'/security.log', 10, Level::Critical));
         $logger->critical('Recaptcha security. IP register :'.$request->getClientIp());
     }
 }

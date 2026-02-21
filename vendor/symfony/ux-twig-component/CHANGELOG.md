@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.32
+
+-  Add option `profiler.collect_components` to control component data collection
+   in the profiler (enabled in debug mode by default)
+-  Add support for using directory name as component name for anonymous components
+
 ## 2.30
 
 -  Ensure compatibility with PHP 8.5

@@ -25,14 +25,14 @@ export default function (input) {
         const score = result.score;
 
         const strengthLevels = [
-            { width: '20%', color: '#ff4d4f', text: text.dataset.veryLow },
-            { width: '40%', color: '#ff7a45', text: text.dataset.low },
-            { width: '60%', color: '#fadb14', text: text.dataset.medium },
-            { width: '80%', color: '#13c2c2', text: text.dataset.strong },
-            { width: '100%', color: '#006d75', text: text.dataset.veryStrong }
+            {width: '20%', color: '#ff4d4f', text: text.dataset.veryLow},
+            {width: '40%', color: '#ff7a45', text: text.dataset.low},
+            {width: '60%', color: '#fadb14', text: text.dataset.medium},
+            {width: '80%', color: '#13c2c2', text: text.dataset.strong},
+            {width: '100%', color: '#006d75', text: text.dataset.veryStrong}
         ];
 
-        const level = !isNull ? strengthLevels[score] : { width: '0%', color: '#ff4d4f', text: '' };
+        const level = !isNull ? strengthLevels[score] : {width: '0%', color: '#ff4d4f', text: ''};
 
         if (isNull) {
             wrap.classList.add('d-none');

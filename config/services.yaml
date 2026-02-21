@@ -18,6 +18,7 @@ services:
             $cacheHelperLogger: '@monolog.logger.cache_helper'
             $uploadsPath: '%uploadsPath%'
             $projectDir: '%projectDir%'
+            $publicDir: '%publicDir%'
             $logDir: '%logDir%'
             $cacheDir: '%cacheDir%'
             $prefix: '%prefix%'

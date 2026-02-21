@@ -131,6 +131,7 @@ return array(
     'Nette\\Utils\\Type' => $vendorDir . '/nette/utils/src/Utils/Type.php',
     'Nette\\Utils\\UnknownImageFileException' => $vendorDir . '/nette/utils/src/Utils/exceptions.php',
     'Nette\\Utils\\Validators' => $vendorDir . '/nette/utils/src/Utils/Validators.php',
+    'NoDiscard' => $vendorDir . '/symfony/polyfill-php85/Resources/stubs/NoDiscard.php',
     'Normalizer' => $vendorDir . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
     'NumberFormatter' => $vendorDir . '/symfony/polyfill-intl-icu/Resources/stubs/NumberFormatter.php',
     'Override' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/Override.php',
@@ -162,6 +163,5 @@ return array(
     'SebastianBergmann\\FileIterator\\Facade' => $vendorDir . '/phpunit/php-file-iterator/src/Facade.php',
     'SebastianBergmann\\FileIterator\\Factory' => $vendorDir . '/phpunit/php-file-iterator/src/Factory.php',
     'SebastianBergmann\\FileIterator\\Iterator' => $vendorDir . '/phpunit/php-file-iterator/src/Iterator.php',
-    'Stringable' => $vendorDir . '/marc-mabe/php-enum/stubs/Stringable.php',
     '©' => $vendorDir . '/symfony/cache/Traits/ValueWrapper.php',
 );

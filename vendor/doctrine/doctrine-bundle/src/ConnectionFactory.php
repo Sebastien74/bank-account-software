@@ -24,8 +24,6 @@ use InvalidArgumentException;
 
 use function array_merge;
 use function class_exists;
-use function func_num_args;
-use function is_array;
 use function is_subclass_of;
 use function method_exists;
 
@@ -63,50 +61,16 @@ class ConnectionFactory
     /**
      * Create a connection by name.
      *
-     * @param mixed[]                                 $params
-     * @param EventManager|array<string, string>|null $eventManagerOrMappingTypes
-     * @param array<string, string>                   $deprecatedMappingTypes
+     * @param mixed[]               $params
+     * @param array<string, string> $mappingTypes
      * @phpstan-param Params $params
      *
      * @return Connection
-     *
-     * @no-named-arguments
      */
-    public function createConnection(
-        array $params,
-        Configuration|null $config = null,
-        EventManager|array|null $eventManagerOrMappingTypes = [],
-        array $deprecatedMappingTypes = [],
-    ) {
-        if (! method_exists(Connection::class, 'getEventManager') && $eventManagerOrMappingTypes instanceof EventManager) {
+    public function createConnection(array $params, Configuration|null $config = null, EventManager|null $eventManager = null, array $mappingTypes = [])
+    {
+        if (! method_exists(Connection::class, 'getEventManager') && $eventManager !== null) {
             throw new InvalidArgumentException('Passing an EventManager instance is not supported with DBAL > 3');
-        }
-
-        if (is_array($eventManagerOrMappingTypes) && func_num_args() === 4) {
-            throw new InvalidArgumentException('Passing mapping types both as 3rd and 4th argument makes no sense.');
-        }
-
-        if ($eventManagerOrMappingTypes instanceof EventManager) {
-            // DBAL 3
-            $eventManager = $eventManagerOrMappingTypes;
-            $mappingTypes = $deprecatedMappingTypes;
-        } elseif (is_array($eventManagerOrMappingTypes)) {
-            // Future signature
-            $eventManager = null;
-            $mappingTypes = $eventManagerOrMappingTypes;
-        } else {
-            // Legacy signature
-            if (! method_exists(Connection::class, 'getEventManager')) {
-                Deprecation::trigger(
-                    'doctrine/doctrine-bundle',
-                    'https://github.com/doctrine/DoctrineBundle/pull/1976',
-                    'Passing mapping types as 4th argument to %s is deprecated when using DBAL 4 and will not be supported in version 3.0 of the bundle. Pass them as 3rd argument instead.',
-                    __METHOD__,
-                );
-            }
-
-            $eventManager = null;
-            $mappingTypes = $deprecatedMappingTypes;
         }
 
         if (! $this->initialized) {

@@ -37,8 +37,8 @@ export default function (pickers) {
             theme: {
                 theme_color: '#6f42c1'
             },
-            ...(minDate && { minDate }),
-            ...(maxDate && { maxDate }),
+            ...(minDate && {minDate}),
+            ...(maxDate && {maxDate}),
         }
 
         const datePicker = MCDatepicker.create(options);

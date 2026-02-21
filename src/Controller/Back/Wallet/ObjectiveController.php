@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Back\Wallet;
 
-use App\Controller\BaseController;
+use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Objective;
 use App\Form\Type\Wallet\ObjectiveType;
 use Knp\Component\Pager\PaginatorInterface;

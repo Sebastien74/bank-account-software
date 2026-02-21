@@ -19,7 +19,7 @@
 {% endif %}
 
 {% if app.user or inAdmin %}
-    <a href="{{ path('back_dashboard') }}" class="btn btn-primary py-2 px-3 mt-3">{{ "Retourner au tableau de bord"|trans }}</a>
+    <a href="{{ path('back_wallet_index') }}" class="btn btn-primary py-2 px-3 mt-3">{{ "Retourner aux comptes"|trans }}</a>
 {% else %}
     <div class="d-flex">
         <a href="{{ path('security_login') }}" class="btn btn-primary py-2 px-3 text-uppercase mx-auto">{{ "Connectez-vous"|trans }}</a>

@@ -12,18 +12,16 @@ use Exception;
 /**
  * ResetPasswordManager.
  *
- * Manage User security reset password
- *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class ResetPasswordManager
+readonly class ResetPasswordManager
 {
     /**
      * ResetPasswordManager constructor.
      */
     public function __construct(
-        private readonly CoreLocatorInterface $coreLocator,
-        private readonly MailerService $mailer,
+        private CoreLocatorInterface $coreLocator,
+        private MailerService        $mailer,
     ) {
     }
 
@@ -36,16 +34,12 @@ class ResetPasswordManager
     {
         $email = $data['email'];
         $user = $this->coreLocator->em()->getRepository(User::class)->findOneBy(['email' => $email]);
-
         if (!$user) {
             $session = $this->coreLocator->request()->getSession();
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('Aucun compte trouvé pour cet email.', [], 'security_cms'));
-
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('No account found for this email address.', [], 'security_cms'));
             return false;
         }
-
         $token = $this->setToken($user, $email);
-
         $this->sendEmail($user, $email, $token);
 
         return true;
@@ -79,7 +73,7 @@ class ResetPasswordManager
      */
     private function sendEmail(User $user, string $email, string $token): void
     {
-        $subject = $this->coreLocator->translator()->trans('Réinitialisation de votre mot de passe', [], 'security_cms');
+        $subject = $this->coreLocator->translator()->trans('Password reset', [], 'security_cms');
 
         $this->mailer->setSubject($subject);
         $this->mailer->setTo([$email]);
@@ -88,6 +82,6 @@ class ResetPasswordManager
         $this->mailer->send();
 
         $session = $this->coreLocator->request()->getSession();
-        $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Un email vous a été envoyé. Si vous ne l'avez pas reçu, pensez à vérifier dans vos spams.", [], 'security_cms'));
+        $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("We’ve sent you an email. If you don’t see it, please check your spam folder.", [], 'security_cms'));
     }
 }

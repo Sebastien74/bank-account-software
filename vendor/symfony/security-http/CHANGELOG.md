@@ -1,6 +1,43 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Deprecate extending the `RememberMeDetails` class with a constructor expecting the user FQCN
+
+   Before:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userFqcn, $userIdentifier, $expires, $value);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userIdentifier, $expires, $value);
+       }
+   }
+   ```
+ * Add support for union types with `#[CurrentUser]`
+ * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
+ * Deprecate `AbstractListener::__invoke`
+ * Add `$methods` argument to `#[IsGranted]` to restrict validation to specific HTTP methods
+ * Allow subclassing `#[IsGranted]`
+ * Add `$tokenSource` argument to `#[IsCsrfTokenValid]` to support reading tokens from the query string or headers
+ * Deprecate `RememberMeDetails::getUserFqcn()`, the user FQCN will be removed from the remember-me cookie in 8.0
+ * Allow configuring multiple OIDC discovery base URIs
+
 7.3
 ---
 

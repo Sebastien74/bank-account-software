@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Back\Wallet;
 
-use App\Controller\BaseController;
+use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Wallet;
 use App\Form\Type\Wallet\WalletType;
 use Knp\Component\Pager\PaginatorInterface;
@@ -150,7 +150,7 @@ class WalletController extends BaseController
             rsort($availableYears);
         }
 
-        return $this->render($this->template, $this->defaultArguments() + [
+        return $this->render($this->template, $this->coreArguments() + [
             'wallet' => $wallet,
             'yearStats' => $yearStats,
             'monthStats' => $monthStats,

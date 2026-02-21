@@ -32,7 +32,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
 
     private mixed $LOGIN_TYPE;
     private const string LOGIN_ROUTE = 'security_login';
-    private const string REGISTER_ROUTE = 'security_register';
 
     /**
      * LoginFormAuthenticator constructor.
@@ -57,7 +56,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
     public function supports(Request $request): ?bool
     {
         $this->baseAuthenticator->setLoginRoute(self::LOGIN_ROUTE);
-        $this->baseAuthenticator->setRegisterRoute(self::REGISTER_ROUTE);
         $this->baseAuthenticator->setLoginType($this->LOGIN_TYPE);
         $this->baseAuthenticator->setClassname(User::class);
         $this->baseAuthenticator->setUserRepository($this->userRepository);
@@ -84,15 +82,11 @@ class LoginFormAuthenticator extends AbstractAuthenticator implements Authentica
         $this->baseAuthenticator->onAuthenticationSuccess($request);
         $this->clearAdminSession();
 
-        if (self::REGISTER_ROUTE === $request->get('_route')) {
-            return new RedirectResponse($this->coreLocator->router()->generate(self::REGISTER_ROUTE));
-        }
-
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->coreLocator->router()->generate('back_dashboard'));
+        return new RedirectResponse($this->coreLocator->router()->generate('back_wallet_index'));
     }
 
     /**

@@ -1,0 +1,93 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back modal
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+.modal-content {
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px !important;
+    background: radial-gradient(900px 520px at 82% 100%, rgba(111, 66, 193, 0.045), transparent 62%),
+    radial-gradient(1100px 780px at 30% 65%, rgba(255, 255, 255, 0.012), transparent 68%),
+    linear-gradient(0deg, #121726, #0e1219 48%, #0a0d12);
+
+    &:before {
+        content: "";
+        background: radial-gradient(520px 220px at 18% 0%, rgba(124, 108, 255, 0.22), transparent 62%);
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        border-radius: 14px !important;
+    }
+
+    > *:first-child {
+        position: relative;
+    }
+
+    .modal-header {
+        border-bottom: 0 !important;
+    }
+
+    .modal-body,
+    .modal-footer {
+        border: 0 !important;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+
+        .icon-plus-circle,
+        .icon-minus-circle {
+            font-size: 24px;
+        }
+
+        .btn-close {
+            color: $white;
+        }
+    }
+
+    .modal-body {
+
+        i.large {
+            font-size: 60px;
+        }
+
+        .delete-alert {
+            font-size: 18px;
+        }
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding-right: 1.5rem !important;
+        padding-left: 1.5rem !important;
+    }
+
+    @include mediaQuery(max-sm) {
+
+        .modal-footer {
+
+            .btn {
+
+                width: 100%;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-bottom: .75rem !important;
+
+                &[data-bs-dismiss="modal"] {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}

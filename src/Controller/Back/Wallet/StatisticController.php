@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Back\Wallet;
 
-use App\Controller\BaseController;
-use App\Entity\Wallet\Operation;
+use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Wallet;
 use App\Model\Wallet\WalletModel;
 use Exception;

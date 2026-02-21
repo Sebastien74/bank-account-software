@@ -11,7 +11,7 @@
 
 @mixin fontsWeights($fonts-weights) {
     @each $size in $fonts-weights {
-        .fw-#{$size}, .fw-#{$size} *:not(strong):not(b) {
+        .fw-#{$size}, .fw-#{$size} *:not(strong):not(b):not(.fw-init) {
             font-weight: $size !important;
         }
     }

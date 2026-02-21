@@ -1,27 +1,40 @@
 {% trans_default_domain 'back' %}
 
-<header class="navbar bg-dark p-0" data-bs-theme="dark">
-    <a href="{{ path('back_dashboard') }}" class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white d-flex align-items-center text-uppercase h-100">
+<header class="navbar w-100 p-0">
+    <a href="{{ path('back_wallet_index') }}" class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white d-flex align-items-center h-100">
         <span class="icon-wrap d-flex align-items-center justify-content-center me-3 bg-white">
-            <i class="icon-piggy-bank"></i>
+            {{ 'felix-logo-small.png'|img('back', {
+                screensSizes: {
+                    mobile: {width: null, height: 25},
+                    tablet: {width: null, height: 25},
+                    desktop: {width: null, height: 25}
+                },
+                lazyLoad: true,
+                placeholder: true
+            }) }}
         </span>
-        <span>{{ companyName|striptags }}</span>
+        <div>
+            <span class="fw-600">{{ companyName|striptags }}</span><br>
+        </div>
     </a>
-    <div class="right d-flex align-items-center h-100">
-        <button class="navbar-toggler nav-toggler-icon-wrap d-flex d-lg-none flex-column" aria-label="{{ "Menu"|trans|raw }}">
+    <div class="right d-flex align-items-center h-100 pe-4">
+        <button class="navbar-toggler nav-toggler-icon-wrap d-flex d-lg-none flex-column me-3" aria-label="{{ "Menu"|trans|raw }}">
             <span class="nav-toggler-icon" aria-label="{{ "Menu"|trans|raw }}">
                 <span></span>
                 <span></span>
                 <span></span>
             </span>
         </button>
-        <div class="title-wrap d-none d-lg-inline-flex align-items-center px-4">
+        <div class="title-wrap d-none d-lg-inline-flex align-items-center pe-4">
             {% if pageIcon %}
-                <span class="icon-wrap d-flex align-items-center justify-content-center me-2 bg-primary">
-                    <i class="icon-{{ pageIcon }} text-white"></i>
+                <span class="icon-wrap d-flex align-items-center justify-content-center me-2">
+                    <i class="icon-{{ pageIcon }}"></i>
                 </span>
             {% endif %}
-            <h2 class="title fw-400 text-white mb-0">{{ pageTitle }}</h2>
+            <h2 class="title fw-400 text-white mb-0">{{ pageTitle|raw }}</h2>
         </div>
+        {% if granted('ROLE_DEV') %}
+            <span id="open-btn-opposite" class="icon-wrap cursor d-flex align-items-center justify-content-center ms-auto"><i class="icon-cog text-white"></i></span>
+        {% endif %}
     </div>
 </header>

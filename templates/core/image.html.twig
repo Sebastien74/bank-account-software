@@ -1,1 +1,63 @@
 {% trans_default_domain 'core' %}
+
+{% set lazyLoad = lazyLoad is defined ? lazyLoad : true %}
+{% set class = class is defined ? class : false %}
+
+{% set desktopRetinaImg = files.desktopRetina is defined and files.desktopRetina ? files.desktopRetina : null %}
+{% set desktopImg = files.desktop is defined and files.desktop ? files.desktop : null %}
+{% set desktopLazy = files.desktopLazy is defined and files.desktopLazy ? files.desktopLazy : "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" %}
+
+{% set tabletRetinaImg = files.tabletRetina is defined and files.tabletRetina ? files.tabletRetina : desktopRetinaImg %}
+{% set tabletImg = files.tablet is defined and files.tablet ? files.tablet : desktopImg %}
+{% set tabletLazy = files.tabletLazy is defined and files.tabletLazy ? files.tabletLazy : desktopLazy %}
+
+{% set mobileRetinaImg = files.mobileRetina is defined and files.mobileRetina ? files.mobileRetina : (tabletRetinaImg ? tabletRetinaImg : desktopRetinaImg) %}
+{% set mobileImg = files.mobile is defined and files.mobile ? files.mobile : (tabletImg ? tabletImg : desktopImg) %}
+{% set mobileLazy = files.mobileLazy is defined and files.mobileLazy ? files.mobileLazy : tabletLazy %}
+
+{% set source = files.source is defined and files.source ? files.source : null %}
+{% set srcLazy = lazyLoad and files.lazy is defined and files.lazy ? files.lazy : source %}
+
+{% set desktopWidth = screensSizes.desktopWidth is defined ? screensSizes.desktopWidth : width %}
+{% set desktopHeight = screensSizes.desktopHeight is defined ? screensSizes.desktopHeight : height %}
+{% set tabletWidth = screensSizes.tabletWidth is defined ? screensSizes.tabletWidth : width %}
+{% set tabletHeight = screensSizes.tabletHeight is defined ? screensSizes.tabletHeight : height %}
+{% set mobileWidth = screensSizes.mobileWidth is defined ? screensSizes.mobileWidth : width %}
+{% set mobileHeight = screensSizes.mobileHeight is defined ? screensSizes.mobileHeight : height %}
+
+{#{% if not generateThumb %}#}
+{#    <div class="img-loader-wrap position-relative generating">#}
+{#        <div class="img-loader overflow-hidden d-flex align-items-center justify-content-center position-relative"#}
+{#             style="max-width: {{ width }}px; max-height: {{ height }}px; background-image: url({{ absolute_url(asset(source)) }});">#}
+{#            <img src="{{ lazyFileSvg }}" alt="SVG Loader" class="img-fluid force-size" width="{{ width }}" height="{{ height }}">#}
+{#        </div>#}
+{#        {{ render_hinclude(controller('App\\Controller\\Front\\MediaController::mediaLoader', {#}
+{#            screensSizes: screensSizes|json_encode,#}
+{#            screensMedias: screensMedias|json_encode,#}
+{#        }), {default: '', attributes: {evaljs: 'true', class: 'hx-include-media-loader only-hx'}})|raw }}#}
+{#    </div>#}
+{#{% else %}#}
+    <picture>
+        {% if mobileImg %}
+            {% set mobileLazy = lazyLoad ? mobileLazy : mobileImg %}
+            <source media="(max-width: 575px)"
+                    srcset="{{ mobileLazy }}{% if not lazyLoad and mobileRetinaImg %}, {{ mobileRetinaImg }} 2x{% endif %}"
+                    {% if lazyLoad %}data-srcset="{{ mobileImg }}{% if mobileRetinaImg %}, {{ mobileRetinaImg }} 2x{% endif %}"{% endif %}>
+        {% endif %}
+        {% if tabletImg %}
+            {% set tabletLazy = lazyLoad ? tabletLazy : tabletImg %}
+            <source media="(min-width: 576px) and (max-width: 991px)"
+                    srcset="{{ tabletLazy }}{% if not lazyLoad and tabletRetinaImg %}, {{ tabletRetinaImg }} 2x{% endif %}"
+                    {% if lazyLoad %}data-srcset="{{ tabletImg }}{% if tabletRetinaImg %}, {{ tabletRetinaImg }} 2x{% endif %}"{% endif %}>
+        {% endif %}
+        {% if desktopImg and tabletImg %}
+            {% set desktopLazy = lazyLoad ? desktopLazy : desktopImg %}
+            <source media="(min-width: 992px)"
+                    srcset="{{ desktopLazy }}{% if not lazyLoad and desktopRetinaImg %}, {{ desktopRetinaImg }} 2x{% endif %}"
+                    {% if lazyLoad %}data-srcset="{{ desktopImg }}{% if desktopRetinaImg %}, {{ desktopRetinaImg }} 2x{% endif %}"{% endif %}>
+        {% endif %}
+        <img src="{{ srcLazy }}"
+            {% if lazyLoad %}data-src="{{ source }}"{% endif %}
+            {{ attributes|raw }}>
+    </picture>
+{#{% endif %}#}

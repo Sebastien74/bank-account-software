@@ -1,0 +1,153 @@
+/* --------------------------------------------------------------------------------------
+
+    Module : Back variables
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+    1 ) Screens sizes
+    2 ) Elements
+    3 ) Colors
+    4 ) Breadcrumb
+    5 ) Button
+    6 ) Form
+    7 ) Cards
+
+----------------------------------------------------------------------------------------- */
+
+@import 'bootstrap/functions';
+
+/*-----------------------------------
+   1 ) Screens sizes
+-----------------------------------*/
+
+$xs: 320px !default;
+$sm: 576px !default;
+$md: 768px !default;
+$lg: 992px !default;
+$xl: 1200px !default;
+$xxl: 1400px !default;
+$xxxl: 1600px !default;
+
+$grid-breakpoints: (
+    xs: 0,
+    sm: $sm,
+    md: $md,
+    lg: $lg,
+    xl: $xl,
+    xxl: $xxl,
+    xxxl: $xxxl,
+) !default;
+
+$container-max-widths: (
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1320px,
+    xxxl: 1440px,
+) !default;
+
+/*-----------------------------------
+   2 ) Elements
+-----------------------------------*/
+
+$fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
+
+/*-----------------------------------
+   3 ) Colors
+-----------------------------------*/
+
+$primary: #6f42c1 !default
+$primary-lighten: tint-color($primary, 25%) !default
+$primary-darken: shade-color($primary, 40%) !default
+$red: #dc3545 !default
+$white: #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #4c4c4c !default;
+$gray-800: #292929 !default;
+$gray-900: #0e0e0e !default;
+
+/* Opaque surfaces (avoid transparency issues) */
+$dash-surface: #14161e !default;
+$dash-surface-2: mix(#ffffff, $dash-surface, 4%) !default;
+$dash-surface-3: mix(#000000, $dash-surface, 6%) !default;
+
+$dash-border: rgba(255, 255, 255, 0.10) !default;
+$dash-border-hover: rgba(124, 108, 255, 0.35) !default;
+$dash-border-focus: rgba(124, 108, 255, 0.55) !default;
+
+$dash-text: rgba(255, 255, 255, 0.92) !default;
+$dash-muted: rgba(255, 255, 255, 0.55) !default;
+
+$dash-item-hover: rgba(124, 108, 255, 0.16) !default;
+$dash-item-active: rgba(124, 108, 255, 0.24) !default;
+
+$dash-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !default;
+
+$dash-accent: $primary !default;
+$dash-side-surface: #07090d !default;
+
+/* Balanced dark – slightly darker, still readable */
+$dash-bg-0: #0a0d12 !default; // deepest
+$dash-bg-1: #0e1219 !default; // main
+$dash-bg-2: #121726 !default; // top
+
+$bg-body: radial-gradient(
+        900px 520px at 18% 0%,
+        rgba($primary, 0.045),
+        transparent 62%
+),
+radial-gradient(
+        1100px 780px at 70% 35%,
+        rgba(255, 255, 255, 0.012),
+        transparent 68%
+),
+linear-gradient(
+        180deg,
+        $dash-bg-2,
+        $dash-bg-1 48%,
+        $dash-bg-0
+);
+
+/*-----------------------------------
+   4 ) Breadcrumb
+-----------------------------------*/
+
+$breadcrumb-divider-color: $gray-500 !default;
+$breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='#{$breadcrumb-divider-color}'/></svg>");
+
+/*-----------------------------------
+   5 ) Button
+-----------------------------------*/
+
+$btn-padding-y: .65rem !default;
+$btn-padding-x: 1.5rem !default;
+
+/*-----------------------------------
+   6 ) Form
+-----------------------------------*/
+
+$form-label-color: $gray-600 !default;
+$input-bg: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%), linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !default;
+$input-invalid-bg: radial-gradient(520px 160px at 12% 0%, mix($red, $dash-surface, 10%), $dash-surface 62%), linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !default;
+$input-border-color: $dash-border !default;
+$input-border-radius: 12px !default;
+$input-font-size: 12px !default;
+$input-color: $gray-300 !default;
+$input-border-width: 1px !default;
+$input-placeholder-color: transparentize($white, .6) !default;
+$form-invalid-border-color: $input-bg !default;
+$input-font-size: 14px !default;
+$input-group-addon-bg: transparent !default;
+
+/*-----------------------------------
+   7 ) Cards
+-----------------------------------*/
+
+$card-inner-border-radius: .25rem !default;

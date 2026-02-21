@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for the `QUERY` HTTP method in the profiler
+ * Add support for Server-Sent Events / `EventSource` requests in the debug toolbar
+ * Add support for displaying the application runner class
+
 7.3
 ---
 
@@ -28,7 +35,7 @@ CHANGELOG
            prefix: /_wdt
 
        web_profiler_profiler:
-           resource: '@WebProfilerBundle/Resources/config/routing/profiler.php
+           resource: '@WebProfilerBundle/Resources/config/routing/profiler.php'
            prefix: /_profiler
    ```
 

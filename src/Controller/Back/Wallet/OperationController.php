@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller\Back\Wallet;
 
-use App\Controller\BaseController;
+use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Operation;
 use App\Entity\Wallet\Wallet;
 use App\Form\Manager\GlobalManagerInterface;
 use App\Form\Manager\Wallet\OperationInterface;
 use App\Form\Type\Wallet\OperationType;
 use App\Model\Wallet\WalletModel;
+use App\Service\AdminLocatorInterface;
 use App\Service\CoreLocatorInterface;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
@@ -43,10 +44,11 @@ class OperationController extends BaseController
      */
     public function __construct(
         protected CoreLocatorInterface $coreLocator,
+        protected AdminLocatorInterface $adminLocator,
         protected GlobalManagerInterface $globalFormManager,
         protected OperationInterface $operation,
     ) {
-        parent::__construct($coreLocator, $globalFormManager, $operation);
+        parent::__construct($coreLocator, $adminLocator, $globalFormManager, $operation);
     }
 
     /**

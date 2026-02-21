@@ -1,13 +1,18 @@
 {% trans_default_domain 'back' %}
 
 {% if breadcrumb is not empty %}
-    <nav class="py-3 px-4 breadcrumb-container bg-secondary" aria-label="breadcrumb">
-        <div class="container-fluid">
-            <ol class="page-breadcrumb breadcrumb mb-0">
-                {% for item, path in breadcrumb %}
-                    <li class="breadcrumb-item"><a href="{{ path }}" class="text-white">{{ item }}</a></li>
-                {% endfor %}
-            </ol>
+    <nav class="breadcrumb-container mt-4 mb-3" aria-label="breadcrumb">
+        <div class="d-flex align-items-center gap-2 px-1">
+            <span class="dash-btn-icon me-2" aria-hidden="true">
+                <i class="icon-tachometer-alt"></i>
+            </span>
+            <div class="container-fluid">
+                <ol class="page-breadcrumb breadcrumb mb-0">
+                    {% for item, path in breadcrumb %}
+                        <li class="breadcrumb-item ps-0"><a href="{{ path }}" class="text-white">{{ item }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
         </div>
     </nav>
 {% endif %}

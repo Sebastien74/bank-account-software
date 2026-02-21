@@ -28,7 +28,7 @@ export default function (selectors, returnElem = false) {
 
     selectors.forEach(function (selector) {
 
-        let searchTrans = trans.dataset.hasOwnProperty('search') ? selector.dataset.search : 'Rechercher';
+        let searchTrans = trans.dataset.hasOwnProperty('search') ? selector.dataset.search : 'Search';
         let searchPlaceholderValue = selector.dataset.hasOwnProperty('searchPlaceholder') ? selector.dataset.searchPlaceholder : searchTrans;
         let placeholderValue = selector.getAttribute('placeholder') ? selector.getAttribute('placeholder') : '';
         let noChoicesText = selector.getAttribute('noChoicesText') ? selector.getAttribute('noChoicesText') : '';
@@ -42,8 +42,8 @@ export default function (selectors, returnElem = false) {
             noResultsText: trans.getAttribute('data-choices-no-result'),
             itemSelectText: '',
             noChoicesText: noChoicesText,
-            removeItems: false,
-            removeItemButton: false,
+            removeItems: true,
+            removeItemButton: true,
             searchPlaceholderValue: searchPlaceholderValue,
             shouldSort: false,
             allowHTML: true,
@@ -57,7 +57,7 @@ export default function (selectors, returnElem = false) {
         if (selector.classList.contains('select-icons')) {
             const choices = selector.closest('.choices');
             choices.querySelector('.choices__list--dropdown').classList.add('text-center');
-            import(/* webpackPreload: true */ '../vendor/components/lazy-load').then(({default: lazyLoad}) => {
+            import('../vendor/components/lazy-load').then(({default: lazyLoad}) => {
                 new lazyLoad();
             }).catch(error => console.error(error.message));
         }

@@ -20,19 +20,17 @@
 
 body {
 
-    font-family: $font-family;
     font-size: 15px;
     overflow-x: hidden;
-    background-color: $bg-body;
+    background: $bg-body;
     min-height: 100dvh;
 
     #content {
-        background-color: $bg-body;
-    }
 
-    @each $size in $fonts-weights {
-        .fw-#{$size}, .fw-#{$size} *:not(strong):not(b) {
-            font-weight: $size !important;
+        background-color: transparent;
+
+        @include mediaQuery(min-sm) {
+            width: 335px;
         }
     }
 }
@@ -47,10 +45,6 @@ body {
 
 .text-underline {
     text-decoration: underline !important;
-}
-
-.alert .btn-close {
-    display: none !important;
 }
 
 svg.dark {
@@ -68,24 +62,27 @@ ul.reset {
 }
 
 a {
+
     text-decoration: none !important;
-    color: $link-color;
+    transition: all .3s ease-in-out;
+
+    &.link:hover {
+        color: $link-color !important;
+        transition: all .3s ease-in-out;
+    }
 }
 
 h2 {
     font-size: 25px;
 }
 
-.login-register {
+.login-wrapper {
 
     padding: 0;
     margin-top: 0;
-    min-height: 100vh;
-    width: calc(100% - 400px);
+    min-height: 100dvh;
 
     #bg-container {
-        background: url(../../../medias/images/security/background-security.jpg);
-        position: fixed !important;
         background-size: cover !important;
         background-repeat: no-repeat !important;
         background-position: center center !important;
@@ -102,43 +99,24 @@ h2 {
         left: 0;
         bottom: 0;
         width: calc(100% - 400px);
-        background-color: transparentize($bg-body, .3);
-    }
-
-    .btn {
-        font-weight: 500;
-        border-radius: .25rem;
+        background: transparentize($black, 0.3);
     }
 
     .login-box {
 
         width: 400px;
-        margin: 0 auto;
-        background-color: $bg-body;
-        min-height: 100%;
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        top: 0;
-        height: 100%;
+        background: radial-gradient(900px 600px at 20% 0%, rgba($dash-accent, 0.08), transparent 55%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 42%),
+        $dash-side-surface;
+        min-height: 100dvh;
         box-shadow: -3px 0 5px 0 rgba(0, 0, 0, 0.1);
 
         #logo {
-
-            max-height: 130px;
-            max-width: 85%;
+            max-height: 150px;
+            height: 150px;
             width: auto;
+            max-width: 100%;
             fill: $primary;
-
-            * {
-                fill: $primary;
-            }
-        }
-
-        #contact-info {
-            a, a i {
-                font-size: 12px;
-            }
         }
     }
 
@@ -157,33 +135,21 @@ h2 {
 
     $theme-color: $primary;
 
-    .header {
+    .badge-lp {
 
-        .icon-wrap {
+        width: 70px;
+        height: 70px;
+        flex: 0 0 70px;
+        background: rgba($theme-color, 0.18) !important;
+        border: 1px solid rgba($theme-color, 0.55) !important;
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.75), 0 0 0 4px rgba($theme-color, 0.16);
+        font-size: 1rem;
+        border-radius: 20px;
 
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            aspect-ratio: 1;
-            background-color: $primary;
-
-            i {
-                color: $white;
-                font-size: 75px;
-            }
+        i {
+            font-size: 40px;
+            color: transparentize($white, .2);
         }
-    }
-
-    .btn-info,
-    .form-check-input:checked {
-        background-color: $theme-color;
-        border-color: $theme-color;
-    }
-
-    .form-material .form-control,
-    .form-material .form-control.focus,
-    .form-material .form-control:focus {
-        background-image: linear-gradient($theme-color, $theme-color), linear-gradient(#e9ecef, #e9ecef);
     }
 }
 
@@ -191,15 +157,17 @@ h2 {
    4 ) Responsive
 -----------------------------------*/
 
-@media(max-width: 991px) {
+@include mediaQuery(between-md-lg) {
+    #content {
+        width: 380px;
+    }
+}
+
+@include mediaQuery(max-lg) {
 
     body .login-sidebar {
 
         width: 100% !important;
-
-        #content {
-            min-height: calc(100vh - 190px);
-        }
 
         .login-box {
 
@@ -207,7 +175,7 @@ h2 {
             z-index: 2;
             width: 100%;
             max-width: 100%;
-            min-height: 100vh;
+            min-height: 100dvh;
             left: 0;
             right: 0;
             display: inline-block;

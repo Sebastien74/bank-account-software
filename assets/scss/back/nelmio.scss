@@ -1,0 +1,353 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+    Module : Nelmio
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+----------------------------------------------------------------------------------------- */
+
+@import '../vendor/variables';
+
+@import '../../lib/fonts/google-poppins';
+@import '../../lib/fonts/icomoon';
+
+@import '../vendor/bootstrap/bootstrap';
+@import '../vendor/bootstrap/variables';
+
+@import '../vendor/mixin/media-queries';
+
+$dash-accent: $primary !default;
+
+/* Balanced dark – slightly darker, still readable */
+$dash-bg-0: #0a0d12 !default; // deepest
+$dash-bg-1: #0e1219 !default; // main
+$dash-bg-2: #121726 !default; // top
+
+body {
+
+    min-height: 100dvh;
+
+    background: radial-gradient(
+            900px 520px at 18% 0%,
+            rgba($dash-accent, 0.045),
+            transparent 62%
+    ),
+    radial-gradient(
+            1100px 780px at 70% 35%,
+            rgba(255, 255, 255, 0.012),
+            transparent 68%
+    ),
+    linear-gradient(
+            180deg,
+            $dash-bg-2,
+            $dash-bg-1 48%,
+            $dash-bg-0
+    );
+}
+
+html.dark-mode .swagger-ui {
+    background-color: transparent;
+}
+
+header {
+
+    background-color: transparent;
+    position: sticky !important;
+
+    &:before {
+        display: none;
+    }
+
+    #logo-api {
+
+        img {
+
+            @include mediaQuery(max-sm) {
+                height: 50px;
+            }
+
+            @include mediaQuery(min-sm) {
+                height: 60px;
+            }
+        }
+
+        .badge-lp {
+
+            border-radius: .25rem;
+            font-weight: 800;
+
+            @include mediaQuery(max-sm) {
+                width: 25px;
+                height: 25px;
+                flex: 0 0 25px;
+                font-size: 11px;
+            }
+
+            @include mediaQuery(min-sm) {
+                width: 30px;
+                height: 30px;
+                flex: 0 0 30px;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+.container,
+#swagger-ui.api-platform .wrapper,
+#swagger-ui.api-platform .info {
+
+    padding-left: .75rem;
+    padding-right: .75rem;
+
+    @media (max-width: 575px) {
+        max-width: 97%;
+    }
+
+    @media (min-width: 576px) {
+        max-width: 540px;
+    }
+
+    @media (min-width: 768px) {
+        max-width: 720px;
+    }
+
+    @media (min-width: 992px) {
+        max-width: 960px;
+    }
+
+    @media (min-width: 1200px) {
+        max-width: 1140px;
+    }
+
+    @media (min-width: 1400px) {
+        max-width: 1320px;
+    }
+
+    @media (min-width: 1600px) {
+        max-width: 1440px;
+    }
+}
+
+#swagger-ui.api-platform {
+
+    .information-container.wrapper {
+        background-color: transparent;
+        padding-top: 0;
+        padding-bottom: 0;
+        border: 0 !important;
+    }
+
+    .info {
+
+        .title {
+
+            color: $primary-darken;
+            font-weight: 800;
+
+            @include mediaQuery(max-sm) {
+                font-size: 25px;
+            }
+
+            @include mediaQuery(min-sm) {
+                @include rfs(33px);
+            }
+        }
+
+        hgroup.main {
+            margin: 0;
+        }
+
+        p {
+            color: transparentize($white, .3);
+            margin: 0;
+        }
+    }
+
+    .swagger-ui .info .title small {
+        display: none;
+    }
+
+    .opblock-tag {
+
+        background-color: $purple-900;
+        border-bottom: 1px solid $purple-600 !important;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin: 0 0 1rem;
+
+        &:hover {
+            background-color: $purple-800;
+            transform: none;
+        }
+
+        a span {
+            font-weight: 600;
+        }
+
+        small {
+            opacity: 0 !important;
+        }
+    }
+
+    .block-desktop > div {
+
+        > span:last-child {
+            display: none;
+        }
+
+        > span .opblock-tag-section {
+            margin-bottom: .5rem;
+        }
+    }
+
+    .swagger-ui {
+        color: transparentize($white, .3);
+        padding-bottom: 2rem;
+    }
+
+    .swagger-ui textarea {
+        background: #333333;
+        color: transparentize($white, .3);
+    }
+
+    .swagger-ui select {
+        background-color: #333333;
+        color: transparentize($white, .3);
+        border: 0;
+        height: 35px;
+        padding-left: 1rem;
+    }
+
+    .swagger-ui input[type="email"],
+    .swagger-ui input[type="file"],
+    .swagger-ui input[type="password"],
+    .swagger-ui input[type="search"],
+    .swagger-ui input[type="text"],
+    .swagger-ui textarea {
+        background-color: #333333;
+        border: 0;
+        color: transparentize($white, .3);
+    }
+
+    .opblock .opblock-summary-path-description-wrapper {
+        padding-top: .5rem;
+        padding-bottom: .5rem;
+    }
+
+    .tab li,
+    table thead tr td,
+    table thead tr th,
+    .response-col_status,
+    .opblock .opblock-section-header h4,
+    .opblock-description-wrapper p,
+    .opblock-external-docs-wrapper p,
+    .opblock-title_normal p,
+    .opblock .opblock-summary-description,
+    .opblock .opblock-summary-description,
+    .opblock .opblock-summary-operation-id,
+    .opblock .opblock-summary-path,
+    .opblock .opblock-summary-path__deprecated,
+    .opblock-tag small,
+    .opblock-tag {
+        color: transparentize($white, .3);
+    }
+
+    .opblock-tag {
+        border-bottom: 1px solid transparentize($white, .3);
+    }
+
+    .swagger-ui svg,
+    .expand-operation svg,
+    .expand-operation svg * {
+        fill: $purple-300;
+    }
+
+    .opblock.opblock-get,
+    .opblock.opblock-post {
+
+        background-color: $gray-900;
+
+        .opblock-section-header {
+            color: transparentize($white, .3);
+            background-color: transparentize($primary, .9);
+        }
+    }
+
+    .btn {
+        border: 0 !important;
+        background-color: $primary !important;
+        color: $white !important;
+        border-radius: .325rem !important;
+    }
+
+    .btn-group {
+
+        .btn {
+            margin-right: .25rem;
+            margin-left: .25rem;
+            transition: none !important;
+        }
+    }
+
+    .opblock-summary-method {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .opblock.opblock-post {
+
+        .opblock-summary {
+            border-bottom: 1px solid $teal-700;
+        }
+
+        .opblock-summary-method {
+            background-color: $teal-700;
+        }
+
+        .opblock-control-arrow {
+            svg, svg * {
+                fill: $teal-700 !important;
+            }
+        }
+    }
+
+    .opblock.opblock-get {
+
+        .opblock-summary {
+            border-bottom: 1px solid $cyan-700;
+        }
+
+        .opblock-summary-method {
+            background-color: $cyan-700;
+        }
+
+        .opblock-control-arrow {
+            svg, svg * {
+                fill: $cyan !important;
+            }
+        }
+    }
+
+    .parameter__name.required::after,
+    .parameter__name.required span {
+        color: $red;
+    }
+
+    .opblock-summary {
+        padding: 0 1rem 0 0;
+    }
+
+    .swagger-ui .opblock .opblock-summary .view-line-link.copy-to-clipboard {
+        width: 25px;
+        height: 25px;
+        margin: 0 15px;
+        opacity: 0;
+    }
+
+    .swagger-ui .opblock .opblock-summary:hover .view-line-link.copy-to-clipboard {
+        opacity: 1;
+    }
+}

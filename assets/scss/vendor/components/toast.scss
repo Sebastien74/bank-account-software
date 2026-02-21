@@ -1,0 +1,183 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+    Module : Back toast (Dashboard charter - gradient background, no left border)
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+----------------------------------------------------------------------------------------- */
+
+/* Base surfaces (opaque) */
+$toast-surface: #14161e !default;
+$toast-surface-top: mix(#ffffff, $toast-surface, 4%) !default;
+$toast-surface-bottom: mix(#000000, $toast-surface, 6%) !default;
+
+/* Variants */
+$toast-success: $success !default;
+$toast-danger: $danger !default;
+$toast-warning: $warning !default;
+$toast-info: $info !default;
+
+/* Gradient intensity tuning */
+$toast-tint-strong: 18% !default; /* higher = more visible tint */
+$toast-tint-soft: 10% !default;
+
+body {
+
+    > .toast-container:first-child {
+        top: 1.5rem !important;
+    }
+
+    > .toast-container:nth-child(2) {
+        top: 5.5rem !important;
+    }
+
+    > .toast-container:nth-child(3) {
+        top: 9.5rem !important;
+    }
+}
+
+.toast {
+
+    &.bottom-right {
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    &.top-right {
+        top: 6rem;
+        right: 2rem;
+    }
+}
+
+.toast-container {
+
+    right: 1.5rem !important;
+    z-index: 99999;
+
+    .toast {
+
+        width: auto !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: radial-gradient(720px 220px at 10% 0%, $toast-surface-top, $toast-surface 62%),
+            linear-gradient(180deg, $toast-surface-top, $toast-surface 45%, $toast-surface-bottom) !important;
+        box-shadow:
+            0 18px 48px rgba(0, 0, 0, 0.60),
+            0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        overflow: hidden;
+    }
+
+    .toast-header {
+        background: transparent !important;
+        border: 0 !important; /* no left border, no header border */
+        padding: 12px 14px !important;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.92) !important;
+        font-weight: 400;
+    }
+
+    .toast-body {
+        padding: 0 14px 12px 14px !important;
+        color: rgba(255, 255, 255, 0.78);
+        font-weight: 500;
+        line-height: 1.25;
+    }
+
+    /* Icon */
+    .toast-header svg {
+        fill: rgba(255, 255, 255, 0.72);
+    }
+
+    .toast-header i {
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+    /* Close button */
+    .btn-close {
+
+        filter: brightness(0) invert(1);
+        opacity: 0.7;
+        width: .5em;
+        height: .5em;
+        background-size: 9px;
+        margin: 0;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14) !important;
+        }
+    }
+
+    /* ------------------------------------------------------------
+       Variants : colored gradient background (no left border)
+       Bootstrap uses .bg-* on .toast; we override the whole background
+    ------------------------------------------------------------- */
+
+    .toast.bg-success {
+        border-color: rgba($toast-success, 0.22) !important;
+        background:
+            radial-gradient(
+                    720px 220px at 10% 0%,
+                    mix($toast-success, $toast-surface, $toast-tint-strong),
+                    $toast-surface 62%
+            ),
+            linear-gradient(
+                    180deg,
+                    mix(#ffffff, mix($toast-success, $toast-surface, $toast-tint-soft), 6%),
+                    $toast-surface 45%,
+                    $toast-surface-bottom
+            ) !important;
+    }
+
+    .toast.bg-danger {
+        border-color: rgba($toast-danger, 0.22) !important;
+        background:
+            radial-gradient(
+                    720px 220px at 10% 0%,
+                    mix($toast-danger, $toast-surface, $toast-tint-strong),
+                    $toast-surface 62%
+            ),
+            linear-gradient(
+                    180deg,
+                    mix(#ffffff, mix($toast-danger, $toast-surface, $toast-tint-soft), 6%),
+                    $toast-surface 45%,
+                    $toast-surface-bottom
+            ) !important;
+    }
+
+    .toast.bg-warning {
+        border-color: rgba($toast-warning, 0.22) !important;
+        background:
+            radial-gradient(
+                    720px 220px at 10% 0%,
+                    mix($toast-warning, $toast-surface, $toast-tint-strong),
+                    $toast-surface 62%
+            ),
+            linear-gradient(
+                    180deg,
+                    mix(#ffffff, mix($toast-warning, $toast-surface, $toast-tint-soft), 6%),
+                    $toast-surface 45%,
+                    $toast-surface-bottom
+            ) !important;
+    }
+
+    .toast.bg-info {
+        border-color: rgba($toast-info, 0.22) !important;
+        background:
+            radial-gradient(
+                    720px 220px at 10% 0%,
+                    mix($toast-info, $toast-surface, $toast-tint-strong),
+                    $toast-surface 62%
+            ),
+            linear-gradient(
+                    180deg,
+                    mix(#ffffff, mix($toast-info, $toast-surface, $toast-tint-soft), 6%),
+                    $toast-surface 45%,
+                    $toast-surface-bottom
+            ) !important;
+    }
+}

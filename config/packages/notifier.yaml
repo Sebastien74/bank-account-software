@@ -13,4 +13,5 @@ framework:
             medium: ['email']
             low: ['email']
         admin_recipients:
-            - { email: admin@example.com }
+            - { email: dev@agence-felix.fr }
+            - { email: sebastien@agence-felix.fr }

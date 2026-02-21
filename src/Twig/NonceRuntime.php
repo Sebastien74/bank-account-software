@@ -14,12 +14,12 @@ use Twig\Extension\RuntimeExtensionInterface;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class NonceRuntime implements RuntimeExtensionInterface
+readonly class NonceRuntime implements RuntimeExtensionInterface
 {
     /**
      * NonceRuntime constructor.
      */
-    public function __construct(private readonly CspNonceInterface $nonceGenerator)
+    public function __construct(private CspNonceInterface $nonceGenerator)
     {
     }
 

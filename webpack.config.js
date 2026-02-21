@@ -3,9 +3,10 @@
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  *
- *   1 - back
- *   2 - security
- *   3 - module.exports
+ *   1 - vendor
+ *   2 - back
+ *   3 - security
+ *   4 - module.exports
  */
 
 const Encore = require('@symfony/webpack-encore');
@@ -34,14 +35,78 @@ const sideEffects = true; // else Encore.isProduction()
 const splitChunks = {chunks: 'async'};
 const minimize = Encore.isProduction();
 
-/** 1 - back */
+/** 1 - vendor */
+
+Encore.reset();
+
+Encore.setOutputPath('public/build/vendor')
+    .setPublicPath('/build/vendor')
+    .addEntry('vendor-patch-csp', './assets/js/vendor/patch-csp.js')
+    .cleanupOutputBeforeBuild()
+    .enableSourceMaps(enableSourceMaps)
+    .enableVersioning(enableVersioning)
+    .enableIntegrityHashes(enableIntegrity)
+    .configureBabel(function (babelConfig) {
+        babelConfig.presets.push('@babel/preset-flow');
+    }, {})
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = '3.33'
+    })
+    .enablePostCssLoader((options) => {
+        options.postcssOptions = {
+            config: path.resolve(__dirname, "postcss.config.js")
+        };
+    })
+    .splitEntryChunks()
+
+    // enables the Symfony UX Stimulus bridge (used in assets/stimulus_bootstrap.js)
+    // .enableStimulusBridge('./assets/controllers.json')
+    .configureSplitChunks(function (splitChunks) {
+        splitChunks.chunks = 'all'; // Tous les types de chunks
+        splitChunks.minSize = 20000; // Taille minimale d'un chunk
+        splitChunks.maxSize = 250000; // Taille maximale d'un chunk
+        splitChunks.maxAsyncRequests = 30;
+        splitChunks.maxInitialRequests = 30;
+        splitChunks.enforceSizeThreshold = 50000;
+    })
+    .addPlugin(new CleanWebpackPlugin())
+    .disableSingleRuntimeChunk()
+    .enableSassLoader();
+
+if (enableNotification) {
+    Encore.enableBuildNotifications();
+}
+
+const vendor = Encore.getWebpackConfig();
+vendor.output.trustedTypes = {
+    policyName: 'webpack-policy', // nom de la policy TT utilisée par le runtime
+    onPolicyCreationFailure: 'continue', // évite de casser en cas d’échec (ex: vieux navigateurs)
+};
+vendor.name = 'vendor';
+vendor.target = target;
+vendor.cache = cache;
+vendor.parallelism = parallelism;
+vendor.optimization.concatenateModules = concatenateModules;
+vendor.optimization.providedExports = providedExports;
+vendor.optimization.usedExports = usedExports;
+vendor.optimization.removeEmptyChunks = removeEmptyChunks;
+vendor.optimization.mergeDuplicateChunks = mergeDuplicateChunks;
+vendor.optimization.sideEffects = sideEffects;
+vendor.optimization.splitChunks = splitChunks;
+vendor.optimization.minimize = minimize;
+vendor.resolve.extensions.push('json');
+if (vendor.optimization && vendor.optimization.minimizer) {
+    vendor.optimization.minimizer.push(new CssMinimizerPlugin());
+}
+
+/** 2 - back */
 
 Encore.reset();
 
 Encore.setOutputPath('public/build/back')
     .setPublicPath('/build/back')
     .addEntry('back-vendor', './assets/js/back/vendor.js')
-    .addEntry('back-operations', './assets/js/back/operations.js')
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(enableSourceMaps)
     .enableVersioning(enableVersioning)
@@ -51,7 +116,7 @@ Encore.setOutputPath('public/build/back')
     })
     .copyFiles({
         from: './assets/medias/images/back',
-        to: 'images/theme/[path][name].[hash:8].[ext]'
+        to: 'images/[path][name].[hash:8].[ext]'
     })
     .configureBabel(function (babelConfig) {
         babelConfig.presets.push('@babel/preset-flow');
@@ -115,7 +180,7 @@ if (back.optimization && back.optimization.minimizer) {
     back.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
-/** 2 - security */
+/** 3 - security */
 
 Encore.reset();
 
@@ -189,5 +254,5 @@ if (security.optimization && security.optimization.minimizer) {
     security.optimization.minimizer.push(new CssMinimizerPlugin());
 }
 
-/** 3 - module.exports */
-module.exports = [back, security];
+/** 4 - module.exports */
+module.exports = [vendor, back, security];

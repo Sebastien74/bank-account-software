@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Security;
 
-use App\Controller\BaseController;
 use App\Entity\Security\User;
 use App\Form\Type\Security\LoginType;
 use Exception;
@@ -35,7 +34,7 @@ class SecurityController extends BaseController
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser() instanceof User && $this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('back_dashboard');
+            return $this->redirectToRoute('back_wallet_index');
         }
 
         $form = $this->createForm(LoginType::class);

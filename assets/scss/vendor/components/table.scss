@@ -1,0 +1,423 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Back table
+    Copyright : 2025
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+----------------------------------------------------------------------------------------- */
+
+.table {
+
+    > :not(caption) > * > * {
+        padding: 10px 10px;
+    }
+
+    .media-col {
+
+        width: 60px;
+
+        svg {
+            max-width: 35px;
+            max-height: 20px;
+        }
+    }
+
+    a {
+
+        text-decoration: none;
+
+        &.index-link {
+
+            color: transparentize($white, .3);
+            font-size: 15px;
+            transition: all .3s ease-in-out;
+
+            &:hover {
+                color: transparentize($white, 0);
+                transition: all .3s ease-in-out;
+            }
+        }
+    }
+
+    .btn-circle {
+
+        width: 30px;
+        height: 30px;
+
+        i:not(.network-wired) {
+            font-size: 1rem;
+        }
+
+        i.icon-network-wired {
+            font-size: 14px;
+        }
+    }
+}
+
+$dash-accent: #7c6cff !default;
+
+$tbl-surface: rgba(255, 255, 255, .02) !default;
+$tbl-border: rgba(255, 255, 255, .07) !default;
+$tbl-border-soft: rgba(255, 255, 255, .05) !default;
+$tbl-hover: rgba(255, 255, 255, .03) !default;
+
+$tbl-text: rgba(255, 255, 255, .92) !default;
+$tbl-muted: rgba(255, 255, 255, .70) !default;
+
+$tbl-shadow: 0 18px 45px rgba(0, 0, 0, .55) !default;
+
+.dash-table {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: $tbl-surface;
+    border: 1px solid $tbl-border;
+}
+
+/* Subtle corner glow like your cards */
+.dash-table::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background: radial-gradient(520px 220px at 18% 0%, rgba($dash-accent, .12), transparent 62%);
+    opacity: 0.75;
+    pointer-events: none;
+    filter: blur(0.6px);
+}
+
+.dash-table__head,
+.dash-table__foot {
+    padding: 12px 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .02), transparent 70%);
+    border-bottom: 1px solid $tbl-border-soft;
+}
+
+.dash-table__foot {
+    border-top: 1px solid $tbl-border-soft;
+    border-bottom: 0;
+}
+
+/* Override Bootstrap dark table to match your surface */
+.dash-table .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: #fff;
+    --bs-table-border-color: rgba(255, 255, 255, .06);
+    margin-bottom: 0;
+}
+
+.dash-table thead th {
+    color: $tbl-text;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    border-bottom-color: rgba(255, 255, 255, .07) !important;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.dash-table tbody td {
+    color: $tbl-text;
+    border-top-color: rgba(255, 255, 255, .06) !important;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+/* Hover row (subtle) */
+.dash-table tbody tr:hover > * {
+    background: $tbl-hover !important;
+}
+
+/* Links */
+.dash-link {
+
+    color: rgba($white, .7);
+    transition: color 120ms ease;
+    font-size: 12px;
+
+    &:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+}
+
+/* Badge in header */
+.dash-badge {
+    background: rgba(255, 255, 255, .06) !important;
+    border: 1px solid rgba(255, 255, 255, .10);
+    color: $tbl-muted !important;
+    font-weight: 650;
+}
+
+/* Action buttons = chips */
+.dash-action {
+
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(255, 255, 255, .02);
+    color: $tbl-text;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+
+    i {
+        font-size: .75rem;
+    }
+
+    &:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, .04);
+        border-color: rgba(255, 255, 255, .12);
+        box-shadow: $tbl-shadow;
+    }
+
+    &:focus-visible {
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba($dash-accent, .18);
+    }
+}
+
+.dash-accent {
+
+    &.dash-darken {
+
+        background: rgba($dash-accent, .7);
+        border-color: rgba($dash-accent, .6);
+
+        i {
+            color: transparentize($dark, .6) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba($dash-accent, .16);
+        border-color: rgba($dash-accent, .35);
+    }
+
+    &:hover {
+        background: rgba($dash-accent, .22);
+        border-color: rgba($dash-accent, .55);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, .60),
+        0 0 0 4px rgba($dash-accent, .14);
+    }
+}
+
+.dash-danger {
+
+    &.dash-darken {
+
+        background: rgba(255, 92, 92, .7);
+        border-color: rgba(255, 92, 92, .6);
+
+        i {
+            color: transparentize($white, .6) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba(255, 92, 92, .12);
+        border-color: rgba(255, 92, 92, .30);
+    }
+
+    &:hover {
+        background: rgba(255, 92, 92, .18);
+        border-color: rgba(255, 92, 92, .55);
+    }
+}
+
+.dash-info {
+
+    &.dash-darken {
+
+        background: rgba(59, 130, 246, .7);
+        border-color: rgba(59, 130, 246, .6);
+
+        i {
+            color: transparentize($dark, .3) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba(59, 130, 246, .12);
+        border-color: rgba(59, 130, 246, .30);
+    }
+
+    &:hover {
+        background: rgba(59, 130, 246, .18);
+        border-color: rgba(59, 130, 246, .55);
+    }
+}
+
+.dash-warning {
+
+    &.dash-darken {
+
+        background: rgba(245, 158, 11, .7);
+        border-color: rgba(245, 158, 11, .6);
+
+        i {
+            color: transparentize($dark, .3) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba(245, 158, 11, .12);
+        border-color: rgba(245, 158, 11, .30);
+    }
+
+    &:hover {
+
+        background: rgba(245, 158, 11, .18);
+        border-color: rgba(245, 158, 11, .55);
+
+        &.dash-darken {
+            i {
+                color: transparentize($white, .3) !important;
+            }
+        }
+    }
+}
+
+.dash-teal,
+.dash-success {
+
+    &.dash-darken {
+
+        background: $teal-800;
+        border-color:$teal-800;
+
+        i {
+            color: transparentize($white, .5) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba(13, 148, 136, .12);
+        border-color: rgba(13, 148, 136, .30);
+    }
+
+    &:hover {
+        background: rgba(13, 148, 136, .18);
+        border-color: rgba(13, 148, 136, .55);
+    }
+}
+
+.dash-white,
+.dash-white-50 {
+
+    &.dash-darken {
+
+        background: rgba(255, 255, 255, .12);
+        border-color: rgba(255, 255, 255, .30);
+
+        i {
+            color: transparentize($white, .3) !important;
+        }
+    }
+
+    &:not(.dash-darken) {
+        background: rgba(255, 255, 255, .12);
+        border-color: rgba(255, 255, 255, .30);
+    }
+
+    &.cursor-not-allowed {
+        opacity: .3;
+    }
+
+    &:not(.cursor-not-allowed):hover {
+        background: rgba(255, 255, 255, .18);
+        border-color: rgba(255, 255, 255, .55);
+    }
+}
+
+@include mediaQuery(between-lg-xl) {
+
+    table.responsive-cards {
+
+        .infos-badge {
+
+            .btn.github {
+
+                min-width: 145px;
+
+                span {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+@include mediaQuery(max-md) {
+
+    table.responsive-cards {
+
+        thead {
+            display: none; // Hide table header on mobile
+        }
+
+        .infos-badge {
+            .btn-square {
+                width: 40px !important;
+            }
+        }
+
+        // Turn table into block layout
+        &, tbody, tr, td {
+            display: block;
+            width: 100%;
+        }
+
+        tr {
+            // Card container
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: .5rem;
+            overflow: hidden;
+        }
+
+        &:not(.show-view) td {
+            display: flex;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: .75rem 1rem;
+        }
+
+        &.show-view td a {
+            font-size: 14px;
+        }
+
+        td {
+
+            // Row line inside the card
+            border: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .10);
+
+            &:last-child {
+                border-bottom: 0; // Remove last divider
+            }
+
+            &::before {
+                // Label on the left
+                content: attr(data-label);
+                font-weight: 600;
+                opacity: .85;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+            }
+
+            &.text-end {
+                text-align: left !important; // Avoid weird alignment with flex
+            }
+        }
+    }
+}

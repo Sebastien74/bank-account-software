@@ -2,7 +2,7 @@
     "name": "@symfony/ux-turbo",
     "description": "Hotwire Turbo integration for Symfony",
     "license": "MIT",
-    "version": "2.29.2",
+    "version": "2.31.0",
     "keywords": [
         "symfony-ux",
         "turbo",
@@ -23,8 +23,9 @@
         "build": "tsx ../../../bin/build_package.ts .",
         "watch": "tsx ../../../bin/build_package.ts . --watch",
         "test": "pnpm run test:unit && pnpm run test:browser",
-        "test:unit": "../../../bin/test_package.sh . --unit",
-        "test:browser": "../../../bin/test_package.sh . --browser",
+        "test:unit": "../../../bin/unit_test_package.sh .",
+        "test:browser": "playwright test",
+        "test:browser:ui": "playwright test --ui",
         "check": "biome check",
         "ci": "biome ci"
     },

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Service\CryptServiceInterface;
+use Exception;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -15,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * RecaptchaAuthenticator.
  *
- * Manage recaptcha security authenticate post
+ * Manage recaptcha security authenticate post.
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
@@ -37,11 +38,11 @@ class RecaptchaAuthenticator
     /**
      * Check if is valid POST.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(Request $request): bool
     {
-        $formSecurityKey = $_ENV['SECRET_KEY'];
+        $formSecurityKey = $_ENV['APP_SECRET_KEY'];
         $fieldHo = $request->request->get('field_ho');
         $fieldHoEntitled = $request->request->get('field_ho_entitled');
 
@@ -52,10 +53,10 @@ class RecaptchaAuthenticator
             }
         }
 
-        $this->session->getFlashBag()->add('error_form', $this->translator->trans('Erreur de sécurité !! Rechargez la page et réessayez.', [], 'front_form'));
+        $this->session->getFlashBag()->add('error', $this->translator->trans('The captcha is invalid. Please reload the page and try again.', [], 'core_form'));
 
         $logger = new Logger('SECURITY_FORM');
-        $logger->pushHandler(new RotatingFileHandler($this->logDir.'/security-cms.log', 10, Level::Critical));
+        $logger->pushHandler(new RotatingFileHandler($this->logDir.'/recaptcha.log', 10, Level::Critical));
         $logger->critical('Recaptcha security. IP register :'.$request->getClientIp());
 
         return false;

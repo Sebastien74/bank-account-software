@@ -6,8 +6,10 @@ namespace Doctrine\Bundle\MigrationsBundle\DependencyInjection;
 
 use Doctrine\Bundle\MigrationsBundle\Collector\MigrationsCollector;
 use Doctrine\Bundle\MigrationsBundle\Collector\MigrationsFlattener;
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\MigrationFactory;
 use InvalidArgumentException;
 use RuntimeException;
@@ -17,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 use function array_keys;
@@ -30,6 +32,7 @@ use function sprintf;
 use function strlen;
 use function substr;
 
+/** @final */
 class DoctrineMigrationsExtension extends Extension
 {
     /**
@@ -44,9 +47,22 @@ class DoctrineMigrationsExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $locator = new FileLocator(__DIR__ . '/../../config/');
-        $loader  = new XmlFileLoader($container, $locator);
+        $loader  = new PhpFileLoader($container, $locator);
 
-        $loader->load('services.xml');
+        $loader->load('services.php');
+
+        if ($config['enable_service_migrations']) {
+            $container->registerForAutoconfiguration(AbstractMigration::class)
+                ->addTag('doctrine_migrations.migration');
+
+            if (! isset($config['services'][MigrationsRepository::class])) {
+                $config['services'][MigrationsRepository::class] = 'doctrine.migrations.service_migrations_repository';
+            }
+        } else {
+            $container->removeDefinition('doctrine.migrations.service_migrations_repository');
+            $container->removeDefinition('doctrine.migrations.connection');
+            $container->removeDefinition('doctrine.migrations.logger');
+        }
 
         $configurationDefinition = $container->getDefinition('doctrine.migrations.configuration');
 

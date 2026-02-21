@@ -6,6 +6,7 @@ parameters:
     locale: '%env(APP_LOCALE)%'
     uploadsPath: '%kernel.project_dir%/public/uploads'
     projectDir: '%kernel.project_dir%'
+    publicDir: '%kernel.project_dir%/public'
     logDir: '%kernel.logs_dir%'
     cacheDir: '%kernel.cache_dir%'
     debugMode: '%env(APP_DEBUG)%'

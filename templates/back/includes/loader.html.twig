@@ -1,0 +1,11 @@
+{% trans_default_domain 'back' %}
+
+<div class="stripe-preloader d-none">
+    <div class="bg-stripe-loader"></div>
+    <div class="inner h-100 d-flex align-items-center justify-content-center">
+        {{ 'loader.gif'|img('back', {
+            lazyLoad: true,
+            placeholder: true,
+        }) }}
+    </div>
+</div>

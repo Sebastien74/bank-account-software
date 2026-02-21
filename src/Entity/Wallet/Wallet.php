@@ -28,7 +28,7 @@ class Wallet extends BaseEntity
         'name' => 'wallet',
     ];
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'float', nullable: true)]
     private ?float $initialAmount = null;
 
     #[ORM\OneToMany(targetEntity: Operation::class, mappedBy: 'wallet', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]

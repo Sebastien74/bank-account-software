@@ -11,26 +11,27 @@
 
 #main-preloader {
 
-    position: absolute;
+    position: fixed;
     top: 0;
-    left: 0;
+    left: initial;
     bottom: 0;
     right: 0;
     z-index: 1500;
-    background-color: $bg-body;
+    background: $bg-body;
 
-    .icon-wrap {
+    @include mediaQuery(max-lg) {
+        width: 100%;
+    }
 
-        width: 150px;
+    @include mediaQuery(min-lg) {
+        width: 400px;
+    }
+
+    .logo-wrap img {
+        max-height: 150px;
         height: 150px;
-        border-radius: 50%;
-        aspect-ratio: 1;
-        background-color: $primary;
-
-        i {
-            color: $white;
-            font-size: 75px;
-        }
+        width: auto;
+        max-width: 100%;
     }
 }
 

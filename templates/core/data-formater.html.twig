@@ -1,0 +1,94 @@
+{% trans_default_domain 'core' %}
+
+{% set inAdmin = inAdmin is defined and inAdmin %}
+{% set property = property is defined ? property : false %}
+{% set asCode = asCode is defined ? asCode : [] %}
+{% set displayCode = displayCode is defined ? displayCode : asCode is defined and property in asCode %}
+
+{% if dataValue and dataValue|isDateTime %}
+    {% if property == 'birthday' %}
+        {{ date().diff(date(dataValue)).y }}
+    {% elseif 'hour' in property|lower %}
+        {{ dataValue|format_datetime(pattern="HH:mm"|trans, locale=app.request.locale) }}
+    {% else %}
+        {{ dataValue|format_datetime(pattern="cccc d MMMM Y 'à' HH:mm"|trans, locale=app.request.locale) }}
+    {% endif %}
+{% elseif dataValue and dataValue|isEmail %}
+    <a href="mailto:{{ dataValue }}">{{ dataValue }}</a>
+{% elseif dataValue and 'phone' in property %}
+    <a href="tel:{{ dataValue }}">{{ dataValue }}</a>
+{% elseif dataValue|isBool %}
+    {% if 'asError' == property and inAdmin and dataValue %}
+        <i class="icon-ban text-danger"></i>
+    {% elseif 'asError' == property and inAdmin and not dataValue %}
+        <i class="icon-check-circle text-success"></i>
+    {% elseif inAdmin and not dataValue %}
+        <i class="icon-ban text-danger"></i>
+    {% elseif inAdmin %}
+        <i class="icon-check-circle text-success"></i>
+    {% elseif dataValue == false %}
+        {{ "No"|trans|raw }}
+    {% else %}
+        {{ "Yes"|trans|raw }}
+    {% endif %}
+{% elseif dataValue|isObject %}
+    {% if '.' in property %}
+        {% set properties = property|split('.') %}
+        {% set displayCode = property in asCode %}
+        {% set dataValue = dataValue.entity is defined ? dataValue.entity : dataValue %}
+        {% set data = attribute(dataValue, properties[0]) %}
+        {% if data|isObject and 'PersistentCollection' in data|getClass %}
+            <ul class="m-0 ps-3">
+                {% for value in data %}
+                    <li>
+                        {% include 'core/data-formater.html.twig' with {
+                            dataValue: attribute(value, properties[1]
+                        )} only %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elseif data %}
+            {% include 'core/data-formater.html.twig' with {
+                asCode: asCode,
+                displayCode: displayCode,
+                dataValue: attribute(data, properties[1]),
+            } only %}
+        {% endif %}
+    {% endif %}
+{% else %}
+    {% if displayCode %}
+{% if 'xml' in dataValue %}
+<pre class="m-0"><code class="language-xml">
+{{ dataValue|replace({' ': ''}) }}
+</code></pre>
+{% else %}
+{% set asJson = dataValue|default('')|trim|first == '{' %}
+<pre class="m-0"><code class="language-txt{% if asJson %} as-json{% endif %}">
+{% if asJson %}
+{{ dataValue|jsonPretty|e|nl2br }}
+{% else %}
+{{ dataValue|raw|nl2br }}
+{% endif %}
+</code></pre>
+{% endif %}
+    {% else %}
+        {% set href = dataValue %}
+        {% if 'url' in property|lower and entity.entity is defined and entity.entity and entityValue(entity.entity, property) %}
+            {% set href = entityValue(entity.entity, property) %}
+        {% endif %}
+        {% set asUrl = 'http' in href %}
+        {% if asUrl %}
+            <a href="{{ href }}" target="_blank" class="text-primary-lighten">
+        {% endif %}
+        {% if 'httpStatus' == property and entity.httpStatusColor is defined and entity.httpStatusColor %}
+            <span class="text-{{ entity.httpStatusColor }} fw-700">
+        {% endif %}
+            {{ dataValue|raw|nl2br }}
+        {% if 'httpStatus' == property and entity.httpStatusColor is defined and entity.httpStatusColor %}
+            </span>
+        {% endif %}
+        {% if asUrl %}
+            </a>
+        {% endif %}
+    {% endif %}
+{% endif %}

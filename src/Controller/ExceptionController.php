@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Security\User;
+use App\Service\AdminLocatorInterface;
+use App\Service\CoreLocatorInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,10 +20,21 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
-class ExceptionController extends BaseController
+class ExceptionController extends \App\Controller\BaseController
 {
     protected int $statusCode = 0;
     protected bool $isDebug = false;
+
+    /**
+     * ExceptionController constructor.
+     */
+    public function __construct(
+        protected CoreLocatorInterface $coreLocator,
+        protected AdminLocatorInterface $adminLocator,
+    )
+    {
+        parent::__construct($coreLocator);
+    }
 
     /**
      * Page render.
@@ -29,14 +42,12 @@ class ExceptionController extends BaseController
     public function showAction(
         Request $request,
         FlattenException|\Exception $exception,
-        bool $isDebug,
-        string $projectDir,
         ?DebugLoggerInterface $logger = null,
     ): Response {
 
-        $this->isDebug = $isDebug;
+        $this->isDebug = $this->coreLocator->isDebug();
 
-        if (!$this->isDebug && preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $request->getUri()) && !$this->getUser() instanceof User) {
+        if (!$this->isDebug && $this->coreLocator->inAdmin() && !$this->getUser() instanceof User) {
             return $this->redirect($request->getSchemeAndHttpHost());
         }
 
@@ -44,17 +55,17 @@ class ExceptionController extends BaseController
         $this->statusCode = 0 === $this->statusCode ? 500 : $this->statusCode;
 
         $arguments = $this->setArguments($exception, $logger);
-        $template = $this->getTemplate($projectDir);
+        $template = $this->getTemplate();
 
         return $this->render($template, $arguments);
     }
     /**
      * Get template.
      */
-    private function getTemplate(string $projectDir): string
+    private function getTemplate(): string
     {
         $filesystem = new Filesystem();
-        $dirname = $projectDir.'\templates\bundles\TwigBundle\Exception\\';
+        $dirname = $this->coreLocator->projectDir().'\templates\bundles\TwigBundle\Exception\\';
         $isNotFound = 404 === $this->statusCode;
         $isForbidden = 403 === $this->statusCode || 401 === $this->statusCode;
         $isDevEnv = $_ENV['APP_ENV'] === 'local' || $_ENV['APP_ENV'] === 'dev';
@@ -74,18 +85,30 @@ class ExceptionController extends BaseController
     /**
      * Set page arguments.
      */
-    private function setArguments(
-        FlattenException|\Exception $exception,
-        ?DebugLoggerInterface $logger = null,
-    ): array {
-
+    private function setArguments(FlattenException|\Exception $exception, ?DebugLoggerInterface $logger = null,): array
+    {
         $arguments['is_debug'] = $this->isDebug;
         $arguments['logger'] = $logger;
         $arguments['status_code'] = $this->statusCode;
         $arguments['status_text'] = $exception->getMessage();
         $arguments['exception'] = $exception;
         $arguments['currentContent'] = null;
+        $arguments['webpackName'] = $arguments['pageCode'] = 'error';
 
-        return array_merge($this->defaultArguments(), $arguments);
+        $this->breadcrumb();
+
+        return array_merge($arguments, $this->coreArguments());
+    }
+
+    /**
+     * To set breadcrumb.
+     */
+    protected function breadcrumb(array $items = []): void
+    {
+        if ($this->coreLocator->inAdmin()) {
+            $items[$this->coreLocator->translator()->trans('Comptes', [], 'back_breadcrumb')] = 'back_wallet_index';
+        }
+
+        $this->arguments['breadcrumb'] = $items;
     }
 }

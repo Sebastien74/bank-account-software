@@ -1,0 +1,22 @@
+{% trans_default_domain 'core' %}
+
+{% set messagesSet = [] %}
+
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        {% if message in messagesSet %}
+            <div class="d-none">
+        {% endif %}
+        {% include 'core/alert.html.twig' with {
+            display: display is defined ? display : 'alert',
+            size: size is defined and size ? size : 'normal',
+            alert: type,
+            class: alertClass is defined ? alertClass : 'mb-0',
+            message: message
+        } only %}
+        {% if message in messagesSet %}
+            </div>
+        {% endif %}
+        {% set messagesSet = messagesSet|merge({message}) %}
+    {% endfor %}
+{% endfor %}
