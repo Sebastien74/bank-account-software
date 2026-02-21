@@ -43,6 +43,10 @@
                         {% if monthStats is empty %}
                             <p class="text-muted mb-0">{{ "Aucune donnée disponible pour ce mois."|trans }}</p>
                         {% else %}
+                            <div class="alert alert-info py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                                <i class="icon-info-sign me-1"></i>
+                                {{ "Les tendances sont calculées du 1er au %day% du mois par rapport à la même période l'année précédente."|trans({'%day%': comparisonDay}) }}
+                            </div>
                             {% include 'back/pages/includes/_stats_accordion.html.twig' with {stats: monthStats, idPrefix: 'month'} %}
                         {% endif %}
                     </div>
