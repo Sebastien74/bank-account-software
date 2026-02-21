@@ -149,6 +149,18 @@ class CoreRuntime implements RuntimeExtensionInterface
     }
 
     /**
+     * Count entity collection by property.
+     */
+    public function countCollection(mixed $entity = null, ?string $property = null): ?int
+    {
+        $getter = 'get'.ucfirst($property);
+        if ($entity && is_object($entity) && method_exists($entity, $getter) && is_iterable($entity->$getter())) {
+            return count($entity->$getter());
+        }
+        return null;
+    }
+
+    /**
      * Get format Date by locale.
      *
      * @throws Exception

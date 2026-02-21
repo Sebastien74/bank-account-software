@@ -28,10 +28,13 @@ class Category extends BaseEntity
     protected static array $interface = [
         'name' => 'category',
         'masterField' => 'operationtype',
+        'buttons' => [
+            'subCategories' => 'back_subcategory_index',
+        ],
     ];
 
-    protected static array $buttons = [
-        'back_subcategory_index' => 'adminName',
+    protected static array $labels = [
+        'back_subcategory_index' => 'Sous-catégories',
     ];
 
     #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]

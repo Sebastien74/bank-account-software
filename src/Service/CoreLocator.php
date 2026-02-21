@@ -164,8 +164,9 @@ class CoreLocator implements CoreLocatorInterface
                                 if (!empty($interface['name']) && $match === $interface['name']) {
                                     $parameters[$match] = $entity->getId();
                                 }
-                                if ($match === $interface['masterField'] && method_exists($entity, $interface['masterFieldGetter']) && $entity->$interface['masterFieldGetter']()) {
-                                    $parameters[$match] = $entity->$interface['masterFieldGetter']()->getId();
+                                $masterFieldGetter = $interface['masterFieldGetter'];
+                                if ($match === $interface['masterField'] && method_exists($entity, $interface['masterFieldGetter']) && $entity->$masterFieldGetter()) {
+                                    $parameters[$match] = $entity->$masterFieldGetter()->getId();
                                 }
                             }
                         }

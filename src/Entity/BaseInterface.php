@@ -24,6 +24,8 @@ class BaseInterface extends BaseUserAction
 
     protected static array $buttons = [];
 
+    protected static array $labels = [];
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $createdAt = null;
 
@@ -58,6 +60,11 @@ class BaseInterface extends BaseUserAction
     public static function getButtons(): array
     {
         return static::$buttons;
+    }
+
+    public static function getLabels(): array
+    {
+        return static::$labels;
     }
 
     public function setCreatedAt(?\DateTimeInterface $createdAt = null): static

@@ -48,6 +48,7 @@ class InterfaceHelper implements InterfaceHelperInterface
         $this->cache[$classname]['masterFieldSetter'] = !empty($interface['masterField']) ? 'set'.ucfirst($interface['masterField']) : false;
         $this->cache[$classname]['disabledActions'] = !empty($interface['disabledActions']) ? $interface['disabledActions'] : [];
         $this->cache[$classname]['buttons'] = !empty($interface['buttons']) ? $interface['buttons'] : [];
+        $this->cache[$classname]['labels'] = $referEntity && method_exists($referEntity, 'getLabels') ? $referEntity::getLabels() : [];
         $this->cache[$classname]['columns'] = !empty($interface['columns']) ? $interface['columns'] : [];
         $this->cache[$classname]['export'] = !empty($interface['export']) ? $interface['export'] : [];
         $this->cache[$classname]['showAsConfig'] = !empty($interface['show']);
@@ -56,5 +57,19 @@ class InterfaceHelper implements InterfaceHelperInterface
         $this->cache[$classname]['email'] = !empty($interface['email']) ? $interface['email'] : [];
 
         return $field && !empty($this->cache[$classname][$field]) ? $this->cache[$classname][$field] : $this->cache[$classname];
+    }
+
+    /**
+     * Set Labels.
+     */
+    public function setLabels(): void
+    {
+        $entity = $this->getEntity();
+        if (is_object($entity) && method_exists($entity, 'getLabels')) {
+            $reflectionMethod = new \ReflectionMethod($entity, 'getLabels');
+            $this->labels = $reflectionMethod->isStatic() && !empty($entity::getLabels()) ? $this->getEntity()::getLabels() : [];
+        } else {
+            $this->parentMasterField = null;
+        }
     }
 }

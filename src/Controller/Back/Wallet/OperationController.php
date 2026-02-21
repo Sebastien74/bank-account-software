@@ -84,6 +84,8 @@ class OperationController extends BaseController
         $this->arguments['wallet'] = $wallet = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations :', [], 'back').' '.$wallet->title;
 
+        $this->entities = $this->coreLocator->em()->getRepository(Operation::class)->findAll();
+
         return parent::index($paginator);
     }
 
@@ -94,8 +96,6 @@ class OperationController extends BaseController
     public function edit(): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations', [], 'back');
-
-        dd('Mettre pointed dans fom pas new');
 
         return parent::edit();
     }

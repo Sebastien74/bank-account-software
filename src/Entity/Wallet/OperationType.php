@@ -27,10 +27,13 @@ class OperationType extends BaseEntity
      */
     protected static array $interface = [
         'name' => 'operationtype',
+        'buttons' => [
+            'categories' => 'back_category_index',
+        ],
     ];
 
-    protected static array $buttons = [
-        'back_category_index' => 'adminName',
+    protected static array $labels = [
+        'back_category_index' => 'Catégories',
     ];
 
     #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]

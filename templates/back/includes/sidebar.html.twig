@@ -2,36 +2,41 @@
 
 <aside id="sidebar-menu" class="sidebar py-4">
     <nav class="nav nav-pills flex-column pt-4 gap-3 h-100">
-        {% set active = 'dashboard' in app.request.uri %}
+        {% set active = 'wallets' in app.request.uri %}
         <a href="{{ path('back_wallet_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
                 <i class="icon-wallet"></i>
             </span>
-            <span class="mx-1 label">{{ 'Gérer mes comptes'|trans|raw }}</span>
+            <span class="mx-1 label">{{ 'Gestion des comptes'|trans|raw }}</span>
         </a>
-{#        {% set active = 'domains' in app.request.uri %}#}
-{#        <a href="{{ path('back_domain_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#            <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
-{#                <i class="icon-desktop"></i>#}
-{#            </span>#}
-{#            <span class="mx-1 label">{{ "Gérer mes comptes"|trans|raw }}</span>#}
-{#        </a>#}
-{#        {% set active = 'documentation' in app.request.uri %}#}
-{#        <a href="{{ path('back_documentation_view') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#            <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
-{#                <i class="icon-code"></i>#}
-{#            </span>#}
-{#            <span class="mx-1 label">{{ 'Documentation'|trans|raw }}</span>#}
-{#        </a>#}
-{#        {% if granted('ROLE_USERS') %}#}
-{#            {% set active = 'security/' in app.request.uri %}#}
-{#            <a href="{{ path('back_user_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                <span class="label-icon d-inline-flex align-items-center justify-content-center">#}
-{#                    <i class="icon-users"></i>#}
-{#                </span>#}
-{#                <span class="mx-1 label">{{ 'Users'|trans|raw }}</span>#}
-{#            </a>#}
-{#        {% endif %}#}
+        {% set active = 'budgets' in app.request.uri %}
+        <a href="{{ path('back_budget_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
+            <span class="label-icon d-inline-flex align-items-center justify-content-center">
+                <i class="icon-envelope-open-dollar"></i>
+            </span>
+            <span class="mx-1 label">{{ 'Gestion des budgets'|trans|raw }}</span>
+        </a>
+        {% set active = 'objectives' in app.request.uri %}
+        <a href="{{ path('back_objective_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
+            <span class="label-icon d-inline-flex align-items-center justify-content-center">
+                <i class="icon-bullseye-arrow"></i>
+            </span>
+            <span class="mx-1 label">{{ 'Gestion des objectifs'|trans|raw }}</span>
+        </a>
+        {% set active = 'operations-types' in app.request.uri %}
+        <a href="{{ path('back_operationtype_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
+            <span class="label-icon d-inline-flex align-items-center justify-content-center">
+                <i class="icon-list-alt"></i>
+            </span>
+            <span class="mx-1 label">{{ 'Gestion des catégories'|trans|raw }}</span>
+        </a>
+        {% set active = 'outsiders' in app.request.uri %}
+        <a href="{{ path('back_outsider_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
+            <span class="label-icon d-inline-flex align-items-center justify-content-center">
+                <i class="icon-list-alt"></i>
+            </span>
+            <span class="mx-1 label">{{ 'Gestion des bénéficiaires'|trans|raw }}</span>
+        </a>
         <div class="d-none d-lg-flex flex-grow-1"></div>
         <div class="sidebar-footer d-flex jusify-content-center pt-3 mt-3 mx-auto">
             <a href="{{ path('app_logout') }}" class="nav-link nav-link-danger w-100 logout d-inline-flex align-items-center text-white mx-auto py-2 px-4">
@@ -43,72 +48,3 @@
         </div>
     </nav>
 </aside>
-
-{#<div id="sidebar-menu" class="sidebar bg-dark py-4">#}
-{#    <div tabindex="-1">#}
-{#        <ul class="nav flex-column mt-4">#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'wallet' in app.request.uri %}#}
-{#                <a href="{{ path('back_wallet_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-wallet"></i>#}
-{#                    </span>#}
-{#                    {{ "Gérer mes comptes"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'statistics' in app.request.uri %}#}
-{#                <a href="{{ path('back_statistics') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-chart-bar"></i>#}
-{#                    </span>#}
-{#                    {{ "Statistiques"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'cryptocurrencies' in app.request.uri %}#}
-{#                <a href="{{ path('back_cryptocurrency_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-btc"></i>#}
-{#                    </span>#}
-{#                    {{ "Cryptomonnaies"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'budgets' in app.request.uri %}#}
-{#                <a href="{{ path('back_budget_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-envelope-open-dollar"></i>#}
-{#                    </span>#}
-{#                    {{ "Gestion des budgets"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'objectives' in app.request.uri %}#}
-{#                <a href="{{ path('back_objective_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-bullseye-arrow"></i>#}
-{#                    </span>#}
-{#                    {{ "Gestion des objectifs"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex">#}
-{#                {% set active = 'categories' in app.request.uri %}#}
-{#                <a href="{{ path('back_operationtype_index') }}" class="nav-link d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4{% if active %} active{% endif %}">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-list-alt"></i>#}
-{#                    </span>#}
-{#                    {{ "Gestion des catégories"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="nav-item d-flex mt-3">#}
-{#                <a href="{{ path('app_logout') }}" class="nav-link logout d-inline-flex align-items-center text-white mb-3 mx-auto py-2 px-4">#}
-{#                    <span class="d-inline-flex align-items-center justify-content-center me-3 my-1">#}
-{#                        <i class="icon-power-off"></i>#}
-{#                    </span>#}
-{#                    {{ "Déconnexion"|trans|raw }}#}
-{#                </a>#}
-{#            </li>#}
-{#        </ul>#}
-{#    </div>#}
-{#</div>#}

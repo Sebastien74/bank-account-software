@@ -7,7 +7,7 @@ namespace App\Form\Type\Wallet;
 use App\Entity\Wallet;
 use App\Form\Widget\SubmitType;
 use App\Service\CoreLocatorInterface;
-use App\Twig\CoreExtension;
+use App\Twig\CoreRuntime;
 use Doctrine\ORM\EntityRepository;
 use Exception;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -33,7 +33,7 @@ class OperationType extends AbstractType
      */
     public function __construct(
         private readonly CoreLocatorInterface $coreLocator,
-        private readonly CoreExtension $coreExtension,
+        private readonly CoreRuntime $coreExtension,
     )
     {
         $this->translator = $this->coreLocator->translator();
