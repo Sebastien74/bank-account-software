@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[IsGranted('ROLE_ADMIN')]
-#[Route('/back-%security_token%/categories-types', schemes: '%protocol%')]
+#[Route('/back-%security_token%/operations-types', schemes: '%protocol%')]
 class OperationTypeController extends BaseController
 {
     protected ?string $pageIcon = 'list-alt';
