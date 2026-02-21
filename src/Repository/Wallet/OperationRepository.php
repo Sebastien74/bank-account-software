@@ -41,13 +41,14 @@ class OperationRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.subCategory', 'sc')
+            ->leftJoin('o.operationType', 'ot')
             ->andWhere('o.wallet = :wallet')
             ->setParameter('wallet', $wallet)
             ->setParameter('initial', $initial)
             ->select("
                 (
                     COALESCE(SUM(
-                        CASE WHEN sc.type = 'incomes' THEN o.amount
+                        CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN o.amount
                              ELSE (0 - o.amount)
                         END
                     ), 0)
@@ -61,9 +62,8 @@ class OperationRepository extends ServiceEntityRepository
         }
 
         if ($limitDate instanceof DateTimeInterface) {
-            $limitDate  = (new \DateTimeImmutable($limitDate->format('Y-m-01 00:00:00'), new \DateTimeZone('UTC')));
             $qb->andWhere('o.date < :end')
-                ->setParameter('end', $limitDate, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE);
+                ->setParameter('end', $limitDate);
         }
 
         $balance = $qb->getQuery()->getSingleScalarResult();
@@ -92,11 +92,12 @@ class OperationRepository extends ServiceEntityRepository
             $next = $cursor->modify('first day of next month')->setTime(0, 0, 0);
             $qb = $this->createQueryBuilder('o')
                 ->leftJoin('o.subCategory', 'sc')
+                ->leftJoin('o.operationType', 'ot')
                 ->andWhere('o.wallet = :wallet')->setParameter('wallet', $wallet)
                 ->andWhere('o.date IS NOT NULL')
                 ->andWhere('o.date >= :start')->setParameter('start', $cursor, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
                 ->andWhere('o.date < :end')->setParameter('end', $next, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
-                ->andWhere('sc.type = :type')->setParameter('type', 'expenses')
+                ->andWhere('ot.type = :type OR (ot.id IS NULL AND sc.type = :type)')->setParameter('type', 'expenses')
                 ->select('COALESCE(SUM(o.amount), 0)');
             $total = (string) $qb->getQuery()->getSingleScalarResult();
             $results[] = [

@@ -14,5 +14,7 @@ use Symfony\Component\Form\FormInterface;
  */
 interface OperationInterface
 {
+    public function import(): void;
+
     public function execute(Operation $operation, FormInterface $form): void;
 }

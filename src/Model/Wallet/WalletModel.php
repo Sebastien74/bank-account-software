@@ -46,8 +46,14 @@ final class WalletModel extends BaseModel
         $operations = !empty($options['operations']) ? $options['operations'] : [];
         $operationRepository = self::$coreLocator->em()->getRepository(Operation::class);
         $date = (new \DateTime('now', new \DateTimeZone('Europe/Paris')))->modify('first day of next month');
-        $currentBalance = $operationRepository->sumBalance($wallet, false, $date);
-        $currentRealBalance = $operationRepository->sumBalance($wallet, true, $date);
+
+        // Identify the first operation date in the current month's list to calculate the starting balance
+        $firstOperationDate = null;
+        if (!empty($operations)) {
+            $firstOperationDate = $operations[0]->getDate();
+        }
+
+        $balanceBefore = $operationRepository->sumBalance($wallet, false, $firstOperationDate);
 
         return new self(
             id: $wallet->getId(),
@@ -56,9 +62,9 @@ final class WalletModel extends BaseModel
             title: $wallet->getAdminName(),
             balance: $operationRepository->sumBalance($wallet),
             realBalance: $operationRepository->sumBalance($wallet, true),
-            currentBalance: $currentBalance,
-            currentRealBalance: $currentRealBalance,
-            currentOperations: self::currentOperations($operations, $currentRealBalance),
+            currentBalance: $operationRepository->sumBalance($wallet, false, $date),
+            currentRealBalance: $operationRepository->sumBalance($wallet, true, $date),
+            currentOperations: self::currentOperations($operations, $balanceBefore),
             sumPerMonth: self::sumPerMonth($wallet, $options),
         );
     }
@@ -69,13 +75,14 @@ final class WalletModel extends BaseModel
     private static function currentOperations(array $operations = [], ?float $balance = null): array
     {
         $result = [];
+        $runningBalance = $balance;
         foreach ($operations as $operation) {
             $model = OperationModel::fromEntity($operation, self::$coreLocator);
-            $balance = $model->income ? $balance + $operation->getAmount() : $balance - $operation->getAmount();
+            $runningBalance = $model->income ? $runningBalance + $operation->getAmount() : $runningBalance - $operation->getAmount();
             $result[$operation->getId()] = [
                 'model' => $model,
                 'amount' => $operation->getAmount(),
-                'balance' => $balance,
+                'balance' => $runningBalance,
             ];
         }
 

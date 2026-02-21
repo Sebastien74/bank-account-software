@@ -44,7 +44,19 @@ class WalletType extends AbstractType
             'constraints' => [
                 new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
             ],
-            'row_attr' => ['class' => 'col-12'],
+            'row_attr' => ['class' => 'col-lg-9'],
+        ]);
+
+        $builder->add('slug', Type\TextType::class, [
+            'label_html' => true,
+            'label' => $this->translator->trans('Code', [], 'back'),
+            'attr' => [
+                'placeholder' => $this->translator->trans('Saisissez un code', [], 'back'),
+            ],
+            'constraints' => [
+                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un code.', [], 'back')])
+            ],
+            'row_attr' => ['class' => 'col-lg-3'],
         ]);
 
         $builder->add('initialAmount', Type\NumberType::class, [
@@ -53,7 +65,7 @@ class WalletType extends AbstractType
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un montant', [], 'back'),
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-3'],
             'constraints' => [
                 new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un montant.', [], 'back'),]),
             ],

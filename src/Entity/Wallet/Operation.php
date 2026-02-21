@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Wallet;
 
 use App\Entity\BaseEntity;
+use App\Entity\Wallet\OperationType as EntityOperationType;
 use App\Repository\Wallet\OperationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,6 +40,10 @@ class Operation extends BaseEntity
     #[ORM\ManyToOne(targetEntity: Wallet::class, cascade: ['persist'], inversedBy: 'operations')]
     #[ORM\JoinColumn(onDelete: 'cascade')]
     private ?Wallet $wallet = null;
+
+    #[ORM\ManyToOne(targetEntity: EntityOperationType::class)]
+    #[ORM\JoinColumn(name: 'operation_type_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?EntityOperationType $operationType = null;
 
     #[ORM\ManyToOne(targetEntity: SubCategory::class)]
     #[ORM\JoinColumn(name: 'sub_category_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
@@ -104,6 +109,18 @@ class Operation extends BaseEntity
     public function setSubCategory(?SubCategory $subCategory): static
     {
         $this->subCategory = $subCategory;
+
+        return $this;
+    }
+
+    public function getOperationType(): ?EntityOperationType
+    {
+        return $this->operationType;
+    }
+
+    public function setOperationType(?EntityOperationType $operationType): static
+    {
+        $this->operationType = $operationType;
 
         return $this;
     }

@@ -34,13 +34,26 @@ final class OperationModel extends BaseModel
     {
         self::setLocator($coreLocator);
 
-        $subCategory = SubCategoryModel::fromEntity($operation->getSubCategory(), $coreLocator);
+        $subCategoryEntity = $operation->getSubCategory();
+        $subCategory = SubCategoryModel::fromEntity($subCategoryEntity, $coreLocator);
+
+        $operationType = $operation->getOperationType();
+        $isExpense = false;
+        $isIncome = false;
+
+        if ($operationType) {
+            $isExpense = 'expenses' === $operationType->getType();
+            $isIncome = 'incomes' === $operationType->getType();
+        } elseif ($subCategoryEntity) {
+            $isExpense = $subCategory->expense;
+            $isIncome = $subCategory->income;
+        }
 
         return new self(
             id: $operation->getId(),
             entity: $operation,
-            expense: $subCategory->expense,
-            income: $subCategory->income,
+            expense: $isExpense,
+            income: $isIncome,
             subCategory: $subCategory,
         );
     }

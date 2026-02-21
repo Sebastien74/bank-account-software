@@ -20,7 +20,7 @@ final class SubCategoryModel extends BaseModel
      */
     public function __construct(
         public readonly ?int $id = null,
-        public readonly ?SubCategory $entity = null,
+        public readonly ?object $entity = null,
         public readonly ?bool $expense = null,
         public readonly ?bool $income = null,
     ) {
@@ -29,15 +29,15 @@ final class SubCategoryModel extends BaseModel
     /**
      * fromEntity.
      */
-    public static function fromEntity(SubCategory $subCategory, CoreLocatorInterface $coreLocator, array $options = []): object
+    public static function fromEntity(?SubCategory $subCategory, CoreLocatorInterface $coreLocator, array $options = []): object
     {
         self::setLocator($coreLocator);
 
         return new self(
-            id: $subCategory->getId(),
+            id: $subCategory?->getId(),
             entity: $subCategory,
-            expense: 'expenses' === $subCategory->getType(),
-            income: 'incomes' === $subCategory->getType(),
+            expense: $subCategory && 'expenses' === $subCategory->getType(),
+            income: $subCategory && 'incomes' === $subCategory->getType(),
         );
     }
 }
