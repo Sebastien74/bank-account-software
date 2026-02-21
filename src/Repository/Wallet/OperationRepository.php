@@ -184,4 +184,37 @@ class OperationRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Get available years for a wallet.
+     */
+    public function getAvailableYears(Wallet $wallet): array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('DISTINCT(o.date) as date')
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date IS NOT NULL')
+            ->setParameter('wallet', $wallet)
+            ->orderBy('o.date', 'DESC');
+
+        $results = $qb->getQuery()->getResult();
+        $years = [];
+
+        foreach ($results as $result) {
+            $date = $result['date'];
+            if ($date instanceof \DateTimeInterface) {
+                $year = $date->format('Y');
+            } elseif (is_string($date)) {
+                $year = (new \DateTime($date))->format('Y');
+            } else {
+                continue;
+            }
+
+            if (!in_array($year, $years)) {
+                $years[] = $year;
+            }
+        }
+
+        return $years;
+    }
 }

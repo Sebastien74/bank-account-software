@@ -85,13 +85,19 @@ class WalletController extends BaseController
         $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
         $monthStatsRaw = $operationRepository->getStats($wallet, $startMonth, $endMonth);
 
+        $availableYears = $operationRepository->getAvailableYears($wallet);
+        if (!in_array($now->format('Y'), $availableYears)) {
+            $availableYears[] = $now->format('Y');
+            rsort($availableYears);
+        }
+
         return $this->render($this->template, $this->defaultArguments() + [
             'wallet' => $wallet,
             'yearStats' => $this->formatStats($yearStatsRaw),
             'monthStats' => $this->formatStats($monthStatsRaw),
             'selectedYear' => $selectedYear,
             'selectedMonth' => $selectedMonth,
-            'years' => range($now->format('Y'), $now->format('Y') - 5), // Les 5 dernières années
+            'years' => $availableYears,
             'months' => [
                 '01' => 'Janvier', '02' => 'Février', '03' => 'Mars', '04' => 'Avril',
                 '05' => 'Mai', '06' => 'Juin', '07' => 'Juillet', '08' => 'Août',
