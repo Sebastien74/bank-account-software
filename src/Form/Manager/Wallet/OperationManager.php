@@ -406,13 +406,44 @@ readonly class OperationManager implements OperationInterface
             $dateStr = $row['A'];
             $adminName = trim($row['B']);
             $cleanAdminName = $this->cleanOutsiderName($adminName);
-            $debit = !empty($row['C']) ? (float) str_replace(',', '.', (string) $row['C']) : 0.0;
-            $credit = !empty($row['D']) ? (float) str_replace(',', '.', (string) $row['D']) : 0.0;
+            $debitStr = (string) $row['C'];
+            $creditStr = (string) $row['D'];
+
+            // Nettoyage des montants (gestion des espaces, espaces insécables, symboles €)
+            $debitStr = str_replace([' ', '€', "\u{00A0}"], '', $debitStr);
+            $creditStr = str_replace([' ', '€', "\u{00A0}"], '', $creditStr);
+
+            $debit = $debitStr !== '' ? (float) str_replace(',', '.', $debitStr) : 0.0;
+            $credit = $creditStr !== '' ? (float) str_replace(',', '.', $creditStr) : 0.0;
+
+            // Si aucun montant n'est présent, on ignore la ligne
+            if ($debit <= 0 && $credit <= 0) {
+                continue;
+            }
+
             $amount = $debit > 0 ? $debit : $credit;
             $operationType = $debit > 0 ? $expensesType : $incomesType;
 
             try {
-                $date = \DateTime::createFromFormat('d/m/Y', $dateStr);
+                $date = null;
+                if (str_contains($dateStr, '/')) {
+                    $parts = explode('/', $dateStr);
+                    if (count($parts) === 3) {
+                        $month = (int) $parts[0];
+                        $day = (int) $parts[1];
+                        $year = (int) $parts[2];
+                        if ($month > 12 && $day <= 12) {
+                            $date = \DateTime::createFromFormat('d/m/Y', $dateStr);
+                        } else {
+                            $date = \DateTime::createFromFormat('m/d/Y', $dateStr);
+                        }
+                    }
+                }
+
+                if (!$date) {
+                    $date = \DateTime::createFromFormat('d/m/Y', $dateStr);
+                }
+
                 if (!$date) {
                     continue;
                 }
@@ -527,8 +558,14 @@ readonly class OperationManager implements OperationInterface
         // Suppression des préfixes de paiement courants
         $adminName = str_replace(['PAIEMENT PAR CARTE', 'PAIEMENT PAR', 'VIREMENT DE', 'VIREMENT POUR', 'PRELEVEMENT'], '', $adminName);
 
+        // Suppression des identifiants et références (BTAW, PAGP, FR35, etc.)
+        $adminName = preg_replace('/[A-Z0-9]{10,}/', '', $adminName);
+
         // Suppression des codes de transaction (ex: X9322)
         $adminName = preg_replace('/X\d{4,}/', '', $adminName);
+
+        // Suppression des numéros de téléphone (ex: 06XXXXX891)
+        $adminName = preg_replace('/\d{2}[\sX]{5,}\d{3}/', '', $adminName);
 
         // Suppression des dates (ex: 19/02)
         $adminName = preg_replace('/\d{2}\/\d{2}/', '', $adminName);
