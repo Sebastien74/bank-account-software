@@ -113,10 +113,10 @@
                         </td>
                         <td class="align-middle px-3">{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
                         <td class="align-middle px-3">{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</td>
-                        <td class="text-end align-middle px-3">{% if entity.amount %}{{ entity.amount|number_format(2) }}{% endif %}</td>
+                        <td class="text-end align-middle px-3">{% if entity.amount is not null %}{{ entity.amount|number_format(2, ',', ' ') }}{% endif %}</td>
                         <td class="text-end align-middle px-3">
                             {% if wallet.currentOperations[entity.id].balance is defined %}
-                                {{ wallet.currentOperations[entity.id].balance|number_format(2) }}
+                                {{ wallet.currentOperations[entity.id].balance|number_format(2, ',', ' ') }}
                             {% endif %}
                         </td>
                         <td class="text-end align-middle">

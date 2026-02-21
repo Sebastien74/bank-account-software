@@ -14,9 +14,9 @@
                     </span>
                     <div class="d-flex align-items-center me-3">
                         {% if category.prevTotal is defined %}
-                            <span class="badge bg-secondary opacity-50 me-2" data-bs-toggle="tooltip" data-bs-title="{{ "Année précédente"|trans }}">{{ category.prevTotal|number_format(2, ',', ' ') }} €</span>
+                            <span class="badge bg-secondary opacity-50 me-2" data-bs-toggle="tooltip" data-bs-title="{{ "Année précédente"|trans }}">{{ category.prevTotal|number_format(2, ',', '') }} €</span>
                         {% endif %}
-                        <span class="badge bg-primary">{{ category.total|number_format(2, ',', ' ') }} €</span>
+                        <span class="badge bg-primary">{{ category.total|number_format(2, ',', '') }} €</span>
                     </div>
                 </button>
             </h2>
@@ -36,9 +36,9 @@
                                 </div>
                                 <div class="d-flex align-items-center">
                                     {% if subCategory.prevTotal is defined %}
-                                        <small class="text-muted opacity-50 me-2" style="font-size: 0.75rem;">({{ subCategory.prevTotal|number_format(2, ',', ' ') }} €)</small>
+                                        <small class="text-muted opacity-50 me-2" style="font-size: 0.75rem;">({{ subCategory.prevTotal|number_format(2, ',', '') }} €)</small>
                                     {% endif %}
-                                    <small class="text-muted">{{ subCategory.total|number_format(2, ',', ' ') }} €</small>
+                                    <small class="text-muted">{{ subCategory.total|number_format(2, ',', '') }} €</small>
                                 </div>
                             </li>
                         {% endfor %}

@@ -26,6 +26,7 @@ readonly class OperationManager implements OperationInterface
         'assurance-habitation',
         'bouygues-telecom',
         'engie',
+        'tabac',
         'pathe-cinepass-pathe-cinepass',
         'interets-debiteurs',
     ];
@@ -80,6 +81,7 @@ readonly class OperationManager implements OperationInterface
         'casa-deolinda-porto' => 'expenses-leisure-activities-vacation', // CASA DEOLINDA PORTO
         'casa-raphaela-lyon-6' => 'expenses-leisure-activities-vacation', // CASA RAPHAELA LYON 6
         'casa-tabacpress-anne' => 'expenses-various-tobacco', // CASA TABACPRESS ANNE
+        'tabac' => 'expenses-various-tobacco', // Tabac
         'cave-de-la-poste-la' => 'expenses-leisure-activities-vacation', // CAVE DE LA POSTE LA
         'certas-essof100-anne' => 'CERTAS ESSOF100 ANNE', // CERTAS ESSOF100 ANNE
         'chaclema-annecy' => 'expenses-life-food', // CHACLEMA ANNECY
@@ -547,6 +549,7 @@ readonly class OperationManager implements OperationInterface
             }
         }
     }
+
 
     /**
      * Nettoie le nom du tiers pour éviter les doublons.

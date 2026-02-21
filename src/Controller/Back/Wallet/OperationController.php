@@ -59,7 +59,7 @@ class OperationController extends BaseController
     #[Route('/index/{wallet}', name: 'back_operation_index', methods: 'GET|POST')]
     public function index(PaginatorInterface $paginator): Response
     {
-        $this->operation->import();
+//        $this->operation->import();
 
         $this->template = 'back/pages/operations.html.twig';
         $wallet = $this->coreLocator->em()->getRepository(Wallet::class)->find($this->coreLocator->request()->get('wallet'));
