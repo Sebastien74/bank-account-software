@@ -34,7 +34,7 @@ final class OperationModel extends BaseModel
     {
         self::setLocator($coreLocator);
 
-        $subCategoryEntity = $operation->getSubCategory();
+        $subCategoryEntity = $operation->getOperationType();
         $subCategory = SubCategoryModel::fromEntity($subCategoryEntity, $coreLocator);
 
         $operationType = $operation->getOperationType();

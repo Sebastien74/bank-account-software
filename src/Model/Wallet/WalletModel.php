@@ -48,9 +48,16 @@ final class WalletModel extends BaseModel
         $date = (new \DateTime('now', new \DateTimeZone('Europe/Paris')))->modify('first day of next month');
 
         // Identify the first operation date in the current month's list to calculate the starting balance
+        // We sort them by date ASC and ID ASC to find the chronologically first operation of the period
+        $sortedOperations = $operations;
+        usort($sortedOperations, function($a, $b) {
+            $dateDiff = $a->getDate() <=> $b->getDate();
+            return 0 !== $dateDiff ? $dateDiff : $a->getId() <=> $b->getId();
+        });
+
         $firstOperationDate = null;
-        if (!empty($operations)) {
-            $firstOperationDate = $operations[0]->getDate();
+        if (!empty($sortedOperations)) {
+            $firstOperationDate = $sortedOperations[0]->getDate();
         }
 
         $balanceBefore = $operationRepository->sumBalance($wallet, false, $firstOperationDate);
@@ -60,10 +67,10 @@ final class WalletModel extends BaseModel
             slug : $wallet->getSlug(),
             entity: $wallet,
             title: $wallet->getAdminName(),
-            balance: $operationRepository->sumBalance($wallet),
-            realBalance: $operationRepository->sumBalance($wallet, true),
-            currentBalance: $operationRepository->sumBalance($wallet, false, $date),
-            currentRealBalance: $operationRepository->sumBalance($wallet, true, $date),
+            balance: round($operationRepository->sumBalance($wallet), 2),
+            realBalance: round($operationRepository->sumBalance($wallet, true), 2),
+            currentBalance: round($operationRepository->sumBalance($wallet, false, $date), 2),
+            currentRealBalance: round($operationRepository->sumBalance($wallet, true, $date), 2),
             currentOperations: self::currentOperations($operations, $balanceBefore),
             sumPerMonth: self::sumPerMonth($wallet, $options),
         );
@@ -76,14 +83,28 @@ final class WalletModel extends BaseModel
     {
         $result = [];
         $runningBalance = $balance;
-        foreach ($operations as $operation) {
+
+        // We must calculate balances chronologically regardless of the display order
+        $chronologicalOperations = $operations;
+        usort($chronologicalOperations, function($a, $b) {
+            $dateDiff = $a->getDate() <=> $b->getDate();
+            return 0 !== $dateDiff ? $dateDiff : $a->getId() <=> $b->getId();
+        });
+
+        $balances = [];
+        foreach ($chronologicalOperations as $operation) {
             $model = OperationModel::fromEntity($operation, self::$coreLocator);
             $runningBalance = $model->income ? $runningBalance + $operation->getAmount() : $runningBalance - $operation->getAmount();
-            $result[$operation->getId()] = [
+            $balances[$operation->getId()] = [
                 'model' => $model,
                 'amount' => $operation->getAmount(),
-                'balance' => $runningBalance,
+                'balance' => round($runningBalance, 2),
             ];
+        }
+
+        // Return results in the original order provided (usually the requested display order)
+        foreach ($operations as $operation) {
+            $result[$operation->getId()] = $balances[$operation->getId()];
         }
 
         return $result;

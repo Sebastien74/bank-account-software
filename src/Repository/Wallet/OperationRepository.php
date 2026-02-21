@@ -149,10 +149,13 @@ class OperationRepository extends ServiceEntityRepository
 
         if ('date' === $sort or 'amount' === $sort or 'pointed' === $sort) {
             $qb->orderBy('o.'.$sort, $order);
+            $qb->addOrderBy('o.id', $order);
         } elseif ('category' === $sort) {
             $qb->orderBy('sb.adminName', $order);
+            $qb->addOrderBy('o.id', $order);
         } elseif ('outsider' === $sort) {
             $qb->orderBy('os.adminName', $order);
+            $qb->addOrderBy('o.id', $order);
         }
 
         return $qb->getQuery()->getResult();

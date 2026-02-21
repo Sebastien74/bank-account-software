@@ -76,7 +76,7 @@ class OperationController extends BaseController
         $this->arguments['nextMonth'] = $next->format('m');
 
         $sort = $this->arguments['sort'] = !$this->coreLocator->request()->get('sort') ? 'date' : $this->coreLocator->request()->get('sort');
-        $order = $this->arguments['order'] = !$this->coreLocator->request()->get('order') ? 'ASC' : $this->coreLocator->request()->get('order');
+        $order = $this->arguments['order'] = !$this->coreLocator->request()->get('order') ? 'DESC' : $this->coreLocator->request()->get('order');
 
         $this->entities = $this->coreLocator->em()->getRepository(Operation::class)->findByYearMonth($year, $month, $sort, $order, new \DateTimeZone('Europe/Paris'));
         $this->arguments['wallet'] = $wallet = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);

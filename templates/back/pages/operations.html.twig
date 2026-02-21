@@ -20,13 +20,13 @@
         <span class="th-label me-3">{{ label|striptags }}</span>
         <span class="sort-controls ms-auto" role="group" aria-label="Trier la colonne Tiers">
             <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'asc'}) }}"
-               class="sort sort-asc{% if ('asc' == app.request.get('order') and sort == app.request.get('sort')) or (not app.request.get('sort') and 'dt' == sort) %} is-active{% endif %}"
+               class="sort sort-asc{% if 'asc' == app.request.get('order') and sort == app.request.get('sort') %} is-active{% endif %}"
                data-bs-toggle="tooltip"
                data-bs-title="{{ "Trier par ordre croissant"|trans|striptags }}"
                aria-label="{{ "Trier par ordre croissant"|trans|striptags }}">
             </a>
             <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'desc'}) }}"
-               class="sort sort-desc{% if 'desc' == app.request.get('order') and sort == app.request.get('sort') %} is-active{% endif %}"
+               class="sort sort-desc{% if ('desc' == app.request.get('order') and sort == app.request.get('sort')) or (not app.request.get('sort') and 'dt' == sort) %} is-active{% endif %}"
                data-bs-toggle="tooltip"
                data-bs-title="{{ "Trier par ordre décroissant"|trans|striptags }}"
                aria-label="{{ "Trier par ordre décroissant"|trans|striptags }}">
@@ -116,7 +116,7 @@
                         <td class="text-end align-middle px-3">{% if entity.amount %}{{ entity.amount|number_format(2) }}{% endif %}</td>
                         <td class="text-end align-middle px-3">
                             {% if wallet.currentOperations[entity.id].balance is defined %}
-                                {{ wallet.currentOperations[entity.id].balance }}
+                                {{ wallet.currentOperations[entity.id].balance|number_format(2) }}
                             {% endif %}
                         </td>
                         <td class="text-end align-middle">
