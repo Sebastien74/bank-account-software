@@ -186,6 +186,23 @@ class OperationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Check if a period has any operations.
+     */
+    public function hasOperations(Wallet $wallet, \DateTimeInterface $start, \DateTimeInterface $end): bool
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date <= :end')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    /**
      * Get available years for a wallet.
      */
     public function getAvailableYears(Wallet $wallet): array

@@ -100,7 +100,11 @@ class WalletController extends BaseController
         $prevPeriodStatsRaw = $operationRepository->getStats($wallet, $startPrevPeriod, $endPrevPeriod);
 
         $monthStats = $this->formatStats($monthStatsRaw);
-        $this->computeTrends($monthStats, $currentPeriodStatsRaw, $prevPeriodStatsRaw);
+        $hasPrevOperations = $operationRepository->hasOperations($wallet, $startPrevPeriod, $endPrevPeriod);
+
+        if ($hasPrevOperations) {
+            $this->computeTrends($monthStats, $currentPeriodStatsRaw, $prevPeriodStatsRaw);
+        }
 
         $availableYears = $operationRepository->getAvailableYears($wallet);
         if (!in_array($now->format('Y'), $availableYears)) {
