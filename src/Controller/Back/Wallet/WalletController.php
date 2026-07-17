@@ -66,8 +66,7 @@ class WalletController extends BaseController
     #[Route('/statistics/{wallet}', name: 'back_operation_statistics', methods: 'GET')]
     public function statistics(Wallet $wallet): Response
     {
-        $this->pageTitle = $this->coreLocator->translator()->trans('Statistiques', [], 'back');
-        $this->template = 'back/pages/wallet_statistics.html.twig';
+        $this->pageTitle = $wallet->getAdminName().' - '.$this->coreLocator->translator()->trans('Statistiques', [], 'back');
 
         $operationRepository = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\Operation::class);
         $request = $this->coreLocator->request();
@@ -150,7 +149,9 @@ class WalletController extends BaseController
             rsort($availableYears);
         }
 
-        return $this->render($this->template, $this->coreArguments() + [
+        return $this->render('back/pages/wallet-statistics.html.twig', $this->coreArguments() + [
+            'pageTitle' => $this->pageTitle,
+            'pageIcon' => 'chart-line',
             'wallet' => $wallet,
             'yearStats' => $yearStats,
             'monthStats' => $monthStats,

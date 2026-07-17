@@ -53,6 +53,8 @@ $container-max-widths: (
 -----------------------------------*/
 
 $fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
+$border-radius: 16px !default;
+$theme-color-interval: 8% !default;
 
 /*-----------------------------------
    3 ) Colors
@@ -63,6 +65,7 @@ $primary-lighten: tint-color($primary, 25%) !default
 $primary-darken: shade-color($primary, 40%) !default
 $red: #dc3545 !default
 $white: #fff !default;
+$white-lighten: transparentize($white, .3) !default;
 $gray-100: #f8f9fa !default;
 $gray-200: #e9ecef !default;
 $gray-300: #dee2e6 !default;
@@ -97,6 +100,10 @@ $dash-side-surface: #07090d !default;
 $dash-bg-0: #0a0d12 !default; // deepest
 $dash-bg-1: #0e1219 !default; // main
 $dash-bg-2: #121726 !default; // top
+
+$bg-gradient-primary: radial-gradient(520px 160px at 12% 0%, rgba($dash-accent, 0.10), transparent 60%),
+linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%),
+rgba(255, 255, 255, 0.015);
 
 $bg-body: radial-gradient(
         900px 520px at 18% 0%,
@@ -151,3 +158,18 @@ $input-group-addon-bg: transparent !default;
 -----------------------------------*/
 
 $card-inner-border-radius: .25rem !default;
+
+/*-----------------------------------
+   8 ) Function
+-----------------------------------*/
+
+@function theme-color($key: "primary") {
+    @return map-get($theme-colors, $key);
+}
+
+@function theme-color-level($color-name: "primary", $level: 0) {
+    $color: theme-color($color-name);
+    $color-base: if($level > 0, $black, $white);
+    $level: abs($level);
+    @return mix($color-base, $color, $level * $theme-color-interval);
+}

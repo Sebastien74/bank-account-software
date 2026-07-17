@@ -1,0 +1,109 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'back' %}
+
+{% block body %}
+    <div id="wallet-statistics" class="container-fluid pt-4 pb-5">
+
+        <div class="mb-4">
+            <form method="get" class="d-flex align-items-center mt-3 mt-md-0">
+                <select name="month" class="form-select initial form-select-sm bg-dark border-secondary me-2">
+                    {% for value, label in months %}
+                        <option value="{{ value }}" {{ value == selectedMonth ? 'selected' : '' }}>{{ label|trans }}</option>
+                    {% endfor %}
+                </select>
+                <select name="year" class="form-select initial form-select-sm bg-dark border-secondary me-2">
+                    {% for year in years %}
+                        <option value="{{ year }}" {{ year == selectedYear ? 'selected' : '' }}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm me-3">
+                    <i class="icon-search"></i>
+                </button>
+                <a href="{{ path('back_wallet_index') }}" class="btn btn-primary btn-sm">
+                    <i class="icon-arrow-left me-1"></i> {{ "Retour"|trans }}
+                </a>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="main-subtitle"><i class="icon-calendar-alt"></i>{{ months[selectedMonth]|trans }} {{ selectedYear }}</h4>
+                        {% if monthStats is empty %}
+                            {% include 'core/alert.html.twig' with {
+                                display: 'alert',
+                                alert: 'info',
+                                message: "Aucune donnée disponible pour ce mois."|trans
+                            } only %}
+                        {% else %}
+                            {% set message = "Les tendances sont calculées du 1er au %day% %month% par rapport à la même période l'année précédente."|trans({'%day%': comparisonDay == 1 ? '1er' : comparisonDay, '%month%': months[selectedMonth]|trans}) %}
+                            {% if comparisonDay < (endMonth|date('d')) %}
+                                {% set message = message~"<br>" %}
+                                {% set message = message~'<strong class="text-warning d-inline-block mt-2">' %}
+                                {% set message = message~"Les jours du %start% au %end% sont exclus car sans données l'année précédente."|trans({
+                                    '%start%': (comparisonDay + 1),
+                                    '%end%': endMonth|date('d')
+                                }) %}
+                                {% set message = message~'</strong>' %}
+                            {% endif %}
+                            {% include 'core/alert.html.twig' with {
+                                display: 'alert',
+                                alert: 'info',
+                                message: message
+                            } only %}
+                            {% include 'back/pages/includes/stats-accordion.html.twig' with {
+                                stats: monthStats,
+                                idPrefix: 'month',
+                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonDay, '%month%': months[selectedMonth]|trans})
+                            } %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="main-subtitle"><i class="icon-calendar-alt"></i>{{ "Année"|trans }} {{ selectedYear }}</h4>
+                        {% if yearStats is empty %}
+                            {% include 'core/alert.html.twig' with {
+                                display: 'alert',
+                                alert: 'info',
+                                message: "Aucune donnée disponible pour cette année."|trans
+                            } only %}
+                        {% else %}
+                            {% set message = "Les tendances sont calculées du %startDay% %startMonth% au %day% %month% par rapport à la même période l'année précédente."|trans({
+                                '%startDay%': comparisonYearStartDay == 1 ? '1er' : comparisonYearStartDay,
+                                '%startMonth%': months[comparisonYearStartMonth|format('%02d')]|default('Janvier')|trans,
+                                '%day%': comparisonYearDay == 1 ? '1er' : comparisonYearDay,
+                                '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans
+                            }) %}
+                        {% if excludedMonths is not empty %}
+                                {% set message = message~"<br>" %}
+                                {% set excludedNames = [] %}
+                                {% for m in excludedMonths %}
+                                    {% set excludedNames = excludedNames|merge([months[m]|trans]) %}
+                                {% endfor %}
+                                {% set message = message~'<strong class="text-warning d-inline-block mt-2">' %}
+                                {% set message = message~"Mois exclus des calculs car sans données l'année précédente :"|trans~' '~excludedNames|join(', ') %}
+                                {% set message = message~'</strong>' %}
+                            {% endif %}
+                            {% include 'core/alert.html.twig' with {
+                                display: 'alert',
+                                alert: 'info',
+                                message: message
+                            } only %}
+                            {% include 'back/pages/includes/stats-accordion.html.twig' with {
+                                stats: yearStats,
+                                idPrefix: 'year',
+                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonYearDay, '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans})
+                            } %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

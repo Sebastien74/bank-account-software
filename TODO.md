@@ -1,5 +1,12 @@
 Passer en 7.4
 
+->get a changer
+
+Regenerer tous les slugs
+
+Supprimer import
+
+Mettre les stats dans un Service
 
 prelevement-izi FRAUDE !!!!
 

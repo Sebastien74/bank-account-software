@@ -55,7 +55,6 @@ class OutsiderController extends BaseController
     #[Route('/delete/{outsider}', name: 'back_outsider_delete', methods: 'GET')]
     public function delete(Outsider $outsider): RedirectResponse
     {
-        die;
         return $this->redirect($this->globalFormManager->delete($outsider));
     }
 

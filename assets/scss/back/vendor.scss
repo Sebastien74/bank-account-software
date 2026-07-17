@@ -24,6 +24,9 @@
 @import 'layout/pagination';
 @import 'layout/loader';
 
+@import 'components/card';
+@import 'components/buttons';
+
 /*-----------------------------------
    2 ) Core
 -----------------------------------*/
@@ -60,6 +63,30 @@ body {
             );
         }
 
+        .main-subtitle {
+
+            display: inline-flex;
+            width: 100%;
+            align-items: center;
+            gap: .75rem;
+            padding: .5rem 1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            background: $bg-gradient-primary;
+            border-radius: 12px;
+            border: 1px solid $crumb-border;
+            font-size: 1rem;
+            color: transparentize($white, .5);
+
+            i:not(.initial) {
+                width: 30px !important;
+                height: 30px !important;
+                flex: 0 0 30px !important;
+                border-radius: 10px !important;
+                font-size: 12px !important;
+            }
+        }
+
         @include mediaQuery(max-lg) {
             width: 100%;
         }
@@ -84,6 +111,10 @@ body {
 
     .fz-md {
         font-size: 14px;
+    }
+
+    .text-muted {
+        color: transparentize($white, .5) !important;
     }
 
     .text-italic {
