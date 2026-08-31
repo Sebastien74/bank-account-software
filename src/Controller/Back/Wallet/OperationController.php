@@ -59,8 +59,6 @@ class OperationController extends BaseController
     #[Route('/index/{wallet}', name: 'back_operation_index', methods: 'GET|POST')]
     public function index(PaginatorInterface $paginator): Response
     {
-        $this->operation->import();
-
         $this->template = 'back/pages/operations.html.twig';
         $wallet = $this->coreLocator->em()->getRepository(Wallet::class)->find($this->coreLocator->request()->get('wallet'));
 
@@ -80,11 +78,14 @@ class OperationController extends BaseController
         $sort = $this->arguments['sort'] = !$this->coreLocator->request()->get('sort') ? 'date' : $this->coreLocator->request()->get('sort');
         $order = $this->arguments['order'] = !$this->coreLocator->request()->get('order') ? 'DESC' : $this->coreLocator->request()->get('order');
 
-        $this->entities = $this->coreLocator->em()->getRepository(Operation::class)->findByYearMonth($year, $month, $sort, $order, new \DateTimeZone('Europe/Paris'));
-        $this->arguments['wallet'] = $wallet = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);
-        $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations :', [], 'back').' '.$wallet->title;
+        if (!$wallet instanceof Wallet) {
+            throw $this->createNotFoundException();
+        }
 
-//        $this->entities = $this->coreLocator->em()->getRepository(Operation::class)->findAll();
+        $this->entities = $this->coreLocator->em()->getRepository(Operation::class)
+            ->findByYearMonth($year, $month, $sort, $order, new \DateTimeZone('Europe/Paris'), $wallet);
+        $this->arguments['wallet'] = $walletModel = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);
+        $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations :', [], 'back').' '.$walletModel->title;
 
         return parent::index($paginator);
     }

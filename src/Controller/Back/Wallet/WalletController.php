@@ -37,7 +37,40 @@ class WalletController extends BaseController
         $this->addBtnLabel = $this->coreLocator->translator()->trans('Ajouter un compte', [], 'back');
         $this->template = 'back/pages/wallets.html.twig';
 
+        $this->entities = $this->coreLocator->em()->getRepository(Wallet::class)->findBy([], ['position' => 'ASC']);
+        $this->forceEntities = true;
+        $this->arguments['walletsStats'] = $this->walletsStats($this->entities);
+
         return parent::index($paginator);
+    }
+
+    /**
+     * Agrégats affichés sur les cartes de compte.
+     *
+     * Calculés en base plutôt qu'en parcourant la collection d'opérations, qui
+     * compte plusieurs milliers de lignes par compte.
+     *
+     * @param Wallet[] $wallets
+     */
+    private function walletsStats(array $wallets): array
+    {
+        $repository = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\Operation::class);
+        $now = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+        $currentDay = (int) $now->format('d');
+        $remainingDays = (int) $now->format('t') - $currentDay + 1;
+        $stats = [];
+
+        foreach ($wallets as $wallet) {
+            $balance = $repository->sumBalance($wallet);
+            $totals = $repository->currentMonthTotals($wallet);
+            $stats[$wallet->getId()] = [
+                'balance' => round($balance, 2),
+                'dailyAverageExpenses' => $currentDay > 0 ? round($totals['expenses'] / $currentDay, 2) : 0.0,
+                'remainingDailyBudget' => $remainingDays > 0 ? round($balance / $remainingDays, 2) : 0.0,
+            ];
+        }
+
+        return $stats;
     }
 
     /**
@@ -72,8 +105,16 @@ class WalletController extends BaseController
         $request = $this->coreLocator->request();
 
         $now = new \DateTime();
-        $selectedYear = $request->query->get('year', $now->format('Y'));
-        $selectedMonth = $request->query->get('month', $now->format('m'));
+        // Les deux valeurs alimentent des chaînes de date : elles sont validées,
+        // sans quoi createFromFormat retourne false et la vue échoue en erreur 500.
+        $selectedYear = (string) $request->query->get('year', $now->format('Y'));
+        $selectedMonth = (string) $request->query->get('month', $now->format('m'));
+        if (!preg_match('/^\d{4}$/', $selectedYear)) {
+            $selectedYear = $now->format('Y');
+        }
+        if (!preg_match('/^(0[1-9]|1[0-2])$/', $selectedMonth)) {
+            $selectedMonth = $now->format('m');
+        }
 
         $startYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-01-01 00:00:00");
         $endYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-12-31 23:59:59");
@@ -192,16 +233,6 @@ class WalletController extends BaseController
                 $subCategory['trend'] = $this->calculateTrend($currSubTotal, $prevSubTotal);
             }
         }
-    }
-
-    private function findSubCategoryId(string $name, array $subCategories): ?int
-    {
-        foreach ($subCategories as $id => $sub) {
-            if ($sub['name'] === $name) {
-                return $id;
-            }
-        }
-        return null;
     }
 
     private function calculateTrend(float $current, float $previous): ?array

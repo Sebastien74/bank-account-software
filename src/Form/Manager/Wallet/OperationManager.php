@@ -344,186 +344,865 @@ readonly class OperationManager implements OperationInterface
     ];
 
     /**
+     * Correspondance bénéficiaire normalisé => sous-catégorie.
+     *
+     * Clé : slug du nom de commerçant normalisé par la banque (dernier segment du
+     * libellé Crédit Agricole), stable d'un export à l'autre contrairement au
+     * libellé brut qui contient la référence de carte, la ville et la date.
+     */
+    private const MERCHANT_CORRESPONDENCE = [
+        // Frais alimentaires
+        'vival' => 'expenses-life-food',
+        'monoprix' => 'expenses-life-food',
+        'monop' => 'expenses-life-food',
+        'picard' => 'expenses-life-food',
+        'lidl' => 'expenses-life-food',
+        'aldi' => 'expenses-life-food',
+        'auchan' => 'expenses-life-food',
+        'carrefour-city' => 'expenses-life-food',
+        'carrefour-market' => 'expenses-life-food',
+        'super-u' => 'expenses-life-food',
+        'intermarche' => 'expenses-life-food',
+        'e-leclerc' => 'expenses-life-food',
+        'le-petit-casino' => 'expenses-life-food',
+        'sherpa' => 'expenses-life-food', // Superette de station (Bourg-Saint-Maurice, Briancon)
+        'biltoki-annecy' => 'expenses-life-food', // Halle gourmande du Haras
+        'dab-distribution' => 'expenses-life-food', // Alimentation generale, Bourg-Saint-Maurice
+        'boucherie-de-novel' => 'expenses-life-food',
+        'le-comptoir-du-pain' => 'expenses-life-food',
+        'au-pain-d-antan' => 'expenses-life-food',
+        'fruit-augustin' => 'expenses-life-food',
+        'maison-chevallier' => 'expenses-life-food',
+        'sarl-dangreaux' => 'expenses-life-food',
+        'frankos' => 'expenses-life-food',
+        'la-toque-cuivree' => 'expenses-life-food',
+        'maxicoffee' => 'expenses-life-food',
+
+        // Tabac / presse
+        '2m' => 'expenses-various-tobacco', // Bar-tabac-presse, 35 av de Cran Annecy
+        'cafe-inn' => 'expenses-various-tobacco', // Cafe bar tabac, rue Carnot Annecy
+        'casa' => 'expenses-various-tobacco', // CASA TABACPRESS
+        'l-d-j-74' => 'expenses-various-tobacco', // SNC debit de tabac, Pringy
+        'whip-et-vikky' => 'expenses-various-tobacco', // SNC debit de tabac, Annecy
+        'mako' => 'expenses-various-tobacco', // Tabac presse de la Liberation, Bassens
+        'le-melchristo' => 'expenses-various-tobacco',
+        'tabac-le-central' => 'expenses-various-tobacco',
+        'tabac-de-loverchy' => 'expenses-various-tobacco',
+        'le-tabac-d-elya' => 'expenses-various-tobacco',
+        'tabac-presse-des-clarines' => 'expenses-various-tobacco',
+        'tabac-qi-helene' => 'expenses-various-tobacco',
+        'la-civette-de-la-gare' => 'expenses-various-tobacco',
+        'le-petit-vapoteur' => 'expenses-various-tobacco',
+        'relais-h' => 'expenses-various-tobacco',
+        'relay' => 'expenses-various-tobacco',
+
+        // Restaurants
+        'class-croute' => 'expenses-restaurants',
+        'uber-eats' => 'expenses-restaurants',
+        'mevlana-ii' => 'expenses-restaurants',
+        'pizzeria-des-alpes' => 'expenses-restaurants',
+        'sushi-lac' => 'expenses-restaurants',
+        'la-symphonie-des-saveurs' => 'expenses-restaurants',
+        'sainte-claire' => 'expenses-restaurants', // Le Sapaudia, pizzeria Annecy
+        'le-repere-d-albigny' => 'expenses-restaurants', // SARL Le Pas Sage
+        'oasis' => 'expenses-restaurants', // L'Oasis Sevrier
+        'alpk' => 'expenses-restaurants', // Chalet de Roselend, Beaufort
+        'neno' => 'expenses-restaurants', // Advena, Saint-Jean-de-Niost
+        'le-chatillon' => 'expenses-restaurants',
+        'restaurant-du-clocher' => 'expenses-restaurants',
+        'o-galettes-de-sophie' => 'expenses-restaurants',
+        'le-comptoir-du-palais' => 'expenses-restaurants',
+        'brasserie-du-parc' => 'expenses-restaurants',
+        'brasserie-bathieu' => 'expenses-restaurants',
+        'au-bavarois' => 'expenses-restaurants',
+        'le-batavia' => 'expenses-restaurants',
+        'le-munich-annecy' => 'expenses-restaurants',
+        'bar-des-halles' => 'expenses-restaurants',
+        'eden-bar' => 'expenses-restaurants',
+        'le-bivouac' => 'expenses-restaurants',
+        'l-esplanade' => 'expenses-restaurants',
+        'f-c-g-f' => 'expenses-restaurants', // Brasserie Le Bon Lieu, Annecy
+        'les-terrasses-de-perouges' => 'expenses-restaurants',
+        'hostellerie-de-perouges' => 'expenses-restaurants',
+        'chez-jean-annecy-sncf' => 'expenses-restaurants',
+        'newrest' => 'expenses-restaurants', // Newrest Wagons-Lits
+
+        // Sorties
+        'zihuatanejo' => 'expenses-leisure-activities-outings', // Le Cabanon, Annecy-le-Vieux
+        'les-artistes' => 'expenses-leisure-activities-outings',
+        'chez-pen' => 'expenses-leisure-activities-outings',
+        'grass-royale' => 'expenses-leisure-activities-outings',
+        'artmalte' => 'expenses-leisure-activities-outings', // Microbrasserie / bar a bieres
+        'frerots' => 'expenses-leisure-activities-outings', // Society Bar, Annecy
+        'wines-vibes' => 'expenses-leisure-activities-outings', // La Cave, Annecy
+        'le-grand-cafe' => 'expenses-leisure-activities-outings',
+        'soc-golf-miniature-imperial' => 'expenses-leisure-activities-outings',
+
+        // Vacances / hebergement
+        'garrigae' => 'expenses-leisure-activities-vacation', // Hotel 4* Caserne de Briancon
+        'annecy-hostel' => 'expenses-leisure-activities-vacation',
+        'hotel-amaya' => 'expenses-leisure-activities-vacation',
+        'mih-belley' => 'expenses-leisure-activities-vacation', // MiHotel, hebergement touristique
+        'l-angival' => 'expenses-leisure-activities-vacation', // Hotel-restaurant Bourg-Saint-Maurice
+        'airbnb-hmjw9' => 'expenses-leisure-activities-vacation',
+        'refuge-de-la-blanche' => 'expenses-leisure-activities-vacation',
+
+        // Sport
+        'decathlon' => 'expenses-leisure-activities-sport',
+        'decathlon-lu' => 'expenses-leisure-activities-sport',
+        'ekosport' => 'expenses-leisure-activities-sport',
+        'njuko' => 'expenses-leisure-activities-sport', // Billetterie d'epreuves sportives
+        'peyce' => 'expenses-leisure-activities-sport', // Miles Republic, inscriptions courses
+        'zwift-luxemb' => 'expenses-leisure-activities-sport',
+        'a-s-o' => 'expenses-leisure-activities-sport', // Amaury Sport Organisation
+        'federation-francaise-d-athletisme' => 'expenses-leisure-activities-sport',
+        'amer-sports-france' => 'expenses-leisure-activities-sport',
+        'annecy-tenni' => 'expenses-leisure-activities-sport',
+        'les-arcs-bourg-saint-maurice-tourisme' => 'expenses-leisure-activities-sport', // Centre nautique
+
+        // Informatique
+        'jetbrainssr' => 'expenses-leisure-activities-computer',
+        'github-inc-l' => 'expenses-leisure-activities-computer',
+        'microsoft-lu' => 'expenses-leisure-activities-computer',
+        'ovh-luxembou' => 'expenses-leisure-activities-computer',
+        'fnac' => 'expenses-leisure-activities-computer',
+
+        // Abonnements / culture
+        'netflix' => 'expenses-various-subscriptions',
+        'canal' => 'expenses-various-subscriptions',
+        'deezer-luxem' => 'expenses-various-subscriptions',
+        'pathe' => 'expenses-cinema',
+        'ass-musique-amplifiee-marquisats-annecy' => 'expenses-concerts', // Le Brise Glace
+        'weezevent' => 'expenses-concerts',
+
+        // Automobile
+        'aprr' => 'expenses-motorway',
+        'vinci-autoroutes' => 'expenses-motorway',
+        'regie-bpnl' => 'expenses-motorway', // Peage peripherique nord de Lyon
+        'vignette-suisse' => 'expenses-motorway',
+        'ville-d-annecy' => 'expenses-parking', // Horodateurs
+        'commune-de-bourg-saint-maurice' => 'expenses-parking', // Horodateurs
+        'parking' => 'expenses-parking',
+        'aig-caisse-auto' => 'expenses-parking', // Caisse automatique (terminal EP2, Suisse)
+        'avia' => 'expenses-automobile-fuel',
+        'auchan-carburant' => 'expenses-automobile-fuel',
+        'carrefour-carburant' => 'expenses-automobile-fuel',
+        'allopneus' => 'expenses-automobile-vehicle-maintenance',
+        'lav-auto' => 'expenses-automobile-vehicle-maintenance',
+        'thalia' => 'expenses-automobile-vehicle-maintenance', // Bubble Wash, lavage auto
+        'sklamp' => 'expenses-automobile-vehicle-maintenance',
+
+        // Deplacements
+        'sncf' => 'expenses-various-travel',
+        'navigo' => 'expenses-various-travel',
+        'concessions-gares-france' => 'expenses-various-travel',
+        'airserv-france' => 'expenses-various-travel',
+        'sibra' => 'expenses-bus',
+
+        // Sante / soins
+        'pharmacie-chorus' => 'expenses-pharmacy',
+        'pharmacie-carnot' => 'expenses-pharmacy',
+        'planity' => 'expenses-life-hairdressers',
+        'atmosphair' => 'expenses-life-hairdressers',
+
+        // Logement
+        'leroy-merlin' => 'expenses-housing-do-it-yourself',
+        'engie-s-a' => 'expenses-housing-energy',
+        'engie' => 'expenses-housing-energy',
+        'nathalie-combepine' => 'expenses-housing-rent',
+
+        // Telephonie
+        'bouygues-telecom' => 'expenses-phone-phone-internet',
+
+        // Divers
+        'librairie-alpine-maison-heritier' => 'expenses-various-supplies',
+        'leetchi' => 'expenses-various-gifts',
+        'retrait-dab' => 'expenses-other-withdrawals',
+        'offre-compte-a-composer' => 'expenses-various-banking',
+        'cotisation-carte' => 'expenses-various-banking',
+        'interets-debiteurs' => 'expenses-various-banking',
+        'frais-carte-a-l-etranger-hors-ue' => 'expenses-various-banking',
+        'frais-carte-etranger-hors-ue' => 'expenses-various-banking',
+
+        // Revenus
+        'felix-multimedia-felix-animation' => 'incomes-income-remuneration',
+        'fournier-sebastien' => 'incomes-other-deposits',
+        'remise-de-cheque' => 'incomes-other-deposits',
+        'fournier-chantal' => 'incomes-refunds-miscellaneous-refunds',
+        'voiture-madame-fournier-chanta' => 'incomes-refunds-miscellaneous-refunds',
+        // Tiers apparaissant dans les deux sens : virements entre particuliers.
+        'magali-belmonte' => [
+            'expenses' => 'expenses-other',
+            'incomes' => 'incomes-refunds-miscellaneous-refunds',
+        ],
+        'fournier-sebast' => [
+            'expenses' => 'expenses-other',
+            'incomes' => 'incomes-other-deposits',
+        ],
+        'dgfip-finances-publiques-1p' => 'incomes-refunds-miscellaneous-refunds',
+        'interets-crediteurs' => 'incomes-income-financial-income',
+        'franchise-interets-debiteurs' => 'incomes-income-financial-income',
+    ];
+
+    /**
+     * Alias de beneficiaires : libelles que la banque n'a pas normalises
+     * (segment « nom du commercant » absent) et qui designent un tiers deja connu.
+     */
+    private const MERCHANT_ALIASES = [
+        'carrefourcitysco-bri' => 'Carrefour City',
+        'canal-plus-fr-issy-l' => 'CANAL+',
+        'bouyguestel' => 'Bouygues Telecom',
+        'peage-autoroute-npv' => 'APRR',
+        'pk-bo-c-auto-sc-74-a' => 'Parking',
+        'aig-caisse-auto-ep2' => 'AIG Caisse Auto',
+        'x9322-aig-caisse-auto-ep2-p' => 'Frais carte etranger hors UE',
+        'gare-du-nord-v36-par' => 'Concessions Gares France',
+        'airservfrance-an' => 'AirServ France',
+        'fruit-augustin-annec' => 'Fruit Augustin',
+        'artmalte-petite-anne' => 'Artmalte',
+        'amer-sports-france-v' => 'Amer Sports France',
+        'tabac-qi-helene-berc' => 'Tabac QI Helene',
+        'mih-01300-belley' => 'MIH Belley',
+        'vignetteswitzerl' => 'Vignette Suisse',
+        'ls-la-cave-annecy' => 'Wines & Vibes',
+        'la-cave-annecy' => 'Wines & Vibes',
+        'brasserie-bathieu-la' => 'Brasserie Bathieu',
+        'sklamp-annecy' => 'Sklamp',
+        'la-symphonie-annecy' => 'La Symphonie Des Saveurs',
+        'musiques-amplifi-ann' => 'Ass Musique Amplifiee Marquisats Annecy',
+        'chevallier' => 'Maison Chevallier',
+        'le-fournil-des-pommaries-au-pain-d-antan' => 'Au Pain D Antan',
+        'paiement-4x' => 'PayPal Paiement 4X',
+        'les-arcs-bourg-saint-maurice-tourisme-abt' => 'Les Arcs Bourg Saint Maurice Tourisme',
+        'fourniture-d-une-carte-de-debit-international-a-debit-immediat' => 'Cotisation carte',
+        'nathalie-combepine-loyer' => 'Nathalie COMBEPINE',
+        'magali-belmonte-vacances' => 'Magali BELMONTE',
+    ];
+
+    /**
+     * Deduction par mot-cle sur le libelle complet, appliquee lorsque ni le libelle
+     * brut ni le beneficiaire normalise ne sont connus. L'ordre compte : le premier
+     * motif rencontre gagne.
+     */
+    private const KEYWORD_CORRESPONDENCE = [
+        'assurance-automobile' => 'expenses-automobile-car-insurance-and-taxes',
+        'assurance-habitation' => 'expenses-housing-home-insurance',
+        'horodateur' => 'expenses-parking',
+        'peage' => 'expenses-motorway',
+        'autoroute' => 'expenses-motorway',
+        'pharmacie' => 'expenses-pharmacy',
+        'civette' => 'expenses-various-tobacco',
+        'tabac' => 'expenses-various-tobacco',
+        'boulangerie' => 'expenses-life-food',
+        'patisserie' => 'expenses-life-food',
+        'fournil' => 'expenses-life-food',
+        'boucherie' => 'expenses-life-food',
+        'epicerie' => 'expenses-life-food',
+        'alimentation' => 'expenses-life-food',
+        'superette' => 'expenses-life-food',
+        'supermarche' => 'expenses-life-food',
+        'restaurant' => 'expenses-restaurants',
+        'pizzeria' => 'expenses-restaurants',
+        'brasserie' => 'expenses-restaurants',
+        'auberge' => 'expenses-restaurants',
+        'hostellerie' => 'expenses-restaurants',
+        'hotel' => 'expenses-leisure-activities-vacation',
+        'hostel' => 'expenses-leisure-activities-vacation',
+        'camping' => 'expenses-leisure-activities-vacation',
+        'coiffure' => 'expenses-life-hairdressers',
+        'coiffeur' => 'expenses-life-hairdressers',
+        'parking' => 'expenses-parking',
+        'carburant' => 'expenses-automobile-fuel',
+        'station-service' => 'expenses-automobile-fuel',
+        'lavage' => 'expenses-automobile-vehicle-maintenance',
+        'wash' => 'expenses-automobile-vehicle-maintenance',
+        'cinema' => 'expenses-cinema',
+        'librairie' => 'expenses-various-supplies',
+        'sncf' => 'expenses-various-travel',
+        'interets-debiteurs' => 'expenses-various-banking',
+        'cotisation-carte' => 'expenses-various-banking',
+        'frais-carte' => 'expenses-various-banking',
+    ];
+
+    /**
+     * Sous-categorie par defaut selon la nature de l'operation, dernier recours.
+     */
+    private const NATURE_CORRESPONDENCE = [
+        'withdrawal' => 'expenses-other-withdrawals',
+        'bank_fee' => 'expenses-various-banking',
+        'interest' => 'incomes-income-financial-income',
+        'cheque_in' => 'incomes-other-deposits',
+        'cheque_out' => 'expenses-other',
+        'refund' => 'incomes-refunds-miscellaneous-refunds',
+    ];
+
+    private const DEFAULT_EXPENSE = 'expenses-other';
+    private const DEFAULT_INCOME = 'incomes-other-income-to-be-categorized';
+
+    /** Tolerance de comparaison sur les montants, en euros. */
+    private const EPSILON = 0.005;
+
+    /**
      * OperationManager constructor.
      */
     public function __construct(private CoreLocatorInterface $coreLocator)
     {
     }
 
-    public function import(): void
+    /**
+     * Importe un relevé de compte au format XLSX (export Crédit Agricole).
+     *
+     * L'import est idempotent : une opération déjà présente en base n'est pas
+     * recréée, mais les doublons légitimes du relevé (même date, même libellé,
+     * même montant) sont conservés — un rapprochement par comptage, et non par
+     * simple existence, est effectué.
+     *
+     * @return array rapport d'exécution
+     */
+    public function import(?string $filename = null, ?Wallet $wallet = null, bool $dryRun = false): array
     {
-        $wallet = $this->coreLocator->em()->getRepository(Wallet::class)->findOneBy(['slug' => 'main-wallet']);
-        if (!$wallet) {
-            return;
-        }
-
-        $file = $this->coreLocator->projectDir() . '/bin/data/import/operations.xlsx';
-        if (!file_exists($file)) {
-            return;
-        }
-
-        $spreadsheet = IOFactory::load($file);
-        $worksheet = $spreadsheet->getActiveSheet();
-        $rows = $worksheet->toArray(null, true, true, true);
+        $report = [
+            'file' => null,
+            'wallet' => null,
+            'rows' => 0,
+            'parsed' => 0,
+            'imported' => 0,
+            'skipped' => 0,
+            'ignored' => 0,
+            'outsiders' => 0,
+            'categorized' => 0,
+            'uncategorized' => [],
+            'targetBalance' => null,
+            'operationsSum' => null,
+            'initialAmount' => null,
+            'balance' => null,
+            'errors' => [],
+        ];
 
         $em = $this->coreLocator->em();
-        $operationRepository = $em->getRepository(Operation::class);
-        $outsiderRepository = $em->getRepository(Outsider::class);
-        $operationTypeRepository = $em->getRepository(OperationType::class);
-        $user = $this->coreLocator->user();
+        $wallet = $wallet ?: $em->getRepository(Wallet::class)->findOneBy(['slug' => 'main-wallet']);
 
+        if (!$wallet instanceof Wallet) {
+            $report['errors'][] = 'Aucun compte cible : le wallet "main-wallet" est introuvable.';
+
+            return $report;
+        }
+
+        $report['wallet'] = $wallet->getAdminName();
+        $filename = $filename ?: $this->coreLocator->projectDir().'/bin/data/import/operations.xlsx';
+        $filename = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $filename);
+
+        if (!is_file($filename)) {
+            $report['errors'][] = sprintf('Fichier introuvable : %s', $filename);
+
+            return $report;
+        }
+
+        $report['file'] = $filename;
+        $rows = IOFactory::load($filename)->getActiveSheet()->toArray(null, true, true, true);
+
+        $headerIndex = null;
+        $targetBalance = null;
+        foreach ($rows as $index => $row) {
+            $columnA = trim((string) ($row['A'] ?? ''));
+            $columnB = trim((string) ($row['B'] ?? ''));
+            if (null === $targetBalance && preg_match('/^solde\s+au/iu', $columnB) && '' !== trim((string) ($row['C'] ?? ''))) {
+                $targetBalance = $this->cleanAmount($row['C']);
+            }
+            if (null === $headerIndex && 'date' === mb_strtolower($columnA, 'UTF-8')
+                && str_starts_with(mb_strtolower($columnB, 'UTF-8'), 'libell')) {
+                $headerIndex = $index;
+            }
+        }
+
+        if (null === $headerIndex) {
+            $report['errors'][] = 'En-tête "Date / Libellé / Débit / Crédit" introuvable dans le fichier.';
+
+            return $report;
+        }
+
+        $report['targetBalance'] = $targetBalance;
+        $entries = $this->readEntries($rows, $headerIndex, $report);
+
+        if ([] === $entries) {
+            $report['errors'][] = 'Aucune opération exploitable dans le fichier.';
+
+            return $report;
+        }
+
+        $operationTypeRepository = $em->getRepository(OperationType::class);
         $expensesType = $operationTypeRepository->findOneBy(['type' => 'expenses']);
         $incomesType = $operationTypeRepository->findOneBy(['type' => 'incomes']);
-
-        $subCategoryRepository = $em->getRepository(SubCategory::class);
-        $subCategories = [];
-        foreach (self::CORRESPONDENCE as $outsiderSlug => $subCategorySlug) {
-            if ($subCategorySlug) {
-                $subCategory = $subCategoryRepository->findOneBy(['slug' => $subCategorySlug]);
-                if ($subCategory) {
-                    $subCategories[$outsiderSlug] = $subCategory;
-                }
-            }
-        }
-
-        $targetBalance = null;
-        if (!empty($rows[7]['C'])) {
-            $targetBalance = $this->cleanAmount($rows[7]['C']);
-        }
+        $user = $this->coreLocator->user();
 
         $outsiders = [];
-        foreach ($outsiderRepository->findBy(['createdBy' => $user]) as $outsider) {
-            $outsiders[$outsider->getAdminName()] = $outsider;
+        foreach ($em->getRepository(Outsider::class)->findAll() as $outsider) {
+            $outsiders[$outsider->getSlug()] = $outsider;
         }
 
-        $hasChanges = false;
-        foreach ($rows as $index => $row) {
-            if ($index < 11 || empty($row['A']) || empty($row['B'])) {
+        $subCategories = [];
+        foreach ($em->getRepository(SubCategory::class)->findAll() as $subCategory) {
+            $subCategories[$subCategory->getSlug()] = $subCategory;
+        }
+
+        $existing = $this->existingOperationCounts($wallet);
+        $position = count($outsiders);
+        $seen = [];
+
+        foreach ($entries as $entry) {
+            $key = $entry['key'];
+            $seen[$key] = ($seen[$key] ?? 0) + 1;
+
+            if ($seen[$key] <= ($existing[$key] ?? 0)) {
+                ++$report['skipped'];
                 continue;
             }
 
-            $dateStr = $row['A'];
-            $adminName = trim($row['B']);
-            $cleanAdminName = $this->cleanOutsiderName($adminName);
-            $debit = $this->cleanAmount((string) $row['C']);
-            $credit = $this->cleanAmount((string) $row['D']);
-
-            // Si aucun montant n'est présent, on ignore la ligne
-            if ($debit <= 0 && $credit <= 0) {
-                continue;
+            $outsiderSlug = Urlizer::urlize($entry['merchant']);
+            if (!isset($outsiders[$outsiderSlug])) {
+                $outsider = new Outsider();
+                $outsider->setAdminName($entry['merchant']);
+                $outsider->setSlug($outsiderSlug);
+                $outsider->setPosition(++$position);
+                if ($user) {
+                    $outsider->setCreatedBy($user);
+                }
+                $em->persist($outsider);
+                $outsiders[$outsiderSlug] = $outsider;
+                ++$report['outsiders'];
             }
 
-            $amount = $debit > 0 ? $debit : $credit;
-            $operationType = $debit > 0 ? $expensesType : $incomesType;
-
-            try {
-                $date = null;
-                if (str_contains($dateStr, '/')) {
-                    $parts = explode('/', $dateStr);
-                    if (count($parts) === 3) {
-                        $month = (int) $parts[0];
-                        $day = (int) $parts[1];
-                        $year = (int) $parts[2];
-                        if ($month > 12 && $day <= 12) {
-                            $date = \DateTime::createFromFormat('d/m/Y', $dateStr);
-                        } else {
-                            $date = \DateTime::createFromFormat('m/d/Y', $dateStr);
-                        }
-                    }
-                }
-
-                if (!$date) {
-                    $date = \DateTime::createFromFormat('d/m/Y', $dateStr);
-                }
-
-                if (!$date) {
-                    continue;
-                }
-                $date->setTime(0, 0, 0);
-            } catch (\Exception) {
-                continue;
-            }
-
-            $existing = $operationRepository->findOneBy([
-                'wallet' => $wallet,
-                'date' => $date,
-                'amount' => $amount,
-                'adminName' => $adminName
-            ]);
-
-            if (!$existing) {
-                $operation = new Operation();
-                $operation->setWallet($wallet);
-                $operation->setDate($date);
-                $operation->setAmount($amount);
-                $operation->setAdminName($adminName);
+            $operation = new Operation();
+            $operation->setWallet($wallet);
+            $operation->setDate($entry['date']);
+            $operation->setAmount($entry['amount']);
+            $operation->setAdminName($entry['label']);
+            $operation->setSlug(Urlizer::urlize($entry['date']->format('Ymd').'-'.$entry['merchant']));
+            $operation->setOperationType($entry['expense'] ? $expensesType : $incomesType);
+            $operation->setOutsider($outsiders[$outsiderSlug]);
+            if ($user) {
                 $operation->setCreatedBy($user);
-                $operation->setOperationType($operationType);
-
-                if (!isset($outsiders[$cleanAdminName])) {
-                    $outsider = $outsiderRepository->findOneBy(['adminName' => $cleanAdminName, 'createdBy' => $user]);
-                    if (!$outsider) {
-                        $outsider = new Outsider();
-                        $outsider->setAdminName($cleanAdminName);
-                        $outsider->setSlug(Urlizer::urlize($cleanAdminName));
-                        $outsider->setCreatedBy($user);
-                        $outsider->setPosition(count($outsiders) + 1);
-                        $em->persist($outsider);
-                    }
-                    $outsiders[$cleanAdminName] = $outsider;
-                }
-                $operation->setOutsider($outsiders[$cleanAdminName]);
-
-                $subCategory = $this->findSubCategoryForOutsider($operation->getOutsider());
-                if ($subCategory) {
-                    $operation->setSubCategory($subCategory);
-                }
-
-                $em->persist($operation);
-                $hasChanges = true;
             }
+
+            $subCategorySlug = $entry['subCategory'];
+            if ($subCategorySlug && isset($subCategories[$subCategorySlug])) {
+                $operation->setSubCategory($subCategories[$subCategorySlug]);
+            }
+
+            // Une affectation par défaut n'est pas une catégorisation : elle est
+            // remontée dans le rapport pour être arbitrée à la main.
+            if (in_array($subCategorySlug, [self::DEFAULT_EXPENSE, self::DEFAULT_INCOME], true)) {
+                $report['uncategorized'][$entry['merchant']] = ($report['uncategorized'][$entry['merchant']] ?? 0) + 1;
+            } else {
+                ++$report['categorized'];
+            }
+
+            $em->persist($operation);
+            ++$report['imported'];
         }
 
-        if ($hasChanges) {
-            $em->flush();
+        if ($dryRun) {
+            $em->clear();
+
+            return $report;
         }
+
+        $em->flush();
+
+        $operationRepository = $em->getRepository(Operation::class);
+        $operationsSum = $operationRepository->sumOperations($wallet);
+        $report['operationsSum'] = round($operationsSum, 2);
 
         if (null !== $targetBalance) {
-            $initial = $wallet->getInitialAmount() ?? 0.0;
-            $currentBalance = $operationRepository->sumBalance($wallet);
-            if ($currentBalance !== $targetBalance) {
-                $diff = $targetBalance - $currentBalance;
-                $wallet->setInitialAmount($initial + $diff);
+            $initialAmount = round($targetBalance - $operationsSum, 2);
+            if (abs($initialAmount - (float) ($wallet->getInitialAmount() ?? 0.0)) >= self::EPSILON) {
+                $wallet->setInitialAmount($initialAmount);
                 $em->persist($wallet);
                 $em->flush();
             }
         }
+
+        $report['initialAmount'] = round((float) ($wallet->getInitialAmount() ?? 0.0), 2);
+        $report['balance'] = round($operationRepository->sumBalance($wallet), 2);
+
+        return $report;
     }
 
+    /**
+     * Lit et normalise les lignes d'opérations situées sous l'en-tête.
+     */
+    private function readEntries(array $rows, int|string $headerIndex, array &$report): array
+    {
+        $entries = [];
+        $started = false;
+
+        foreach ($rows as $index => $row) {
+            if ($index === $headerIndex) {
+                $started = true;
+                continue;
+            }
+            if (!$started) {
+                continue;
+            }
+
+            ++$report['rows'];
+            $rawDate = $row['A'] ?? null;
+            $label = trim(preg_replace('/\s+/u', ' ', (string) ($row['B'] ?? '')));
+
+            if ('' === $label || null === $rawDate || '' === trim((string) $rawDate)) {
+                ++$report['ignored'];
+                continue;
+            }
+
+            $debit = $this->cleanAmount($row['C'] ?? null);
+            $credit = $this->cleanAmount($row['D'] ?? null);
+
+            if ($debit <= 0 && $credit <= 0) {
+                ++$report['ignored'];
+                continue;
+            }
+
+            $date = $this->parseDate($rawDate);
+            if (!$date instanceof \DateTimeInterface) {
+                ++$report['ignored'];
+                $report['errors'][] = sprintf('Ligne %s : date illisible (%s).', (string) $index, (string) $rawDate);
+                continue;
+            }
+
+            $isExpense = $debit > 0;
+            $amount = round($isExpense ? $debit : $credit, 2);
+            $parsed = $this->parseLabel($label);
+
+            $entries[] = [
+                'date' => $date,
+                'label' => $label,
+                'amount' => $amount,
+                'expense' => $isExpense,
+                'merchant' => $parsed['merchant'],
+                'subCategory' => $this->resolveSubCategorySlug($label, $parsed, $isExpense),
+                'key' => $this->operationKey($date, $amount, $isExpense, $label),
+            ];
+            ++$report['parsed'];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Compte les opérations déjà présentes, par clé date/montant/sens/libellé.
+     *
+     * @return array<string, int>
+     */
+    private function existingOperationCounts(Wallet $wallet): array
+    {
+        $results = $this->coreLocator->em()->getRepository(Operation::class)
+            ->createQueryBuilder('o')
+            ->select('o.date AS date', 'o.amount AS amount', 'o.adminName AS adminName', 'ot.type AS type')
+            ->leftJoin('o.operationType', 'ot')
+            ->andWhere('o.wallet = :wallet')
+            ->setParameter('wallet', $wallet)
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($results as $result) {
+            if (!$result['date'] instanceof \DateTimeInterface) {
+                continue;
+            }
+            $key = $this->operationKey(
+                $result['date'],
+                (float) $result['amount'],
+                'expenses' === $result['type'],
+                (string) $result['adminName']
+            );
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Clé de rapprochement d'une opération.
+     */
+    private function operationKey(\DateTimeInterface $date, float $amount, bool $isExpense, string $label): string
+    {
+        return implode('|', [
+            $date->format('Y-m-d'),
+            number_format($amount, 2, '.', ''),
+            $isExpense ? 'D' : 'C',
+            mb_strtolower(trim(preg_replace('/\s+/u', ' ', $label)), 'UTF-8'),
+        ]);
+    }
+
+    /**
+     * Décompose un libellé Crédit Agricole en nature d'opération et bénéficiaire.
+     *
+     * Structure observée : « Nature - libellé brut [- nom normalisé du commerçant] ».
+     * Le dernier segment, lorsqu'il existe, est le nom normalisé par la banque : il
+     * est stable d'un relevé à l'autre, contrairement au libellé brut.
+     *
+     * @return array{nature: string, merchant: string, middle: string}
+     */
+    public function parseLabel(string $rawLabel): array
+    {
+        $label = trim(preg_replace('/\s+/u', ' ', $rawLabel));
+        $parts = array_values(array_filter(
+            array_map('trim', preg_split('/\s+-\s+/u', $label)),
+            static fn (string $part): bool => '' !== $part
+        ));
+
+        $nature = $parts[0] ?? '';
+        $key = mb_strtolower($nature, 'UTF-8');
+        $count = count($parts);
+        $middle = $this->stripLabelNoise($parts[1] ?? '');
+
+        if (str_starts_with($key, 'paiement par carte')) {
+            $last = $count >= 4 ? implode(' ', array_slice($parts, 2)) : ($parts[2] ?? '');
+            if ('' !== $last && preg_match('/^paypal$/iu', $last) && str_contains($middle, '*')) {
+                // Agrégateur de paiement : le commerçant réel est derrière l'astérisque.
+                $merchant = trim(substr($middle, strpos($middle, '*') + 1));
+            } elseif ('' !== $last) {
+                $merchant = $last;
+            } else {
+                $merchant = str_contains($middle, '*')
+                    ? trim(substr($middle, strpos($middle, '*') + 1))
+                    : $middle;
+            }
+
+            return $this->finalizeParsed('card', $merchant, $middle);
+        }
+
+        if (str_starts_with($key, 'prelevement') || str_starts_with($key, 'prélèvement')) {
+            $merchant = $parts[1] ?? '';
+            if (preg_match('/^\d/', $merchant) && isset($parts[2])) {
+                $merchant = $parts[2];
+            }
+            $merchant = trim(preg_replace('/\s*-?ECHEANCE.*$/ui', '', $merchant));
+            $merchant = trim(preg_replace('/\s*\d{4,}.*$/u', '', $merchant));
+
+            return $this->finalizeParsed('debit', '' !== $merchant ? $merchant : ($parts[1] ?? 'Prélèvement'), $middle);
+        }
+
+        if (str_starts_with($key, 'virement')) {
+            $merchant = preg_replace('/^(WEB|VIR INST)\s+/ui', '', $middle);
+            $merchant = preg_replace('/^(DE|VERS|POUR)\s+/ui', '', (string) $merchant);
+            $merchant = preg_replace('/^(MONSIEUR|MADAME|MR|MME)\s+/ui', '', (string) $merchant);
+            $merchant = trim(preg_replace('/\s*\d{5,}.*$/u', '', (string) $merchant));
+            $nature = str_contains($key, 'emis') || str_contains($key, 'émis') ? 'transfer_out' : 'transfer_in';
+
+            return $this->finalizeParsed($nature, $merchant, $middle);
+        }
+
+        if (str_starts_with($key, 'retrait')) {
+            return $this->finalizeParsed('withdrawal', 'Retrait DAB', $middle);
+        }
+
+        if (str_starts_with($key, 'cheque emis') || str_starts_with($key, 'chèque emis')) {
+            return $this->finalizeParsed('cheque_out', 'Chèque émis', $middle);
+        }
+
+        if (str_starts_with($key, 'remise de cheque') || str_starts_with($key, 'remise de chèque')) {
+            return $this->finalizeParsed('cheque_in', 'Remise de chèque', $middle);
+        }
+
+        if (str_starts_with($key, 'cotisation')) {
+            return $this->finalizeParsed('bank_fee', $parts[1] ?? 'Cotisation', $middle);
+        }
+
+        if (str_starts_with($key, 'avoir')) {
+            $merchant = trim(preg_replace('/^CARTE\s+X?\d*\s*/ui', '', $middle));
+
+            return $this->finalizeParsed('refund', $merchant, $middle);
+        }
+
+        if (str_starts_with($key, 'interets') || str_starts_with($key, 'intérêts')) {
+            return $this->finalizeParsed('interest', $nature, $middle);
+        }
+
+        return $this->finalizeParsed('other', '' !== $middle ? $middle : $nature, $middle);
+    }
+
+    /**
+     * Applique les alias de bénéficiaires et garantit un nom non vide.
+     *
+     * @return array{nature: string, merchant: string, middle: string}
+     */
+    private function finalizeParsed(string $nature, string $merchant, string $middle): array
+    {
+        $merchant = trim(preg_replace('/\s+/u', ' ', $merchant));
+        $slug = (string) Urlizer::urlize($merchant);
+
+        if (isset(self::MERCHANT_ALIASES[$slug])) {
+            $merchant = self::MERCHANT_ALIASES[$slug];
+        }
+
+        if ('' === trim($merchant)) {
+            $merchant = 'Non identifié';
+        }
+
+        return ['nature' => $nature, 'merchant' => $merchant, 'middle' => $middle];
+    }
+
+    /**
+     * Retire d'un segment de libellé la référence de carte, la date et l'heure.
+     */
+    private function stripLabelNoise(string $value): string
+    {
+        $value = preg_replace('/^X\d{3,}\s*/u', '', $value);
+        $value = preg_replace('/\s*\d{2}\/\d{2}\s*/u', ' ', (string) $value);
+        $value = preg_replace('/\s*\d{1,2}H\d{2}\s*/ui', ' ', (string) $value);
+
+        return trim(preg_replace('/\s+/u', ' ', (string) $value));
+    }
+
+    /**
+     * Détermine la sous-catégorie d'une opération.
+     *
+     * Ordre de résolution : libellé brut connu, bénéficiaire normalisé connu,
+     * correspondance partielle, déduction par mot-clé, défaut par nature. Le sens
+     * de l'opération (débit/crédit) fait ensuite foi : une sous-catégorie de type
+     * opposé est écartée.
+     *
+     * @param array{nature: string, merchant: string, middle: string} $parsed
+     */
+    public function resolveSubCategorySlug(string $rawLabel, array $parsed, bool $isExpense): ?string
+    {
+        $middleSlug = (string) Urlizer::urlize($parsed['middle']);
+        $merchantSlug = (string) Urlizer::urlize($parsed['merchant']);
+        $labelSlug = (string) Urlizer::urlize($rawLabel);
+        $generic = [self::DEFAULT_EXPENSE, self::DEFAULT_INCOME];
+
+        $byMerchant = $this->directedCorrespondence(self::MERCHANT_CORRESPONDENCE[$merchantSlug] ?? null, $isExpense);
+        $byLabel = self::CORRESPONDENCE[$middleSlug] ?? null;
+        $resolved = null;
+
+        // Le libellé brut fait foi, sauf lorsqu'il ne porte qu'un classement
+        // générique : une correspondance par bénéficiaire est alors plus précise.
+        if (!empty($byLabel) && (!in_array($byLabel, $generic, true) || !$byMerchant)) {
+            $resolved = $byLabel;
+        } elseif ($byMerchant) {
+            $resolved = $byMerchant;
+        } elseif (!empty(self::CORRESPONDENCE[$merchantSlug])) {
+            $resolved = self::CORRESPONDENCE[$merchantSlug];
+        }
+
+        if (!$resolved) {
+            foreach (self::PARTIAL_MATCH_KEYS as $partialKey) {
+                if (empty(self::CORRESPONDENCE[$partialKey])) {
+                    continue;
+                }
+                if (str_contains($middleSlug, $partialKey) || str_contains($merchantSlug, $partialKey)) {
+                    $resolved = self::CORRESPONDENCE[$partialKey];
+                    break;
+                }
+            }
+        }
+
+        if (!$resolved) {
+            foreach (self::KEYWORD_CORRESPONDENCE as $keyword => $subCategorySlug) {
+                if (str_contains($labelSlug, $keyword)) {
+                    $resolved = $subCategorySlug;
+                    break;
+                }
+            }
+        }
+
+        // Le sens de l'opération prime : une sous-catégorie de type opposé fausserait
+        // les statistiques par catégorie.
+        $expected = $isExpense ? 'expenses-' : 'incomes-';
+
+        if (!$resolved || !str_starts_with($resolved, $expected)) {
+            $resolved = self::NATURE_CORRESPONDENCE[$parsed['nature']] ?? null;
+        }
+
+        if (!$resolved || !str_starts_with($resolved, $expected)) {
+            $resolved = $isExpense ? self::DEFAULT_EXPENSE : self::DEFAULT_INCOME;
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Résout une correspondance pouvant être définie par sens d'opération.
+     *
+     * Un même tiers peut apparaître au débit comme au crédit (virements entre
+     * particuliers) : la table accepte alors ['expenses' => ..., 'incomes' => ...].
+     */
+    private function directedCorrespondence(string|array|null $correspondence, bool $isExpense): ?string
+    {
+        if (is_array($correspondence)) {
+            $correspondence = $correspondence[$isExpense ? 'expenses' : 'incomes'] ?? null;
+        }
+
+        return !empty($correspondence) ? (string) $correspondence : null;
+    }
+
+    /**
+     * Convertit la date d'une cellule en objet DateTime.
+     *
+     * Le format des exports bancaires français est jj/mm/aaaa : il est appliqué
+     * strictement, sans heuristique sur la valeur du premier groupe.
+     */
+    private function parseDate(mixed $value): ?\DateTimeInterface
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return (new \DateTime($value->format('Y-m-d')))->setTime(0, 0);
+        }
+
+        if (is_numeric($value)) {
+            // Numéro de série Excel.
+            $timestamp = ((float) $value - 25569) * 86400;
+
+            return (new \DateTime('@'.(int) $timestamp))
+                ->setTimezone(new \DateTimeZone('Europe/Paris'))
+                ->setTime(0, 0);
+        }
+
+        $raw = trim((string) $value);
+
+        foreach (['d/m/Y', 'd/m/y', 'Y-m-d', 'd-m-Y'] as $format) {
+            $date = \DateTime::createFromFormat('!'.$format, $raw);
+            $errors = \DateTime::getLastErrors();
+            $hasError = is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0);
+            if ($date instanceof \DateTime && !$hasError) {
+                return $date->setTime(0, 0);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Applique le bénéficiaire et la sous-catégorie déduits lors d'une saisie manuelle.
+     */
     public function execute(Operation $operation, FormInterface $form): void
     {
         $adminName = $form->get('adminName')->getData();
+
         if ($adminName) {
-            $cleanAdminName = $this->cleanOutsiderName($adminName);
-            $position = count($this->coreLocator->em()->getRepository(Outsider::class)->findBy([
-                'createdBy' => $this->coreLocator->user()
-            ])) + 1;
-            $outsider = $this->coreLocator->em()->getRepository(Outsider::class)->findOneBy([
-                'createdBy' => $this->coreLocator->user(),
-                'adminName' => $cleanAdminName,
-            ]);
+            $parsed = $this->parseLabel((string) $adminName);
+            $outsiderSlug = (string) Urlizer::urlize($parsed['merchant']);
+            $outsiderRepository = $this->coreLocator->em()->getRepository(Outsider::class);
+            $outsider = $outsiderRepository->findOneBy(['slug' => $outsiderSlug]);
+
             if (!$outsider) {
                 $outsider = new Outsider();
-                $outsider->setAdminName($cleanAdminName);
-                $outsider->setSlug(Urlizer::urlize($cleanAdminName));
+                $outsider->setAdminName($parsed['merchant']);
+                $outsider->setSlug($outsiderSlug);
                 $outsider->setCreatedBy($this->coreLocator->user());
-                $outsider->setPosition($position);
+                $outsider->setPosition(count($outsiderRepository->findAll()) + 1);
                 $this->coreLocator->em()->persist($outsider);
             }
+
             $operation->setOutsider($outsider);
 
             if (!$operation->getSubCategory()) {
-                $subCategory = $this->findSubCategoryForOutsider($outsider);
+                $isExpense = !$operation->getOperationType()
+                    || 'expenses' === $operation->getOperationType()->getType();
+                $subCategorySlug = $this->resolveSubCategorySlug((string) $adminName, $parsed, $isExpense);
+                $subCategory = $subCategorySlug
+                    ? $this->coreLocator->em()->getRepository(SubCategory::class)->findOneBy(['slug' => $subCategorySlug])
+                    : null;
                 if ($subCategory) {
                     $operation->setSubCategory($subCategory);
                 }
@@ -532,7 +1211,7 @@ readonly class OperationManager implements OperationInterface
 
         if ($operation->getSubCategory() && !$operation->getOperationType()) {
             $operationType = $this->coreLocator->em()->getRepository(OperationType::class)->findOneBy([
-                'type' => $operation->getSubCategory()->getType()
+                'type' => $operation->getSubCategory()->getType(),
             ]);
             if ($operationType) {
                 $operation->setOperationType($operationType);
@@ -540,106 +1219,46 @@ readonly class OperationManager implements OperationInterface
         }
     }
 
-
     /**
-     * Nettoie le montant pour le convertir en float.
+     * Convertit une valeur de cellule en montant.
+     *
+     * Les valeurs numériques natives sont retournées telles quelles ; l'analyse des
+     * séparateurs n'est appliquée qu'aux chaînes, où elle est nécessaire.
      */
     private function cleanAmount(mixed $amount): float
     {
-        // 1. Suppression de tous les types d'espaces (y compris insécables) et du symbole €
-        $amountStr = (string) $amount;
-        $amountStr = preg_replace('/\s+|€|\x{00A0}|\x{202F}/u', '', $amountStr);
-
-        if ($amountStr === '' || $amountStr === null) {
+        if (null === $amount || '' === $amount) {
             return 0.0;
         }
 
-        $hasComma = str_contains($amountStr, ',');
-        $hasDot   = str_contains($amountStr, '.');
+        if (is_int($amount) || is_float($amount)) {
+            return (float) $amount;
+        }
 
-        // 2. Si les deux séparateurs sont présents, on détermine le séparateur décimal comme étant le dernier qui apparaît
+        $value = preg_replace('/\s+|€|\x{00A0}|\x{202F}/u', '', (string) $amount);
+
+        if (null === $value || '' === $value) {
+            return 0.0;
+        }
+
+        $hasComma = str_contains($value, ',');
+        $hasDot = str_contains($value, '.');
+
         if ($hasComma && $hasDot) {
-            $lastComma = strrpos($amountStr, ',');
-            $lastDot   = strrpos($amountStr, '.');
-            $decimalSep   = ($lastDot !== false && $lastDot > (int) $lastComma) ? '.' : ',';
-            $thousandSep  = $decimalSep === '.' ? ',' : '.';
-
-            // Supprimer tous les séparateurs de milliers
-            $amountStr = str_replace($thousandSep, '', $amountStr);
-            // Remplacer le séparateur décimal par un point
-            if ($decimalSep === ',') {
-                $amountStr = str_replace(',', '.', $amountStr);
+            // Le dernier séparateur rencontré est le séparateur décimal.
+            $lastComma = strrpos($value, ',');
+            $lastDot = strrpos($value, '.');
+            $decimalSeparator = (false !== $lastDot && $lastDot > (int) $lastComma) ? '.' : ',';
+            $value = str_replace('.' === $decimalSeparator ? ',' : '.', '', $value);
+            if (',' === $decimalSeparator) {
+                $value = str_replace(',', '.', $value);
             }
         } elseif ($hasComma) {
-            // 3. Si une virgule est présente (format FR):
-            //    - les points restants sont des séparateurs de milliers
-            //    - la virgule est le séparateur décimal
-            $amountStr = str_replace('.', '', $amountStr);
-            $amountStr = str_replace(',', '.', $amountStr);
-        } elseif ($hasDot) {
-            // 4. Pas de virgule, mais un/des points
-            //    - Plusieurs points => séparateurs de milliers
-            //    - Un seul point avec exactement 3 chiffres après => probablement milliers
-            $parts = explode('.', $amountStr);
-            if (count($parts) > 2) {
-                $amountStr = str_replace('.', '', $amountStr);
-            } elseif (count($parts) === 2 && strlen($parts[1]) === 3) {
-                $amountStr = str_replace('.', '', $amountStr);
-            }
+            $value = str_replace(['.', ','], ['', '.'], $value);
+        } elseif ($hasDot && substr_count($value, '.') > 1) {
+            $value = str_replace('.', '', $value);
         }
 
-        return (float) $amountStr;
-    }
-
-    /**
-     * Nettoie le nom du tiers pour éviter les doublons.
-     */
-    private function cleanOutsiderName(string $adminName): string
-    {
-        $adminName = mb_strtoupper($adminName, 'UTF-8');
-
-        // Suppression des préfixes de paiement courants
-        $adminName = str_replace(['PAIEMENT PAR CARTE', 'PAIEMENT PAR', 'VIREMENT DE', 'VIREMENT POUR', 'PRELEVEMENT'], '', $adminName);
-
-        // Suppression des identifiants et références (BTAW, PAGP, FR35, etc.)
-        $adminName = preg_replace('/[A-Z0-9]{10,}/', '', $adminName);
-
-        // Suppression des codes de transaction (ex: X9322)
-        $adminName = preg_replace('/X\d{4,}/', '', $adminName);
-
-        // Suppression des numéros de téléphone (ex: 06XXXXX891)
-        $adminName = preg_replace('/\d{2}[\sX]{5,}\d{3}/', '', $adminName);
-
-        // Suppression des dates (ex: 19/02)
-        $adminName = preg_replace('/\d{2}\/\d{2}/', '', $adminName);
-
-        // Nettoyage des espaces multiples et trim
-        return trim(preg_replace('/\s+/', ' ', $adminName));
-    }
-
-    /**
-     * Recherche la sous-catégorie correspondante pour un tiers.
-     */
-    private function findSubCategoryForOutsider(Outsider $outsider): ?SubCategory
-    {
-        $slug = $outsider->getSlug();
-        $subCategorySlug = null;
-
-        if (isset(self::CORRESPONDENCE[$slug]) && self::CORRESPONDENCE[$slug]) {
-            $subCategorySlug = self::CORRESPONDENCE[$slug];
-        } else {
-            foreach (self::PARTIAL_MATCH_KEYS as $partialKey) {
-                if (str_contains($slug, $partialKey) && isset(self::CORRESPONDENCE[$partialKey]) && self::CORRESPONDENCE[$partialKey]) {
-                    $subCategorySlug = self::CORRESPONDENCE[$partialKey];
-                    break;
-                }
-            }
-        }
-
-        if ($subCategorySlug) {
-            return $this->coreLocator->em()->getRepository(SubCategory::class)->findOneBy(['slug' => $subCategorySlug]);
-        }
-
-        return null;
+        return (float) $value;
     }
 }

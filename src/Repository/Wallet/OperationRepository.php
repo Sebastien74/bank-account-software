@@ -72,6 +72,66 @@ class OperationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Somme algébrique des opérations d'un compte, hors solde initial.
+     *
+     * @throws NonUniqueResultException|NoResultException
+     */
+    public function sumOperations(Wallet $wallet): float
+    {
+        $total = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sc')
+            ->leftJoin('o.operationType', 'ot')
+            ->andWhere('o.wallet = :wallet')
+            ->setParameter('wallet', $wallet)
+            ->select("
+                COALESCE(SUM(
+                    CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN o.amount
+                         ELSE (0 - o.amount)
+                    END
+                ), 0) AS total
+            ")
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (float) $total;
+    }
+
+    /**
+     * Totaux d'un compte pour le mois en cours, calculés en base.
+     *
+     * Évite de charger la collection d'opérations pour un simple affichage de solde.
+     *
+     * @return array{expenses: float, incomes: float}
+     */
+    public function currentMonthTotals(Wallet $wallet, ?\DateTimeZone $tz = null): array
+    {
+        $tz ??= new \DateTimeZone('Europe/Paris');
+        $start = new \DateTimeImmutable('first day of this month 00:00:00', $tz);
+        $end = $start->modify('first day of next month');
+
+        $rows = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sc')
+            ->leftJoin('o.operationType', 'ot')
+            ->select("
+                COALESCE(SUM(CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN o.amount ELSE 0 END), 0) AS incomes,
+                COALESCE(SUM(CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN 0 ELSE o.amount END), 0) AS expenses
+            ")
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date < :end')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('start', $start, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->setParameter('end', $end, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->getQuery()
+            ->getSingleResult();
+
+        return [
+            'expenses' => (float) $rows['expenses'],
+            'incomes' => (float) $rows['incomes'],
+        ];
+    }
+
+    /**
      * sumPerMonthNet.=
      *
      * @throws Exception
@@ -120,7 +180,8 @@ class OperationRepository extends ServiceEntityRepository
         string $month,
         string $sort = 'date',
         string $order = 'ASC',
-        ?\DateTimeZone $tz = null): array
+        ?\DateTimeZone $tz = null,
+        ?Wallet $wallet = null): array
     {
         if (!preg_match('/^(0[1-9]|1[0-2])$/', $month)) {
             throw new \InvalidArgumentException('Invalid month format, expected "01".."12".');
@@ -143,6 +204,10 @@ class OperationRepository extends ServiceEntityRepository
             ->setParameter('end', $nextStart, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
             ->addSelect('sb')
             ->addSelect('os');
+
+        if ($wallet instanceof Wallet) {
+            $qb->andWhere('o.wallet = :wallet')->setParameter('wallet', $wallet);
+        }
 
         $sort = 'dt' === $sort ? 'date' : ('pt' === $sort ? 'pointed': ('ct' === $sort ? 'category' : ('os' === $sort ? 'outsider' : ('at' === $sort ? 'amount' : $sort))));
         $order = strtoupper($order);
