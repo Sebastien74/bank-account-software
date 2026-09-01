@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '9506f324f8851cbd609600c1ed7899279e7d332e',
+        'reference' => '28f6a626eabd56d963782da14054c1a68544a268',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9506f324f8851cbd609600c1ed7899279e7d332e',
+            'reference' => '28f6a626eabd56d963782da14054c1a68544a268',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -752,8 +752,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0|3.0',
-                1 => '3.0.0',
+                0 => '3.0.0',
+                1 => '1.0|2.0|3.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -1556,6 +1556,24 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/ux-chartjs' => array(
+            'pretty_version' => 'v2.36.0',
+            'version' => '2.36.0.0',
+            'reference' => 'd37e229067ae92703fe93fd210ba9c31a8c1b6a4',
+            'type' => 'symfony-bundle',
+            'install_path' => __DIR__ . '/../symfony/ux-chartjs',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/ux-icons' => array(
+            'pretty_version' => 'v2.36.1',
+            'version' => '2.36.1.0',
+            'reference' => '567f33ddffc25504788abc61977565381e424ada',
+            'type' => 'symfony-bundle',
+            'install_path' => __DIR__ . '/../symfony/ux-icons',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'symfony/ux-live-component' => array(
             'pretty_version' => 'v2.32.0',
             'version' => '2.32.0.0',
@@ -1575,9 +1593,9 @@
             'dev_requirement' => false,
         ),
         'symfony/ux-twig-component' => array(
-            'pretty_version' => 'v2.32.0',
-            'version' => '2.32.0.0',
-            'reference' => '0a300088327d1b766733fdcd81ae4a77852d6177',
+            'pretty_version' => 'v2.36.0',
+            'version' => '2.36.0.0',
+            'reference' => 'd64b068d8339e905cd48974bdd6e9ba54dc8f247',
             'type' => 'symfony-bundle',
             'install_path' => __DIR__ . '/../symfony/ux-twig-component',
             'aliases' => array(),

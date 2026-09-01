@@ -140,7 +140,7 @@ Encore.setOutputPath('public/build/back')
     })
     .splitEntryChunks()
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    // .enableStimulusBridge('./assets/controllers.json')
+    .enableStimulusBridge('./assets/controllers.json')
     .configureSplitChunks(function (splitChunks) {
         splitChunks.chunks = 'all'; // Tous les types de chunks
         splitChunks.minSize = 20000; // Taille minimale d'un chunk

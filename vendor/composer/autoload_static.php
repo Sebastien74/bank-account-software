@@ -59,6 +59,8 @@ class ComposerStaticInite61f34e6e78bd4300e22fbb3b6ef8697
             'Symfony\\UX\\Turbo\\' => 17,
             'Symfony\\UX\\StimulusBundle\\' => 26,
             'Symfony\\UX\\LiveComponent\\' => 25,
+            'Symfony\\UX\\Icons\\' => 17,
+            'Symfony\\UX\\Chartjs\\' => 19,
             'Symfony\\UX\\Autocomplete\\' => 24,
             'Symfony\\Runtime\\Symfony\\Component\\' => 34,
             'Symfony\\Requirements\\' => 21,
@@ -303,6 +305,14 @@ class ComposerStaticInite61f34e6e78bd4300e22fbb3b6ef8697
         'Symfony\\UX\\LiveComponent\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/ux-live-component/src',
+        ),
+        'Symfony\\UX\\Icons\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/ux-icons/src',
+        ),
+        'Symfony\\UX\\Chartjs\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/ux-chartjs/src',
         ),
         'Symfony\\UX\\Autocomplete\\' => 
         array (
@@ -687,8 +697,8 @@ class ComposerStaticInite61f34e6e78bd4300e22fbb3b6ef8697
         ),
         'Nette\\' => 
         array (
-            0 => __DIR__ . '/..' . '/nette/utils/src',
-            1 => __DIR__ . '/..' . '/nette/schema/src',
+            0 => __DIR__ . '/..' . '/nette/schema/src',
+            1 => __DIR__ . '/..' . '/nette/utils/src',
         ),
         'Monolog\\' => 
         array (

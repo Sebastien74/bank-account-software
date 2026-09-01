@@ -9,21 +9,36 @@ import {lazyLoadComponent} from '../vendor/functions';
 import bootstrap from './bootstrap';
 import displayLoader from './display-loader';
 
+/** Stimulus : Turbo et Chart.js sont enregistrés via assets/controllers.json */
+import '../../bootstrap';
+
 /** Import CSS */
 import '../../scss/back/vendor.scss';
 
 lazyLoadComponent('.collapse', () => import('./collapse'), (Collapse, els) => new Collapse(els));
 lazyLoadComponent('#index-filters-form', () => import('./form-filters'), (Filters, el) => new Filters(el));
 
-document.addEventListener('DOMContentLoaded', function () {
+/**
+ * Turbo remplace le corps du document sans recharger la page : DOMContentLoaded
+ * n'est émis qu'au tout premier affichage. Toute initialisation doit donc être
+ * rejouée sur turbo:load, sans quoi les composants meurent à la seconde navigation.
+ */
+const onPageReady = (callback) => {
+    document.addEventListener('DOMContentLoaded', callback);
+    document.addEventListener('turbo:load', callback);
+};
+
+onPageReady(function () {
 
     const body = document.body;
 
     const togglerNav = document.querySelector('button.nav-toggler-icon-wrap');
-    togglerNav.onclick = function (e) {
-        e.preventDefault();
-        togglerNav.querySelector('.nav-toggler-icon').classList.toggle('open');
-        body.classList.toggle('menu-open');
+    if (togglerNav) {
+        togglerNav.onclick = function (e) {
+            e.preventDefault();
+            togglerNav.querySelector('.nav-toggler-icon').classList.toggle('open');
+            body.classList.toggle('menu-open');
+        }
     }
 
     bootstrap();
@@ -90,8 +105,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-const showEl = document.querySelector('#show-entity');
-if (showEl) {
+onPageReady(function () {
+
+    const showEl = document.querySelector('#show-entity');
+    if (!showEl) {
+        return;
+    }
+
     showEl.querySelectorAll('td.value').forEach(td => {
         const text = (td.textContent || '')
             .replace(/\u00A0/g, ' ') // Convert &nbsp; to regular space
@@ -103,8 +123,10 @@ if (showEl) {
             td.closest('tr').remove();
         }
     });
-}
+});
 
-import('../vendor/components/lazy-load').then(({default: lazyLoad}) => {
-    new lazyLoad();
-}).catch(error => console.error(error.message));
+onPageReady(function () {
+    import('../vendor/components/lazy-load').then(({default: lazyLoad}) => {
+        new lazyLoad();
+    }).catch(error => console.error(error.message));
+});
