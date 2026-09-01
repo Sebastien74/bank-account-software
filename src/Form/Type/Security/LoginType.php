@@ -85,7 +85,7 @@ class LoginType extends AbstractType
         $builder->add('submit', Type\SubmitType::class, [
             'label' => $this->translator->trans('Log in', [], 'security_form'),
             'row_attr' => ['class' => 'col-lg-12'],
-            'attr' => ['class' => 'dash-btn w-100 justify-content-center', 'icon' => 'unlock-alt'],
+            'attr' => ['class' => 'btn btn-primary w-100', 'icon' => false],
         ]);
     }
 

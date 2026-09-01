@@ -12,20 +12,12 @@
 #main-preloader {
 
     position: fixed;
-    top: 0;
-    left: initial;
-    bottom: 0;
-    right: 0;
+    inset: 0;
     z-index: 1500;
-    background: $bg-body;
-
-    @include mediaQuery(max-lg) {
-        width: 100%;
-    }
-
-    @include mediaQuery(min-lg) {
-        width: 400px;
-    }
+    background: var(--bas-paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     .logo-wrap img {
         max-height: 150px;

@@ -15,12 +15,12 @@
         <meta name="description" content="" />
         <meta name="author" content="{{ companyName|striptags }}" />
         <title>{{ pageTitle|striptags ~' | '~companyName|striptags }}</title>
-        <link rel="icon" type="image/png" href="{{ asset('medias/favicon-felix/favicon-96x96.png') }}" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="{{ asset('medias/favicon-felix/favicon.svg') }}" />
-        <link rel="shortcut icon" href="{{ asset('medias/favicon-felix/favicon.ico') }}" />
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('medias/favicon-felix/apple-touch-icon.png') }}" />
+        <link rel="icon" type="image/png" href="{{ asset('medias/favicon/favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('medias/favicon/favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('medias/favicon/favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('medias/favicon/apple-touch-icon.png') }}" />
         <meta name="apple-mobile-web-app-title" content="{{ companyName }}" />
-        <link rel="manifest" href="{{ asset('medias/favicon-felix/site.webmanifest') }}" />
+        <link rel="manifest" href="{{ asset('medias/favicon/site.webmanifest') }}" />
         {% block stylesheets %}
             {{ encore_entry_link_tags('back-vendor', null, 'back', {nonce: csp_nonce()}) }}
             <link rel="modulepreload" href="{{ preload(asset('build/back/back-vendor.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">

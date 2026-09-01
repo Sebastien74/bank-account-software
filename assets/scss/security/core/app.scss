@@ -8,9 +8,7 @@
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
     1 ) Core
-    2 ) Contact infos
-    3 ) Base theme
-    4 ) Responsive
+    2 ) Base theme
 
 ----------------------------------------------------------------------------------------- */
 
@@ -19,20 +17,8 @@
 -----------------------------------*/
 
 body {
-
     font-size: 15px;
     overflow-x: hidden;
-    background: $bg-body;
-    min-height: 100dvh;
-
-    #content {
-
-        background-color: transparent;
-
-        @include mediaQuery(min-sm) {
-            width: 335px;
-        }
-    }
 }
 
 * {
@@ -78,47 +64,8 @@ h2 {
 
 .login-wrapper {
 
-    padding: 0;
-    margin-top: 0;
-    min-height: 100dvh;
-
-    #bg-container {
-        background-size: cover !important;
-        background-repeat: no-repeat !important;
-        background-position: center center !important;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: calc(100% - 400px);
-    }
-
-    &:after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: calc(100% - 400px);
-        background: transparentize($black, 0.3);
-    }
-
-    .login-box {
-
-        width: 400px;
-        background: radial-gradient(900px 600px at 20% 0%, rgba($dash-accent, 0.08), transparent 55%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 42%),
-        $dash-side-surface;
-        min-height: 100dvh;
-        box-shadow: -3px 0 5px 0 rgba(0, 0, 0, 0.1);
-
-        #logo {
-            max-height: 150px;
-            height: 150px;
-            width: auto;
-            max-width: 100%;
-            fill: $primary;
-        }
-    }
+    padding: 2rem 1rem;
+    width: 100%;
 
     .alert {
         margin-top: 1.25rem;
@@ -128,7 +75,7 @@ h2 {
 }
 
 /*-----------------------------------
-   3 ) Base theme
+   2 ) Base theme
 -----------------------------------*/
 
 .base-theme {
@@ -153,33 +100,3 @@ h2 {
     }
 }
 
-/*-----------------------------------
-   4 ) Responsive
------------------------------------*/
-
-@include mediaQuery(between-md-lg) {
-    #content {
-        width: 380px;
-    }
-}
-
-@include mediaQuery(max-lg) {
-
-    body .login-sidebar {
-
-        width: 100% !important;
-
-        .login-box {
-
-            position: relative !important;
-            z-index: 2;
-            width: 100%;
-            max-width: 100%;
-            min-height: 100dvh;
-            left: 0;
-            right: 0;
-            display: inline-block;
-            margin: 0;
-        }
-    }
-}

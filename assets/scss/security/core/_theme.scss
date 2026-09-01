@@ -21,6 +21,11 @@
     --bas-muted: #76778e;
     --bas-line: #44485e;
     --bas-primary: #7367f0;
+    /* Fond de bouton sous un libellé blanc fixe : #7367f0 ne tient que 4,26:1 sous le
+       blanc (mesuré, voir .claude/charte-back/ecarts-projet.md). Assombri comme le
+       survol de la démo, 5,07:1 mesuré, seule teinte qui reste lisible en permanence. */
+    --bas-primary-fill: #685dd8;
+    --bas-primary-fill-hover: #5b4fc7;
     --bas-radius: 0.375rem;
 }
 
@@ -39,11 +44,10 @@ body {
     background-color: var(--bas-surface) !important;
     border-radius: 0.5rem;
     box-shadow: 0 0.25rem 1.125rem 0 rgba(47, 43, 61, 0.24);
+    margin: 0 auto;
+    max-width: 400px;
     padding: 2rem;
-
-    @include mediaQuery(min-sm) {
-        width: 400px;
-    }
+    width: 100%;
 }
 
 .security-brand {
@@ -81,16 +85,20 @@ body {
     text-align: center;
 }
 
-/* Champ transparent dessiné par son filet, comme sur le back. */
+/* Champ transparent dessiné par son filet, comme sur le back.
+   `background` et pas `background-color` : le dégradé du composant "material"
+   du dashboard est posé en background-image, une simple background-color ne
+   l'efface pas. */
 .form-control,
-.form-select {
-    background-color: transparent;
+.form-select,
+.input-group-text {
+    background: transparent;
     border-color: var(--bas-line);
     border-radius: var(--bas-radius);
     color: var(--bas-body);
 
     &:focus {
-        background-color: transparent;
+        background: transparent;
         border-color: var(--bas-primary);
         box-shadow: none;
         color: var(--bas-heading);
@@ -99,6 +107,23 @@ body {
     &::placeholder {
         color: var(--bas-muted);
     }
+}
+
+/* Le groupe (champ mot de passe + bouton oeil) porte lui-même le dégradé
+   du dashboard sur son fond ; le filet vient déjà des enfants ci-dessus. */
+.input-group {
+    background: transparent;
+    border-radius: var(--bas-radius);
+}
+
+/* Le bouton oeil hérite de la tuile d'icône du dashboard (badge violet rond) :
+   ici ce n'est qu'un pictogramme, pas une action à mettre en avant. */
+.show-password .dash-btn-icon {
+    background: transparent;
+    border: 0;
+    width: auto;
+    height: auto;
+    color: var(--bas-muted);
 }
 
 label,
@@ -113,13 +138,13 @@ label,
 }
 
 .btn-primary {
-    background-color: var(--bas-primary);
-    border-color: var(--bas-primary);
+    background-color: var(--bas-primary-fill);
+    border-color: var(--bas-primary-fill);
 
     &:hover,
     &:focus {
-        background-color: #6355ee;
-        border-color: #6355ee;
+        background-color: var(--bas-primary-fill-hover);
+        border-color: var(--bas-primary-fill-hover);
     }
 }
 

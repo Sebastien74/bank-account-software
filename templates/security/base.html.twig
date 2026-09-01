@@ -14,12 +14,12 @@
         <meta name="description" content="{{ companyName }}" />
         <meta name="author" content="{{ companyName }}" />
 
-        <link rel="icon" type="image/png" href="{{ asset('medias/favicon-felix/favicon-96x96.png') }}" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="{{ asset('medias/favicon-felix/favicon.svg') }}" />
-        <link rel="shortcut icon" href="{{ asset('medias/favicon-felix/favicon.ico') }}" />
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('medias/favicon-felix/apple-touch-icon.png') }}" />
+        <link rel="icon" type="image/png" href="{{ asset('medias/favicon/favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('medias/favicon/favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('medias/favicon/favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('medias/favicon/apple-touch-icon.png') }}" />
         <meta name="apple-mobile-web-app-title" content="{{ companyName }}" />
-        <link rel="manifest" href="{{ asset('medias/favicon-felix/site.webmanifest') }}" />
+        <link rel="manifest" href="{{ asset('medias/favicon/site.webmanifest') }}" />
 
         {% block stylesheets %}
             {{ encore_entry_link_tags('security', null, 'security', {nonce: csp_nonce()}) }}
@@ -29,32 +29,17 @@
     </head>
 
     <body class="base-theme">
-        <section id="wrapper" class="login-wrapper login-sidebar d-lg-flex w-100">
-            {% set bgImgStyle = 'background-security.jpg'|img('security', {
-                style: true,
-                screensSizes: {
-                    mobile: {width: 1520, height: 919},
-                    tablet: {width: 1520, height: 919},
-                    desktop: {width: 1520, height: 919}
-                }
-            }) %}
-            <div id="bg-container" data-style="{{ bgImgStyle }}"></div>
-            <aside class="login-box py-5">
-                <div class="inner position-relative h-100 d-flex flex-column">
-                    {% include 'security/includes/preloader.html.twig' with {} only %}
-                    <div class="row my-auto mx-auto m-0 px-2 px-sm-0">
-                        <header id="content" class="col-12 col-md-8 col-lg-12">
-                            <a href="{{ path('front_index') }}" class="security-brand text-decoration-none">
-                                <twig:ux:icon name="tabler:pig-money" />
-                                <span>{{ companyName }}</span>
-                            </a>
-                            {% block security_intro %}{% endblock %}
-                            {% block body %}{% endblock %}
-                        </header>
-                    </div>
-                </div>
-            </aside>
-        </section>
+        {% include 'security/includes/preloader.html.twig' with {} only %}
+        <main id="wrapper" class="login-wrapper">
+            <div id="content">
+                <a href="{{ path('front_index') }}" class="security-brand text-decoration-none">
+                    <twig:ux:icon name="tabler:building-bank" />
+                    <span>{{ companyName }}</span>
+                </a>
+                {% block security_intro %}{% endblock %}
+                {% block body %}{% endblock %}
+            </div>
+        </main>
         {% include 'core/data-path.html.twig' with {} only %}
         {% block javascripts %}
             {{ encore_entry_script_tags('vendor-patch-csp', null, 'vendor', {nonce: csp_nonce()}) }}
