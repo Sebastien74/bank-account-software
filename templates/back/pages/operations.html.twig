@@ -51,7 +51,7 @@
                    class="icon-wrap prev bg-dark d-flex align-items-center justify-content-center h-100"
                    data-bs-toggle="tooltip"
                    data-bs-title="{{ "Mois précedent"|trans|striptags }}">
-                    <i class="icon-chevron-left text-white"></i>
+                    <twig:ux:icon name="tabler:chevron-left" class="text-white" />
                 </a>
                 <span class="date bg-dark d-flex align-items-center justify-content-center px-3 h-100"><span class="text-white">{{ date|format_datetime(pattern="MMMM Y"|trans, locale=app.request.locale)|capitalize }}</span></span>
                 <div class="years-controls d-flex flex-column">
@@ -59,20 +59,20 @@
                        class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ "Année précedente"|trans|striptags }}">
-                        <i class="icon-chevron-up text-white"></i>
+                        <twig:ux:icon name="tabler:chevron-up" class="text-white" />
                     </a>
                     <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: nextYear + 1, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
                        class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ "Année suivante"|trans|striptags }}">
-                        <i class="icon-chevron-down text-white"></i>
+                        <twig:ux:icon name="tabler:chevron-down" class="text-white" />
                     </a>
                 </div>
                 <a href="{{ path('back_operation_index', {wallet: wallet.id, month: nextMonth, year: nextYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
                    class="icon-wrap next bg-dark d-flex align-items-center justify-content-center h-100"
                    data-bs-toggle="tooltip"
                    data-bs-title="{{ "Mois suivant"|trans|striptags }}">
-                    <i class="icon-chevron-right text-white"></i>
+                    <twig:ux:icon name="tabler:chevron-right" class="text-white" />
                 </a>
                 {% set asCurrent = (app.request.get('year') == 'now'|date('Y') and app.request.get('month') == 'now'|date('m')) or (not app.request.get('month') and not app.request.get('year')) %}
                 {% if not asCurrent %}
@@ -80,7 +80,7 @@
                        class="icon-wrap now bg-primary d-flex align-items-center justify-content-center h-100 ms-2"
                        data-bs-toggle="tooltip"
                        data-bs-title="{{ "Mois en cours"|trans|striptags }}">
-                        <i class="icon-calendar-star text-white"></i>
+                        <twig:ux:icon name="tabler:calendar-star" class="text-white" />
                     </a>
                 {% endif %}
             </div>

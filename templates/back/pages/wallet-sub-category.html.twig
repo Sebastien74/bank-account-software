@@ -1,0 +1,236 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'back' %}
+
+{% block body %}
+    <div id="wallet-dashboard" class="container-fluid pt-4 pb-5">
+
+        <div class="dashboard-toolbar d-flex flex-wrap align-items-center gap-2 mb-4">
+            <div class="me-auto">
+                <p class="text-secondary small mb-1">
+                    {{ detail.category ? detail.category.adminName : "Non classé"|trans }}
+                </p>
+                <h1 class="h4 mb-0 text-white">{{ detail.subCategory.adminName }}</h1>
+            </div>
+            <form method="get" class="d-flex align-items-center gap-2">
+                <select name="scope" class="form-select form-select-sm bg-dark border-secondary text-white initial">
+                    <option value="month" {{ detail.scope == 'month' ? 'selected' : '' }}>{{ "Le mois"|trans }}</option>
+                    <option value="year" {{ detail.scope == 'year' ? 'selected' : '' }}>{{ "L'année"|trans }}</option>
+                </select>
+                <select name="month" class="form-select form-select-sm bg-dark border-secondary text-white initial">
+                    {% for value, label in detail.months %}
+                        <option value="{{ value }}" {{ value == detail.selectedMonth ? 'selected' : '' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="year" class="form-select form-select-sm bg-dark border-secondary text-white initial">
+                    {% for value in detail.years %}
+                        <option value="{{ value }}" {{ value == detail.selectedYear ? 'selected' : '' }}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+                    <twig:ux:icon name="tabler:search" width="16" height="16" />
+                </button>
+                <a href="{{ path('back_operation_statistics', {wallet: detail.wallet.id, year: detail.selectedYear, month: detail.selectedMonth}) }}"
+                   class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                    <twig:ux:icon name="tabler:arrow-left" width="16" height="16" />
+                    <span>{{ "Statistiques"|trans }}</span>
+                </a>
+            </form>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card stat-card--accent h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:receipt" class="stat-card__icon" />
+                            <span>{{ detail.periodLabel }}</span>
+                        </div>
+                        <p class="stat-card__value text-white">{{ detail.total|number_format(2, ',', ' ') }} €</p>
+                        {% include 'back/pages/includes/stat-trend.html.twig' with {trend: detail.trend, inverted: true} only %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:list-details" class="stat-card__icon" />
+                            <span>{{ "Opérations"|trans }}</span>
+                        </div>
+                        <p class="stat-card__value text-white">{{ detail.count }}</p>
+                        <p class="stat-card__meta">{{ "Panier moyen"|trans }} : {{ detail.average|number_format(2, ',', ' ') }} €</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:users" class="stat-card__icon" />
+                            <span>{{ "Bénéficiaires"|trans }}</span>
+                        </div>
+                        <p class="stat-card__value text-white">{{ detail.beneficiaries|length }}</p>
+                        <p class="stat-card__meta">{{ "distincts sur la période"|trans }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:target-arrow" class="stat-card__icon" />
+                            <span>{{ detail.comparisonLabel }}</span>
+                        </div>
+                        <p class="stat-card__value text-secondary">{{ detail.previousTotal|number_format(2, ',', ' ') }} €</p>
+                        <p class="stat-card__meta">{{ "même période l'an dernier"|trans }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <twig:ux:icon name="tabler:chart-bar" width="18" height="18" />
+                <span>{{ "Évolution sur 12 mois"|trans }}</span>
+                <span class="ms-auto d-inline-flex align-items-center gap-1">
+                    {% if detail.navigation.previous %}
+                        <a class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                           href="{{ path('back_wallet_sub_category_detail', {
+                               wallet: detail.wallet.id, subCategory: detail.subCategory.id,
+                               year: detail.navigation.previous.year, month: detail.navigation.previous.month, scope: 'month'
+                           }) }}">
+                            <twig:ux:icon name="tabler:chevron-left" width="15" height="15" />
+                            <span>{{ "Mois précédent"|trans }}</span>
+                        </a>
+                    {% else %}
+                        <span class="btn btn-outline-secondary btn-sm disabled d-inline-flex align-items-center gap-1">
+                            <twig:ux:icon name="tabler:chevron-left" width="15" height="15" />
+                            <span>{{ "Mois précédent"|trans }}</span>
+                        </span>
+                    {% endif %}
+                    {% if detail.navigation.next %}
+                        <a class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                           href="{{ path('back_wallet_sub_category_detail', {
+                               wallet: detail.wallet.id, subCategory: detail.subCategory.id,
+                               year: detail.navigation.next.year, month: detail.navigation.next.month, scope: 'month'
+                           }) }}">
+                            <span>{{ "Mois suivant"|trans }}</span>
+                            <twig:ux:icon name="tabler:chevron-right" width="15" height="15" />
+                        </a>
+                    {% else %}
+                        <span class="btn btn-outline-secondary btn-sm disabled d-inline-flex align-items-center gap-1">
+                            <span>{{ "Mois suivant"|trans }}</span>
+                            <twig:ux:icon name="tabler:chevron-right" width="15" height="15" />
+                        </span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary small mb-3">
+                    {{ "Cliquez sur un mois pour afficher le détail de ses opérations."|trans }}
+                </p>
+                <ul class="month-bars">
+                    {% for point in detail.series %}
+                        <li class="month-bars__item {{ point.current ? 'month-bars__item--current' : '' }} {{ not point.available ? 'month-bars__item--out' : '' }}">
+                            {% if point.available %}
+                                <a class="month-bars__link"
+                                   href="{{ path('back_wallet_sub_category_detail', {
+                                       wallet: detail.wallet.id, subCategory: detail.subCategory.id,
+                                       year: point.year, month: point.month, scope: 'month'
+                                   }) }}"
+                                   title="{{ "%month% : %count% opérations, %total% €"|trans({
+                                       '%month%': point.label,
+                                       '%count%': point.count,
+                                       '%total%': point.total|number_format(2, ',', ' ')
+                                   })|striptags }}">
+                            {% else %}
+                                <span class="month-bars__link month-bars__link--disabled"
+                                      title="{{ "Hors historique du compte"|trans|striptags }}">
+                            {% endif %}
+                                <span class="month-bars__value">{{ point.total > 0 ? point.total|number_format(0, ',', ' ') : '' }}</span>
+                                <span class="month-bars__track">
+                                    <span class="month-bars__fill" style="height: {{ point.ratio }}%"></span>
+                                </span>
+                                <span class="month-bars__label">{{ point.label }}</span>
+                                <span class="month-bars__count">{{ point.count > 0 ? point.count ~ ' op.' : '' }}</span>
+                            {{ point.available ? '</a>'|raw : '</span>'|raw }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-xl-5">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:users" width="18" height="18" />
+                        <span>{{ "Bénéficiaires du poste"|trans }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if detail.beneficiaries is empty %}
+                            <p class="text-secondary small p-3 mb-0">{{ "Aucune dépense sur la période."|trans }}</p>
+                        {% else %}
+                            <ul class="beneficiary-list">
+                                {% for item in detail.beneficiaries %}
+                                    <li class="beneficiary-row">
+                                        <span class="beneficiary-row__name">{{ item.name }}</span>
+                                        <span class="beneficiary-row__meta">{{ item.count }} × {{ item.average|number_format(2, ',', ' ') }} €</span>
+                                        <span class="beneficiary-row__track">
+                                            <span class="beneficiary-row__fill" style="width: {{ item.ratio }}%"></span>
+                                        </span>
+                                        <span class="beneficiary-row__total">{{ item.total|number_format(2, ',', ' ') }} €</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-7">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:list-details" width="18" height="18" />
+                        <span>{{ "Toutes les dépenses du poste"|trans }}</span>
+                        <span class="ms-auto badge text-bg-dark">{{ detail.count }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive detail-operations">
+                            <table class="table table-sm table-dark table-borderless mb-0">
+                                <thead>
+                                <tr>
+                                    <th>{{ "Date"|trans }}</th>
+                                    <th>{{ "Bénéficiaire"|trans }}</th>
+                                    <th class="text-end">{{ "Montant"|trans }}</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for operation in detail.operations %}
+                                    <tr>
+                                        <td class="text-secondary text-nowrap">{{ operation.date|date('d/m/Y') }}</td>
+                                        <td>
+                                            {{ operation.beneficiary ?? operation.label }}
+                                            <span class="d-block text-secondary detail-operations__label">{{ operation.label }}</span>
+                                        </td>
+                                        <td class="text-end fw-semibold text-nowrap">{{ operation.amount|number_format(2, ',', ' ') }} €</td>
+                                        <td class="text-end">
+                                            <a href="{{ path('back_operation_edit', {operation: operation.id}) }}"
+                                               class="text-secondary" data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
+                                                <twig:ux:icon name="tabler:pencil" width="15" height="15" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="4" class="text-secondary small">{{ "Aucune dépense sur la période."|trans }}</td></tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -22,8 +22,8 @@
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     {%- if type is defined and type == 'password' -%}
             <span class="input-group-text show-password">
-                <span class="show-icon dash-btn-icon cursor"><i class="icon-eye"></i></span>
-                <span class="hide-icon dash-btn-icon cursor d-none"><i class="icon-eye-slash"></i></span>
+                <span class="show-icon dash-btn-icon cursor"><twig:ux:icon name="tabler:eye" /></span>
+                <span class="hide-icon dash-btn-icon cursor d-none"><twig:ux:icon name="tabler:eye-off" /></span>
             </span>
         </div>
     {%- endif -%}
@@ -251,7 +251,7 @@
     <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
         {%- set icon = attr.icon is defined ? attr.icon : 'save' -%}
         {%- if icon -%}
-            <span class="dash-btn-icon" aria-hidden="true"><i class="icon-{{ icon }}"></i></span>
+            <span class="dash-btn-icon" aria-hidden="true"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
         {%- endif -%}
         <span class="text-white">
             {%- if translation_domain is same as(false) -%}

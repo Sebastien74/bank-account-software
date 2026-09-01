@@ -23,6 +23,63 @@ readonly class IconRuntime implements RuntimeExtensionInterface
     }
 
     /**
+     * Correspondance des anciens noms icomoon vers le jeu Tabler.
+     *
+     * Les noms d'icônes circulent en variable dans les gabarits et les
+     * contrôleurs (pageIcon, alertes) : la traduction se fait ici plutôt que
+     * d'imposer une réécriture de tous les appelants.
+     */
+    private const array UX_ICONS = [
+        'wallet' => 'tabler:wallet',
+        'chart-line' => 'tabler:chart-line',
+        'chart-bar' => 'tabler:chart-bar',
+        'tachometer-alt' => 'tabler:gauge',
+        'list-alt' => 'tabler:list-details',
+        'bullseye-arrow' => 'tabler:target-arrow',
+        'envelope-open-dollar' => 'tabler:mail-dollar',
+        'btc' => 'tabler:currency-bitcoin',
+        'piggy-bank' => 'tabler:pig-money',
+        'cog' => 'tabler:settings',
+        'users' => 'tabler:users',
+        'user' => 'tabler:user',
+        'trash' => 'tabler:trash',
+        'pencil' => 'tabler:pencil',
+        'eye' => 'tabler:eye',
+        'eye-slash' => 'tabler:eye-off',
+        'check' => 'tabler:check',
+        'check-circle' => 'tabler:circle-check',
+        'ban' => 'tabler:ban',
+        'plus-circle' => 'tabler:circle-plus',
+        'minus-circle' => 'tabler:circle-minus',
+        'exclamation' => 'tabler:alert-circle',
+        'exclamation-triangle' => 'tabler:alert-triangle',
+        'info' => 'tabler:info-circle',
+        'power-off' => 'tabler:power',
+        'code' => 'tabler:code',
+        'php' => 'tabler:brand-php',
+        'desktop' => 'tabler:device-desktop',
+        'bug' => 'tabler:bug',
+        'fire-alt' => 'tabler:flame',
+        'calendar-star' => 'tabler:calendar-star',
+        'chevron-up' => 'tabler:chevron-up',
+        'chevron-down' => 'tabler:chevron-down',
+        'chevron-left' => 'tabler:chevron-left',
+        'chevron-right' => 'tabler:chevron-right',
+    ];
+
+    /**
+     * Traduit un nom d'icône historique en identifiant Symfony UX Icons.
+     */
+    public function uxIconName(?string $icon = null, string $fallback = 'tabler:info-circle'): string
+    {
+        if (!$icon) {
+            return $fallback;
+        }
+
+        return self::UX_ICONS[$icon] ?? (str_contains($icon, ':') ? $icon : $fallback);
+    }
+
+    /**
      * Get icon.
      */
     public function icon(

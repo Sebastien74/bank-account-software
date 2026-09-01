@@ -12,6 +12,11 @@
     {{ parent() }}
 {% endblock %}
 
+{% block security_intro %}
+    <p class="security-title">{{ "Connexion"|trans|striptags }}</p>
+    <p class="security-subtitle">{{ "Accédez à la gestion de vos comptes"|trans|striptags }}</p>
+{% endblock %}
+
 {% block body %}
     {{ form_start(form, {attr: {
         novalidate: "novalidate",

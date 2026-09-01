@@ -2,7 +2,7 @@
 
 {% if form %}
     <button type="button" class="btn btn-dark p-0 d-flex align-items-center text-white add-btn btn-icon{% if formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
-        <i class="icon-plus-circle btn-square bg-primary"></i><span class="btn text-white py-0 px-3">{{ addBtnLabel|striptags }}</span>
+        <twig:ux:icon name="tabler:circle-plus" class="btn-square bg-primary" /><span class="btn text-white py-0 px-3">{{ addBtnLabel|striptags }}</span>
     </button>
     <div class="modal fade" id="add-entity-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -11,7 +11,7 @@
                     novalidate: "novalidate",
                 }}) }}
                     <div class="modal-header">
-                        <strong class="text-white fs-5 d-flex align-items-center"><i class="icon-plus-circle text-primary me-2"></i>{{ "Ajouter"|trans|raw }}</strong>
+                        <strong class="text-white fs-5 d-flex align-items-center"><twig:ux:icon name="tabler:circle-plus" class="text-primary me-2" />{{ "Ajouter"|trans|raw }}</strong>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
                     </div>
                     <div class="modal-body pt-4 pb-0">

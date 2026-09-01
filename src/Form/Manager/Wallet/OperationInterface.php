@@ -18,7 +18,13 @@ interface OperationInterface
     /**
      * Importe un relevé de compte XLSX et retourne un rapport d'exécution.
      */
-    public function import(?string $filename = null, ?Wallet $wallet = null, bool $dryRun = false): array;
+    public function import(
+        ?string $filename = null,
+        ?Wallet $wallet = null,
+        bool $dryRun = false,
+        ?\DateTimeInterface $from = null,
+        ?\DateTimeInterface $until = null,
+    ): array;
 
     /**
      * Décompose un libellé bancaire en nature d'opération et bénéficiaire.

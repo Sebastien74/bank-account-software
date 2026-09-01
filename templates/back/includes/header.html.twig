@@ -28,13 +28,13 @@
         <div class="title-wrap d-none d-lg-inline-flex align-items-center pe-4">
             {% if pageIcon %}
                 <span class="icon-wrap d-flex align-items-center justify-content-center me-2">
-                    <i class="icon-{{ pageIcon }}"></i>
+                    <twig:ux:icon name="{{ ux_icon_name(pageIcon) }}" />
                 </span>
             {% endif %}
             <h2 class="title fw-400 text-white mb-0">{{ pageTitle|raw }}</h2>
         </div>
         {% if granted('ROLE_DEV') %}
-            <span id="open-btn-opposite" class="icon-wrap cursor d-flex align-items-center justify-content-center ms-auto"><i class="icon-cog text-white"></i></span>
+            <span id="open-btn-opposite" class="icon-wrap cursor d-flex align-items-center justify-content-center ms-auto"><twig:ux:icon name="tabler:settings" class="text-white" /></span>
         {% endif %}
     </div>
 </header>

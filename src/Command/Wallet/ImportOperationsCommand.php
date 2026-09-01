@@ -45,7 +45,9 @@ class ImportOperationsCommand extends Command
             ->addOption('file', 'f', InputOption::VALUE_REQUIRED, 'Chemin du fichier XLSX à importer')
             ->addOption('wallet', 'w', InputOption::VALUE_REQUIRED, 'Slug du compte cible', 'main-wallet')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Analyse le fichier sans rien écrire')
-            ->addOption('purge', null, InputOption::VALUE_NONE, 'Supprime les opérations du compte avant import');
+            ->addOption('purge', null, InputOption::VALUE_NONE, 'Supprime les opérations du compte avant import')
+            ->addOption('from', null, InputOption::VALUE_REQUIRED, 'N\'importer que les opérations à partir de cette date (AAAA-MM-JJ)')
+            ->addOption('until', null, InputOption::VALUE_REQUIRED, 'N\'importer que les opérations jusqu\'à cette date incluse (AAAA-MM-JJ)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -75,10 +77,28 @@ class ImportOperationsCommand extends Command
             $io->warning(sprintf('%d opérations supprimées avant import.', (int) $deleted));
         }
 
+        $bounds = [];
+        foreach (['from', 'until'] as $bound) {
+            $value = $input->getOption($bound);
+            if (!$value) {
+                $bounds[$bound] = null;
+                continue;
+            }
+            $date = \DateTime::createFromFormat('!Y-m-d', (string) $value);
+            if (!$date instanceof \DateTime) {
+                $io->error(sprintf('Option --%s : date attendue au format AAAA-MM-JJ, reçu "%s".', $bound, (string) $value));
+
+                return Command::FAILURE;
+            }
+            $bounds[$bound] = $date;
+        }
+
         $report = $this->operationManager->import(
             $input->getOption('file') ? (string) $input->getOption('file') : null,
             $wallet,
-            $dryRun
+            $dryRun,
+            $bounds['from'],
+            $bounds['until']
         );
 
         if (!empty($report['errors'])) {
@@ -100,6 +120,7 @@ class ImportOperationsCommand extends Command
             ['Importées' => (string) $report['imported']],
             ['Déjà présentes' => (string) $report['skipped']],
             ['Ignorées' => (string) $report['ignored']],
+            ['Hors période demandée' => (string) $report['outOfRange']],
             ['Bénéficiaires créés' => (string) $report['outsiders']],
             ['Catégorisées' => sprintf('%d / %d', $report['categorized'], $report['imported'])],
         );
@@ -117,7 +138,7 @@ class ImportOperationsCommand extends Command
             );
         }
 
-        if (!$dryRun) {
+        if (!$dryRun && !$report['bounded']) {
             $io->section('Solde');
             $io->definitionList(
                 ['Solde cible du relevé' => null !== $report['targetBalance'] ? number_format($report['targetBalance'], 2, ',', ' ').' €' : 'non trouvé'],

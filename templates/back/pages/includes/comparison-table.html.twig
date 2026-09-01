@@ -1,0 +1,71 @@
+{#
+    Tableau de comparaison d'une période à la même période de l'exercice précédent.
+
+    La fenêtre comparée est rappelée en toutes lettres : un écart n'a de sens
+    que si l'on sait sur quoi il porte.
+#}
+<div class="comparison-block">
+    <p class="comparison-block__title">
+        <twig:ux:icon name="tabler:calendar" width="15" height="15" />
+        <span>{{ title }}</span>
+    </p>
+    <p class="comparison-block__window">{{ scope.windowLabel }}, {{ scope.shortLabel }} {{ "contre"|trans }} {{ scope.shortComparisonLabel }}</p>
+
+    {% if scope.truncated is defined and scope.truncated %}
+        <p class="comparison-block__warning">
+            <twig:ux:icon name="tabler:alert-triangle" width="14" height="14" />
+            <span>{{ "%months% exclu : l'historique ne remonte pas assez loin pour comparer ce mois."|trans({
+                '%months%': scope.excludedMonths|join(', ')
+            }) }}</span>
+        </p>
+    {% endif %}
+
+    {% if not scope.comparable %}
+        <p class="text-secondary small mb-0">
+            {{ "Aucune donnée sur la période de référence : la comparaison n'est pas possible."|trans }}
+        </p>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless comparison-table mb-0">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-end">{{ scope.shortLabel }}</th>
+                    <th class="text-end">{{ scope.shortComparisonLabel }}</th>
+                    <th class="text-end">{{ "Écart"|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set rows = [
+                    {label: "Revenus"|trans, current: scope.incomes, previous: scope.previous.incomes, trend: scope.trends.incomes, inverted: false, unit: '€'},
+                    {label: "Dépenses"|trans, current: scope.expenses, previous: scope.previous.expenses, trend: scope.trends.expenses, inverted: true, unit: '€'},
+                    {label: "Épargne"|trans, current: scope.net, previous: scope.previous.net, trend: scope.trends.net, inverted: false, unit: '€'},
+                    {label: "Taux d'épargne"|trans, current: scope.savingsRate, previous: scope.previous.savingsRate, trend: scope.trends.savingsRate, inverted: false, unit: 'pts'}
+                ] %}
+                {% for row in rows %}
+                    <tr>
+                        <td class="comparison-table__label">{{ row.label }}</td>
+                        <td class="text-end text-nowrap comparison-table__current">
+                            {% if row.unit == 'pts' %}
+                                {{ row.current is null ? '-' : row.current|number_format(1, ',', ' ') ~ ' %' }}
+                            {% else %}
+                                {{ row.current|number_format(2, ',', ' ') }} €
+                            {% endif %}
+                        </td>
+                        <td class="text-end text-nowrap text-secondary">
+                            {% if row.unit == 'pts' %}
+                                {{ row.previous is null ? '-' : row.previous|number_format(1, ',', ' ') ~ ' %' }}
+                            {% else %}
+                                {{ row.previous|number_format(2, ',', ' ') }} €
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% include 'back/pages/includes/stat-trend.html.twig' with {trend: row.trend, inverted: row.inverted, unit: row.unit} only %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>

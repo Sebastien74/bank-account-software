@@ -1,0 +1,137 @@
+@charset "UTF-8";
+
+/* --------------------------------------------------------------------------------------
+
+    Module : Security theme
+    Copyright : 2026
+    Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
+    Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+    Reprise de la palette sombre du back (voir .claude/charte-back) : passer d'un
+    écran de connexion à un back qui ne partage ni le fond, ni le rayon, ni la
+    police donnerait deux produits différents.
+
+----------------------------------------------------------------------------------------- */
+
+:root {
+    --bas-paper: #25293c;
+    --bas-surface: #2f3349;
+    --bas-body: #acabc1;
+    --bas-heading: #cfcde4;
+    --bas-muted: #76778e;
+    --bas-line: #44485e;
+    --bas-primary: #7367f0;
+    --bas-radius: 0.375rem;
+}
+
+body {
+    align-items: center;
+    background: var(--bas-paper) !important;
+    color: var(--bas-body);
+    display: flex;
+    font-size: 0.9375rem;
+    justify-content: center;
+    line-height: 1.375;
+    min-height: 100dvh;
+}
+
+#content {
+    background-color: var(--bas-surface) !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 1.125rem 0 rgba(47, 43, 61, 0.24);
+    padding: 2rem;
+
+    @include mediaQuery(min-sm) {
+        width: 400px;
+    }
+}
+
+.security-brand {
+    align-items: center;
+    display: flex;
+    gap: 0.625rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    svg {
+        color: var(--bas-primary);
+        height: 2rem;
+        width: 2rem;
+    }
+
+    span {
+        color: var(--bas-heading);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+}
+
+.security-title {
+    color: var(--bas-heading);
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.security-subtitle {
+    color: var(--bas-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1.75rem;
+    text-align: center;
+}
+
+/* Champ transparent dessiné par son filet, comme sur le back. */
+.form-control,
+.form-select {
+    background-color: transparent;
+    border-color: var(--bas-line);
+    border-radius: var(--bas-radius);
+    color: var(--bas-body);
+
+    &:focus {
+        background-color: transparent;
+        border-color: var(--bas-primary);
+        box-shadow: none;
+        color: var(--bas-heading);
+    }
+
+    &::placeholder {
+        color: var(--bas-muted);
+    }
+}
+
+label,
+.form-label {
+    color: var(--bas-muted);
+    font-size: 0.8125rem;
+}
+
+.btn {
+    border-radius: var(--bas-radius);
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--bas-primary);
+    border-color: var(--bas-primary);
+
+    &:hover,
+    &:focus {
+        background-color: #6355ee;
+        border-color: #6355ee;
+    }
+}
+
+a {
+    color: #aba4f6;
+
+    &:hover {
+        color: #c5c0f9;
+    }
+}
+
+.form-check-input:checked {
+    background-color: var(--bas-primary);
+    border-color: var(--bas-primary);
+}

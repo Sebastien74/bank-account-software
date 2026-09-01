@@ -5,7 +5,7 @@
 <span data-bs-toggle="tooltip" data-bs-title="{{ "Supprimer"|trans|striptags }}">
     <span class="{% if asBtn %}btn btn-transparent {% endif %}delete-btn p-0 d-inline-flex justify-content-center align-items-center me-1 cursor"
             data-bs-toggle="modal" data-bs-target="#delete-modal-{{ entity.id }}">
-        <i class="icon-trash text-danger"></i>
+        <twig:ux:icon name="tabler:trash" class="text-danger" />
     </span>
 </span>
 
@@ -13,11 +13,11 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark">
             <div class="modal-header">
-                <strong class="text-white fs-5 d-flex align-items-center"><i class="icon-minus-circle text-primary me-2"></i>{{ "Supprimer"|trans|raw }}</strong>
+                <strong class="text-white fs-5 d-flex align-items-center"><twig:ux:icon name="tabler:circle-minus" class="text-primary me-2" />{{ "Supprimer"|trans|raw }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
             </div>
             <div class="modal-body text-center py-4">
-                <i class="icon-exclamation-triangle text-warning large"></i>
+                <twig:ux:icon name="tabler:alert-triangle" class="text-warning large" />
                 <p class="mb-0 delete-alert text-white fw-600 mt-4">{{ "Êtes-vous sûr ?"|trans|raw }}</p>
             </div>
             <div class="modal-footer pt-0 pb-4">

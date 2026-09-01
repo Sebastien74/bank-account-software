@@ -34,15 +34,15 @@
                         <div class="card-footer d-flex align-items-center py-3">
                             <a href="{{ path('back_wallet_edit', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-2"
                                data-bs-toggle="tooltip" data-bs-title="{{ "Configuration"|trans|striptags }}">
-                                <i class="icon-cog"></i>
+                                <twig:ux:icon name="tabler:settings" />
                             </a>
                             <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-3"
                                data-bs-toggle="tooltip" data-bs-title="{{ "Mes opérations"|trans|striptags }}">
-                                <i class="icon-list-alt"></i>
+                                <twig:ux:icon name="tabler:list-details" />
                             </a>
                             <a href="{{ path('back_operation_statistics', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-3"
                                data-bs-toggle="tooltip" data-bs-title="{{ "Statistiques"|trans|striptags }}">Stats
-                                <i class="icon-bar-chart"></i>
+                                <twig:ux:icon name="tabler:chart-bar" />
                             </a>
                             <span class="ms-auto">{% include 'back/core/delete-modal.html.twig' with {entity: wallet} %}</span>
                         </div>

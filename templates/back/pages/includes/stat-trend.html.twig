@@ -1,0 +1,34 @@
+{#
+    Affichage d'un écart par rapport à la période de référence.
+
+    Un pourcentage n'est publié que si la base de comparaison existe et n'est pas
+    dérisoire : sans cela, un poste passant de 4 € à 8 € afficherait « +100 % ».
+#}
+{% set unit = unit|default('€') %}
+{% set inverted = inverted|default(false) %}
+
+{% if trend.status == 'unavailable' %}
+    <span class="stat-trend stat-trend--muted" title="{{ "Pas de référence sur la période précédente"|trans }}">
+        <twig:ux:icon name="tabler:minus" class="stat-trend__icon" />
+        <span>{{ "n/a"|trans }}</span>
+    </span>
+{% elseif trend.status == 'new' %}
+    <span class="stat-trend stat-trend--new">
+        <twig:ux:icon name="tabler:circle-plus" class="stat-trend__icon" />
+        <span>{{ "Nouveau"|trans }}</span>
+    </span>
+{% else %}
+    {% set rising = trend.delta > 0 %}
+    {% set favourable = inverted ? not rising : rising %}
+    <span class="stat-trend {{ trend.delta == 0 ? 'stat-trend--stable' : (favourable ? 'stat-trend--up' : 'stat-trend--down') }}">
+        <twig:ux:icon name="{{ trend.delta == 0 ? 'tabler:minus' : (rising ? 'tabler:arrow-narrow-up' : 'tabler:arrow-narrow-down') }}" class="stat-trend__icon" />
+        <span>
+            {{ trend.delta > 0 ? '+' : '' }}{{ trend.delta|number_format(unit == 'pts' ? 1 : 2, ',', ' ') }} {{ unit }}
+            {%- if trend.percent is not null %}
+                <span class="stat-trend__percent">({{ trend.percent > 0 ? '+' : '' }}{{ trend.percent|number_format(1, ',', ' ') }} %)</span>
+            {%- elseif trend.status == 'insignificant' %}
+                <span class="stat-trend__percent">({{ "base faible"|trans }})</span>
+            {%- endif %}
+        </span>
+    </span>
+{% endif %}

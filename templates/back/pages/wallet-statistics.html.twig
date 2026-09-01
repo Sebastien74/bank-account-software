@@ -2,108 +2,455 @@
 
 {% trans_default_domain 'back' %}
 
-{% block body %}
-    <div id="wallet-statistics" class="container-fluid pt-4 pb-5">
+{% set month = stats.month %}
+{% set year = stats.year %}
 
-        <div class="mb-4">
-            <form method="get" class="d-flex align-items-center mt-3 mt-md-0">
-                <select name="month" class="form-select initial form-select-sm bg-dark border-secondary me-2">
-                    {% for value, label in months %}
-                        <option value="{{ value }}" {{ value == selectedMonth ? 'selected' : '' }}>{{ label|trans }}</option>
+{% block body %}
+    <div id="wallet-dashboard" class="container-fluid pt-4 pb-5">
+
+        {# ---------------------------------------------------------------- Filtres #}
+        <div class="dashboard-toolbar d-flex flex-wrap align-items-center gap-2 mb-4">
+            <div class="me-auto">
+                <h1 class="h4 mb-1 text-white">{{ stats.wallet.adminName }}</h1>
+                <p class="text-secondary small mb-0">
+                    {% if stats.coverage.first %}
+                        {{ "Historique du %from% au %to%"|trans({
+                            '%from%': stats.coverage.first|date('d/m/Y'),
+                            '%to%': stats.coverage.last|date('d/m/Y')
+                        }) }}
+                    {% endif %}
+                </p>
+            </div>
+            <form method="get" class="d-flex align-items-center gap-2">
+                <select name="month" class="form-select form-select-sm bg-dark border-secondary text-white initial">
+                    {% for value, label in stats.months %}
+                        <option value="{{ value }}" {{ value == stats.selectedMonth ? 'selected' : '' }}>{{ label }}</option>
                     {% endfor %}
                 </select>
-                <select name="year" class="form-select initial form-select-sm bg-dark border-secondary me-2">
-                    {% for year in years %}
-                        <option value="{{ year }}" {{ year == selectedYear ? 'selected' : '' }}>{{ year }}</option>
+                <select name="year" class="form-select form-select-sm bg-dark border-secondary text-white initial">
+                    {% for value in stats.years %}
+                        <option value="{{ value }}" {{ value == stats.selectedYear ? 'selected' : '' }}>{{ value }}</option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary btn-sm me-3">
-                    <i class="icon-search"></i>
+                <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+                    <twig:ux:icon name="tabler:search" width="16" height="16" />
+                    <span>{{ "Afficher"|trans }}</span>
                 </button>
-                <a href="{{ path('back_wallet_index') }}" class="btn btn-primary btn-sm">
-                    <i class="icon-arrow-left me-1"></i> {{ "Retour"|trans }}
+                <a href="{{ path('back_wallet_index') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                    <twig:ux:icon name="tabler:arrow-left" width="16" height="16" />
+                    <span>{{ "Comptes"|trans }}</span>
                 </a>
             </form>
         </div>
 
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card mb-4">
+        {# ------------------------------------------------------- Bandeau qualité #}
+        {% if stats.quality.withoutSubCategory > 0 or stats.quality.withoutType > 0 %}
+            <div class="alert alert-warning d-flex align-items-center gap-2 py-2">
+                <twig:ux:icon name="tabler:alert-triangle" width="20" height="20" />
+                <span class="small">
+                    {{ "%count% opérations sans catégorie faussent les ventilations."|trans({'%count%': stats.quality.withoutSubCategory}) }}
+                </span>
+            </div>
+        {% endif %}
+
+        {# ------------------------------------------------------------ Indicateurs #}
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card stat-card--accent h-100">
                     <div class="card-body">
-                        <h4 class="main-subtitle"><i class="icon-calendar-alt"></i>{{ months[selectedMonth]|trans }} {{ selectedYear }}</h4>
-                        {% if monthStats is empty %}
-                            {% include 'core/alert.html.twig' with {
-                                display: 'alert',
-                                alert: 'info',
-                                message: "Aucune donnée disponible pour ce mois."|trans
-                            } only %}
-                        {% else %}
-                            {% set message = "Les tendances sont calculées du 1er au %day% %month% par rapport à la même période l'année précédente."|trans({'%day%': comparisonDay == 1 ? '1er' : comparisonDay, '%month%': months[selectedMonth]|trans}) %}
-                            {% if comparisonDay < (endMonth|date('d')) %}
-                                {% set message = message~"<br>" %}
-                                {% set message = message~'<strong class="text-warning d-inline-block mt-2">' %}
-                                {% set message = message~"Les jours du %start% au %end% sont exclus car sans données l'année précédente."|trans({
-                                    '%start%': (comparisonDay + 1),
-                                    '%end%': endMonth|date('d')
-                                }) %}
-                                {% set message = message~'</strong>' %}
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:building-bank" class="stat-card__icon" />
+                            <span>{{ "Solde du compte"|trans }}</span>
+                        </div>
+                        <p class="stat-card__value {{ stats.balance.current < 0 ? 'text-danger' : 'text-white' }}">
+                            {{ stats.balance.current|number_format(2, ',', ' ') }} €
+                        </p>
+                        <p class="stat-card__meta">
+                            {{ "Pointé"|trans }} : {{ stats.balance.pointed|number_format(2, ',', ' ') }} €
+                            {% if stats.balance.pending != 0 %}
+                                · {{ "en-cours"|trans }} {{ stats.balance.pending|number_format(2, ',', ' ') }} €
                             {% endif %}
-                            {% include 'core/alert.html.twig' with {
-                                display: 'alert',
-                                alert: 'info',
-                                message: message
-                            } only %}
-                            {% include 'back/pages/includes/stats-accordion.html.twig' with {
-                                stats: monthStats,
-                                idPrefix: 'month',
-                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonDay, '%month%': months[selectedMonth]|trans})
-                            } %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:cash-banknote" class="stat-card__icon text-success" />
+                            <span>{{ "Revenus"|trans }} - {{ month.label }}</span>
+                        </div>
+                        <p class="stat-card__value text-success">{{ month.incomes|number_format(2, ',', ' ') }} €</p>
+                        {% include 'back/pages/includes/stat-trend.html.twig' with {trend: month.trends.incomes} only %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:receipt" class="stat-card__icon text-danger" />
+                            <span>{{ "Dépenses"|trans }} - {{ month.label }}</span>
+                        </div>
+                        <p class="stat-card__value text-danger">{{ month.expenses|number_format(2, ',', ' ') }} €</p>
+                        {% include 'back/pages/includes/stat-trend.html.twig' with {trend: month.trends.expenses, inverted: true} only %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="stat-card__head">
+                            <twig:ux:icon name="tabler:pig-money" class="stat-card__icon text-info" />
+                            <span>{{ "Épargne du mois"|trans }}</span>
+                        </div>
+                        <p class="stat-card__value {{ month.net < 0 ? 'text-danger' : 'text-info' }}">
+                            {{ month.net|number_format(2, ',', ' ') }} €
+                        </p>
+                        <p class="stat-card__meta">
+                            {% if month.savingsRate is not null %}
+                                {{ "Taux d'épargne"|trans }} : {{ month.savingsRate|number_format(1, ',', ' ') }} %
+                            {% else %}
+                                {{ "Aucun revenu sur la période"|trans }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# --------------------------------------------------- Répartitions #}
+        <div class="row g-3 mb-3">
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:chart-donut" width="18" height="18" />
+                        <span>{{ "Répartition - %month%"|trans({'%month%': month.label}) }}</span>
+                        <span class="ms-auto text-secondary small">{{ stats.breakdownTotals.month|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-holder chart-holder--tall">
+                            {{ render_chart(stats.charts.donutMonth) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:chart-donut" width="18" height="18" />
+                        <span>{{ "Répartition - %year%"|trans({'%year%': stats.selectedYear}) }}</span>
+                        <span class="ms-auto text-secondary small">{{ stats.breakdownTotals.year|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-holder chart-holder--tall">
+                            {{ render_chart(stats.charts.donut) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ------------------------------------------ Catégories et bénéficiaires #}
+        <div class="row g-3 mb-3">
+            <div class="col-xl-7">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:list-details" width="18" height="18" />
+                        <span>{{ "Postes de dépense - %month%"|trans({'%month%': month.label}) }}</span>
+                        <span class="ms-auto text-secondary small">{{ stats.categories.total|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if stats.categories.posts is empty %}
+                            <p class="text-secondary small p-3 mb-0">{{ "Aucune dépense sur ce mois."|trans }}</p>
+                        {% else %}
+                            <ul class="post-list">
+                                {% for post in stats.categories.posts %}
+                                    <li class="post-row">
+                                        {% if post.id %}
+                                            <a class="post-row__link" href="{{ path('back_wallet_sub_category_detail', {
+                                                wallet: stats.wallet.id, subCategory: post.id,
+                                                year: stats.selectedYear, month: stats.selectedMonth
+                                            }) }}" title="{{ "Voir toutes les dépenses et les bénéficiaires de ce poste"|trans|striptags }}">
+                                                <span class="post-row__name">{{ post.name }}</span>
+                                                <span class="post-row__category">{{ post.category }}</span>
+                                                <span class="post-row__bar"><span class="post-row__fill" style="width: {{ post.share }}%"></span></span>
+                                                <span class="post-row__count">{{ post.count }} {{ "op."|trans }}</span>
+                                                <span class="post-row__total">{{ post.total|number_format(2, ',', ' ') }} €</span>
+                                                <span class="post-row__trend">{% include 'back/pages/includes/stat-trend.html.twig' with {trend: post.trend, inverted: true} only %}</span>
+                                                <twig:ux:icon name="tabler:chevron-right" class="post-row__chevron" />
+                                            </a>
+                                        {% else %}
+                                            <span class="post-row__link">
+                                                <span class="post-row__name">{{ post.name }}</span>
+                                                <span class="post-row__category">{{ post.category }}</span>
+                                                <span class="post-row__bar"><span class="post-row__fill" style="width: {{ post.share }}%"></span></span>
+                                                <span class="post-row__count">{{ post.count }} {{ "op."|trans }}</span>
+                                                <span class="post-row__total">{{ post.total|number_format(2, ',', ' ') }} €</span>
+                                            </span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         {% endif %}
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-6">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h4 class="main-subtitle"><i class="icon-calendar-alt"></i>{{ "Année"|trans }} {{ selectedYear }}</h4>
-                        {% if yearStats is empty %}
-                            {% include 'core/alert.html.twig' with {
-                                display: 'alert',
-                                alert: 'info',
-                                message: "Aucune donnée disponible pour cette année."|trans
-                            } only %}
+            <div class="col-xl-5">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:users" width="18" height="18" />
+                        <span>{{ "Principaux bénéficiaires - %month%"|trans({'%month%': month.label}) }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if stats.beneficiaries.items is empty %}
+                            <p class="text-secondary small p-3 mb-0">{{ "Aucune dépense sur ce mois."|trans }}</p>
                         {% else %}
-                            {% set message = "Les tendances sont calculées du %startDay% %startMonth% au %day% %month% par rapport à la même période l'année précédente."|trans({
-                                '%startDay%': comparisonYearStartDay == 1 ? '1er' : comparisonYearStartDay,
-                                '%startMonth%': months[comparisonYearStartMonth|format('%02d')]|default('Janvier')|trans,
-                                '%day%': comparisonYearDay == 1 ? '1er' : comparisonYearDay,
-                                '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans
-                            }) %}
-                        {% if excludedMonths is not empty %}
-                                {% set message = message~"<br>" %}
-                                {% set excludedNames = [] %}
-                                {% for m in excludedMonths %}
-                                    {% set excludedNames = excludedNames|merge([months[m]|trans]) %}
+                            <ul class="beneficiary-list">
+                                {% for item in stats.beneficiaries.items %}
+                                    <li class="beneficiary-row">
+                                        <span class="beneficiary-row__name">{{ item.name }}</span>
+                                        <span class="beneficiary-row__meta">{{ item.count }} × {{ item.average|number_format(2, ',', ' ') }} €</span>
+                                        <span class="beneficiary-row__track">
+                                            <span class="beneficiary-row__fill" style="width: {{ item.ratio }}%"></span>
+                                        </span>
+                                        <span class="beneficiary-row__total">{{ item.total|number_format(2, ',', ' ') }} €</span>
+                                    </li>
                                 {% endfor %}
-                                {% set message = message~'<strong class="text-warning d-inline-block mt-2">' %}
-                                {% set message = message~"Mois exclus des calculs car sans données l'année précédente :"|trans~' '~excludedNames|join(', ') %}
-                                {% set message = message~'</strong>' %}
-                            {% endif %}
-                            {% include 'core/alert.html.twig' with {
-                                display: 'alert',
-                                alert: 'info',
-                                message: message
-                            } only %}
-                            {% include 'back/pages/includes/stats-accordion.html.twig' with {
-                                stats: yearStats,
-                                idPrefix: 'year',
-                                tooltipTitle: "Tendance par rapport au %day% %month% de l'année précédente"|trans({'%day%': comparisonYearDay, '%month%': months[comparisonYearMonth|format('%02d')]|default('')|trans})
-                            } %}
+                            </ul>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+
+        {# ---------------------------------------------------------- Flux et donut #}
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:chart-line" width="18" height="18" />
+                        <span>{{ "Flux mensuels et trajectoire du solde"|trans }}</span>
+                        <span class="ms-auto badge text-bg-dark">{{ "12 derniers mois"|trans }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-holder chart-holder--tall">
+                            {{ render_chart(stats.charts.flow) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ------------------------------------------------------------ Comparatifs #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <twig:ux:icon name="tabler:target-arrow" width="18" height="18" />
+                <span>{{ "Comparatif avec l'année précédente"|trans }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        {% include 'back/pages/includes/comparison-table.html.twig' with {
+                            scope: year, title: "Sur l'année"|trans
+                        } only %}
+                    </div>
+                    <div class="col-lg-6">
+                        {% include 'back/pages/includes/comparison-table.html.twig' with {
+                            scope: month, title: "Sur le mois"|trans
+                        } only %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <twig:ux:icon name="tabler:chart-bar" width="18" height="18" />
+                <span>{{ "Dépenses mois par mois, contre l'année précédente"|trans }}</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-holder">
+                    {{ render_chart(stats.charts.comparison) }}
+                </div>
+            </div>
+        </div>
+
+        {# --------------------------------------------- Où est passée la différence #}
+        {% if stats.yearCategories.deltas is not empty and stats.yearCategories.comparable %}
+            {% set deltas = stats.yearCategories %}
+            <div class="card mb-3">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <twig:ux:icon name="tabler:target-arrow" width="18" height="18" />
+                    <span>{{ "Ce qui explique l'écart de dépenses entre %year% et %previous%"|trans({
+                        '%year%': stats.selectedYear, '%previous%': stats.selectedYear - 1
+                    }) }}</span>
+                    <span class="ms-auto text-secondary small">{{ year.windowLabel }}</span>
+                </div>
+                <div class="card-body">
+
+                    {# Trois chiffres pour poser la lecture avant de regarder le détail. #}
+                    <div class="delta-summary">
+                        <div class="delta-summary__item">
+                            <span class="delta-summary__label">{{ "Postes en baisse"|trans }}</span>
+                            <span class="delta-summary__value text-success">-{{ deltas.saved|number_format(2, ',', ' ') }} €</span>
+                            <span class="delta-summary__hint">{{ "dépensé en moins qu'en %previous%"|trans({'%previous%': stats.selectedYear - 1}) }}</span>
+                        </div>
+                        <div class="delta-summary__item">
+                            <span class="delta-summary__label">{{ "Postes en hausse"|trans }}</span>
+                            <span class="delta-summary__value text-danger">+{{ deltas.overspent|number_format(2, ',', ' ') }} €</span>
+                            <span class="delta-summary__hint">{{ "dépensé en plus qu'en %previous%"|trans({'%previous%': stats.selectedYear - 1}) }}</span>
+                        </div>
+                        <div class="delta-summary__item delta-summary__item--net">
+                            <span class="delta-summary__label">{{ "Solde de l'écart"|trans }}</span>
+                            <span class="delta-summary__value {{ deltas.net > 0 ? 'text-danger' : 'text-success' }}">
+                                {{ deltas.net > 0 ? '+' : '' }}{{ deltas.net|number_format(2, ',', ' ') }} €
+                            </span>
+                            <span class="delta-summary__hint">
+                                {{ deltas.net > 0
+                                    ? "au total, %year% coûte plus cher"|trans({'%year%': stats.selectedYear})
+                                    : "au total, %year% coûte moins cher"|trans({'%year%': stats.selectedYear}) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm table-dark table-borderless delta-table mb-0">
+                        <thead>
+                        <tr>
+                            <th>{{ "Poste"|trans }}</th>
+                            <th class="text-end">{{ stats.selectedYear }}</th>
+                            <th class="text-end">{{ stats.selectedYear - 1 }}</th>
+                            <th class="delta-table__chart">
+                                <span class="delta-axis">
+                                    <span class="delta-axis__left">{{ "moins cher"|trans }}</span>
+                                    <span class="delta-axis__right">{{ "plus cher"|trans }}</span>
+                                </span>
+                            </th>
+                            <th class="text-end">{{ "Écart"|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for delta in deltas.deltas %}
+                            <tr>
+                                <td class="delta-table__name">{{ delta.name }}</td>
+                                <td class="text-end text-nowrap">{{ delta.current|number_format(2, ',', ' ') }} €</td>
+                                <td class="text-end text-nowrap text-secondary">{{ delta.previous|number_format(2, ',', ' ') }} €</td>
+                                <td class="delta-table__chart">
+                                    <span class="delta-row__track">
+                                        <span class="delta-row__axis"></span>
+                                        <span class="delta-row__bar {{ delta.delta > 0 ? 'delta-row__bar--up' : 'delta-row__bar--down' }}"
+                                              style="width: {{ (delta.ratio / 2)|round(2) }}%; {{ delta.delta > 0 ? 'left: 50%;' : 'right: 50%;' }}"></span>
+                                    </span>
+                                </td>
+                                <td class="text-end text-nowrap fw-semibold {{ delta.delta > 0 ? 'text-danger' : 'text-success' }}">
+                                    {{ delta.delta > 0 ? '+' : '' }}{{ delta.delta|number_format(2, ',', ' ') }} €
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <p class="text-secondary small mb-0 mt-3">
+                        {{ "Les dix postes dont l'écart pèse le plus, du plus contributeur au moins contributeur. La longueur de la barre est proportionnelle à l'écart."|trans }}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        {# --------------------------------------- Grosses dépenses et récurrences #}
+        <div class="row g-3 mb-3">
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:flame" width="18" height="18" />
+                        <span>{{ "Plus grosses dépenses - %month%"|trans({'%month%': month.label}) }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-dark table-borderless mb-0">
+                                <tbody>
+                                {% for expense in stats.largestExpenses %}
+                                    <tr>
+                                        <td class="text-secondary text-nowrap">{{ expense.date|date('d/m') }}</td>
+                                        <td>{{ expense.beneficiary ?? expense.label }}</td>
+                                        <td class="text-secondary small">{{ expense.subCategory }}</td>
+                                        <td class="text-end fw-semibold">{{ expense.amount|number_format(2, ',', ' ') }} €</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td class="text-secondary small">{{ "Aucune dépense sur ce mois."|trans }}</td></tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <twig:ux:icon name="tabler:refresh" width="18" height="18" />
+                        <span>{{ "Charges récurrentes estimées"|trans }}</span>
+                        <span class="ms-auto badge text-bg-dark">
+                            {{ stats.recurring.monthlyTotal|number_format(2, ',', ' ') }} € / {{ "mois"|trans }}
+                        </span>
+                    </div>
+                    <div class="card-body p-0">
+                        <p class="text-secondary small px-3 pt-3 mb-2">
+                            {{ "Tiers présents sur au moins %ratio% des %months% derniers mois. Montant médian retenu."|trans({
+                                '%ratio%': '60 %', '%months%': stats.recurring.observedMonths
+                            }) }}
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-dark table-borderless mb-0">
+                                <tbody>
+                                {% for item in stats.recurring.items %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td class="text-secondary text-end small">{{ item.months }}/{{ stats.recurring.observedMonths }} {{ "mois"|trans }}</td>
+                                        <td class="text-end">{{ item.median|number_format(2, ',', ' ') }} €</td>
+                                        <td class="text-end text-secondary small">{{ item.yearly|number_format(0, ',', ' ') }} €/{{ "an"|trans }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td class="text-secondary small">{{ "Historique insuffisant pour détecter des récurrences."|trans }}</td></tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ------------------------------------------------------------ Cards liens #}
+        <div class="row g-3">
+            {% set links = [
+                {route: 'back_operation_index', params: {wallet: stats.wallet.id}, icon: 'tabler:list-details', title: "Mes opérations"|trans, text: "Consulter et pointer les écritures"|trans},
+                {route: 'back_wallet_edit', params: {wallet: stats.wallet.id}, icon: 'tabler:settings', title: "Configuration du compte"|trans, text: "Solde initial et libellé"|trans},
+                {route: 'back_operationtype_index', params: {}, icon: 'tabler:chart-pie', title: "Catégories"|trans, text: "Organiser les postes de dépense"|trans},
+                {route: 'back_outsider_index', params: {}, icon: 'tabler:users', title: "Bénéficiaires"|trans, text: "Tiers rattachés aux opérations"|trans}
+            ] %}
+            {% for link in links %}
+                <div class="col-6 col-xl-3">
+                    <a href="{{ path(link.route, link.params) }}" class="card link-card h-100 text-decoration-none">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <twig:ux:icon name="{{ link.icon }}" class="link-card__icon" />
+                            <span>
+                                <span class="link-card__title">{{ link.title }}</span>
+                                <span class="link-card__text">{{ link.text }}</span>
+                            </span>
+                            <twig:ux:icon name="tabler:chevron-right" class="link-card__chevron ms-auto" />
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <p class="text-secondary small mt-4 mb-0 d-flex align-items-center gap-2">
+            <twig:ux:icon name="tabler:info-circle" width="14" height="14" />
+            {{ "%operations% opérations sur la période affichée · %unpointed% non pointées"|trans({
+                '%operations%': month.operations,
+                '%unpointed%': stats.quality.unpointed
+            }) }}
+        </p>
     </div>
 {% endblock %}

@@ -7,5 +7,5 @@
 
 <a href="{{ path(route, routeArgs) }}" class="{% if asBtn %}btn btn-{{ btnColor }} btn-square small-btn me-3{% else %}me-2{% endif %} edit-btn p-0 d-inline-flex justify-content-center align-items-center"
    data-bs-toggle="tooltip" data-bs-title="{{ "Éditer"|trans|striptags }}">
-    <i class="icon-pencil text-white"></i>
+    <twig:ux:icon name="tabler:pencil" class="text-white" />
 </a>

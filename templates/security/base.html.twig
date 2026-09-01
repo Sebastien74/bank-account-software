@@ -44,9 +44,11 @@
                     {% include 'security/includes/preloader.html.twig' with {} only %}
                     <div class="row my-auto mx-auto m-0 px-2 px-sm-0">
                         <header id="content" class="col-12 col-md-8 col-lg-12">
-                            <a href="{{ path('front_index') }}" class="header w-100 d-inline-flex justify-content-center align-items-center text-center mb-5 mt-5 mt-md-0">
-                                <span class="badge-lp bg-primary d-inline-flex justify-content-center align-items-center text-white fw-800"><i class="icon-piggy-bank"></i></span>
+                            <a href="{{ path('front_index') }}" class="security-brand text-decoration-none">
+                                <twig:ux:icon name="tabler:pig-money" />
+                                <span>{{ companyName }}</span>
                             </a>
+                            {% block security_intro %}{% endblock %}
                             {% block body %}{% endblock %}
                         </header>
                     </div>

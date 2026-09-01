@@ -19,13 +19,13 @@
     <a href="tel:{{ dataValue }}">{{ dataValue }}</a>
 {% elseif dataValue|isBool %}
     {% if 'asError' == property and inAdmin and dataValue %}
-        <i class="icon-ban text-danger"></i>
+        <twig:ux:icon name="tabler:ban" class="text-danger" />
     {% elseif 'asError' == property and inAdmin and not dataValue %}
-        <i class="icon-check-circle text-success"></i>
+        <twig:ux:icon name="tabler:circle-check" class="text-success" />
     {% elseif inAdmin and not dataValue %}
-        <i class="icon-ban text-danger"></i>
+        <twig:ux:icon name="tabler:ban" class="text-danger" />
     {% elseif inAdmin %}
-        <i class="icon-check-circle text-success"></i>
+        <twig:ux:icon name="tabler:circle-check" class="text-success" />
     {% elseif dataValue == false %}
         {{ "No"|trans|raw }}
     {% else %}

@@ -63,6 +63,7 @@ class VendorExtension extends AbstractExtension
             new TwigFunction('jsonPretty', [CoreRuntime::class, 'jsonPretty']),
             new TwigFunction('iframe', [GdprRuntime::class, 'iframe']),
             new TwigFunction('icon', [IconRuntime::class, 'icon'], ['is_safe' => ['html']]),
+            new TwigFunction('ux_icon_name', [IconRuntime::class, 'uxIconName']),
             new TwigFunction('csp_nonce', [NonceRuntime::class, 'getNonce']),
             new TwigFunction('img', [MediaRuntime::class, 'img'], ['is_safe' => ['html']]),
             new TwigFunction('granted', [SecurityRuntime::class, 'granted']),

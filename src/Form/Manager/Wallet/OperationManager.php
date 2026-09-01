@@ -10,6 +10,7 @@ use App\Entity\Wallet\Outsider;
 use App\Entity\Wallet\SubCategory;
 use App\Entity\Wallet\Wallet;
 use App\Service\CoreLocatorInterface;
+use App\Service\Wallet\BeneficiaryResolver;
 use App\Service\Urlizer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Form\FormInterface;
@@ -471,6 +472,8 @@ readonly class OperationManager implements OperationInterface
         'netflix' => 'expenses-various-subscriptions',
         'canal' => 'expenses-various-subscriptions',
         'deezer-luxem' => 'expenses-various-subscriptions',
+        'resumaker-re' => 'expenses-various-subscriptions',
+        'resumaker-lu' => 'expenses-various-subscriptions',
         'pathe' => 'expenses-cinema',
         'ass-musique-amplifiee-marquisats-annecy' => 'expenses-concerts', // Le Brise Glace
         'weezevent' => 'expenses-concerts',
@@ -526,6 +529,7 @@ readonly class OperationManager implements OperationInterface
 
         // Revenus
         'felix-multimedia-felix-animation' => 'incomes-income-remuneration',
+        'sarl-felix-creation' => 'incomes-income-remuneration',
         'fournier-sebastien' => 'incomes-other-deposits',
         'remise-de-cheque' => 'incomes-other-deposits',
         'fournier-chantal' => 'incomes-refunds-miscellaneous-refunds',
@@ -636,6 +640,18 @@ readonly class OperationManager implements OperationInterface
         'refund' => 'incomes-refunds-miscellaneous-refunds',
     ];
 
+    /**
+     * Nom de tiers retenu quand le libellé ne désigne personne d'identifiable.
+     */
+    private const NATURE_FALLBACK_NAMES = [
+        'withdrawal' => 'Retrait DAB',
+        'cheque_out' => 'Chèque émis',
+        'cheque_in' => 'Remise de chèque',
+        'bank_fee' => 'Frais bancaires',
+        'interest' => 'Intérêts',
+        'refund' => 'Avoir',
+    ];
+
     private const DEFAULT_EXPENSE = 'expenses-other';
     private const DEFAULT_INCOME = 'incomes-other-income-to-be-categorized';
 
@@ -645,8 +661,10 @@ readonly class OperationManager implements OperationInterface
     /**
      * OperationManager constructor.
      */
-    public function __construct(private CoreLocatorInterface $coreLocator)
-    {
+    public function __construct(
+        private CoreLocatorInterface $coreLocator,
+        private BeneficiaryResolver $beneficiaryResolver,
+    ) {
     }
 
     /**
@@ -654,13 +672,18 @@ readonly class OperationManager implements OperationInterface
      *
      * L'import est idempotent : une opération déjà présente en base n'est pas
      * recréée, mais les doublons légitimes du relevé (même date, même libellé,
-     * même montant) sont conservés — un rapprochement par comptage, et non par
+     * même montant) sont conservés - un rapprochement par comptage, et non par
      * simple existence, est effectué.
      *
      * @return array rapport d'exécution
      */
-    public function import(?string $filename = null, ?Wallet $wallet = null, bool $dryRun = false): array
-    {
+    public function import(
+        ?string $filename = null,
+        ?Wallet $wallet = null,
+        bool $dryRun = false,
+        ?\DateTimeInterface $from = null,
+        ?\DateTimeInterface $until = null,
+    ): array {
         $report = [
             'file' => null,
             'wallet' => null,
@@ -669,6 +692,8 @@ readonly class OperationManager implements OperationInterface
             'imported' => 0,
             'skipped' => 0,
             'ignored' => 0,
+            'outOfRange' => 0,
+            'bounded' => false,
             'outsiders' => 0,
             'categorized' => 0,
             'uncategorized' => [],
@@ -699,7 +724,10 @@ readonly class OperationManager implements OperationInterface
         }
 
         $report['file'] = $filename;
-        $rows = IOFactory::load($filename)->getActiveSheet()->toArray(null, true, true, true);
+        // formatData à false : les cellules de type date sont retournées en numéro de
+        // série Excel plutôt que dans le format d'affichage du classeur, qui peut être
+        // en m/j/aaaa et rendrait la date ambiguë.
+        $rows = IOFactory::load($filename)->getActiveSheet()->toArray(null, true, false, true);
 
         $headerIndex = null;
         $targetBalance = null;
@@ -722,7 +750,8 @@ readonly class OperationManager implements OperationInterface
         }
 
         $report['targetBalance'] = $targetBalance;
-        $entries = $this->readEntries($rows, $headerIndex, $report);
+        $report['bounded'] = $from instanceof \DateTimeInterface || $until instanceof \DateTimeInterface;
+        $entries = $this->readEntries($rows, $headerIndex, $report, $from, $until);
 
         if ([] === $entries) {
             $report['errors'][] = 'Aucune opération exploitable dans le fichier.';
@@ -779,6 +808,10 @@ readonly class OperationManager implements OperationInterface
             $operation->setAdminName($entry['label']);
             $operation->setSlug(Urlizer::urlize($entry['date']->format('Ymd').'-'.$entry['merchant']));
             $operation->setOperationType($entry['expense'] ? $expensesType : $incomesType);
+            // Une opération figurant sur un relevé a déjà été débitée ou créditée :
+            // elle est rapprochée par construction. Seules les saisies manuelles,
+            // en attente de passage, restent à pointer.
+            $operation->setPointed(true);
             $operation->setOutsider($outsiders[$outsiderSlug]);
             if ($user) {
                 $operation->setCreatedBy($user);
@@ -813,7 +846,11 @@ readonly class OperationManager implements OperationInterface
         $operationsSum = $operationRepository->sumOperations($wallet);
         $report['operationsSum'] = round($operationsSum, 2);
 
-        if (null !== $targetBalance) {
+        // Sur un import borné, le solde du relevé couvre une période plus large que
+        // celle réellement importée : le réconcilier fausserait le solde initial.
+        if ($report['bounded']) {
+            $report['errors'][] = 'Import borné : le solde initial n\'a pas été réconcilié. Relancez l\'import du relevé le plus récent, sans borne, pour le recalculer.';
+        } elseif (null !== $targetBalance) {
             $initialAmount = round($targetBalance - $operationsSum, 2);
             if (abs($initialAmount - (float) ($wallet->getInitialAmount() ?? 0.0)) >= self::EPSILON) {
                 $wallet->setInitialAmount($initialAmount);
@@ -831,8 +868,13 @@ readonly class OperationManager implements OperationInterface
     /**
      * Lit et normalise les lignes d'opérations situées sous l'en-tête.
      */
-    private function readEntries(array $rows, int|string $headerIndex, array &$report): array
-    {
+    private function readEntries(
+        array $rows,
+        int|string $headerIndex,
+        array &$report,
+        ?\DateTimeInterface $from = null,
+        ?\DateTimeInterface $until = null,
+    ): array {
         $entries = [];
         $started = false;
 
@@ -847,7 +889,11 @@ readonly class OperationManager implements OperationInterface
 
             ++$report['rows'];
             $rawDate = $row['A'] ?? null;
-            $label = trim(preg_replace('/\s+/u', ' ', (string) ($row['B'] ?? '')));
+            // Le libellé brut, retours à la ligne compris, sert au découpage : c'est
+            // le séparateur de l'ancien format d'export. La version compactée sert au
+            // stockage et au rapprochement.
+            $rawLabel = (string) ($row['B'] ?? '');
+            $label = trim(preg_replace('/\s+/u', ' ', $rawLabel));
 
             if ('' === $label || null === $rawDate || '' === trim((string) $rawDate)) {
                 ++$report['ignored'];
@@ -869,9 +915,14 @@ readonly class OperationManager implements OperationInterface
                 continue;
             }
 
+            if (($from && $date < $from) || ($until && $date > $until)) {
+                ++$report['outOfRange'];
+                continue;
+            }
+
             $isExpense = $debit > 0;
             $amount = round($isExpense ? $debit : $credit, 2);
-            $parsed = $this->parseLabel($label);
+            $parsed = $this->parseLabel($rawLabel);
 
             $entries[] = [
                 'date' => $date,
@@ -879,7 +930,7 @@ readonly class OperationManager implements OperationInterface
                 'amount' => $amount,
                 'expense' => $isExpense,
                 'merchant' => $parsed['merchant'],
-                'subCategory' => $this->resolveSubCategorySlug($label, $parsed, $isExpense),
+                'subCategory' => $this->resolveSubCategorySlug($rawLabel, $parsed, $isExpense),
                 'key' => $this->operationKey($date, $amount, $isExpense, $label),
             ];
             ++$report['parsed'];
@@ -945,7 +996,14 @@ readonly class OperationManager implements OperationInterface
      */
     public function parseLabel(string $rawLabel): array
     {
-        $label = trim(preg_replace('/\s+/u', ' ', $rawLabel));
+        // Ancien format d'export : la nature et le libellé brut sont séparés par un
+        // retour à la ligne, sans segment « nom normalisé du commerçant ». On le
+        // ramène au séparateur actuel pour n'avoir qu'une seule logique en aval.
+        if (!preg_match('/\s+-\s+/u', $rawLabel) && preg_match('/\R/u', trim($rawLabel))) {
+            $rawLabel = preg_replace('/\R+/u', ' - ', trim($rawLabel));
+        }
+
+        $label = trim(preg_replace('/\s+/u', ' ', (string) $rawLabel));
         $parts = array_values(array_filter(
             array_map('trim', preg_split('/\s+-\s+/u', $label)),
             static fn (string $part): bool => '' !== $part
@@ -957,19 +1015,16 @@ readonly class OperationManager implements OperationInterface
         $middle = $this->stripLabelNoise($parts[1] ?? '');
 
         if (str_starts_with($key, 'paiement par carte')) {
+            // Le nom normalisé n'existe que dans les exports récents. Sur les
+            // relevés antérieurs il est absent : ne rien passer plutôt qu'un
+            // libellé brut, sinon la correspondance apprise est court-circuitée.
             $last = $count >= 4 ? implode(' ', array_slice($parts, 2)) : ($parts[2] ?? '');
-            if ('' !== $last && preg_match('/^paypal$/iu', $last) && str_contains($middle, '*')) {
+            if ('' !== $last && preg_match('/^paypal$/iu', $last)) {
                 // Agrégateur de paiement : le commerçant réel est derrière l'astérisque.
-                $merchant = trim(substr($middle, strpos($middle, '*') + 1));
-            } elseif ('' !== $last) {
-                $merchant = $last;
-            } else {
-                $merchant = str_contains($middle, '*')
-                    ? trim(substr($middle, strpos($middle, '*') + 1))
-                    : $middle;
+                $last = '';
             }
 
-            return $this->finalizeParsed('card', $merchant, $middle);
+            return $this->finalizeParsed('card', $last, $middle, $label);
         }
 
         if (str_starts_with($key, 'prelevement') || str_starts_with($key, 'prélèvement')) {
@@ -980,7 +1035,7 @@ readonly class OperationManager implements OperationInterface
             $merchant = trim(preg_replace('/\s*-?ECHEANCE.*$/ui', '', $merchant));
             $merchant = trim(preg_replace('/\s*\d{4,}.*$/u', '', $merchant));
 
-            return $this->finalizeParsed('debit', '' !== $merchant ? $merchant : ($parts[1] ?? 'Prélèvement'), $middle);
+            return $this->finalizeParsed('debit', '' !== $merchant ? $merchant : ($parts[1] ?? 'Prélèvement'), $middle, $label);
         }
 
         if (str_starts_with($key, 'virement')) {
@@ -990,57 +1045,58 @@ readonly class OperationManager implements OperationInterface
             $merchant = trim(preg_replace('/\s*\d{5,}.*$/u', '', (string) $merchant));
             $nature = str_contains($key, 'emis') || str_contains($key, 'émis') ? 'transfer_out' : 'transfer_in';
 
-            return $this->finalizeParsed($nature, $merchant, $middle);
+            return $this->finalizeParsed($nature, $merchant, $middle, $label);
         }
 
         if (str_starts_with($key, 'retrait')) {
-            return $this->finalizeParsed('withdrawal', 'Retrait DAB', $middle);
+            return $this->finalizeParsed('withdrawal', 'Retrait DAB', $middle, $label);
         }
 
         if (str_starts_with($key, 'cheque emis') || str_starts_with($key, 'chèque emis')) {
-            return $this->finalizeParsed('cheque_out', 'Chèque émis', $middle);
+            return $this->finalizeParsed('cheque_out', 'Chèque émis', $middle, $label);
         }
 
         if (str_starts_with($key, 'remise de cheque') || str_starts_with($key, 'remise de chèque')) {
-            return $this->finalizeParsed('cheque_in', 'Remise de chèque', $middle);
+            return $this->finalizeParsed('cheque_in', 'Remise de chèque', $middle, $label);
         }
 
         if (str_starts_with($key, 'cotisation')) {
-            return $this->finalizeParsed('bank_fee', $parts[1] ?? 'Cotisation', $middle);
+            return $this->finalizeParsed('bank_fee', $parts[1] ?? 'Cotisation', $middle, $label);
         }
 
         if (str_starts_with($key, 'avoir')) {
             $merchant = trim(preg_replace('/^CARTE\s+X?\d*\s*/ui', '', $middle));
 
-            return $this->finalizeParsed('refund', $merchant, $middle);
+            return $this->finalizeParsed('refund', $merchant, $middle, $label);
         }
 
         if (str_starts_with($key, 'interets') || str_starts_with($key, 'intérêts')) {
-            return $this->finalizeParsed('interest', $nature, $middle);
+            return $this->finalizeParsed('interest', $nature, $middle, $label);
         }
 
-        return $this->finalizeParsed('other', '' !== $middle ? $middle : $nature, $middle);
+        return $this->finalizeParsed('other', '' !== $middle ? $middle : $nature, $middle, $label);
     }
 
     /**
-     * Applique les alias de bénéficiaires et garantit un nom non vide.
+     * Résout le tiers désigné par le libellé.
      *
-     * @return array{nature: string, merchant: string, middle: string}
+     * Le nom éventuellement normalisé par la banque n'est qu'une piste parmi
+     * d'autres : un fragment reconnu du libellé brut prime, car c'est lui qui
+     * reste stable d'une échéance et d'une génération d'export à l'autre.
+     *
+     * @return array{nature: string, merchant: string, middle: string, subCategory: string|null}
      */
-    private function finalizeParsed(string $nature, string $merchant, string $middle): array
+    private function finalizeParsed(string $nature, string $bankName, string $middle, string $rawLabel): array
     {
-        $merchant = trim(preg_replace('/\s+/u', ' ', $merchant));
-        $slug = (string) Urlizer::urlize($merchant);
+        $fallback = self::NATURE_FALLBACK_NAMES[$nature] ?? 'Non identifié';
+        $resolved = $this->beneficiaryResolver->resolve($rawLabel, $middle, $bankName, $fallback);
 
-        if (isset(self::MERCHANT_ALIASES[$slug])) {
-            $merchant = self::MERCHANT_ALIASES[$slug];
-        }
-
-        if ('' === trim($merchant)) {
-            $merchant = 'Non identifié';
-        }
-
-        return ['nature' => $nature, 'merchant' => $merchant, 'middle' => $middle];
+        return [
+            'nature' => $nature,
+            'merchant' => $resolved['name'],
+            'middle' => $middle,
+            'subCategory' => $resolved['subCategory'],
+        ];
     }
 
     /**
@@ -1072,7 +1128,19 @@ readonly class OperationManager implements OperationInterface
         $labelSlug = (string) Urlizer::urlize($rawLabel);
         $generic = [self::DEFAULT_EXPENSE, self::DEFAULT_INCOME];
 
-        $byMerchant = $this->directedCorrespondence(self::MERCHANT_CORRESPONDENCE[$merchantSlug] ?? null, $isExpense);
+        // Une signature de tiers porte parfois sa propre catégorie : un prélèvement
+        // d'assurance habitation ne peut rien être d'autre.
+        if (!empty($parsed['subCategory'])) {
+            $expected = $isExpense ? 'expenses-' : 'incomes-';
+            if (str_starts_with($parsed['subCategory'], $expected)) {
+                return $parsed['subCategory'];
+            }
+        }
+
+        $byMerchant = $this->directedCorrespondence(
+            self::MERCHANT_CORRESPONDENCE[$merchantSlug] ?? $this->correspondenceByPrefix($merchantSlug),
+            $isExpense
+        );
         $byLabel = self::CORRESPONDENCE[$middleSlug] ?? null;
         $resolved = null;
 
@@ -1128,6 +1196,31 @@ readonly class OperationManager implements OperationInterface
      * Un même tiers peut apparaître au débit comme au crédit (virements entre
      * particuliers) : la table accepte alors ['expenses' => ..., 'incomes' => ...].
      */
+    /**
+     * Cherche un bénéficiaire connu en préfixe du slug.
+     *
+     * L'ancien format d'export accole le motif du virement au nom du tiers
+     * (« Magali BELMONTE billets avion ») : le préfixe reste identifiable.
+     */
+    private function correspondenceByPrefix(string $merchantSlug): string|array|null
+    {
+        if ('' === $merchantSlug) {
+            return null;
+        }
+
+        $best = null;
+        $bestLength = 0;
+        foreach (self::MERCHANT_CORRESPONDENCE as $slug => $correspondence) {
+            $length = strlen($slug);
+            if ($length > $bestLength && str_starts_with($merchantSlug, $slug.'-')) {
+                $best = $correspondence;
+                $bestLength = $length;
+            }
+        }
+
+        return $best;
+    }
+
     private function directedCorrespondence(string|array|null $correspondence, bool $isExpense): ?string
     {
         if (is_array($correspondence)) {

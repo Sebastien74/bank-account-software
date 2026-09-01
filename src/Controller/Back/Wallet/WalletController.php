@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace App\Controller\Back\Wallet;
 
 use App\Controller\Back\BaseController;
+use App\Entity\Wallet\Operation;
+use App\Entity\Wallet\SubCategory;
 use App\Entity\Wallet\Wallet;
+use App\Form\Manager\GlobalManagerInterface;
 use App\Form\Type\Wallet\WalletType;
+use App\Service\AdminLocatorInterface;
+use App\Service\CoreLocatorInterface;
+use App\Service\Wallet\Statistics\StatisticsBuilder;
+use App\Service\Wallet\Statistics\SubCategoryDetailBuilder;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +33,20 @@ class WalletController extends BaseController
 
     protected ?string $classname = Wallet::class;
     protected ?string $formType = WalletType::class;
+
+    /**
+     * WalletController constructor.
+     */
+    public function __construct(
+        protected CoreLocatorInterface $coreLocator,
+        protected AdminLocatorInterface $adminLocator,
+        protected GlobalManagerInterface $globalFormManager,
+        protected mixed $formManager,
+        private readonly StatisticsBuilder $statisticsBuilder,
+        private readonly SubCategoryDetailBuilder $subCategoryDetailBuilder,
+    ) {
+        parent::__construct($coreLocator, $adminLocator, $globalFormManager, $formManager);
+    }
 
     /**
      * Wallet index.
@@ -92,195 +113,75 @@ class WalletController extends BaseController
     {
         return $this->redirect($this->globalFormManager->delete($wallet));
     }
-
     /**
-     * Wallet statistics.
+     * Tableau de bord statistique d'un compte.
      */
     #[Route('/statistics/{wallet}', name: 'back_operation_statistics', methods: 'GET')]
     public function statistics(Wallet $wallet): Response
     {
         $this->pageTitle = $wallet->getAdminName().' - '.$this->coreLocator->translator()->trans('Statistiques', [], 'back');
-
-        $operationRepository = $this->coreLocator->em()->getRepository(\App\Entity\Wallet\Operation::class);
+        $this->pageIcon = 'chart-line';
         $request = $this->coreLocator->request();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'));
 
-        $now = new \DateTime();
-        // Les deux valeurs alimentent des chaînes de date : elles sont validées,
-        // sans quoi createFromFormat retourne false et la vue échoue en erreur 500.
-        $selectedYear = (string) $request->query->get('year', $now->format('Y'));
-        $selectedMonth = (string) $request->query->get('month', $now->format('m'));
-        if (!preg_match('/^\d{4}$/', $selectedYear)) {
-            $selectedYear = $now->format('Y');
-        }
-        if (!preg_match('/^(0[1-9]|1[0-2])$/', $selectedMonth)) {
-            $selectedMonth = $now->format('m');
-        }
+        // Les paramètres alimentent des constructions de dates : ils sont bornés
+        // ici, une valeur hors plage retombant sur la période courante.
+        // getInt() rejetterait « 06 », que porte pourtant tout lien historique.
+        // Rien n'est imposé quand la requête ne demande rien : le service se cale
+        // alors sur le dernier mois porteur d'écritures.
+        $year = $this->positiveInt($request->query->get('year'));
+        $month = $this->positiveInt($request->query->get('month'));
+        $year = $year >= 1970 && $year <= 2200 ? $year : null;
+        $month = $month >= 1 && $month <= 12 ? $month : null;
 
-        $startYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-01-01 00:00:00");
-        $endYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-12-31 23:59:59");
-
-        $startMonth = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-$selectedMonth-01 00:00:00");
-        $endMonth = (clone $startMonth)->modify('last day of this month 23:59:59');
-
-        $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
-        $monthStatsRaw = $operationRepository->getStats($wallet, $startMonth, $endMonth);
-
-        // Calculate comparison periods for trends
-        $currentDay = (int) $now->format('d');
-        $selectedMonthMaxDay = (int) $endMonth->format('d');
-        $comparisonDay = min($currentDay, $selectedMonthMaxDay);
-
-        $isCurrentMonthAndYear = $selectedYear === $now->format('Y') && $selectedMonth === $now->format('m');
-
-        $endCurrentPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-$selectedMonth-$comparisonDay 23:59:59");
-        $startPrevPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-$selectedMonth-01 00:00:00");
-        $endPrevPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-$selectedMonth-$comparisonDay 23:59:59");
-
-        $currentPeriodStatsRaw = $operationRepository->getStats($wallet, $startMonth, $endCurrentPeriod);
-        $prevPeriodStatsRaw = $operationRepository->getStats($wallet, $startPrevPeriod, $endPrevPeriod);
-
-        $monthStats = $this->formatStats($monthStatsRaw);
-        $hasPrevMonthOperations = $operationRepository->hasOperations($wallet, $startPrevPeriod, $endPrevPeriod);
-
-        if ($hasPrevMonthOperations) {
-            $this->computeTrends($monthStats, $currentPeriodStatsRaw, $prevPeriodStatsRaw);
-        }
-
-        // Calculate comparison periods for annual trends
-        $isCurrentYear = $selectedYear === $now->format('Y');
-        $comparisonYearDay = $isCurrentYear ? $currentDay : 31;
-        $comparisonYearMonth = $isCurrentYear ? (int) $now->format('m') : 12;
-
-        $endCurrentYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-$comparisonYearMonth-$comparisonYearDay 23:59:59");
-        $startPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-01-01 00:00:00");
-        $endPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-$comparisonYearMonth-$comparisonYearDay 23:59:59");
-
-        $hasPrevYearOperations = $operationRepository->hasOperations($wallet, $startPrevYearPeriod, $endPrevYearPeriod);
-
-        $comparisonYearStartMonth = 1;
-        $comparisonYearStartDay = 1;
-        $excludedMonths = [];
-        if ($hasPrevYearOperations) {
-            $firstOpPrevYear = $operationRepository->getFirstOperationDateInYear($wallet, (int) $selectedYear - 1);
-            if ($firstOpPrevYear) {
-                $comparisonYearStartMonth = (int) $firstOpPrevYear->format('m');
-                $comparisonYearStartDay = (int) $firstOpPrevYear->format('d');
-                $startYear = \DateTime::createFromFormat('Y-m-d H:i:s', "$selectedYear-" . $firstOpPrevYear->format('m-d') . " 00:00:00");
-                $startPrevYearPeriod = \DateTime::createFromFormat('Y-m-d H:i:s', ($selectedYear - 1) . "-" . $firstOpPrevYear->format('m-d') . " 00:00:00");
-
-                for ($m = 1; $m < $comparisonYearStartMonth; $m++) {
-                    $excludedMonths[] = sprintf('%02d', $m);
-                }
-            }
-        }
-
-        // We use the same start date for both main stats and trend comparison to be consistent
-        $yearStatsRaw = $operationRepository->getStats($wallet, $startYear, $endYear);
-        $yearStats = $this->formatStats($yearStatsRaw);
-
-        if ($hasPrevYearOperations) {
-            $currentYearPeriodStatsRaw = $operationRepository->getStats($wallet, $startYear, $endCurrentYearPeriod);
-            $prevYearPeriodStatsRaw = $operationRepository->getStats($wallet, $startPrevYearPeriod, $endPrevYearPeriod);
-            $this->computeTrends($yearStats, $currentYearPeriodStatsRaw, $prevYearPeriodStatsRaw);
-        }
-
-        $availableYears = $operationRepository->getAvailableYears($wallet);
-        if (!in_array($now->format('Y'), $availableYears)) {
-            $availableYears[] = $now->format('Y');
-            rsort($availableYears);
-        }
+        $this->breadcrumb();
 
         return $this->render('back/pages/wallet-statistics.html.twig', $this->coreArguments() + [
             'pageTitle' => $this->pageTitle,
-            'pageIcon' => 'chart-line',
-            'wallet' => $wallet,
-            'yearStats' => $yearStats,
-            'monthStats' => $monthStats,
-            'selectedYear' => $selectedYear,
-            'selectedMonth' => $selectedMonth,
-            'endMonth' => $endMonth,
-            'isCurrentMonthAndYear' => $isCurrentMonthAndYear,
-            'comparisonDay' => $comparisonDay,
-            'comparisonYearDay' => $comparisonYearDay,
-            'comparisonYearMonth' => $comparisonYearMonth,
-            'comparisonYearStartDay' => $comparisonYearStartDay ?? 1,
-            'comparisonYearStartMonth' => $comparisonYearStartMonth,
-            'excludedMonths' => $excludedMonths,
-            'years' => $availableYears,
-            'months' => [
-                '01' => 'Janvier', '02' => 'Février', '03' => 'Mars', '04' => 'Avril',
-                '05' => 'Mai', '06' => 'Juin', '07' => 'Juillet', '08' => 'Août',
-                '09' => 'Septembre', '10' => 'Octobre', '11' => 'Novembre', '12' => 'Décembre'
-            ],
+            'pageIcon' => $this->pageIcon,
+            'breadcrumb' => $this->breadcrumb,
+            'stats' => $this->statisticsBuilder->build($wallet, $year, $month),
         ]);
     }
 
-    private function computeTrends(array &$mainStats, array $currentPeriodRaw, array $prevPeriodRaw): void
+    /**
+     * Détail d'un poste de dépense : opérations et bénéficiaires.
+     */
+    #[Route('/statistics/{wallet}/poste/{subCategory}', name: 'back_wallet_sub_category_detail', methods: 'GET')]
+    public function subCategoryDetail(Wallet $wallet, SubCategory $subCategory): Response
     {
-        $currentPeriod = $this->formatStats($currentPeriodRaw);
-        $prevPeriod = $this->formatStats($prevPeriodRaw);
+        $request = $this->coreLocator->request();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'));
 
-        foreach ($mainStats as $catId => &$category) {
-            $currCatTotal = $currentPeriod[$catId]['total'] ?? 0;
-            $prevCatTotal = $prevPeriod[$catId]['total'] ?? 0;
-            $category['prevTotal'] = $prevCatTotal;
-            $category['trend'] = $this->calculateTrend($currCatTotal, $prevCatTotal);
+        $year = $this->positiveInt($request->query->get('year'));
+        $month = $this->positiveInt($request->query->get('month'));
+        $year = $year >= 1970 && $year <= 2200 ? $year : (int) $now->format('Y');
+        $month = $month >= 1 && $month <= 12 ? $month : (int) $now->format('n');
+        $scope = 'year' === $request->query->get('scope') ? 'year' : 'month';
 
-            foreach ($category['subCategories'] as $subCatId => &$subCategory) {
-                $currSubTotal = $currentPeriod[$catId]['subCategories'][$subCatId]['total'] ?? 0;
-                $prevSubTotal = $prevPeriod[$catId]['subCategories'][$subCatId]['total'] ?? 0;
-                $subCategory['prevTotal'] = $prevSubTotal;
-                $subCategory['trend'] = $this->calculateTrend($currSubTotal, $prevSubTotal);
-            }
-        }
-    }
+        $this->pageTitle = $subCategory->getAdminName();
+        $this->pageIcon = 'chart-bar';
+        $this->breadcrumb();
 
-    private function calculateTrend(float $current, float $previous): ?array
-    {
-        if ($previous == 0) {
-            return $current > 0 ? ['direction' => 'up', 'percentage' => 100, 'color' => 'danger'] : null;
-        }
-
-        $diff = round($current, 2) - round($previous, 2);
-        $percentage = ($diff / $previous) * 100;
-
-        if (abs($diff) < 0.01) {
-            return ['direction' => 'stable', 'percentage' => 0, 'color' => 'secondary'];
-        }
-
-        return [
-            'direction' => $diff > 0 ? 'up' : 'down',
-            'percentage' => abs($percentage),
-            'color' => $diff > 0 ? 'danger' : 'success',
-        ];
-    }
-
-    private function formatStats(array $rawStats): array
-    {
-        $stats = [];
-        foreach ($rawStats as $row) {
-            $catId = $row['categoryId'];
-            if (!isset($stats[$catId])) {
-                $stats[$catId] = [
-                    'name' => $row['categoryName'],
-                    'total' => 0,
-                    'subCategories' => [],
-                ];
-            }
-            $stats[$catId]['total'] += (float) $row['total'];
-            $subCatId = $row['subCategoryId'];
-            $stats[$catId]['subCategories'][$subCatId] = [
-                'name' => $row['subCategoryName'],
-                'total' => (float) $row['total'],
-            ];
-        }
-
-        return $stats;
+        return $this->render('back/pages/wallet-sub-category.html.twig', $this->coreArguments() + [
+            'pageTitle' => $this->pageTitle,
+            'pageIcon' => $this->pageIcon,
+            'breadcrumb' => $this->breadcrumb,
+            'detail' => $this->subCategoryDetailBuilder->build($wallet, $subCategory, $year, $month, $scope),
+        ]);
     }
 
     /**
-     * To set breadcrumb.
+     * Lit un entier positif depuis la requête, sans lever d'exception.
+     *
+     * Toute valeur non numérique retourne zéro, à charge pour l'appelant de lui
+     * substituer sa valeur par défaut.
      */
+    private function positiveInt(mixed $value): int
+    {
+        return is_string($value) && ctype_digit($value) ? (int) $value : 0;
+    }
+
     protected function breadcrumb(array $items = []): void
     {
         $translator = $this->coreLocator->translator();

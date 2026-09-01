@@ -5,35 +5,35 @@
         {% set active = 'wallets' in app.request.uri %}
         <a href="{{ path('back_wallet_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <i class="icon-wallet"></i>
+                <twig:ux:icon name="tabler:wallet" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des comptes'|trans|raw }}</span>
         </a>
         {% set active = 'budgets' in app.request.uri %}
         <a href="{{ path('back_budget_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <i class="icon-envelope-open-dollar"></i>
+                <twig:ux:icon name="tabler:mail-dollar" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des budgets'|trans|raw }}</span>
         </a>
         {% set active = 'objectives' in app.request.uri %}
         <a href="{{ path('back_objective_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <i class="icon-bullseye-arrow"></i>
+                <twig:ux:icon name="tabler:target-arrow" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des objectifs'|trans|raw }}</span>
         </a>
         {% set active = 'operations-types' in app.request.uri %}
         <a href="{{ path('back_operationtype_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <i class="icon-list-alt"></i>
+                <twig:ux:icon name="tabler:list-details" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des catégories'|trans|raw }}</span>
         </a>
         {% set active = 'outsiders' in app.request.uri %}
         <a href="{{ path('back_outsider_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <i class="icon-list-alt"></i>
+                <twig:ux:icon name="tabler:list-details" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des bénéficiaires'|trans|raw }}</span>
         </a>
@@ -41,7 +41,7 @@
         <div class="sidebar-footer d-flex jusify-content-center pt-3 mt-3 mx-auto">
             <a href="{{ path('app_logout') }}" class="nav-link nav-link-danger w-100 logout d-inline-flex align-items-center text-white mx-auto py-2 px-4">
                 <span class="label-icon d-inline-flex align-items-center justify-content-center bg-danger">
-                    <i class="icon-power-off"></i>
+                    <twig:ux:icon name="tabler:power" />
                 </span>
                 <span class="mx-1 label">{{ 'Logout'|trans|raw }}</span>
             </a>

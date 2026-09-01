@@ -20,7 +20,7 @@
 
 {% if 'alert' == display %}
     <div class="alert alert-{{ bgColor }} position-relative d-flex p-0 {% if class %} {{ class }}{% endif %}">
-        <div class="icon d-flex align-items-center justify-content-center position-relative bg-{{ bgColor }}"><i class="icon-{{ icon }} text-{{ iconColor }}"></i></div>
+        <div class="icon d-flex align-items-center justify-content-center position-relative bg-{{ bgColor }}"><twig:ux:icon name="{{ ux_icon_name(icon) }}" class="text-{{ iconColor }}" /></div>
         <div class="message px-3 py-3 w-100 text-{{ iconColor }}">
             {% if 'small' == size %}
                 <small class="d-inline-block text-{{ iconColor }}">
@@ -37,7 +37,7 @@
 {% elseif 'ribbon' == display %}
     <div class="ribbon-vwrapper alert alert-{{ bgColor }}">
         <div class="ribbon ribbon-bookmark ribbon-vertical-l ribbon-{{ bgColor }}">
-            <i class="icon-{{ icon }} text-{{ iconColor }}"></i>
+            <twig:ux:icon name="{{ ux_icon_name(icon) }}" class="text-{{ iconColor }}" />
         </div>
         <button class="btn-close" data-bs-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
         {% if message is defined %}
@@ -48,7 +48,7 @@
     </div>
 {% elseif 'feedback' == display %}
     <div class="{% if 'error' == alert or 'danger' == alert %}invalid-feedback{% else %}feedback{% endif %} text-{{ bgColor }} d-flex">
-        <i class="icon-{{ icon }} text-{{ bgColor }} position-relative me-2"></i>
+        <twig:ux:icon name="{{ ux_icon_name(icon) }}" class="text-{{ bgColor }} position-relative me-2" />
         <span>{{ message|raw }}</span>
     </div>
 {% else %}
@@ -56,7 +56,7 @@
         <div class="toast toast-alert fade show border-0 bg-{{ color }}" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header d-flex border-0 no-radius py-3 px-3 text-{{ bgColor }}">
                 <div class="inner d-flex align-items-center">
-                    <span class="dash-action dash-{{ bgColor }} dash-accent me-3"><i class="icon-{{ icon }}"></i></span>
+                    <span class="dash-action dash-{{ bgColor }} dash-accent me-3"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
                     <div class="message">{{ message|raw }}</div>
                 </div>
                 <button type="button" class="btn-close ms-3" data-bs-dismiss="toast" aria-label="{{ "Close"|trans|striptags }}"></button>

@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Sébastien FOURNIER <fournier.sebastien@outlook.com>
  */
 #[ORM\Table(name: 'wallet_operation')]
+#[ORM\Index(name: 'idx_operation_wallet_date', columns: ['wallet_id', 'date'])]
+#[ORM\Index(name: 'idx_operation_wallet_date_sub_category', columns: ['wallet_id', 'date', 'sub_category_id'])]
+#[ORM\Index(name: 'idx_operation_wallet_date_outsider', columns: ['wallet_id', 'date', 'outsider_id'])]
 #[ORM\Entity(repositoryClass: OperationRepository::class)]
 class Operation extends BaseEntity
 {
