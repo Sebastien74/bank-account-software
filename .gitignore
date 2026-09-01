@@ -77,3 +77,11 @@ blackfire.msi
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+# Ruflo local secrets and runtime data
+.env
+.env.local
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
