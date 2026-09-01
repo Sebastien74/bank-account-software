@@ -9,12 +9,14 @@ use App\Entity\Wallet\Operation;
 use App\Entity\Wallet\Wallet;
 use App\Form\Manager\GlobalManagerInterface;
 use App\Form\Manager\Wallet\OperationInterface;
+use App\Form\Type\Wallet\OperationImportType;
 use App\Form\Type\Wallet\OperationType;
 use App\Model\Wallet\WalletModel;
 use App\Service\AdminLocatorInterface;
 use App\Service\CoreLocatorInterface;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,9 +87,66 @@ class OperationController extends BaseController
         $this->entities = $this->coreLocator->em()->getRepository(Operation::class)
             ->findByYearMonth($year, $month, $sort, $order, new \DateTimeZone('Europe/Paris'), $wallet);
         $this->arguments['wallet'] = $walletModel = WalletModel::fromEntity($wallet, $this->coreLocator, ['operations' => $this->entities]);
+        $this->arguments['importForm'] = $this->createForm(OperationImportType::class, null, [
+            'action' => $this->generateUrl('back_operation_import', ['wallet' => $wallet->getId()]),
+        ])->createView();
         $this->pageTitle = $this->coreLocator->translator()->trans('Mes opérations :', [], 'back').' '.$walletModel->title;
 
         return parent::index($paginator);
+    }
+
+    /**
+     * Operation import from an XLSX bank statement.
+     *
+     * @throws Exception
+     */
+    #[Route('/import/{wallet}', name: 'back_operation_import', methods: 'POST')]
+    public function import(): RedirectResponse
+    {
+        $wallet = $this->coreLocator->em()->getRepository(Wallet::class)->find($this->coreLocator->request()->get('wallet'));
+        if (!$wallet instanceof Wallet) {
+            throw $this->createNotFoundException();
+        }
+
+        $form = $this->createForm(OperationImportType::class);
+        $form->handleRequest($this->coreLocator->request());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $uploadedFile */
+            $uploadedFile = $form->get('file')->getData();
+            $importDir = $this->coreLocator->projectDir().'/var/import';
+            if (!is_dir($importDir)) {
+                mkdir($importDir, 0775, true);
+            }
+            $filename = uniqid('operations-', true).'.xlsx';
+            $uploadedFile->move($importDir, $filename);
+            $path = $importDir.\DIRECTORY_SEPARATOR.$filename;
+
+            try {
+                $report = $this->operation->import($path, $wallet);
+                if ($report['errors']) {
+                    $this->addFlash('danger', implode(' ', $report['errors']));
+                } else {
+                    $this->addFlash('success', $this->coreLocator->translator()->trans(
+                        '%imported% opération(s) importée(s), %skipped% déjà présente(s) ignorée(s).',
+                        ['%imported%' => $report['imported'], '%skipped%' => $report['skipped']],
+                        'back'
+                    ));
+                }
+            } finally {
+                if (is_file($path)) {
+                    unlink($path);
+                }
+            }
+        } elseif ($form->isSubmitted()) {
+            $errors = [];
+            foreach ($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+            $this->addFlash('danger', $errors ? implode(' ', $errors) : $this->coreLocator->translator()->trans('Le fichier déposé est invalide.', [], 'back'));
+        }
+
+        return $this->redirectToRoute('back_operation_index', ['wallet' => $wallet->getId()]);
     }
 
     /**

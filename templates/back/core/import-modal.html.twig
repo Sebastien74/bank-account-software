@@ -1,0 +1,32 @@
+{% trans_default_domain 'back' %}
+
+{% if form %}
+    <button type="button" class="btn btn-dark p-0 d-flex align-items-center text-white add-btn btn-icon ms-2" data-bs-toggle="modal" data-bs-target="#import-operations-modal">
+        <twig:ux:icon name="tabler:file-spreadsheet" class="btn-square bg-primary" /><span class="btn text-white py-0 px-3">{{ "Importer"|trans|striptags }}</span>
+    </button>
+    <div class="modal fade" id="import-operations-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                {{ form_start(form, {attr: {
+                    novalidate: "novalidate",
+                    enctype: "multipart/form-data",
+                }}) }}
+                    <div class="modal-header">
+                        <strong class="text-white fs-5 d-flex align-items-center"><twig:ux:icon name="tabler:file-spreadsheet" class="text-primary me-2" />{{ "Importer des opérations"|trans|raw }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
+                    </div>
+                    <div class="modal-body pt-4 pb-0">
+                        <p class="text-white-50">{{ "Déposez le relevé de compte au format XLSX à importer."|trans|raw }}</p>
+                        <div class="row">
+                            {{ form_row(form.file) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer pt-0 pb-4">
+                        <button type="button" class="btn btn-dark me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
+                        {{ form_widget(form.submit) }}
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endif %}

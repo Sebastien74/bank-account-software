@@ -46,6 +46,9 @@
                 form: form is defined and form ? form : false,
                 formErrors: formErrors is defined and formErrors ? formErrors : false,
             } only %}
+            {% include 'back/core/import-modal.html.twig' with {
+                form: importForm is defined and importForm ? importForm : false,
+            } only %}
             <div class="dates-controls d-flex align-items-center ms-4">
                 <a href="{{ path('back_operation_index', {wallet: wallet.id, month: previousMonth, year: previousYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
                    class="icon-wrap prev bg-dark d-flex align-items-center justify-content-center h-100"
