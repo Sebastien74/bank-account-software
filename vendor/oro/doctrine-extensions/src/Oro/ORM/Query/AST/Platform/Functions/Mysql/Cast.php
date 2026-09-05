@@ -20,7 +20,7 @@ class Cast extends PlatformFunctionNode
         $isBoolean = $type === 'bool' || $type === 'boolean';
         if ($type === 'char') {
             $type = 'char(1)';
-        } elseif ($type === 'string' || $type === 'text' || $type === 'json') {
+        } elseif ($type === 'string' || $type === 'text' || $type === 'uuid') {
             $type = 'char';
         } elseif ($type === 'int' || $type === 'integer' || $isBoolean) {
             $type = 'signed';

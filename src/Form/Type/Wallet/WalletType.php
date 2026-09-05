@@ -42,7 +42,7 @@ class WalletType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez un nom', [], 'back'),
             ],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
             'row_attr' => ['class' => 'col-lg-9'],
         ]);
@@ -54,7 +54,7 @@ class WalletType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez un code', [], 'back'),
             ],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un code.', [], 'back')])
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un code.', [], 'back'))
             ],
             'row_attr' => ['class' => 'col-lg-3'],
         ]);
@@ -67,7 +67,7 @@ class WalletType extends AbstractType
             ],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-3'],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un montant.', [], 'back'),]),
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un montant.', [], 'back')),
             ],
         ]);
 

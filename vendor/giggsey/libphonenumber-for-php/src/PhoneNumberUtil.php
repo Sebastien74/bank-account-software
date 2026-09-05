@@ -933,9 +933,11 @@ class PhoneNumberUtil
     public function getNationalSignificantNumber(PhoneNumber $number): string
     {
         // If leading zero(s) have been set, we prefix this now. Note this is not a national prefix.
+        // Defensively cap the number of leading zeros to avoid OOM from malicious input.
         $nationalNumber = '';
         if ($number->isItalianLeadingZero() && $number->getNumberOfLeadingZeros() > 0) {
-            $zeros = str_repeat('0', $number->getNumberOfLeadingZeros());
+            $numberOfLeadingZeros = min($number->getNumberOfLeadingZeros(), 10);
+            $zeros = str_repeat('0', $numberOfLeadingZeros);
             $nationalNumber .= $zeros;
         }
         $nationalNumber .= $number->getNationalNumber();
@@ -1156,13 +1158,17 @@ class PhoneNumberUtil
     public function format(PhoneNumber $number, PhoneNumberFormat $numberFormat): string
     {
         if ($number->getNationalNumber() === '0' && $number->hasRawInput()) {
-            // Unparsable numbers that kept their raw input just use that.
-            // This is the only case where a number can be formatted as E164 without a
-            // leading '+' symbol (but the original number wasn't parseable anyway).
-            // TODO: Consider removing the 'if' above so that unparsable
-            // strings without raw input format to the empty string instead of "+00"
+            // Unparseable numbers that kept their raw input just use that, unless default country was
+            // specified and the format is E164. In that case, we prepend the raw input with the country
+            // code
             $rawInput = $number->getRawInput();
-            if ($rawInput !== '') {
+
+            if ($rawInput !== '' && $number->hasCountryCode() && $number->getCountryCodeSource() === CountryCodeSource::FROM_DEFAULT_COUNTRY && $numberFormat === PhoneNumberFormat::E164) {
+                $countryCallingCode = $number->getCountryCode();
+                $formattedNumber = $rawInput;
+                $this->prefixNumberWithCountryCallingCode($countryCallingCode, $numberFormat, $formattedNumber);
+                return $formattedNumber;
+            } elseif ($rawInput !== '' || !$number->hasCountryCode()) {
                 return $rawInput;
             }
         }
@@ -1367,6 +1373,30 @@ class PhoneNumberUtil
     }
 
     /**
+     * Checks whether the supplied string contains at least three ASCII letters.
+     */
+    private function hasAtLeastThreeAlphaChars(string $number): bool
+    {
+        $alphaCount = 0;
+        $length = strlen($number);
+
+        for ($i = 0; $i < $length; $i++) {
+            $character = ord($number[$i]);
+
+            if (
+                ($character >= 65 && $character <= 90)
+                || ($character >= 97 && $character <= 122)
+            ) {
+                if (++$alphaCount >= 3) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if the number is a valid vanity (alpha) number such as 800 MICROSOFT. A valid vanity
      * number will start with at least 3 digits and will have three or more alpha characters. This
      * does not do region-specific checks - to work out if this number is actually valid for a region,
@@ -1378,12 +1408,18 @@ class PhoneNumberUtil
      */
     public function isAlphaNumber(string $number): bool
     {
-        if (!static::isViablePhoneNumber($number)) {
-            // Number is too short, or doesn't match the basic phone number pattern.
+        if (strlen($number) > static::MAX_INPUT_STRING_LENGTH) {
             return false;
         }
+
+        if (!static::isViablePhoneNumber($number)) {
+            // Number is too short, or doesn't match the basic phone-number pattern.
+            return false;
+        }
+
         $this->maybeStripExtension($number);
-        return (bool) preg_match('/' . static::VALID_ALPHA_PHONE_PATTERN . '/' . static::REGEX_FLAGS, $number);
+
+        return $this->hasAtLeastThreeAlphaChars($number);
     }
 
     /**
@@ -2752,7 +2788,9 @@ class PhoneNumberUtil
      */
     public function formatInOriginalFormat(PhoneNumber $number, string $regionCallingFrom): string
     {
-        if ($number->hasRawInput() && !$this->hasFormattingPatternForNumber($number)) {
+        $formatRule = $this->getFormattingPatternForNumber($number);
+
+        if ($number->hasRawInput() && $formatRule === null) {
             // We check if we have the formatting pattern because without that, we might format the number
             // as a group without national prefix.
             return $number->getRawInput();
@@ -2796,11 +2834,6 @@ class PhoneNumberUtil
                     $formattedNumber = $nationalFormat;
                     break;
                 }
-                // Metadata cannot be null here because getNddPrefixForRegion() (above) returns null if
-                // there is no metadata for the region.
-                $metadata = $this->getMetadataForRegion($regionCode);
-                $nationalNumber = $this->getNationalSignificantNumber($number);
-                $formatRule = $this->chooseFormattingPatternForNumber($metadata->numberFormats(), $nationalNumber);
                 // The format rule could still be null here if the national number was 0 and there was no
                 // raw input (this should not be possible for numbers generated by the phonenumber library
                 // as they would also not have a country calling code and we would have exited earlier).
@@ -2847,17 +2880,19 @@ class PhoneNumberUtil
         return $formattedNumber;
     }
 
-    protected function hasFormattingPatternForNumber(PhoneNumber $number): bool
+    /**
+     * Called chooseFormattingPatternForNumber in libphonenumber
+     */
+    protected function getFormattingPatternForNumber(PhoneNumber $number): ?NumberFormat
     {
         $countryCallingCode = $number->getCountryCode();
         $phoneNumberRegion = $this->getRegionCodeForCountryCode($countryCallingCode);
         $metadata = $this->getMetadataForRegionOrCallingCode($countryCallingCode, $phoneNumberRegion);
         if ($metadata === null) {
-            return false;
+            return null;
         }
         $nationalNumber = $this->getNationalSignificantNumber($number);
-        $formatRule = $this->chooseFormattingPatternForNumber($metadata->numberFormats(), $nationalNumber);
-        return $formatRule !== null;
+        return $this->chooseFormattingPatternForNumber($metadata->numberFormats(), $nationalNumber);
     }
 
     /**

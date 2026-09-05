@@ -64,7 +64,7 @@ class ObjectiveController extends BaseController
     protected function breadcrumb(array $items = []): void
     {
         $items[$this->coreLocator->translator()->trans('Objectifs', [], 'breadcrumb')] = 'back_objective_index';
-        if ($this->coreLocator->request()->get('objective')) {
+        if ($this->coreLocator->request()->attributes->get('objective')) {
             $items[$this->coreLocator->translator()->trans('Édition', [], 'back_breadcrumb')] = 'back_objective_edit';
         }
 

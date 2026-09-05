@@ -15,38 +15,27 @@ use Monolog\Formatter\JsonFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\HandlerInterface;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\AddProcessorsPass;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\AddSwiftMailerTransportPass;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\FixEmptyLoggerPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @final since 3.9.0
  */
-class MonologBundle extends Bundle
+final class MonologBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        $container->addCompilerPass($channelPass = new LoggerChannelPass());
-        $container->addCompilerPass(new FixEmptyLoggerPass($channelPass));
+        $container->addCompilerPass(new LoggerChannelPass());
         $container->addCompilerPass(new AddProcessorsPass());
-        $container->addCompilerPass(new AddSwiftMailerTransportPass());
     }
 
     /**
      * @internal
-     *
-     * @return void
      */
-    public static function includeStacktraces(HandlerInterface $handler)
+    public static function includeStacktraces(HandlerInterface $handler): void
     {
         $formatter = $handler->getFormatter();
         if ($formatter instanceof LineFormatter || $formatter instanceof JsonFormatter) {

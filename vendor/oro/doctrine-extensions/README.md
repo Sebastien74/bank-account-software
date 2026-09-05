@@ -1,7 +1,7 @@
 Oro Doctrine Extensions
 =======================
 
-[![Build Status](https://travis-ci.org/oroinc/doctrine-extensions.svg)](https://travis-ci.org/oroinc/doctrine-extensions)
+[![CI](https://github.com/oroinc/doctrine-extensions/actions/workflows/ci.yml/badge.svg?branch=3.x)](https://github.com/oroinc/doctrine-extensions/actions/workflows/ci.yml)
 
 Table of Contents
 -----------------
@@ -47,7 +47,7 @@ Available functions:
 * `ROUND(value, ?precision)` - Rounds the value to the specified precision (defaults to 0 precision if not specified).
 * `CEIL(value)` - Returns the value rounded up.
 * `SIGN(expr)` - Returns the sign of the argument.
-* `CAST(expr as type)` - Takes an expression of any type and produces a result value of a specified type. Supported types are: `char`, `string`, `text`, `date`, `datetime`, `time`, `int`, `integer`, `bigint`, `decimal`, `boolean`, `binary`.
+* `CAST(expr as type)` - Takes an expression of any type and produces a result value of a specified type. Supported types are: `char`, `string`, `text`, `date`, `datetime`, `time`, `int`, `integer`, `bigint`, `decimal`, `boolean`, `binary`, `uuid`.
 * `CONCAT_WS` - Concatenate all but the first argument. The first argument is used as the separator string.
 * `GROUP_CONCAT` - Returns a concatenated string. GROUP_CONCAT full syntax:
 ```
@@ -95,7 +95,7 @@ Add the following dependency to your composer.json:
 ```json
 {
     "require": {
-        "oro/doctrine-extensions": "^2.0"
+        "oro/doctrine-extensions": "^3.0"
     }
 }
 ```
@@ -240,7 +240,3 @@ This library also provides the following field types:
 
 * `MoneyType`
 * `PercentType`
-* `ObjectType`
-* `ArrayType`
-
-`ObjectType` and `ArrayType` use Base64 encoded strings to store values in the database instead of storing serialized strings. For backward compatibility the values that are already stored in the database will be unserialized without Base64 encoding. The new values will be Base64 encoded before saving to the database and Base64 decoded before unserialization.

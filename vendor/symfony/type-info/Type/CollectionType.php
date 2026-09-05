@@ -40,8 +40,7 @@ class CollectionType extends Type implements WrappingTypeInterface
 
         if ($this->isList()) {
             if (!$type->isIdentifiedBy(TypeIdentifier::ARRAY)) {
-                trigger_deprecation('symfony/type-info', '7.3', 'Creating a "%s" that is a list and not an array is deprecated and will throw a "%s" in 8.0.', self::class, InvalidArgumentException::class);
-                // throw new InvalidArgumentException(\sprintf('Cannot create a "%s" as list when type is not "array".', self::class));
+                throw new InvalidArgumentException(\sprintf('Cannot create a "%s" as list when type is not "array".', self::class));
             }
 
             $keyType = $this->getCollectionKeyType();
@@ -52,14 +51,33 @@ class CollectionType extends Type implements WrappingTypeInterface
         } elseif ($type instanceof GenericType && $type->getWrappedType() instanceof BuiltinType && TypeIdentifier::ARRAY === $type->getWrappedType()->getTypeIdentifier()) {
             $keyType = $this->getCollectionKeyType();
 
-            $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
-
-            foreach ($keyTypes as $type) {
-                if (!$type instanceof BuiltinType || !\in_array($type->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
-                    throw new InvalidArgumentException(\sprintf('"%s" is not a valid array key type.', (string) $keyType));
-                }
-            }
+            $this->assertValidArrayKeyType($keyType);
         }
+    }
+
+    private function assertValidArrayKeyType(Type $keyType, ?Type $rootType = null): void
+    {
+        $rootType ??= $keyType;
+
+        if ($keyType instanceof UnionType) {
+            foreach ($keyType->getTypes() as $type) {
+                $this->assertValidArrayKeyType($type, $rootType);
+            }
+
+            return;
+        }
+
+        if ($keyType instanceof TemplateType) {
+            $this->assertValidArrayKeyType($keyType->getBound(), $rootType);
+
+            return;
+        }
+
+        if ($keyType instanceof BuiltinType && \in_array($keyType->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(\sprintf('"%s" is not a valid array key type.', (string) $rootType));
     }
 
     /**
@@ -157,6 +175,9 @@ class CollectionType extends Type implements WrappingTypeInterface
         return $defaultCollectionValueType;
     }
 
+    /**
+     * @param-immediately-invoked-callable $specification
+     */
     public function wrappedTypeIsSatisfiedBy(callable $specification): bool
     {
         return $this->getWrappedType()->isSatisfiedBy($specification);

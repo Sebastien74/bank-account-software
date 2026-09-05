@@ -22,12 +22,12 @@ class LiveComponentMetadata
 {
     public function __construct(
         private ComponentMetadata $componentMetadata,
-        /** @var list<LivePropMetadata|LegacyLivePropMetadata> */
+        /** @var list<LivePropMetadata> */
         private array $livePropsMetadata,
     ) {
         uasort(
             $this->livePropsMetadata,
-            static fn (LivePropMetadata|LegacyLivePropMetadata $a, LivePropMetadata|LegacyLivePropMetadata $b) => $a->hasModifier() <=> $b->hasModifier()
+            static fn (LivePropMetadata $a, LivePropMetadata $b) => $a->hasModifier() <=> $b->hasModifier()
         );
     }
 
@@ -37,9 +37,9 @@ class LiveComponentMetadata
     }
 
     /**
-     * @return list<LivePropMetadata|LegacyLivePropMetadata>
+     * @return list<LivePropMetadata>
      */
-    public function getAllLivePropsMetadata(object $component): iterable
+    public function getAllLivePropsMetadata(?object $component): iterable
     {
         foreach ($this->livePropsMetadata as $livePropMetadata) {
             yield $livePropMetadata->withModifier($component);
@@ -55,11 +55,11 @@ class LiveComponentMetadata
      */
     public function getOnlyPropsThatAcceptUpdatesFromParent(array $inputProps): array
     {
-        $writableProps = array_filter($this->livePropsMetadata, function (LivePropMetadata|LegacyLivePropMetadata $livePropMetadata) {
+        $writableProps = array_filter($this->livePropsMetadata, static function (LivePropMetadata $livePropMetadata) {
             return $livePropMetadata->acceptUpdatesFromParent();
         });
 
-        $propNames = array_map(function ($livePropMetadata) {
+        $propNames = array_map(static function ($livePropMetadata) {
             return $livePropMetadata->getName();
         }, $writableProps);
 

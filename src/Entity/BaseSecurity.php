@@ -45,7 +45,7 @@ abstract class BaseSecurity extends BaseInterface implements UserInterface, Pass
     #[Groups('main')]
     protected ?string $firstName = null;
 
-    #[Assert\Length(['max' => 4096])]
+    #[Assert\Length(max: 4096)]
     protected ?string $plainPassword = null;
 
     #[ORM\Column(type: Types::STRING, length: 255)]

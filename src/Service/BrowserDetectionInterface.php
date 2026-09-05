@@ -17,5 +17,5 @@ interface BrowserDetectionInterface
 
     function isMobile(): bool;
 
-    function is(string $key, string $userAgent = null, array $httpHeaders = null): bool;
+    function is(string $key, ?string $userAgent = null, ?array $httpHeaders = null): bool;
 }

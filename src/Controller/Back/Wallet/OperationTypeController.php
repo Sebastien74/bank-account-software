@@ -64,7 +64,7 @@ class OperationTypeController extends BaseController
     protected function breadcrumb(array $items = []): void
     {
         $items[$this->coreLocator->translator()->trans("Types d'opérations", [], 'breadcrumb')] = 'back_operationtype_index';
-        if ($this->coreLocator->request()->get('operationtype')) {
+        if ($this->coreLocator->request()->attributes->get('operationtype')) {
             $items[$this->coreLocator->translator()->trans('Édition', [], 'back_breadcrumb')] = 'back_operationtype_edit';
         }
 

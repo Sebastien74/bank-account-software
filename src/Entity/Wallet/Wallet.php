@@ -35,7 +35,7 @@ class Wallet extends BaseEntity
     // les soldes et moyennes sont calculés en base (OperationRepository).
     #[ORM\OneToMany(targetEntity: Operation::class, mappedBy: 'wallet', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['date' => 'DESC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
+    #[Assert\Valid(groups: ['form_submission'])]
     private ArrayCollection|PersistentCollection $operations;
 
     /**

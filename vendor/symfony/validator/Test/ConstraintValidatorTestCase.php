@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -80,7 +81,15 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
         $this->context = $this->createContext();
         $this->validator = $this->createValidator();
-        $this->validator->initialize($this->context);
+
+        // TODO remove this in Symfony 9.0
+        if (!$this->validator instanceof ConstraintValidator && !method_exists($this->validator, 'validateInContext')) {
+            $this->validator->initialize($this->context);
+        } elseif ($this->validator instanceof ConstraintValidator) {
+            // Keep usages of $this->validator->validate() in tests working for BC for tests not using $this->validate() yet
+            // TODO figure out whether we could make such usages trigger a deprecation
+            (new \ReflectionProperty(ConstraintValidator::class, 'context'))->setValue($this->validator, $this->context);
+        }
 
         if (class_exists(\Locale::class)) {
             $this->defaultLocale = \Locale::getDefault();
@@ -117,6 +126,17 @@ abstract class ConstraintValidatorTestCase extends TestCase
         if (null !== $this->defaultTimezone) {
             date_default_timezone_set($this->defaultTimezone);
             $this->defaultTimezone = null;
+        }
+    }
+
+    protected function validate(mixed $value, Constraint $constraint): void
+    {
+        // TODO remove this in Symfony 9.0
+        if (!$this->validator instanceof ConstraintValidator && !method_exists($this->validator, 'validateInContext')) {
+            $this->validator->initialize($this->context);
+            $this->validator->validate($value, $constraint);
+        } else {
+            $this->validator->validateInContext($value, $constraint, $this->context);
         }
     }
 
@@ -160,19 +180,19 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
         $contextualValidator
             ->method('atPath')
-            ->willReturnCallback(fn ($path) => $contextualValidator->doAtPath($path));
+            ->willReturnCallback(static fn ($path) => $contextualValidator->doAtPath($path));
         $contextualValidator
             ->method('validate')
-            ->willReturnCallback(fn ($value, $constraints = null, $groups = null) => $contextualValidator->doValidate($value, $constraints, $groups));
+            ->willReturnCallback(static fn ($value, $constraints = null, $groups = null) => $contextualValidator->doValidate($value, $constraints, $groups));
         $contextualValidator
             ->method('validateProperty')
-            ->willReturnCallback(fn ($object, $propertyName, $groups = null) => $contextualValidator->validateProperty($object, $propertyName, $groups));
+            ->willReturnCallback(static fn ($object, $propertyName, $groups = null) => $contextualValidator->validateProperty($object, $propertyName, $groups));
         $contextualValidator
             ->method('validatePropertyValue')
-            ->willReturnCallback(fn ($objectOrClass, $propertyName, $value, $groups = null) => $contextualValidator->doValidatePropertyValue($objectOrClass, $propertyName, $value, $groups));
+            ->willReturnCallback(static fn ($objectOrClass, $propertyName, $value, $groups = null) => $contextualValidator->doValidatePropertyValue($objectOrClass, $propertyName, $value, $groups));
         $contextualValidator
             ->method('getViolations')
-            ->willReturnCallback(fn () => $contextualValidator->doGetViolations());
+            ->willReturnCallback(static fn () => $contextualValidator->doGetViolations());
         $validator
             ->method('inContext')
             ->willReturn($contextualValidator);
@@ -182,7 +202,10 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function setGroup(?string $group)
     {
-        $this->group = $group;
+        if (null !== $group) {
+            $this->group = $group;
+        }
+
         $this->context->setGroup($group);
     }
 
@@ -216,7 +239,10 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->root = $root;
         $this->context = $this->createContext();
-        $this->validator->initialize($this->context);
+        // TODO remove this in Symfony 9.0
+        if (!$this->validator instanceof ConstraintValidator && !method_exists($this->validator, 'validateInContext')) {
+            $this->validator->initialize($this->context);
+        }
     }
 
     protected function setPropertyPath(string $propertyPath)
@@ -234,7 +260,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectValidateAt(int $i, string $propertyPath, mixed $value, string|GroupSequence|array|null $group)
     {
         $validator = $this->context->getValidator()->inContext($this->context);
-        $validator->expectValidation($i, $propertyPath, $value, $group, function ($passedConstraints) {
+        $validator->expectValidation($i, $propertyPath, $value, $group, static function ($passedConstraints) {
             $expectedConstraints = LogicalOr::fromConstraints(new IsNull(), new IsIdentical([]), new IsInstanceOf(Valid::class));
 
             Assert::assertThat($passedConstraints, $expectedConstraints);
@@ -244,7 +270,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectValidateValue(int $i, mixed $value, array $constraints = [], string|GroupSequence|array|null $group = null)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
+        $contextualValidator->expectValidation($i, null, $value, $group, static function ($passedConstraints) use ($constraints) {
             if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
@@ -256,7 +282,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectFailingValueValidation(int $i, mixed $value, array $constraints, string|GroupSequence|array|null $group, ConstraintViolationInterface $violation)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
+        $contextualValidator->expectValidation($i, null, $value, $group, static function ($passedConstraints) use ($constraints) {
             if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
@@ -268,7 +294,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectValidateValueAt(int $i, string $propertyPath, mixed $value, Constraint|array $constraints, string|GroupSequence|array|null $group = null)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expectValidation($i, $propertyPath, $value, $group, function ($passedConstraints) use ($constraints) {
+        $contextualValidator->expectValidation($i, $propertyPath, $value, $group, static function ($passedConstraints) use ($constraints) {
             Assert::assertEquals($constraints, $passedConstraints);
         });
     }
@@ -280,8 +306,14 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $validatorClassname = $constraint->validatedBy();
 
         $validator = new $validatorClassname();
-        $validator->initialize($context);
-        $validator->validate($value, $constraint);
+
+        // TODO remove this in Symfony 9.0
+        if ($validator instanceof ConstraintValidator || method_exists($validator, 'validateInContext')) {
+            $validator->validateInContext($value, $constraint, $context);
+        } else {
+            $validator->initialize($context);
+            $validator->validate($value, $constraint);
+        }
 
         $this->expectedViolations[] = $context->getViolations();
 

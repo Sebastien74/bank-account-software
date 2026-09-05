@@ -44,7 +44,7 @@ class OperationType extends BaseEntity
 
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'operationtype', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
+    #[Assert\Valid(groups: ['form_submission'])]
     private ArrayCollection|PersistentCollection $categories;
 
     /**

@@ -497,7 +497,7 @@ class FileInfo implements FileInfoInterface
     /**
      * Get file Bytes.
      */
-    private function setFormatBytes(int $bytes = null, int $precision = 2): void
+    private function setFormatBytes(?int $bytes = null, int $precision = 2): void
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;

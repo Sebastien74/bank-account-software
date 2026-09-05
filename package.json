@@ -1,4 +1,7 @@
 {
+    "engines": {
+        "node": ">=24 <25"
+    },
     "browserslist": [
         "> 0.5%",
         "last 2 versions",
@@ -24,11 +27,11 @@
         "core-js": "^3.47.0",
         "css-minimizer-webpack-plugin": "^7.0.4",
         "file-loader": "6.2.0",
-        "node-sass": "^9.0.0",
         "postcss": "^8.4.47",
         "postcss-loader": "^8.1.1",
         "purgecss-webpack-plugin": "^7.0.2",
         "regenerator-runtime": "^0.14.1",
+        "sass": "^1.104.0",
         "sass-loader": "16.0.6",
         "tom-select": "^2.2.2",
         "url-loader": "4.1.1",

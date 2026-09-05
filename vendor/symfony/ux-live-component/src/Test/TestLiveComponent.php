@@ -65,7 +65,7 @@ final class TestLiveComponent
             $this->metadataFactory->getMetadata($this->metadata->getName()),
         );
 
-        return (new MountedComponent($this->metadata->getName(), $component, $componentAttributes))->getComponent();
+        return new MountedComponent($this->metadata->getName(), $component, $componentAttributes)->getComponent();
     }
 
     /**
@@ -80,8 +80,8 @@ final class TestLiveComponent
     }
 
     /**
-     * @param array<string,mixed>         $arguments
-     * @param array<string, UploadedFile> $files
+     * @param array<string,mixed>                        $arguments
+     * @param array<string, UploadedFile|UploadedFile[]> $files
      */
     public function call(string $action, array $arguments = [], array $files = []): self
     {

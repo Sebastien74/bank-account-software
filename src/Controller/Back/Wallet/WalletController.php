@@ -187,9 +187,9 @@ class WalletController extends BaseController
         $translator = $this->coreLocator->translator();
         $items[$translator->trans('Mes comptes', [], 'breadcrumb')] = 'back_wallet_index';
 
-        $walletId = $this->coreLocator->request()->get('wallet');
+        $walletId = $this->coreLocator->request()->attributes->get('wallet');
         if ($walletId) {
-            $routeName = $this->coreLocator->request()->get('_route');
+            $routeName = $this->coreLocator->request()->attributes->get('_route');
             if ($routeName === 'back_wallet_edit') {
                 $items[$translator->trans('Édition', [], 'back_breadcrumb')] = 'back_wallet_edit';
             } elseif ($routeName === 'back_operation_statistics') {

@@ -94,6 +94,10 @@ final class AutocompleteChoiceTypeExtension extends AbstractTypeExtension
         $values['create-option-text'] = $this->trans($options['create_option_text']);
         $values['preload'] = $options['preload'];
 
+        if ($options['reset_on_focus']) {
+            $values['reset-on-focus'] = '';
+        }
+
         foreach ($values as $name => $value) {
             $attr['data-'.$controllerName.'-'.$name.'-value'] = $value;
         }
@@ -152,15 +156,11 @@ final class AutocompleteChoiceTypeExtension extends AbstractTypeExtension
             'min_characters' => null,
             'max_results' => 10,
             'preload' => 'focus',
+            'reset_on_focus' => false,
             'extra_options' => [],
         ]);
 
-        // if autocomplete_url is passed, then HTML options are already supported
-        $resolver->setNormalizer('options_as_html', function (Options $options, $value) {
-            return null === $options['autocomplete_url'] ? $value : false;
-        });
-
-        $resolver->setNormalizer('preload', function (Options $options, $value) {
+        $resolver->setNormalizer('preload', static function (Options $options, $value) {
             if (\is_bool($value)) {
                 $value = $value ? 'true' : 'false';
             }

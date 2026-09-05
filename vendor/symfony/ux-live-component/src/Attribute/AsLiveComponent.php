@@ -13,6 +13,7 @@ namespace Symfony\UX\LiveComponent\Attribute;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
+use Symfony\UX\TwigComponent\Attribute\FromMethod;
 
 /**
  * An attribute to register a LiveComponent.
@@ -27,59 +28,46 @@ final class AsLiveComponent extends AsTwigComponent
     public string $route;
     public string $method;
     public int $urlReferenceType;
+    public ?string $fetchCredentials;
 
     private ?string $defaultAction;
 
     /**
      * @param string|null              $name              The component name (ie: TodoList)
-     * @param string|null              $template          The template path of the component (ie: components/TodoList.html.twig).
+     * @param string|FromMethod|null   $template          The template path of the component (ie: components/TodoList.html.twig), or a reference to a component's method (ie: FromMethod('getTemplate')
      * @param string|null              $defaultAction     The default action to call when the component is mounted (ie: __invoke)
      * @param bool                     $exposePublicProps Whether to expose every public property as a Twig variable
      * @param string                   $attributesVar     The name of the special "attributes" variable in the template
      * @param string                   $route             The route used to render the component & handle actions
      * @param string                   $method            The HTTP method to use
      * @param UrlGeneratorInterface::* $urlReferenceType  Which type of URL should be generated for the given route
+     * @param string|null              $fetchCredentials  The fetch credentials mode to use ('same-origin', 'include', 'omit'), null to use the global default
      */
     public function __construct(
         ?string $name = null,
-        ?string $template = null,
+        string|FromMethod|null $template = null,
         ?string $defaultAction = null,
         bool $exposePublicProps = true,
         string $attributesVar = 'attributes',
-        string|bool $route = 'ux_live_component',
+        string $route = 'ux_live_component',
         string $method = 'post',
-        int|string $urlReferenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-        public bool|int $csrf = true, // @deprecated
+        int $urlReferenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
+        ?string $fetchCredentials = null,
     ) {
-        if (8 < \func_num_args() || \is_bool($route)) {
-            trigger_deprecation('symfony/ux-live-component', '2.21', 'Argument "$csrf" of "#[%s]" has no effect anymore and is deprecated.', static::class);
-        }
-        if (\is_bool($route)) {
-            $this->csrf = $route;
-            $route = $method;
-            $method = $urlReferenceType;
-            $urlReferenceType = $csrf;
-
-            switch (\func_num_args()) {
-                case 6: $route = 'ux_live_component';
-                    // no break
-                case 7: $method = 'post';
-                    // no break
-                case 8: $urlReferenceType = UrlGeneratorInterface::ABSOLUTE_PATH;
-                    // no break
-                default:
-            }
-        }
-
         parent::__construct($name, $template, $exposePublicProps, $attributesVar);
 
         $this->defaultAction = $defaultAction;
         $this->route = $route;
         $this->method = strtolower($method);
         $this->urlReferenceType = $urlReferenceType;
+        $this->fetchCredentials = $fetchCredentials;
 
-        if (!\in_array($method, ['get', 'post'])) {
+        if (!\in_array($this->method, ['get', 'post'], true)) {
             throw new \UnexpectedValueException('$method must be either \'get\' or \'post\'.');
+        }
+
+        if (null !== $fetchCredentials && !\in_array($fetchCredentials, ['same-origin', 'include', 'omit'], true)) {
+            throw new \UnexpectedValueException('$fetchCredentials must be either \'same-origin\', \'include\' or \'omit\'.');
         }
     }
 
@@ -91,10 +79,10 @@ final class AsLiveComponent extends AsTwigComponent
         return array_merge(parent::serviceConfig(), [
             'default_action' => $this->defaultAction,
             'live' => true,
-            'csrf' => $this->csrf,
             'route' => $this->route,
             'method' => $this->method,
             'url_reference_type' => $this->urlReferenceType,
+            'fetch_credentials' => $this->fetchCredentials,
         ]);
     }
 

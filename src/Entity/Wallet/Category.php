@@ -45,7 +45,7 @@ class Category extends BaseEntity
 
     #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category', cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
-    #[Assert\Valid(['groups' => ['form_submission']])]
+    #[Assert\Valid(groups: ['form_submission'])]
     private ArrayCollection|PersistentCollection $subCategories;
 
     #[ORM\ManyToOne(targetEntity: OperationType::class, cascade: ['persist'], inversedBy: 'categories')]

@@ -121,10 +121,10 @@ class GlobalManager implements GlobalManagerInterface
      */
     public function setMasterField(mixed $entity, string $masterField, string $masterFieldSetter): void
     {
-        if ($masterFieldSetter && method_exists($entity, $masterFieldSetter) && $this->coreLocator->request()->get($masterField)) {
+        if ($masterFieldSetter && method_exists($entity, $masterFieldSetter) && $this->coreLocator->request()->attributes->get($masterField)) {
             $metadata = $this->coreLocator->em()->getClassMetadata(get_class($entity));
             $masterClassname = $metadata->associationMappings[$masterField]['targetEntity'];
-            $masterEntity = $this->coreLocator->em()->getRepository($masterClassname)->find($this->coreLocator->request()->get($masterField));
+            $masterEntity = $this->coreLocator->em()->getRepository($masterClassname)->find($this->coreLocator->request()->attributes->get($masterField));
             $entity->$masterFieldSetter($masterEntity);
         }
     }

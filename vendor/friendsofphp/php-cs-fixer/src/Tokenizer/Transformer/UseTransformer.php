@@ -46,7 +46,12 @@ final class UseTransformer extends AbstractTransformer
         return 5_03_00;
     }
 
-    public function process(Tokens $tokens, Token $token, int $index): void
+    public function isCandidate(Tokens $tokens): bool
+    {
+        return $tokens->isTokenKindFound(\T_USE);
+    }
+
+    public function processToken(Tokens $tokens, Token $token, int $index): void
     {
         if ($token->isGivenKind(\T_USE) && $this->isUseForLambda($tokens, $index)) {
             $tokens[$index] = new Token([CT::T_USE_LAMBDA, $token->getContent()]);
@@ -66,7 +71,7 @@ final class UseTransformer extends AbstractTransformer
         }
 
         $index = $tokens->getNextTokenOfKind($index, ['{']);
-        $innerLimit = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $index);
+        $innerLimit = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $index);
 
         while ($index < $innerLimit) {
             $token = $tokens[++$index];

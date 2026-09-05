@@ -49,5 +49,5 @@ interface FileInfoInterface
 
     public function isPlaceHolder(): bool;
 
-    public function formatBytes(int $bytes = null, int $precision = 2): ?string;
+    public function formatBytes(?int $bytes = null, int $precision = 2): ?string;
 }

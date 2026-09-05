@@ -51,7 +51,7 @@ class LocaleSubscriber implements EventSubscriberInterface
         $uri = $request->getUri();
         $inAdmin = preg_match('/\/back-'.$_ENV['SECURITY_TOKEN'].'/', $uri);
         $session = $request->getSession();
-        $asSwitch = !empty($request->get('_switch_user'));
+        $asSwitch = !empty($request->query->get('_switch_user'));
 
         if (!$request->hasPreviousSession() && !$event->isMainRequest() || $asSwitch || str_contains($uri, '_fragment') || str_contains($uri, '_wdt')) {
             return;

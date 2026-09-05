@@ -13,9 +13,7 @@ namespace Symfony\Component\Security\Http\AccessToken\Oidc;
 
 use Jose\Component\Checker;
 use Jose\Component\Checker\ClaimCheckerManager;
-use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Component\Encryption\JWETokenSupport;
@@ -48,6 +46,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     private ?AlgorithmManager $decryptionAlgorithms = null;
     private bool $enforceEncryption = false;
 
+    private bool $enforceKeyUsageVerification = true;
     private ?CacheInterface $discoveryCache = null;
     private ?string $oidcConfigurationCacheKey = null;
 
@@ -57,22 +56,14 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     private array $discoveryClients = [];
 
     public function __construct(
-        private Algorithm|AlgorithmManager $signatureAlgorithm,
-        private JWK|JWKSet|null $signatureKeyset,
+        private AlgorithmManager $signatureAlgorithm,
+        private ?JWKSet $signatureKeyset,
         private string $audience,
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
     ) {
-        if ($signatureAlgorithm instanceof Algorithm) {
-            trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
-            $this->signatureAlgorithm = new AlgorithmManager([$signatureAlgorithm]);
-        }
-        if ($signatureKeyset instanceof JWK) {
-            trigger_deprecation('symfony/security-http', '7.1', 'Second argument must be instance of %s, %s given.', JWKSet::class, JWK::class);
-            $this->signatureKeyset = new JWKSet([$signatureKeyset]);
-        }
     }
 
     public function enableJweSupport(JWKSet $decryptionKeyset, AlgorithmManager $decryptionAlgorithms, bool $enforceEncryption): void
@@ -84,16 +75,19 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
     /**
      * @param HttpClientInterface|HttpClientInterface[] $client
+     * @param bool                                      $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
+     *                                                                               `key_ops` contains "sign"/"verify" are accepted for signature verification.
+     *                                                                               When false (lax), JWKs missing both `use` and `key_ops` are also accepted;
+     *                                                                               JWKs explicitly scoped to encryption (`use=enc` or only encryption-related
+     *                                                                               `key_ops`) are still rejected. Use the lax mode only with providers known
+     *                                                                               to omit `use`/`key_ops` on signing keys.
      */
-    public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, ?string $oidcJWKSetCacheKey = null): void
+    public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, bool $enforceKeyUsageVerification = true): void
     {
-        if (null !== $oidcJWKSetCacheKey) {
-            trigger_deprecation('symfony/security-http', '7.4', 'Passing $oidcJWKSetCacheKey parameter to "%s()" is deprecated.', __METHOD__);
-        }
-
         $this->discoveryCache = $cache;
         $this->discoveryClients = \is_array($client) ? $client : [$client];
         $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
+        $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -131,6 +125,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),
+                'exception' => $e::class,
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -154,22 +149,19 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         }
         $logger = $this->logger;
         try {
-            $keys = [];
+            $discoveredKeys = [];
             $minTtl = null;
             $configResponses = [];
             $jwkSetResponses = [];
 
             foreach ($clients as $client) {
-                $configResponses[] = [$client, $client->request('GET', '.well-known/openid-configuration')];
+                $configResponses[] = [$client, $client->request('GET', '.well-known/openid-configuration', ['max_redirects' => 0])];
             }
 
             foreach ($configResponses as [$client, $response]) {
                 $config = $response->toArray();
 
-                $jwksUri = $config['jwks_uri'] ?? null;
-                if (!\is_string($jwksUri) || '' === $jwksUri) {
-                    throw new \RuntimeException('The "jwks_uri" is missing from the OIDC discovery document.');
-                }
+                $jwksUri = self::checkDiscoveredEndpoint($config['jwks_uri'] ?? null, 'jwks_uri', $response->getInfo('url'));
 
                 $jwkSetResponses[] = $client->request('GET', $jwksUri);
             }
@@ -187,10 +179,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                     $minTtl = $currentTtl;
                 }
 
-                foreach ($response->toArray()['keys'] as $key) {
-                    if ('sig' === ($key['use'] ?? null)) {
-                        $keys[] = $key;
-                    }
+                $keys = $response->toArray()['keys'];
+                foreach ($this->filterSignatureKeys($keys) as $key) {
+                    $discoveredKeys[] = $key;
                 }
             }
 
@@ -199,7 +190,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
             }
 
-            return $keys;
+            return $discoveredKeys;
         } catch (\Exception $e) {
             $logger?->error('An error occurred while requesting OIDC certs.', [
                 'error' => $e->getMessage(),
@@ -210,6 +201,37 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         }
     }
 
+    private function filterSignatureKeys(array $keys): array
+    {
+        return array_values(array_filter($keys, function (array $jwk): bool {
+            if ($this->enforceKeyUsageVerification) {
+                if (isset($jwk['use']) && 'sig' === $jwk['use']) {
+                    return true;
+                }
+                if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
+                    return !empty(array_intersect($jwk['key_ops'], ['sign', 'verify']));
+                }
+
+                return false;
+            }
+
+            if (isset($jwk['use']) && 'enc' === $jwk['use']) {
+                return false;
+            }
+            if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
+                $encOps = ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'deriveKey', 'deriveBits'];
+                $sigOps = ['sign', 'verify'];
+                $hasEnc = !empty(array_intersect($jwk['key_ops'], $encOps));
+                $hasSig = !empty(array_intersect($jwk['key_ops'], $sigOps));
+                if ($hasEnc && !$hasSig) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+    }
+
     private function loadAndVerifyJws(string $accessToken, JWKSet $jwkset): array
     {
         // Decode the token
@@ -218,7 +240,12 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         $jws = $serializerManager->unserialize($accessToken);
 
         // Verify the signature
-        if (!$jwsVerifier->verifyWithKeySet($jws, $jwkset, 0)) {
+        if (method_exists($jwsVerifier, 'verify')) { // web-token/jwt-library >= 4.3
+            $verified = $jwsVerifier->verify($jws, $jwkset, 0)->isVerified();
+        } else {
+            $verified = $jwsVerifier->verifyWithKeySet($jws, $jwkset, 0);
+        }
+        if (!$verified) {
             throw new InvalidSignatureException();
         }
 
@@ -237,16 +264,16 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     {
         // Verify the claims
         $checkers = [
-            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0),
             new Checker\AudienceChecker($this->audience),
             new Checker\IssuerChecker($this->issuers),
         ];
         $claimCheckerManager = new ClaimCheckerManager($checkers);
 
         // if this check fails, an InvalidClaimException is thrown
-        return $claimCheckerManager->check($claims);
+        return $claimCheckerManager->check($claims, ['iat', 'exp', 'aud', 'iss']);
     }
 
     private function decryptIfNeeded(string $accessToken): string
@@ -261,7 +288,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             [
                 new Checker\AlgorithmChecker($this->decryptionAlgorithms->list()),
                 new Checker\CallableChecker('enc', fn ($value) => \in_array($value, $this->decryptionAlgorithms->list())),
-                new Checker\CallableChecker('cty', fn ($value) => 'JWT' === $value),
+                new Checker\CallableChecker('cty', static fn ($value) => 'JWT' === $value),
                 new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
                 new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
                 new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
@@ -273,8 +300,14 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         try {
             $jwe = $serializerManager->unserialize($accessToken);
             $jweHeaderChecker->check($jwe, 0);
-            $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
-            if (false === $result) {
+            if (method_exists($jweDecrypter, 'decrypt')) { // web-token/jwt-library >= 4.3
+                $result = $jweDecrypter->decrypt($jwe, $this->decryptionKeyset, 0);
+                $jwe = $result->getJwe();
+                $result = $result->isDecrypted();
+            } else {
+                $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
+            }
+            if (!$result) {
                 throw new \RuntimeException('The JWE could not be decrypted.');
             }
 
