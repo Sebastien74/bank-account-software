@@ -43,7 +43,7 @@ class SubCategoryType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'back'),
             ],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-6'],
         ]);
@@ -57,7 +57,7 @@ class SubCategoryType extends AbstractType
                     'placeholder' => $this->translator->trans('Saisissez un code', [], 'back'),
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un code.', [], 'back')])
+                    new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un code.', [], 'back'))
                 ],
                 'row_attr' => ['class' => 'col-lg-3'],
             ]);

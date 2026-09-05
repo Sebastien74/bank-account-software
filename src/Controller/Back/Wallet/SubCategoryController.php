@@ -65,7 +65,7 @@ class SubCategoryController extends BaseController
      */
     protected function breadcrumb(array $items = []): void
     {
-        $categoryRequest = $this->coreLocator->request()->get('category');
+        $categoryRequest = $this->coreLocator->request()->attributes->get('category');
         $category = $categoryRequest ? $this->coreLocator->em()->getRepository(Category::class)->find($categoryRequest) : false;
         $categoryTypeId = $category ? $category->getOperationtype()->getId() : ($this->entity ? $this->entity->getCategory()->getOperationtype()->getId() : false);
 
@@ -73,7 +73,7 @@ class SubCategoryController extends BaseController
         $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = $this->coreLocator->router()->generate('back_category_index', ['operationtype' => $categoryTypeId], UrlGeneratorInterface::ABSOLUTE_URL);
         $items[$this->coreLocator->translator()->trans('Sous-catégories', [], 'breadcrumb')] = 'back_subcategory_index';
 
-        if ($this->coreLocator->request()->get('subcategory')) {
+        if ($this->coreLocator->request()->attributes->get('subcategory')) {
             $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'back_subcategory_edit';
         }
 

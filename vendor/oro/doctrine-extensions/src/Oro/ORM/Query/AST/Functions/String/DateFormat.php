@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\ORM\Query\AST\Functions\String;
 
-use Doctrine\ORM\Query\Lexer;
+use Doctrine\ORM\Query\TokenType;
 use Doctrine\ORM\Query\Parser;
 use Oro\ORM\Query\AST\Functions\AbstractPlatformAwareFunctionNode;
 
@@ -13,7 +13,7 @@ class DateFormat extends AbstractPlatformAwareFunctionNode
     public const FORMAT_KEY = 'format';
 
     /** @var array */
-    private static $knownFormats = [
+    private static array $knownFormats = [
         '%a',
         '%b',
         '%c',
@@ -49,7 +49,7 @@ class DateFormat extends AbstractPlatformAwareFunctionNode
     ];
 
     /** @var array */
-    private static $supportedFormats = [
+    private static array $supportedFormats = [
         '%a',
         '%b',
         '%c',
@@ -76,19 +76,22 @@ class DateFormat extends AbstractPlatformAwareFunctionNode
         '%%',
     ];
 
-    public function parse(Parser $parser)
+    /**
+     * {@inheritdoc}
+     */
+    public function parse(Parser $parser): void
     {
-        $parser->match(Lexer::T_IDENTIFIER);
-        $parser->match(Lexer::T_OPEN_PARENTHESIS);
+        $parser->match(TokenType::T_IDENTIFIER);
+        $parser->match(TokenType::T_OPEN_PARENTHESIS);
 
         $this->parameters[self::DATE_KEY] = $parser->ArithmeticPrimary();
 
-        $parser->match(Lexer::T_COMMA);
+        $parser->match(TokenType::T_COMMA);
 
         $this->parameters[self::FORMAT_KEY] = $parser->StringPrimary();
         $this->validateFormat($parser);
 
-        $parser->match(Lexer::T_CLOSE_PARENTHESIS);
+        $parser->match(TokenType::T_CLOSE_PARENTHESIS);
     }
 
     private function validateFormat(Parser $parser): void
@@ -96,7 +99,7 @@ class DateFormat extends AbstractPlatformAwareFunctionNode
         $format = \str_replace('%%', '', (string)$this->parameters[self::FORMAT_KEY]);
         $unsupportedFormats = \array_diff(self::$knownFormats, self::$supportedFormats);
         foreach ($unsupportedFormats as $unsupportedFormat) {
-            if (false !== \strpos($format, $unsupportedFormat)) {
+            if (str_contains($format, $unsupportedFormat)) {
                 $parser->syntaxError(
                     \sprintf(
                         'Format string contains unsupported specifier %s. The supported specifiers are: "%s"',

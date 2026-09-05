@@ -12,7 +12,6 @@ doctrine:
                     engine: InnoDB
                 #server_version: '15'
                 profiling_collect_backtrace: '%kernel.debug%'
-                use_savepoints: true
 
     orm:
         default_entity_manager: default
@@ -22,7 +21,6 @@ doctrine:
                     type: pool
                     pool: doctrine.query_cache_pool
                 connection: default
-                report_fields_where_declared: true
                 naming_strategy: doctrine.orm.naming_strategy.default
                 auto_mapping: true
                 validate_xml_mapping: true
@@ -38,10 +36,6 @@ doctrine:
 #                dql:
 #                    datetime_functions:
 #                        date_format: App\DoctrineExtensions\DateFormat
-        auto_generate_proxy_classes: true
-        enable_lazy_ghost_objects: true
-        controller_resolver:
-            auto_mapping: false
 
 when@test:
     doctrine:
@@ -57,22 +51,14 @@ when@local:
 #            connections:
 #                direct:
 #                    url: 'mysql://%env(DB_USER_DIRECT)%:%env(DB_PASSWORD_DIRECT)%@%env(DB_HOST_DIRECT)%:%env(DB_PORT_DIRECT)%/%env(DB_NAME_DIRECT)%'
-        orm:
-            auto_generate_proxy_classes: true
+#        orm:
 #            entity_managers:
 #                direct:
 #                    connection: direct
 
-when@dev:
-    doctrine:
-        orm:
-            auto_generate_proxy_classes: true
-
 when@preprod:
     doctrine:
         orm:
-            auto_generate_proxy_classes: false
-            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool
@@ -90,8 +76,6 @@ when@preprod:
 when@prod:
     doctrine:
         orm:
-            auto_generate_proxy_classes: false
-            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool

@@ -54,6 +54,7 @@ class StatsCommand extends Command
                 The <info>--format</info> option specifies the format of the command output:
 
                   <info>php %command.full_name% --format=json</info>
+
                 EOF
             )
         ;
@@ -65,11 +66,6 @@ class StatsCommand extends Command
         $errorIo = $io->getErrorStyle();
 
         $format = $input->getOption('format');
-        if ('text' === $format) {
-            trigger_deprecation('symfony/messenger', '7.2', 'The "text" format is deprecated, use "txt" instead.');
-
-            $format = 'txt';
-        }
         if (!\in_array($format, $this->getAvailableFormatOptions(), true)) {
             throw new InvalidArgumentException('Invalid output format.');
         }

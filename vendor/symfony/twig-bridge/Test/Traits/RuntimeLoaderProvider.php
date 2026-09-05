@@ -18,13 +18,10 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 trait RuntimeLoaderProvider
 {
-    /**
-     * @return void
-     */
-    protected function registerTwigRuntimeLoader(Environment $environment, FormRenderer $renderer)
+    protected function registerTwigRuntimeLoader(Environment $environment, FormRenderer $renderer): void
     {
         $environment->addRuntimeLoader(new ContainerRuntimeLoader(new ServiceLocator([
-            FormRenderer::class => fn () => $renderer,
+            FormRenderer::class => static fn () => $renderer,
         ])));
     }
 }

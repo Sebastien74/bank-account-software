@@ -87,7 +87,7 @@ class OperationType extends AbstractType
             ],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez sélectionner une date.', [], 'back')])
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez sélectionner une date.', [], 'back'))
             ],
         ]);
 
@@ -99,7 +99,7 @@ class OperationType extends AbstractType
             ],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un montant.', [], 'back'),]),
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un montant.', [], 'back')),
             ],
         ]);
 
@@ -118,7 +118,7 @@ class OperationType extends AbstractType
                 return strip_tags($entity->getAdminName());
             },
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez sélectionne une catégorie.', [], 'back'),]),
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez sélectionne une catégorie.', [], 'back')),
             ],
         ]);
 

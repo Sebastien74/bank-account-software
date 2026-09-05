@@ -35,6 +35,7 @@ use Doctrine\ORM\Internal\UnitOfWork\InsertBatch;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Mapping\PropertyAccessors\ReadonlyAccessor;
 use Doctrine\ORM\Mapping\ToManyInverseSideMapping;
 use Doctrine\ORM\Persisters\Collection\CollectionPersister;
 use Doctrine\ORM\Persisters\Collection\ManyToManyPersister;
@@ -64,6 +65,8 @@ use function array_values;
 use function assert;
 use function count;
 use function current;
+use function deepclone_hydrate;
+use function extension_loaded;
 use function get_debug_type;
 use function implode;
 use function in_array;
@@ -73,6 +76,8 @@ use function reset;
 use function spl_object_id;
 use function sprintf;
 use function strtolower;
+
+use const PHP_VERSION_ID;
 
 /**
  * The UnitOfWork is responsible for tracking changes to objects during an
@@ -496,6 +501,10 @@ class UnitOfWork implements PropertyChangedListener
     {
         foreach ($this->entityInsertions as $entity) {
             $class = $this->em->getClassMetadata($entity::class);
+
+            if (PHP_VERSION_ID >= 80400 && $class->reflClass->isUninitializedLazyObject($entity)) {
+                $class->reflClass->initializeLazyObject($entity);
+            }
 
             $this->computeChangeSet($class, $entity);
         }
@@ -1176,7 +1185,10 @@ class UnitOfWork implements PropertyChangedListener
             // Entity with this $oid after deletion treated as NEW, even if the $oid
             // is obtained by a new entity because the old one went out of scope.
             //$this->entityStates[$oid] = self::STATE_NEW;
-            if (! $class->isIdentifierNatural()) {
+            if (
+                ! $class->isIdentifierNatural() &&
+                ! $class->propertyAccessors[$class->identifier[0]] instanceof ReadonlyAccessor
+            ) {
                 $class->propertyAccessors[$class->identifier[0]]->setValue($entity, null);
             }
 
@@ -2394,7 +2406,12 @@ class UnitOfWork implements PropertyChangedListener
                 } else {
                     $entity->__setInitialized(true);
 
-                    Hydrator::hydrate($entity, (array) $class->reflClass->newInstanceWithoutConstructor());
+                    if (extension_loaded('deepclone')) {
+                        deepclone_hydrate($entity, (array) $class->reflClass->newInstanceWithoutConstructor());
+                    } else {
+                        /** @phpstan-ignore staticMethod.deprecatedClass */
+                        Hydrator::hydrate($entity, (array) $class->reflClass->newInstanceWithoutConstructor());
+                    }
                 }
             } else {
                 if (

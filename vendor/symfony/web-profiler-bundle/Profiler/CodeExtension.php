@@ -126,7 +126,7 @@ final class CodeExtension extends AbstractExtension
         $contents = file_get_contents($file);
 
         if (!str_contains($contents, '<?php') && !str_contains($contents, '<?=')) {
-            $lines = explode("\n", $contents);
+            $lines = explode("\n", htmlspecialchars($contents, \ENT_QUOTES | \ENT_SUBSTITUTE, $this->charset));
 
             if (0 > $srcContext) {
                 $srcContext = \count($lines);
@@ -143,27 +143,15 @@ final class CodeExtension extends AbstractExtension
         // see https://bugs.php.net/25725
         $code = @highlight_string($contents, true);
 
-        if (\PHP_VERSION_ID >= 80300) {
-            // remove main pre/code tags
-            $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
-            // split multiline span tags
-            $code = preg_replace_callback(
-                '#<span ([^>]++)>((?:[^<\\n]*+\\n)++[^<]*+)</span>#',
-                static fn (array $m): string => "<span $m[1]>".str_replace("\n", "</span>\n<span $m[1]>", $m[2]).'</span>',
-                $code
-            );
-            $lines = explode("\n", $code);
-        } else {
-            // remove main code/span tags
-            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            // split multiline spans
-            $code = preg_replace_callback(
-                '#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#',
-                static fn (array $m): string => "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>',
-                $code
-            );
-            $lines = explode('<br />', $code);
-        }
+        // remove main pre/code tags
+        $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
+        // split multiline span tags
+        $code = preg_replace_callback(
+            '#<span ([^>]++)>((?:[^<\\n]*+\\n)++[^<]*+)</span>#',
+            static fn (array $m): string => "<span $m[1]>".str_replace("\n", "</span>\n<span $m[1]>", $m[2]).'</span>',
+            $code
+        );
+        $lines = explode("\n", $code);
 
         if (0 > $srcContext) {
             $srcContext = \count($lines);

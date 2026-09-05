@@ -23,7 +23,7 @@ class ZipCode extends Constraint
      * @param mixed $options
      * @param string|null $message
      */
-    public function __construct(array $options = null, string $message = null)
+    public function __construct(?array $options = null, ?string $message = null)
     {
         parent::__construct($options);
 

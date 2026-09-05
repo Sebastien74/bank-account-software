@@ -45,7 +45,7 @@ class BrowserRuntime implements RuntimeExtensionInterface
     public function screen(): ?string
     {
         $request = $this->requestStack->getMainRequest();
-        if ($request instanceof Request && $request->get('thumbScreen')) {
+        if ($request instanceof Request && $request->request->get('thumbScreen')) {
             return $request->request->get('thumbScreen');
         }
 

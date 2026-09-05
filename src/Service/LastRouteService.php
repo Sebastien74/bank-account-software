@@ -26,10 +26,10 @@ class LastRouteService
     {
         $request = $event->getRequest();
         $uri = $request->getUri();
-        $routeName = $request->get('_route');
+        $routeName = $request->attributes->get('_route');
         $session = $request->getSession();
 
-        $routeParams = $request->get('_route_params');
+        $routeParams = $request->attributes->get('_route_params');
         if ('_' == $routeName[0]) {
             return;
         }

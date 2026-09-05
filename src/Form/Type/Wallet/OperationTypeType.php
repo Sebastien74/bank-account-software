@@ -43,7 +43,7 @@ class OperationTypeType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'back'),
             ],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')]),
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back')),
             ],
             'row_attr' => ['class' => $isNew ? 'col-lg-8' : 'col-lg-9'],
         ]);
@@ -63,9 +63,9 @@ class OperationTypeType extends AbstractType
                     $this->translator->trans('Débit', [], 'back') => 'expenses',
                     $this->translator->trans('Crédit', [], 'back') => 'incomes',
                 ],
-                'constraints' => [new Assert\NotBlank([
-                    'message' => $this->translator->trans('Veuillez sélectionner un type.', [], 'back'),
-                ])],
+                'constraints' => [new Assert\NotBlank(
+                    message: $this->translator->trans('Veuillez sélectionner un type.', [], 'back'),
+                )],
                 'row_attr' => ['class' => 'col-lg-4'],
             ]);
         }

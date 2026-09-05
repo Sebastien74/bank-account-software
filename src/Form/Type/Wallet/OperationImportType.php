@@ -40,18 +40,18 @@ class OperationImportType extends AbstractType
             ],
             'row_attr' => ['class' => 'col-12'],
             'constraints' => [
-                new Assert\NotBlank([
-                    'message' => $this->translator->trans('Veuillez sélectionner un fichier à importer.', [], 'back'),
-                ]),
-                new Assert\File([
-                    'maxSize' => '20M',
-                    'mimeTypes' => [
+                new Assert\NotBlank(
+                    message: $this->translator->trans('Veuillez sélectionner un fichier à importer.', [], 'back'),
+                ),
+                new Assert\File(
+                    maxSize: '20M',
+                    mimeTypes: [
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         'application/zip',
                         'application/octet-stream',
                     ],
-                    'mimeTypesMessage' => $this->translator->trans('Le fichier doit être un classeur Excel au format XLSX.', [], 'back'),
-                ]),
+                    mimeTypesMessage: $this->translator->trans('Le fichier doit être un classeur Excel au format XLSX.', [], 'back'),
+                ),
             ],
         ]);
 

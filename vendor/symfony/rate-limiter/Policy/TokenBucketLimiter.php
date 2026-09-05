@@ -33,6 +33,7 @@ final class TokenBucketLimiter implements LimiterInterface
         ?LockInterface $lock = null,
     ) {
         $this->id = $id;
+        $this->maxBurst = min($maxBurst, TokenBucket::MAX_BURST_SIZE);
         $this->storage = $storage;
         $this->lock = $lock;
     }
@@ -75,16 +76,12 @@ final class TokenBucketLimiter implements LimiterInterface
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
 
-                if (0 === $availableTokens) {
-                    // This means 0 tokens where consumed (discouraged in most cases).
-                    // Return the first time a new token is available
-                    $waitDuration = $this->rate->calculateTimeForTokens(1);
-                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration));
-                } else {
-                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now));
+                $retryAfter = $now;
+                if ($availableTokens === $tokens) {
+                    $retryAfter += $this->rate->calculateTimeForTokens(1);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), $waitTime, true, $this->maxBurst));
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($retryAfter)), true, $this->maxBurst));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);

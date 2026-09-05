@@ -5,12 +5,10 @@ namespace Oro\Tests\ORM\AST\Query\Functions;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Query;
-
-use PHPUnit\Framework\Constraint\LogicalOr;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Tests\Connection\TestUtil;
 use Oro\Tests\TestCase;
+use PHPUnit\Framework\Constraint\LogicalOr;
+use Symfony\Component\Yaml\Yaml;
 
 class FunctionsTest extends TestCase
 {
@@ -34,8 +32,7 @@ class FunctionsTest extends TestCase
             foreach ($sql as $sqlVariant) {
                 $constraints[] = static::equalTo($sqlVariant);
             }
-            $constraint = new LogicalOr();
-            $constraint->setConstraints($constraints);
+            $constraint = LogicalOr::fromConstraints($constraints);
             static::assertThat($query->getSQL(), $constraint);
         } else {
             static::assertEquals($sql, $query->getSQL(), \sprintf('Unexpected SQL for "%s"', $dql));
@@ -52,10 +49,9 @@ class FunctionsTest extends TestCase
     /**
      * @throws \Exception
      */
-    public function functionsDataProvider(): array
+    public static function functionsDataProvider(): \Generator
     {
         $platform = TestUtil::getPlatformName();
-        $data = [];
         $files = new \FilesystemIterator(
             __DIR__ . '/fixtures/' . $platform,
             \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME
@@ -65,11 +61,9 @@ class FunctionsTest extends TestCase
             if (!\is_array($fileData)) {
                 throw new \RuntimeException(\sprintf('Could not parse file %s', $file));
             }
-            /** @noinspection SlowArrayOperationsInLoopInspection */
-            $data = \array_merge($data, $fileData);
-        }
 
-        return $data;
+            yield from $fileData;
+        }
     }
 
     protected function registerDqlFunction(

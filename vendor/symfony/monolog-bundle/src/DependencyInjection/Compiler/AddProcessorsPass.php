@@ -22,13 +22,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Christophe Coevoet <stof@notk.org>
  *
- * @internal since 3.9.0
+ * @internal
  */
 class AddProcessorsPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('monolog.logger')) {
             return;
@@ -50,7 +50,7 @@ class AddProcessorsPass implements CompilerPassInterface
             $definition->setTags(array_merge($definition->getTags(), ['monolog.processor' => $tags]));
         }
 
-        $taggedIteratorArgument = new TaggedIteratorArgument('monolog.processor', 'index', null, true);
+        $taggedIteratorArgument = new TaggedIteratorArgument('monolog.processor', 'index', needsIndexes: true);
         // array_reverse is used because ProcessableHandlerTrait::pushProcessor prepends processors to the beginning of the stack
         foreach (array_reverse($this->findAndSortTaggedServices($taggedIteratorArgument, $container), true) as $index => $reference) {
             $tag = $indexedTags[$index];

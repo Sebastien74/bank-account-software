@@ -60,10 +60,10 @@ $theme-color-interval: 8% !default;
    3 ) Colors
 -----------------------------------*/
 
-$primary: #6f42c1 !default
-$primary-lighten: tint-color($primary, 25%) !default
-$primary-darken: shade-color($primary, 40%) !default
-$red: #dc3545 !default
+$primary: #6f42c1 !default;
+$primary-lighten: tint-color($primary, 25%) !default;
+$primary-darken: shade-color($primary, 40%) !default;
+$red: #dc3545 !default;
 $white: #fff !default;
 $white-lighten: transparentize($white, .3) !default;
 $gray-100: #f8f9fa !default;

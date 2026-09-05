@@ -16,8 +16,13 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 
 const path = require('path');
 
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+/** Désactive svgo dans cssnano : certaines icônes SVG encodées en data-URI
+ *  (Bootstrap) font planter postcss-svgo à la minification. */
+const configureCssMinimizer = (options) => {
+    options.minimizerOptions = {preset: ['default', {svgo: false}]};
+};
 
 const enableNotification = false;
 const enableSourceMaps = !Encore.isProduction();
@@ -72,7 +77,12 @@ Encore.setOutputPath('public/build/vendor')
     })
     .addPlugin(new CleanWebpackPlugin())
     .disableSingleRuntimeChunk()
-    .enableSassLoader();
+    .configureCssMinimizerPlugin(configureCssMinimizer)
+    .enableSassLoader((options) => {
+        options.sassOptions = {
+            silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function', 'slash-div'],
+        };
+    });
 
 if (enableNotification) {
     Encore.enableBuildNotifications();
@@ -96,9 +106,6 @@ vendor.optimization.sideEffects = sideEffects;
 vendor.optimization.splitChunks = splitChunks;
 vendor.optimization.minimize = minimize;
 vendor.resolve.extensions.push('json');
-if (vendor.optimization && vendor.optimization.minimizer) {
-    vendor.optimization.minimizer.push(new CssMinimizerPlugin());
-}
 
 /** 2 - back */
 
@@ -151,7 +158,12 @@ Encore.setOutputPath('public/build/back')
     })
     .addPlugin(new CleanWebpackPlugin())
     .enableSingleRuntimeChunk()
-    .enableSassLoader()
+    .configureCssMinimizerPlugin(configureCssMinimizer)
+    .enableSassLoader((options) => {
+        options.sassOptions = {
+            silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function', 'slash-div'],
+        };
+    })
     .autoProvidejQuery();
 
 if (enableNotification) {
@@ -176,9 +188,6 @@ back.optimization.sideEffects = sideEffects;
 back.optimization.splitChunks = splitChunks;
 back.optimization.minimize = minimize;
 back.resolve.extensions.push('json');
-if (back.optimization && back.optimization.minimizer) {
-    back.optimization.minimizer.push(new CssMinimizerPlugin());
-}
 
 /** 3 - security */
 
@@ -226,7 +235,12 @@ Encore.setOutputPath('public/build/security')
     })
     .addPlugin(new CleanWebpackPlugin())
     .enableSingleRuntimeChunk()
-    .enableSassLoader();
+    .configureCssMinimizerPlugin(configureCssMinimizer)
+    .enableSassLoader((options) => {
+        options.sassOptions = {
+            silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function', 'slash-div'],
+        };
+    });
 
 if (enableNotification) {
     Encore.enableBuildNotifications();
@@ -250,9 +264,6 @@ security.optimization.sideEffects = sideEffects;
 security.optimization.splitChunks = splitChunks;
 security.optimization.minimize = minimize;
 security.resolve.extensions.push('json');
-if (security.optimization && security.optimization.minimizer) {
-    security.optimization.minimizer.push(new CssMinimizerPlugin());
-}
 
 /** 4 - module.exports */
 module.exports = [vendor, back, security];

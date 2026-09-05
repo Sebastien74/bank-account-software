@@ -29,6 +29,9 @@ class FormValidator extends ConstraintValidator
      */
     private \SplObjectStorage $resolvedGroups;
 
+    /**
+     * @psalm-suppress ParamNameMismatch
+     */
     public function validate(mixed $form, Constraint $formConstraint): void
     {
         if (!$formConstraint instanceof Form) {
@@ -189,7 +192,7 @@ class FormValidator extends ConstraintValidator
         }
 
         // Mark the form with an error if it contains extra fields
-        if (!$config->getOption('allow_extra_fields') && \count($form->getExtraData()) > 0) {
+        if (!$config->getOption('allow_extra_fields') && $form->getExtraData()) {
             $this->context->setConstraint($formConstraint);
             $this->context->buildViolation($config->getOption('extra_fields_message', ''))
                 ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
@@ -243,6 +246,8 @@ class FormValidator extends ConstraintValidator
      * Post-processes the validation groups option for a given form.
      *
      * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
+     *
+     * @param-immediately-invoked-callable $groups
      *
      * @return GroupSequence|array<string|GroupSequence>
      */

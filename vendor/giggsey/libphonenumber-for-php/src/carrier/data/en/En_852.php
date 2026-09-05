@@ -17,8 +17,10 @@ namespace libphonenumber\carrier\data\en;
 class En_852
 {
     public const DATA = [
-        85240 => 'China Mobile',
+        85242 => 'China Telecom Global Limited',
         85261 => 'HKT',
+        852406 => 'China Unicom',
+        852409 => 'China Mobile',
         852440 => 'China Mobile',
         852441 => 'HKT',
         852442 => 'Hutchison Telecom',
@@ -126,6 +128,7 @@ class En_852
         852621 => 'China Mobile',
         852622 => 'China Mobile',
         852623 => 'China Mobile',
+        852624 => 'China Telecom Global Limited',
         852625 => 'HKT',
         852626 => 'China Mobile',
         852627 => '3',

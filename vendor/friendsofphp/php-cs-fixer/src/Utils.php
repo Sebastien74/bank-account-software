@@ -78,14 +78,13 @@ final class Utils
      * Stability is ensured by using Schwartzian transform.
      *
      * @template T
-     * @template L of list<T>
      * @template R
      *
-     * @param L                   $elements
+     * @param list<T>             $elements
      * @param callable(T): R      $getComparedValue a callable that takes a single element and returns the value to compare
      * @param callable(R, R): int $compareValues    a callable that compares two values
      *
-     * @return L
+     * @return list<T>
      */
     public static function stableSort(array $elements, callable $getComparedValue, callable $compareValues): array
     {
@@ -104,27 +103,29 @@ final class Utils
             return $a[1] <=> $b[1];
         });
 
-        return array_map(static fn (array $item) => $item[0], $sortItems); // @phpstan-ignore return.type (PHPStan cannot understand that the result will still be L template)
+        return array_map(static fn (array $item) => $item[0], $sortItems);
     }
 
     /**
-     * Sort fixers by their priorities.
+     * Sort fixers by their priorities, and by their names if priorities are equal. That is ensuring always deterministic order of fixers.
      *
-     * @template T of list<FixerInterface>
+     * @template T of FixerInterface
      *
-     * @param T $fixers
+     * @param list<T> $fixers
      *
-     * @return T
+     * @return ($fixers is non-empty-list<T> ? non-empty-list<T> : list<T>)
      */
     public static function sortFixers(array $fixers): array
     {
-        // Schwartzian transform is used to improve the efficiency and avoid
-        // `usort(): Array was modified by the user comparison function` warning for mocked objects.
-        return self::stableSort(
-            $fixers,
-            static fn (FixerInterface $fixer): int => $fixer->getPriority(),
-            static fn (int $a, int $b): int => $b <=> $a,
-        );
+        usort($fixers, static function (FixerInterface $a, FixerInterface $b): int {
+            $cmpByPriority = $b->getPriority() <=> $a->getPriority();
+
+            return 0 !== $cmpByPriority
+                ? $cmpByPriority
+                : $a->getName() <=> $b->getName();
+        });
+
+        return $fixers;
     }
 
     /**

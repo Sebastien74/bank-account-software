@@ -31,7 +31,7 @@ class CoreRuntime implements RuntimeExtensionInterface
     /**
      * Get environment variable.
      */
-    public function getEnv(string $name = null): bool|string
+    public function getEnv(?string $name = null): bool|string
     {
         if (!empty($this->cache['env'][$name])) {
             return $this->cache['env'][$name];

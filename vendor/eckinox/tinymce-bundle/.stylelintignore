@@ -1,5 +1,0 @@
-public/ext/**/*.css
-public/skins/**/*.css
-public/bundles/**/*.css
-vendor/**/*.css
-node_modules/**/*.css

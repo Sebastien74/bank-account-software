@@ -41,7 +41,7 @@ class OutsiderType extends AbstractType
                 'placeholder' => $this->translator->trans('Saisissez un intitulé', [], 'back'),
             ],
             'constraints' => [
-                new Assert\NotBlank(['message' => $this->translator->trans('Veuillez saisir un initulé.', [], 'back')])
+                new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
             'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
         ]);

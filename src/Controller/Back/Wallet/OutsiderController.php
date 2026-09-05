@@ -64,7 +64,7 @@ class OutsiderController extends BaseController
     protected function breadcrumb(array $items = []): void
     {
         $items[$this->coreLocator->translator()->trans("Bénéficiaires", [], 'breadcrumb')] = 'back_outsider_index';
-        if ($this->coreLocator->request()->get('outsider')) {
+        if ($this->coreLocator->request()->attributes->get('outsider')) {
             $items[$this->coreLocator->translator()->trans('Édition', [], 'back_breadcrumb')] = 'back_outsider_edit';
         }
 

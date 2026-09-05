@@ -65,7 +65,7 @@ class CategoryController extends BaseController
     {
         $items[$this->coreLocator->translator()->trans("Types d'opérations", [], 'breadcrumb')] = 'back_operationtype_index';
         $items[$this->coreLocator->translator()->trans('Catégories', [], 'breadcrumb')] = 'back_category_index';
-        if ($this->coreLocator->request()->get('category')) {
+        if ($this->coreLocator->request()->attributes->get('category')) {
             $items[$this->coreLocator->translator()->trans('Édition', [], 'breadcrumb')] = 'back_category_edit';
         }
 

@@ -24,7 +24,7 @@ The idea is:
 have to create a custom listener class to apply the filter for this type.
 
 ## Installation
-================
+===============
 
 The bundle can be installed using Composer or the [Symfony binary](https://symfony.com/download):
 
@@ -112,7 +112,8 @@ For installation and how to use the bundle refer to [Resources/doc/index.md](Res
 6. [The FilterTypeExtension](Resources/doc/filtertypeextension.md)
 7. [Working with other bundles](Resources/doc/working-with-other-bundles.md)
     1. [KNP Paginator example](Resources/doc/working-with-other-bundles.md#i-knp-paginator-example)
-8. [Real use case - Advanced usage with PagerFanta](Resources/doc/advanced-usage-with-pagerfanta-bundle.md)   
+8. [Real use case - Advanced usage with PagerFanta](Resources/doc/advanced-usage-with-pagerfanta-bundle.md)
+9. [Debugging filters](Resources/doc/debugging.md)   
 
 Community Support
 -----------------

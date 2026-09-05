@@ -17,6 +17,7 @@ namespace libphonenumber\carrier\data\en;
 class En_255
 {
     public const DATA = [
+        25560 => 'Airtel',
         25561 => 'Viettel',
         25562 => 'Viettel',
         25563 => 'Viettel',
@@ -25,7 +26,9 @@ class En_255
         25567 => 'Yas',
         25568 => 'Airtel',
         25569 => 'Airtel',
+        25570 => 'Yas',
         25571 => 'Yas',
+        25572 => 'Vodacom',
         25573 => 'Tanzania Telecom',
         25574 => 'Vodacom',
         25575 => 'Vodacom',

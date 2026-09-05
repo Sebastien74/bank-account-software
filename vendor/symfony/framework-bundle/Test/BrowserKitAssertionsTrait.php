@@ -17,6 +17,8 @@ use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
+use Symfony\Component\BrowserKit\Response as BrowserKitResponse;
 use Symfony\Component\BrowserKit\Test\Constraint as BrowserKitConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,21 +55,25 @@ trait BrowserKitAssertionsTrait
 
     public static function assertResponseRedirects(?string $expectedLocation = null, ?int $expectedCode = null, string $message = '', ?bool $verbose = null): void
     {
-        $constraint = new ResponseConstraint\ResponseIsRedirected($verbose ?? self::$defaultVerboseMode);
-        if ($expectedLocation) {
-            if (class_exists(ResponseConstraint\ResponseHeaderLocationSame::class)) {
-                $locationConstraint = new ResponseConstraint\ResponseHeaderLocationSame(self::getRequest(), $expectedLocation);
-            } else {
-                $locationConstraint = new ResponseConstraint\ResponseHeaderSame('Location', $expectedLocation);
-            }
+        $verbose ??= self::$defaultVerboseMode;
 
-            $constraint = LogicalAnd::fromConstraints($constraint, $locationConstraint);
+        $constraints = [new ResponseConstraint\ResponseIsRedirected($verbose)];
+        if ($expectedLocation) {
+            $constraints[] = new ResponseConstraint\ResponseHeaderLocationSame(self::getRequest(), $expectedLocation);
         }
         if ($expectedCode) {
-            $constraint = LogicalAnd::fromConstraints($constraint, new ResponseConstraint\ResponseStatusCodeSame($expectedCode));
+            $constraints[] = new ResponseConstraint\ResponseStatusCodeSame($expectedCode, $verbose);
         }
 
-        self::assertThatForResponse($constraint, $message);
+        // LogicalAnd describes its failure by exporting the whole response, body included, so it
+        // cannot be used when $verbose asked for the body to be omitted; assert one by one instead
+        if ($verbose && 1 < \count($constraints)) {
+            $constraints = [LogicalAnd::fromConstraints(...$constraints)];
+        }
+
+        foreach ($constraints as $constraint) {
+            self::assertThatForResponse($constraint, $message);
+        }
     }
 
     public static function assertResponseHasHeader(string $headerName, string $message = ''): void
@@ -182,6 +188,11 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getRequest(), $constraint, $message);
     }
 
+    public static function assertSessionHasFlashMessage(string $messageType, string|array $messages = ''): void
+    {
+        static::assertThat(self::getRequest(), new ResponseConstraint\SessionHasFlashMessage($messageType, $messages));
+    }
+
     public static function assertThatForResponse(Constraint $constraint, string $message = ''): void
     {
         try {
@@ -223,6 +234,14 @@ trait BrowserKitAssertionsTrait
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
         }
 
+        if ($response instanceof BrowserKitResponse) {
+            return new Response(
+                $response->getContent(),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            );
+        }
+
         return $response;
     }
 
@@ -230,6 +249,18 @@ trait BrowserKitAssertionsTrait
     {
         if (!$request = self::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');
+        }
+
+        if ($request instanceof BrowserKitRequest) {
+            return Request::create(
+                $request->getUri(),
+                $request->getMethod(),
+                $request->getParameters(),
+                $request->getCookies(),
+                $request->getFiles(),
+                $request->getServer(),
+                $request->getContent()
+            );
         }
 
         return $request;
