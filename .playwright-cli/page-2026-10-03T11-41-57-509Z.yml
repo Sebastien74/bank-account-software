@@ -1,0 +1,601 @@
+- generic [active] [ref=f6e1]:
+  - link "Aller au contenu" [ref=f6e2] [cursor=pointer]:
+    - /url: "#main-container"
+  - banner [ref=f6e3]:
+    - link "Bank Account Software" [ref=f6e4] [cursor=pointer]:
+      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+    - paragraph [ref=f6e14]: Compte courant - Statistiques
+  - generic [ref=f6e15]:
+    - complementary [ref=f6e16]:
+      - navigation [ref=f6e17]:
+        - link "Gestion des comptes" [ref=f6e18] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+        - link "Gestion des budgets" [ref=f6e25] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/budgets/index
+        - link "Gestion des objectifs" [ref=f6e32] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/objectives/index
+        - link "Gestion des catégories" [ref=f6e41] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/operations-types/index
+        - link "Gestion des bénéficiaires" [ref=f6e46] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/outsiders/index
+        - link "Logout" [ref=f6e53] [cursor=pointer]:
+          - /url: /logout
+    - navigation [ref=f6e59]
+    - main [ref=f6e60]:
+      - generic [ref=f6e61]:
+        - navigation "Fil d'Ariane" [ref=f6e62]:
+          - list [ref=f6e63]:
+            - listitem [ref=f6e64]:
+              - link "Comptes" [ref=f6e65] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f6e66]:
+              - text: /
+              - link "Mes comptes" [ref=f6e67] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f6e68]: / Statistiques
+        - generic [ref=f6e69]:
+          - generic [ref=f6e70]:
+            - generic [ref=f6e71]:
+              - heading "Compte courant" [level=1] [ref=f6e72]
+              - paragraph [ref=f6e73]: Historique du 01/02/2025 au 31/08/2026
+            - generic [ref=f6e74]:
+              - combobox [ref=f6e75] [cursor=pointer]:
+                - listbox [ref=f6e77]:
+                  - option "Août" [selected] [ref=f6e78]
+              - combobox [ref=f6e79] [cursor=pointer]:
+                - listbox [ref=f6e81]:
+                  - option "2026" [selected] [ref=f6e82]
+              - button "Afficher" [ref=f6e83] [cursor=pointer]
+              - link "Comptes" [ref=f6e87] [cursor=pointer]:
+                - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+          - generic [ref=f6e91]:
+            - generic [ref=f6e94]:
+              - generic [ref=f6e95]: Solde du compte
+              - paragraph [ref=f6e99]: 278,05 €
+              - paragraph [ref=f6e100]: "Pointé : 278,05 €"
+            - generic [ref=f6e103]:
+              - generic [ref=f6e104]: Revenus - Août 2026
+              - paragraph [ref=f6e110]: 3 046,74 €
+              - generic [ref=f6e111]: +1 558,74 € (+104,8 %)
+            - generic [ref=f6e117]:
+              - generic [ref=f6e118]: Dépenses - Août 2026
+              - paragraph [ref=f6e122]: 2 876,59 €
+              - generic [ref=f6e123]: "-704,03 € (-19,7 %)"
+            - generic [ref=f6e129]:
+              - generic [ref=f6e130]: Épargne du mois
+              - paragraph [ref=f6e136]: 170,15 €
+              - paragraph [ref=f6e137]: "Taux d'épargne : 5,6 %"
+          - generic [ref=f6e138]:
+            - generic [ref=f6e141]:
+              - heading "Répartition - Août 2026" [level=2] [ref=f6e146]
+              - generic [ref=f6e147]: 2 876,59 €
+            - generic [ref=f6e153]:
+              - heading "Répartition - 2026" [level=2] [ref=f6e158]
+              - generic [ref=f6e159]: 27 417,56 €
+          - generic [ref=f6e163]:
+            - generic [ref=f6e165]:
+              - generic [ref=f6e166]:
+                - heading "Postes de dépense - Août 2026" [level=2] [ref=f6e169]
+                - generic [ref=f6e170]: 2 876,59 €
+              - list [ref=f6e172]:
+                - listitem [ref=f6e173]:
+                  - link "Loyer Frais de logement 1 op. 687,17 € 0,00 € (0,0 %)" [ref=f6e174] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/22?year=2026&month=8
+                    - generic [ref=f6e175]: Loyer
+                    - generic [ref=f6e176]: Frais de logement
+                    - generic [ref=f6e179]: 1 op.
+                    - generic [ref=f6e180]: 687,17 €
+                    - generic [ref=f6e181]: 0,00 € (0,0 %)
+                - listitem [ref=f6e187]:
+                  - link "Virements et chèques Dépenses non classées 3 op. 592,50 € +571,11 € (base faible)" [ref=f6e188] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/45?year=2026&month=8
+                    - generic [ref=f6e189]: Virements et chèques
+                    - generic [ref=f6e190]: Dépenses non classées
+                    - generic [ref=f6e193]: 3 op.
+                    - generic [ref=f6e194]: 592,50 €
+                    - generic [ref=f6e195]: +571,11 € (base faible)
+                - listitem [ref=f6e202]:
+                  - link "Tabac Tabac et presse 23 op. 422,10 € +329,35 € (+355,1 %)" [ref=f6e203] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/14?year=2026&month=8
+                    - generic [ref=f6e204]: Tabac
+                    - generic [ref=f6e205]: Tabac et presse
+                    - generic [ref=f6e208]: 23 op.
+                    - generic [ref=f6e209]: 422,10 €
+                    - generic [ref=f6e210]: +329,35 € (+355,1 %)
+                - listitem [ref=f6e217]:
+                  - link "Frais alimentaires Vie courante et santé 27 op. 368,47 € +167,91 € (+83,7 %)" [ref=f6e218] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/6?year=2026&month=8
+                    - generic [ref=f6e219]: Frais alimentaires
+                    - generic [ref=f6e220]: Vie courante et santé
+                    - generic [ref=f6e223]: 27 op.
+                    - generic [ref=f6e224]: 368,47 €
+                    - generic [ref=f6e225]: +167,91 € (+83,7 %)
+                - listitem [ref=f6e232]:
+                  - link "Retraits Dépenses non classées 2 op. 150,00 € -148,44 € (-49,7 %)" [ref=f6e233] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/1?year=2026&month=8
+                    - generic [ref=f6e234]: Retraits
+                    - generic [ref=f6e235]: Dépenses non classées
+                    - generic [ref=f6e238]: 2 op.
+                    - generic [ref=f6e239]: 150,00 €
+                    - generic [ref=f6e240]: "-148,44 € (-49,7 %)"
+                - listitem [ref=f6e247]:
+                  - link "Sorties Loisirs 8 op. 103,40 € -39,70 € (-27,7 %)" [ref=f6e248] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/29?year=2026&month=8
+                    - generic [ref=f6e249]: Sorties
+                    - generic [ref=f6e250]: Loisirs
+                    - generic [ref=f6e253]: 8 op.
+                    - generic [ref=f6e254]: 103,40 €
+                    - generic [ref=f6e255]: "-39,70 € (-27,7 %)"
+                - listitem [ref=f6e262]:
+                  - link "Abonnements Abonnements et services 7 op. 97,33 € -27,28 € (-21,9 %)" [ref=f6e263] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/9?year=2026&month=8
+                    - generic [ref=f6e264]: Abonnements
+                    - generic [ref=f6e265]: Abonnements et services
+                    - generic [ref=f6e268]: 7 op.
+                    - generic [ref=f6e269]: 97,33 €
+                    - generic [ref=f6e270]: "-27,28 € (-21,9 %)"
+                - listitem [ref=f6e277]:
+                  - link "Vacances Loisirs 1 op. 95,90 € -1 063,78 € (-91,7 %)" [ref=f6e278] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/31?year=2026&month=8
+                    - generic [ref=f6e279]: Vacances
+                    - generic [ref=f6e280]: Loisirs
+                    - generic [ref=f6e283]: 1 op.
+                    - generic [ref=f6e284]: 95,90 €
+                    - generic [ref=f6e285]: "-1 063,78 € (-91,7 %)"
+                - listitem [ref=f6e292]:
+                  - link "Téléphone / Internet Téléphonie 2 op. 94,97 € -4,00 € (-4,0 %)" [ref=f6e293] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/32?year=2026&month=8
+                    - generic [ref=f6e294]: Téléphone / Internet
+                    - generic [ref=f6e295]: Téléphonie
+                    - generic [ref=f6e298]: 2 op.
+                    - generic [ref=f6e299]: 94,97 €
+                    - generic [ref=f6e300]: "-4,00 € (-4,0 %)"
+                - listitem [ref=f6e307]:
+                  - link "Restaurant Loisirs 4 op. 54,00 € +34,00 € (base faible)" [ref=f6e308] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/46?year=2026&month=8
+                    - generic [ref=f6e309]: Restaurant
+                    - generic [ref=f6e310]: Loisirs
+                    - generic [ref=f6e313]: 4 op.
+                    - generic [ref=f6e314]: 54,00 €
+                    - generic [ref=f6e315]: +34,00 € (base faible)
+                - listitem [ref=f6e322]:
+                  - link "Assurances et taxes auto Transports et déplacements 1 op. 47,53 € +2,65 € (base faible)" [ref=f6e323] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/2?year=2026&month=8
+                    - generic [ref=f6e324]: Assurances et taxes auto
+                    - generic [ref=f6e325]: Transports et déplacements
+                    - generic [ref=f6e328]: 1 op.
+                    - generic [ref=f6e329]: 47,53 €
+                    - generic [ref=f6e330]: +2,65 € (base faible)
+                - listitem [ref=f6e337]:
+                  - link "Bricolage Frais de logement 3 op. 37,18 € Nouveau" [ref=f6e338] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/17?year=2026&month=8
+                    - generic [ref=f6e339]: Bricolage
+                    - generic [ref=f6e340]: Frais de logement
+                    - generic [ref=f6e343]: 3 op.
+                    - generic [ref=f6e344]: 37,18 €
+                    - generic [ref=f6e345]: Nouveau
+                - listitem [ref=f6e352]:
+                  - link "Carburant Transports et déplacements 1 op. 35,00 € -22,19 € (-38,8 %)" [ref=f6e353] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/3?year=2026&month=8
+                    - generic [ref=f6e354]: Carburant
+                    - generic [ref=f6e355]: Transports et déplacements
+                    - generic [ref=f6e358]: 1 op.
+                    - generic [ref=f6e359]: 35,00 €
+                    - generic [ref=f6e360]: "-22,19 € (-38,8 %)"
+                - listitem [ref=f6e367]:
+                  - link "Sport Loisirs 4 op. 33,29 € -281,40 € (-89,4 %)" [ref=f6e368] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/30?year=2026&month=8
+                    - generic [ref=f6e369]: Sport
+                    - generic [ref=f6e370]: Loisirs
+                    - generic [ref=f6e373]: 4 op.
+                    - generic [ref=f6e374]: 33,29 €
+                    - generic [ref=f6e375]: "-281,40 € (-89,4 %)"
+                - listitem [ref=f6e382]:
+                  - link "Assurance logement Frais de logement 1 op. 24,15 € +1,75 € (base faible)" [ref=f6e383] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/16?year=2026&month=8
+                    - generic [ref=f6e384]: Assurance logement
+                    - generic [ref=f6e385]: Frais de logement
+                    - generic [ref=f6e388]: 1 op.
+                    - generic [ref=f6e389]: 24,15 €
+                    - generic [ref=f6e390]: +1,75 € (base faible)
+                - listitem [ref=f6e397]:
+                  - link "Coiffeurs Vie courante et santé 1 op. 22,50 € 0,00 € (base faible)" [ref=f6e398] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/5?year=2026&month=8
+                    - generic [ref=f6e399]: Coiffeurs
+                    - generic [ref=f6e400]: Vie courante et santé
+                    - generic [ref=f6e403]: 1 op.
+                    - generic [ref=f6e404]: 22,50 €
+                    - generic [ref=f6e405]: 0,00 € (base faible)
+                - listitem [ref=f6e411]:
+                  - link "Frais bancaires Banque et impôts 1 op. 6,42 € +0,10 € (base faible)" [ref=f6e412] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/13?year=2026&month=8
+                    - generic [ref=f6e413]: Frais bancaires
+                    - generic [ref=f6e414]: Banque et impôts
+                    - generic [ref=f6e417]: 1 op.
+                    - generic [ref=f6e418]: 6,42 €
+                    - generic [ref=f6e419]: +0,10 € (base faible)
+                - listitem [ref=f6e426]:
+                  - link "Parking Transports et déplacements 2 op. 2,50 € Nouveau" [ref=f6e427] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/47?year=2026&month=8
+                    - generic [ref=f6e428]: Parking
+                    - generic [ref=f6e429]: Transports et déplacements
+                    - generic [ref=f6e432]: 2 op.
+                    - generic [ref=f6e433]: 2,50 €
+                    - generic [ref=f6e434]: Nouveau
+                - listitem [ref=f6e441]:
+                  - link "Pharmacie Vie courante et santé 1 op. 2,18 € -19,51 € (base faible)" [ref=f6e442] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1/poste/50?year=2026&month=8
+                    - generic [ref=f6e443]: Pharmacie
+                    - generic [ref=f6e444]: Vie courante et santé
+                    - generic [ref=f6e447]: 1 op.
+                    - generic [ref=f6e448]: 2,18 €
+                    - generic [ref=f6e449]: "-19,51 € (base faible)"
+            - generic [ref=f6e457]:
+              - heading "Principaux bénéficiaires - Août 2026" [level=2] [ref=f6e461]
+              - list [ref=f6e463]:
+                - listitem [ref=f6e464]:
+                  - generic [ref=f6e465]: Nathalie Combepine
+                  - generic [ref=f6e466]: 1 × 687,17 €
+                  - generic [ref=f6e469]: 687,17 €
+                - listitem [ref=f6e470]:
+                  - generic [ref=f6e471]: Fournier Sébastien
+                  - generic [ref=f6e472]: 2 × 256,25 €
+                  - generic [ref=f6e475]: 512,50 €
+                - listitem [ref=f6e476]:
+                  - generic [ref=f6e477]: 2m
+                  - generic [ref=f6e478]: 8 × 21,05 €
+                  - generic [ref=f6e481]: 168,40 €
+                - listitem [ref=f6e482]:
+                  - generic [ref=f6e483]: Retrait DAB
+                  - generic [ref=f6e484]: 2 × 75,00 €
+                  - generic [ref=f6e487]: 150,00 €
+                - listitem [ref=f6e488]:
+                  - generic [ref=f6e489]: L'Angival
+                  - generic [ref=f6e490]: 1 × 95,90 €
+                  - generic [ref=f6e493]: 95,90 €
+                - listitem [ref=f6e494]:
+                  - generic [ref=f6e495]: Bouygues Telecom
+                  - generic [ref=f6e496]: 2 × 47,49 €
+                  - generic [ref=f6e499]: 94,97 €
+                - listitem [ref=f6e500]:
+                  - generic [ref=f6e501]: Relais H
+                  - generic [ref=f6e502]: 4 × 21,88 €
+                  - generic [ref=f6e505]: 87,50 €
+                - listitem [ref=f6e506]:
+                  - generic [ref=f6e507]: Vival
+                  - generic [ref=f6e508]: 8 × 10,90 €
+                  - generic [ref=f6e511]: 87,23 €
+                - listitem [ref=f6e512]:
+                  - generic [ref=f6e513]: Lidl
+                  - generic [ref=f6e514]: 2 × 40,68 €
+                  - generic [ref=f6e517]: 81,36 €
+                - listitem [ref=f6e518]:
+                  - generic [ref=f6e519]: Chèque émis
+                  - generic [ref=f6e520]: 1 × 80,00 €
+                  - generic [ref=f6e523]: 80,00 €
+                - listitem [ref=f6e524]:
+                  - generic [ref=f6e525]: Intermarché
+                  - generic [ref=f6e526]: 3 × 21,38 €
+                  - generic [ref=f6e529]: 64,13 €
+                - listitem [ref=f6e530]:
+                  - generic [ref=f6e531]: Casa
+                  - generic [ref=f6e532]: 4 × 15,60 €
+                  - generic [ref=f6e535]: 62,40 €
+          - generic [ref=f6e539]:
+            - heading "Flux mensuels et trajectoire du solde" [level=2] [ref=f6e542]
+            - generic [ref=f6e543]: 12 derniers mois
+          - generic [ref=f6e547]:
+            - heading "Comparatif avec l'année précédente" [level=2] [ref=f6e555]
+            - generic [ref=f6e557]:
+              - generic [ref=f6e559]:
+                - paragraph [ref=f6e560]:
+                  - generic [ref=f6e563]: Sur l'année
+                - paragraph [ref=f6e564]: Du 1er février au 3 octobre 2026, 2026 contre 2025
+                - paragraph [ref=f6e565]:
+                  - generic [ref=f6e568]: "Janvier exclu : l'historique ne remonte pas assez loin pour comparer ce mois."
+                - table [ref=f6e570]:
+                  - rowgroup [ref=f6e571]:
+                    - row [ref=f6e572]:
+                      - columnheader [ref=f6e573]
+                      - columnheader "2026" [ref=f6e574]
+                      - columnheader "2025" [ref=f6e575]
+                      - columnheader "Écart" [ref=f6e576]
+                  - rowgroup [ref=f6e577]:
+                    - row [ref=f6e578]:
+                      - cell "Revenus" [ref=f6e579]
+                      - cell "24 344,10 €" [ref=f6e580]
+                      - cell "27 913,76 €" [ref=f6e581]
+                      - cell "-3 569,66 € (-12,8 %)" [ref=f6e582]
+                    - row [ref=f6e587]:
+                      - cell "Dépenses" [ref=f6e588]
+                      - cell "24 056,24 €" [ref=f6e589]
+                      - cell "27 761,19 €" [ref=f6e590]
+                      - cell "-3 704,95 € (-13,3 %)" [ref=f6e591]
+                    - row [ref=f6e596]:
+                      - cell "Épargne" [ref=f6e597]
+                      - cell "287,86 €" [ref=f6e598]
+                      - cell "152,57 €" [ref=f6e599]
+                      - cell "+135,29 € (+88,7 %)" [ref=f6e600]
+                    - row [ref=f6e605]:
+                      - cell "Taux d'épargne" [ref=f6e606]
+                      - cell "1,2 %" [ref=f6e607]
+                      - cell "0,5 %" [ref=f6e608]
+                      - cell "+0,7 pts" [ref=f6e609]
+              - generic [ref=f6e615]:
+                - paragraph [ref=f6e616]:
+                  - generic [ref=f6e619]: Sur le mois
+                - paragraph [ref=f6e620]: Du 1er au 31 août, Août 2026 contre Août 2025
+                - table [ref=f6e622]:
+                  - rowgroup [ref=f6e623]:
+                    - row [ref=f6e624]:
+                      - columnheader [ref=f6e625]
+                      - columnheader "Août 2026" [ref=f6e626]
+                      - columnheader "Août 2025" [ref=f6e627]
+                      - columnheader "Écart" [ref=f6e628]
+                  - rowgroup [ref=f6e629]:
+                    - row [ref=f6e630]:
+                      - cell "Revenus" [ref=f6e631]
+                      - cell "3 046,74 €" [ref=f6e632]
+                      - cell "1 488,00 €" [ref=f6e633]
+                      - cell "+1 558,74 € (+104,8 %)" [ref=f6e634]
+                    - row [ref=f6e639]:
+                      - cell "Dépenses" [ref=f6e640]
+                      - cell "2 876,59 €" [ref=f6e641]
+                      - cell "3 580,62 €" [ref=f6e642]
+                      - cell "-704,03 € (-19,7 %)" [ref=f6e643]
+                    - row [ref=f6e648]:
+                      - cell "Épargne" [ref=f6e649]
+                      - cell "170,15 €" [ref=f6e650]
+                      - cell "-2 092,62 €" [ref=f6e651]
+                      - cell "+2 262,77 € (+108,1 %)" [ref=f6e652]
+                    - row [ref=f6e657]:
+                      - cell "Taux d'épargne" [ref=f6e658]
+                      - cell "5,6 %" [ref=f6e659]
+                      - cell "-140,6 %" [ref=f6e660]
+                      - cell "+146,2 pts" [ref=f6e661]
+          - heading "Dépenses mois par mois, contre l'année précédente" [level=2] [ref=f6e670]
+          - generic [ref=f6e674]:
+            - generic [ref=f6e675]:
+              - heading "Ce qui explique l'écart de dépenses entre 2026 et 2025" [level=2] [ref=f6e682]
+              - generic [ref=f6e683]: Du 1er février au 3 octobre 2026
+            - generic [ref=f6e684]:
+              - generic [ref=f6e685]:
+                - generic [ref=f6e686]:
+                  - generic [ref=f6e687]: Postes en baisse
+                  - generic [ref=f6e688]: "-4 541,90 €"
+                  - generic [ref=f6e689]: dépensé en moins qu'en 2025
+                - generic [ref=f6e690]:
+                  - generic [ref=f6e691]: Postes en hausse
+                  - generic [ref=f6e692]: +1 078,07 €
+                  - generic [ref=f6e693]: dépensé en plus qu'en 2025
+                - generic [ref=f6e694]:
+                  - generic [ref=f6e695]: Solde de l'écart
+                  - generic [ref=f6e696]: "-3 463,83 €"
+                  - generic [ref=f6e697]: au total, 2026 coûte moins cher
+              - table [ref=f6e698]:
+                - caption [ref=f6e699]: Écart de dépenses par poste, exercice contre exercice
+                - rowgroup [ref=f6e700]:
+                  - row [ref=f6e701]:
+                    - columnheader "Poste" [ref=f6e702]
+                    - columnheader "2026" [ref=f6e703]
+                    - columnheader "2025" [ref=f6e704]
+                    - columnheader "moins cher plus cher" [ref=f6e705]:
+                      - generic [ref=f6e706]:
+                        - generic [ref=f6e707]: moins cher
+                        - generic [ref=f6e708]: plus cher
+                    - columnheader "Écart" [ref=f6e709]
+                - rowgroup [ref=f6e710]:
+                  - row [ref=f6e711]:
+                    - cell "Loisirs" [ref=f6e712]
+                    - cell "3 234,01 €" [ref=f6e713]
+                    - cell "6 442,88 €" [ref=f6e714]
+                    - cell [ref=f6e715]
+                    - cell "-3 208,87 €" [ref=f6e719]
+                  - row [ref=f6e720]:
+                    - cell "Transports et déplacements" [ref=f6e721]
+                    - cell "1 629,83 €" [ref=f6e722]
+                    - cell "667,65 €" [ref=f6e723]
+                    - cell [ref=f6e724]
+                    - cell "+962,18 €" [ref=f6e728]
+                  - row [ref=f6e729]:
+                    - cell "Frais de logement" [ref=f6e730]
+                    - cell "5 696,26 €" [ref=f6e731]
+                    - cell "6 501,89 €" [ref=f6e732]
+                    - cell [ref=f6e733]
+                    - cell "-805,63 €" [ref=f6e737]
+                  - row [ref=f6e738]:
+                    - cell "Abonnements et services" [ref=f6e739]
+                    - cell "681,49 €" [ref=f6e740]
+                    - cell "1 028,21 €" [ref=f6e741]
+                    - cell [ref=f6e742]
+                    - cell "-346,72 €" [ref=f6e746]
+                  - row [ref=f6e747]:
+                    - cell "Téléphonie" [ref=f6e748]
+                    - cell "699,79 €" [ref=f6e749]
+                    - cell "828,66 €" [ref=f6e750]
+                    - cell [ref=f6e751]
+                    - cell "-128,87 €" [ref=f6e755]
+                  - row [ref=f6e756]:
+                    - cell "Vie courante et santé" [ref=f6e757]
+                    - cell "2 250,16 €" [ref=f6e758]
+                    - cell "2 163,50 €" [ref=f6e759]
+                    - cell [ref=f6e760]
+                    - cell "+86,66 €" [ref=f6e764]
+                  - row [ref=f6e765]:
+                    - cell "Dépenses non classées" [ref=f6e766]
+                    - cell "5 872,72 €" [ref=f6e767]
+                    - cell "5 843,49 €" [ref=f6e768]
+                    - cell [ref=f6e769]
+                    - cell "+29,23 €" [ref=f6e773]
+                  - row [ref=f6e774]:
+                    - cell "Tabac et presse" [ref=f6e775]
+                    - cell "3 844,76 €" [ref=f6e776]
+                    - cell "3 873,35 €" [ref=f6e777]
+                    - cell [ref=f6e778]
+                    - cell "-28,59 €" [ref=f6e782]
+                  - row [ref=f6e783]:
+                    - cell "Banque et impôts" [ref=f6e784]
+                    - cell "147,22 €" [ref=f6e785]
+                    - cell "170,44 €" [ref=f6e786]
+                    - cell [ref=f6e787]
+                    - cell "-23,22 €" [ref=f6e791]
+              - paragraph [ref=f6e792]: Les dix postes dont l'écart pèse le plus, du plus contributeur au moins contributeur. La longueur de la barre est proportionnelle à l'écart.
+          - generic [ref=f6e793]:
+            - generic [ref=f6e795]:
+              - heading "Plus grosses dépenses - Août 2026" [level=2] [ref=f6e799]
+              - table [ref=f6e802]:
+                - caption [ref=f6e803]: Plus grosses dépenses du mois
+                - rowgroup [ref=f6e804]:
+                  - row [ref=f6e805]:
+                    - columnheader "Date" [ref=f6e806]
+                    - columnheader "Bénéficiaire" [ref=f6e807]
+                    - columnheader "Poste" [ref=f6e808]
+                    - columnheader "Montant" [ref=f6e809]
+                - rowgroup [ref=f6e810]:
+                  - row [ref=f6e811]:
+                    - cell "04/08/2026" [ref=f6e812]
+                    - cell "Nathalie Combepine" [ref=f6e813]
+                    - cell "Loyer" [ref=f6e814]
+                    - cell "687,17 €" [ref=f6e815]
+                  - row [ref=f6e816]:
+                    - cell "07/08/2026" [ref=f6e817]
+                    - cell "Fournier Sébastien" [ref=f6e818]
+                    - cell "Virements et chèques" [ref=f6e819]
+                    - cell "400,00 €" [ref=f6e820]
+                  - row [ref=f6e821]:
+                    - cell "10/08/2026" [ref=f6e822]
+                    - cell "Retrait DAB" [ref=f6e823]
+                    - cell "Retraits" [ref=f6e824]
+                    - cell "130,00 €" [ref=f6e825]
+                  - row [ref=f6e826]:
+                    - cell "07/08/2026" [ref=f6e827]
+                    - cell "Fournier Sébastien" [ref=f6e828]
+                    - cell "Virements et chèques" [ref=f6e829]
+                    - cell "112,50 €" [ref=f6e830]
+                  - row [ref=f6e831]:
+                    - cell "04/08/2026" [ref=f6e832]
+                    - cell "L'Angival" [ref=f6e833]
+                    - cell "Vacances" [ref=f6e834]
+                    - cell "95,90 €" [ref=f6e835]
+                  - row [ref=f6e836]:
+                    - cell "11/08/2026" [ref=f6e837]
+                    - cell "Chèque émis" [ref=f6e838]
+                    - cell "Virements et chèques" [ref=f6e839]
+                    - cell "80,00 €" [ref=f6e840]
+                  - row [ref=f6e841]:
+                    - cell "11/08/2026" [ref=f6e842]
+                    - cell "Lidl" [ref=f6e843]
+                    - cell "Frais alimentaires" [ref=f6e844]
+                    - cell "56,02 €" [ref=f6e845]
+                  - row [ref=f6e846]:
+                    - cell "14/08/2026" [ref=f6e847]
+                    - cell "Bouygues Telecom" [ref=f6e848]
+                    - cell "Téléphone / Internet" [ref=f6e849]
+                    - cell "52,99 €" [ref=f6e850]
+            - generic [ref=f6e852]:
+              - generic [ref=f6e853]:
+                - heading "Charges récurrentes estimées" [level=2] [ref=f6e856]
+                - generic [ref=f6e857]: 2 467,04 € / mois
+              - generic [ref=f6e858]:
+                - paragraph [ref=f6e859]: Tiers présents sur au moins 60 % des 12 derniers mois. Montant médian retenu.
+                - table [ref=f6e861]:
+                  - caption [ref=f6e862]: Charges récurrentes estimées
+                  - rowgroup [ref=f6e863]:
+                    - row [ref=f6e864]:
+                      - columnheader "Tiers" [ref=f6e865]
+                      - columnheader "Présence" [ref=f6e866]
+                      - columnheader "Montant médian" [ref=f6e867]
+                      - columnheader "Coût annuel" [ref=f6e868]
+                  - rowgroup [ref=f6e869]:
+                    - row [ref=f6e870]:
+                      - cell "Nathalie Combepine" [ref=f6e871]
+                      - cell "12/12 mois" [ref=f6e872]
+                      - cell "687,17 €" [ref=f6e873]
+                      - cell "8 246 €/an" [ref=f6e874]
+                    - row [ref=f6e875]:
+                      - cell "Fournier Sébastien" [ref=f6e876]
+                      - cell "9/12 mois" [ref=f6e877]
+                      - cell "500,00 €" [ref=f6e878]
+                      - cell "6 000 €/an" [ref=f6e879]
+                    - row [ref=f6e880]:
+                      - cell "2m" [ref=f6e881]
+                      - cell "12/12 mois" [ref=f6e882]
+                      - cell "211,65 €" [ref=f6e883]
+                      - cell "2 540 €/an" [ref=f6e884]
+                    - row [ref=f6e885]:
+                      - cell "Cafe'Inn" [ref=f6e886]
+                      - cell "12/12 mois" [ref=f6e887]
+                      - cell "126,65 €" [ref=f6e888]
+                      - cell "1 520 €/an" [ref=f6e889]
+                    - row [ref=f6e890]:
+                      - cell "Casa" [ref=f6e891]
+                      - cell "11/12 mois" [ref=f6e892]
+                      - cell "122,00 €" [ref=f6e893]
+                      - cell "1 464 €/an" [ref=f6e894]
+                    - row [ref=f6e895]:
+                      - cell "Bouygues Telecom" [ref=f6e896]
+                      - cell "12/12 mois" [ref=f6e897]
+                      - cell "101,97 €" [ref=f6e898]
+                      - cell "1 224 €/an" [ref=f6e899]
+                    - row [ref=f6e900]:
+                      - cell "Retrait DAB" [ref=f6e901]
+                      - cell "8/12 mois" [ref=f6e902]
+                      - cell "100,00 €" [ref=f6e903]
+                      - cell "1 200 €/an" [ref=f6e904]
+                    - row [ref=f6e905]:
+                      - cell "ENGIE" [ref=f6e906]
+                      - cell "8/12 mois" [ref=f6e907]
+                      - cell "97,88 €" [ref=f6e908]
+                      - cell "1 175 €/an" [ref=f6e909]
+                    - row [ref=f6e910]:
+                      - cell "Monoprix" [ref=f6e911]
+                      - cell "12/12 mois" [ref=f6e912]
+                      - cell "83,01 €" [ref=f6e913]
+                      - cell "996 €/an" [ref=f6e914]
+                    - row [ref=f6e915]:
+                      - cell "Vival" [ref=f6e916]
+                      - cell "11/12 mois" [ref=f6e917]
+                      - cell "64,20 €" [ref=f6e918]
+                      - cell "770 €/an" [ref=f6e919]
+                    - row [ref=f6e920]:
+                      - cell "Carrefour City" [ref=f6e921]
+                      - cell "10/12 mois" [ref=f6e922]
+                      - cell "50,09 €" [ref=f6e923]
+                      - cell "601 €/an" [ref=f6e924]
+                    - row [ref=f6e925]:
+                      - cell "Crédit Agricole - Assurance automobile" [ref=f6e926]
+                      - cell "12/12 mois" [ref=f6e927]
+                      - cell "47,53 €" [ref=f6e928]
+                      - cell "570 €/an" [ref=f6e929]
+          - generic [ref=f6e930]:
+            - link "Mes opérations Consulter et pointer les écritures" [ref=f6e932] [cursor=pointer]:
+              - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1
+              - generic [ref=f6e936]:
+                - generic [ref=f6e937]: Mes opérations
+                - generic [ref=f6e938]: Consulter et pointer les écritures
+            - link "Configuration du compte Solde initial et libellé" [ref=f6e942] [cursor=pointer]:
+              - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/edit/1
+              - generic [ref=f6e948]:
+                - generic [ref=f6e949]: Configuration du compte
+                - generic [ref=f6e950]: Solde initial et libellé
+            - link "Catégories Organiser les postes de dépense" [ref=f6e954] [cursor=pointer]:
+              - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/operations-types/index
+              - generic [ref=f6e960]:
+                - generic [ref=f6e961]: Catégories
+                - generic [ref=f6e962]: Organiser les postes de dépense
+            - link "Bénéficiaires Tiers rattachés aux opérations" [ref=f6e966] [cursor=pointer]:
+              - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/outsiders/index
+              - generic [ref=f6e970]:
+                - generic [ref=f6e971]: Bénéficiaires
+                - generic [ref=f6e972]: Tiers rattachés aux opérations
+          - paragraph [ref=f6e975]: 97 opérations sur la période affichée · 0 non pointées
+  - status [ref=f6e980]
+  - toolbar "Symfony Web Debug Toolbar" [ref=f6e981]:
+    - generic [ref=f6e984]:
+      - link "Symfony Loading…" [ref=f6e986] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/b7381c?panel=request
+        - generic [ref=f6e987]:
+          - img "Symfony" [ref=f6e988]
+          - generic [ref=f6e990]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f6e991] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f6e992]

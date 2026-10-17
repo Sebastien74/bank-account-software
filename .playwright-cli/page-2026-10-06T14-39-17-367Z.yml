@@ -1,0 +1,486 @@
+- generic [active] [ref=f5e1]:
+  - link "Aller au contenu" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main-container"
+  - banner [ref=f5e3]:
+    - link "Bank Account Software" [ref=f5e4] [cursor=pointer]:
+      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+    - paragraph [ref=f5e16]: Opérations programmées
+  - generic [ref=f5e17]:
+    - complementary [ref=f5e18]:
+      - navigation [ref=f5e19]:
+        - link "Tableau de bord" [ref=f5e20] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/dashboard
+        - link "Gestion des comptes" [ref=f5e27] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+        - link "Gestion des budgets" [ref=f5e34] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/budgets/index
+        - link "Gestion des catégories" [ref=f5e41] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/operations-types/index
+        - link "Gestion des bénéficiaires" [ref=f5e46] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/outsiders/index
+        - link "Logout" [ref=f5e53] [cursor=pointer]:
+          - /url: /logout
+    - navigation [ref=f5e59]
+    - main [ref=f5e60]:
+      - generic [ref=f5e61]:
+        - navigation "Fil d'Ariane" [ref=f5e62]:
+          - list [ref=f5e63]:
+            - listitem [ref=f5e64]:
+              - link "Comptes" [ref=f5e65] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f5e66]:
+              - text: /
+              - link "Mes comptes" [ref=f5e67] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f5e68]: / Opérations programmées
+        - generic [ref=f5e69]:
+          - generic [ref=f5e70]:
+            - generic [ref=f5e71]:
+              - heading "Opérations programmées" [level=1] [ref=f5e72]
+              - paragraph [ref=f5e73]: Détectées dans l'historique du compte Compte courant. Corrigez ce que l'historique ne peut pas deviner.
+            - link "Mes opérations" [ref=f5e75] [cursor=pointer]:
+              - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1
+          - generic [ref=f5e80]:
+            - generic [ref=f5e82]:
+              - heading "Ajouter une charge" [level=2] [ref=f5e83]
+              - paragraph [ref=f5e84]: Pour une échéance que l'historique ne connaît pas encore.
+            - generic [ref=f5e85]:
+              - generic [ref=f5e86]:
+                - generic [ref=f5e87]:
+                  - generic [ref=f5e88]: Tiers
+                  - combobox [ref=f5e89] [cursor=pointer]:
+                    - listbox [ref=f5e91]:
+                      - option "Sélectionnez" [selected] [ref=f5e92]
+                - generic [ref=f5e93]:
+                  - generic [ref=f5e94]: Nouveau tiers
+                  - textbox "Nouveau tiers" [ref=f5e95]:
+                    - /placeholder: Saisissez un tiers
+                - generic [ref=f5e96]:
+                  - generic [ref=f5e97]: Catégorie
+                  - combobox [ref=f5e98] [cursor=pointer]:
+                    - listbox [ref=f5e100]:
+                      - option "Sélectionnez" [selected] [ref=f5e101]
+              - generic [ref=f5e102]:
+                - generic [ref=f5e103]:
+                  - generic [ref=f5e104]: Périodicité
+                  - combobox [ref=f5e105] [cursor=pointer]:
+                    - listbox [ref=f5e107]:
+                      - option "Tous les mois" [selected] [ref=f5e108]
+                - generic [ref=f5e109]:
+                  - generic [ref=f5e110]: Jour
+                  - spinbutton "Jour" [ref=f5e111]: "1"
+                - generic [ref=f5e112]:
+                  - generic [ref=f5e113]: Mois
+                  - combobox [ref=f5e114] [cursor=pointer]:
+                    - listbox [ref=f5e116]:
+                      - option "Oct" [selected] [ref=f5e117]
+                - generic [ref=f5e118]:
+                  - generic [ref=f5e119]: Montant
+                  - textbox "Montant" [ref=f5e120]:
+                    - /placeholder: 0,00
+                - button "Ajouter" [ref=f5e122] [cursor=pointer]
+          - generic [ref=f5e126]:
+            - generic [ref=f5e127]:
+              - generic [ref=f5e128]:
+                - heading "Charges détectées" [level=2] [ref=f5e129]
+                - paragraph [ref=f5e130]: 17 charges
+              - button "Enregistrer" [ref=f5e132] [cursor=pointer]
+            - table [ref=f5e139]:
+              - caption [ref=f5e140]: Charges programmées du compte
+              - rowgroup [ref=f5e141]:
+                - row [ref=f5e142]:
+                  - columnheader "Active" [ref=f5e143]
+                  - columnheader "Tiers" [ref=f5e144]
+                  - columnheader "Catégorie" [ref=f5e145]
+                  - columnheader "Périodicité" [ref=f5e146]
+                  - columnheader "Échéance" [ref=f5e147]
+                  - columnheader "Montant" [ref=f5e148]
+                  - columnheader "État du mois" [ref=f5e149]
+                  - columnheader "Actions" [ref=f5e150]
+              - rowgroup [ref=f5e151]:
+                - row [ref=f5e152]:
+                  - cell [ref=f5e153]:
+                    - checkbox "Annoncer Crédit Agricole - Assurance habitation dans les charges à venir" [checked] [ref=f5e155]
+                  - cell "Crédit Agricole - Assurance habitation" [ref=f5e156]
+                  - cell "Assurance logement" [ref=f5e157]
+                  - cell [ref=f5e158]:
+                    - combobox [ref=f5e159] [cursor=pointer]:
+                      - listbox [ref=f5e161]:
+                        - option "Tous les mois" [selected] [ref=f5e162]
+                  - cell [ref=f5e163]:
+                    - generic [ref=f5e164]:
+                      - spinbutton "Jour d'échéance de Crédit Agricole - Assurance habitation" [ref=f5e165]: "2"
+                      - combobox [ref=f5e166] [cursor=pointer]:
+                        - listbox [ref=f5e168]:
+                          - option "Oct" [selected] [ref=f5e169]
+                  - cell "Estimé 22,40" [ref=f5e170]:
+                    - textbox "Montant de Crédit Agricole - Assurance habitation, vide pour garder l'estimation" [ref=f5e171]:
+                      - /placeholder: 0,00
+                  - cell "Déjà passée" [ref=f5e173]
+                  - cell [ref=f5e174]:
+                    - button "Effacer le réglage de Crédit Agricole - Assurance habitation" [ref=f5e175] [cursor=pointer]
+                - row [ref=f5e178]:
+                  - cell [ref=f5e179]:
+                    - checkbox "Annoncer Fournier Sébastien dans les charges à venir" [checked] [ref=f5e181]
+                  - cell "Fournier Sébastien" [ref=f5e182]
+                  - cell "Virement vers épargne" [ref=f5e183]
+                  - cell [ref=f5e184]:
+                    - combobox [ref=f5e185] [cursor=pointer]:
+                      - listbox [ref=f5e187]:
+                        - option "Tous les mois" [selected] [ref=f5e188]
+                  - cell [ref=f5e189]:
+                    - generic [ref=f5e190]:
+                      - spinbutton "Jour d'échéance de Fournier Sébastien" [ref=f5e191]: "3"
+                      - combobox [ref=f5e192] [cursor=pointer]:
+                        - listbox [ref=f5e194]:
+                          - option "Oct" [selected] [ref=f5e195]
+                  - cell "Estimé 500,00" [ref=f5e196]:
+                    - textbox "Montant de Fournier Sébastien, vide pour garder l'estimation" [ref=f5e197]:
+                      - /placeholder: 0,00
+                  - cell "Déjà passée" [ref=f5e199]
+                  - cell [ref=f5e200]:
+                    - button "Effacer le réglage de Fournier Sébastien" [ref=f5e201] [cursor=pointer]
+                - row [ref=f5e204]:
+                  - cell [ref=f5e205]:
+                    - checkbox "Annoncer Google Strav dans les charges à venir" [checked] [ref=f5e207]
+                  - cell "Google Strav" [ref=f5e208]
+                  - cell "Abonnements" [ref=f5e209]
+                  - cell [ref=f5e210]:
+                    - combobox [ref=f5e211] [cursor=pointer]:
+                      - listbox [ref=f5e213]:
+                        - option "Une fois par an" [selected] [ref=f5e214]
+                  - cell [ref=f5e215]:
+                    - generic [ref=f5e216]:
+                      - spinbutton "Jour d'échéance de Google Strav" [ref=f5e217]: "3"
+                      - combobox [ref=f5e218] [cursor=pointer]:
+                        - listbox [ref=f5e220]:
+                          - option "Sep" [selected] [ref=f5e221]
+                  - cell "59.99 Estimé 59,99" [ref=f5e222]:
+                    - textbox "Montant de Google Strav, vide pour garder l'estimation" [ref=f5e223]:
+                      - /placeholder: 0,00
+                      - text: "59.99"
+                    - generic [ref=f5e224]: Estimé 59,99
+                  - cell "Attendue" [ref=f5e225]
+                  - cell [ref=f5e226]:
+                    - button "Effacer le réglage de Google Strav" [ref=f5e227] [cursor=pointer]
+                - row [ref=f5e230]:
+                  - cell [ref=f5e231]:
+                    - checkbox "Annoncer Nathalie Combepine dans les charges à venir" [checked] [ref=f5e233]
+                  - cell "Nathalie Combepine" [ref=f5e234]
+                  - cell "Loyer" [ref=f5e235]
+                  - cell [ref=f5e236]:
+                    - combobox [ref=f5e237] [cursor=pointer]:
+                      - listbox [ref=f5e239]:
+                        - option "Tous les mois" [selected] [ref=f5e240]
+                  - cell [ref=f5e241]:
+                    - generic [ref=f5e242]:
+                      - spinbutton "Jour d'échéance de Nathalie Combepine" [ref=f5e243]: "3"
+                      - combobox [ref=f5e244] [cursor=pointer]:
+                        - listbox [ref=f5e246]:
+                          - option "Oct" [selected] [ref=f5e247]
+                  - cell "Estimé 687,17" [ref=f5e248]:
+                    - textbox "Montant de Nathalie Combepine, vide pour garder l'estimation" [ref=f5e249]:
+                      - /placeholder: 0,00
+                  - cell "Déjà passée" [ref=f5e251]
+                  - cell [ref=f5e252]:
+                    - button "Effacer le réglage de Nathalie Combepine" [ref=f5e253] [cursor=pointer]
+                - row [ref=f5e256]:
+                  - cell [ref=f5e257]:
+                    - checkbox "Annoncer Frais de tenue de compte dans les charges à venir" [checked] [ref=f5e259]
+                  - cell "Frais de tenue de compte" [ref=f5e260]
+                  - cell "Frais bancaires" [ref=f5e261]
+                  - cell [ref=f5e262]:
+                    - combobox [ref=f5e263] [cursor=pointer]:
+                      - listbox [ref=f5e265]:
+                        - option "Tous les mois" [selected] [ref=f5e266]
+                  - cell [ref=f5e267]:
+                    - generic [ref=f5e268]:
+                      - spinbutton "Jour d'échéance de Frais de tenue de compte" [ref=f5e269]: "4"
+                      - combobox [ref=f5e270] [cursor=pointer]:
+                        - listbox [ref=f5e272]:
+                          - option "Oct" [selected] [ref=f5e273]
+                  - cell "Estimé 6,32" [ref=f5e274]:
+                    - textbox "Montant de Frais de tenue de compte, vide pour garder l'estimation" [ref=f5e275]:
+                      - /placeholder: 0,00
+                  - cell "Déjà passée" [ref=f5e277]
+                  - cell [ref=f5e278]:
+                    - button "Effacer le réglage de Frais de tenue de compte" [ref=f5e279] [cursor=pointer]
+                - row [ref=f5e282]:
+                  - cell [ref=f5e283]:
+                    - checkbox "Annoncer CANAL+ dans les charges à venir" [checked] [ref=f5e285]
+                  - cell "CANAL+" [ref=f5e286]
+                  - cell "Abonnements" [ref=f5e287]
+                  - cell [ref=f5e288]:
+                    - combobox [ref=f5e289] [cursor=pointer]:
+                      - listbox [ref=f5e291]:
+                        - option "Tous les mois" [selected] [ref=f5e292]
+                  - cell [ref=f5e293]:
+                    - generic [ref=f5e294]:
+                      - spinbutton "Jour d'échéance de CANAL+" [ref=f5e295]: "5"
+                      - combobox [ref=f5e296] [cursor=pointer]:
+                        - listbox [ref=f5e298]:
+                          - option "Oct" [selected] [ref=f5e299]
+                  - cell "Estimé 29,99" [ref=f5e300]:
+                    - textbox "Montant de CANAL+, vide pour garder l'estimation" [ref=f5e301]:
+                      - /placeholder: 0,00
+                  - cell "Déjà passée" [ref=f5e303]
+                  - cell [ref=f5e304]:
+                    - button "Effacer le réglage de CANAL+" [ref=f5e305] [cursor=pointer]
+                - row [ref=f5e308]:
+                  - cell [ref=f5e309]:
+                    - checkbox "Annoncer Darty dans les charges à venir" [checked] [ref=f5e311]
+                  - cell "Darty" [ref=f5e312]
+                  - cell "Cadeaux" [ref=f5e313]
+                  - cell [ref=f5e314]:
+                    - combobox [ref=f5e315] [cursor=pointer]:
+                      - listbox [ref=f5e317]:
+                        - option "En plusieurs fois" [selected] [ref=f5e318]
+                  - cell [ref=f5e319]:
+                    - generic [ref=f5e320]:
+                      - spinbutton "Jour d'échéance de Darty" [ref=f5e321]: "5"
+                      - combobox [ref=f5e322] [cursor=pointer]:
+                        - listbox [ref=f5e324]:
+                          - option "Oct" [selected] [ref=f5e325]
+                    - generic [ref=f5e327]:
+                      - spinbutton "Nombre d'échéances de Darty" [ref=f5e328]: "4"
+                      - combobox [ref=f5e329] [cursor=pointer]:
+                        - listbox [ref=f5e331]:
+                          - option "Oct" [selected] [ref=f5e332]
+                      - spinbutton "Année de la première échéance de Darty" [ref=f5e333]: "2026"
+                  - cell [ref=f5e334]:
+                    - textbox "Montant de Darty, vide pour garder l'estimation" [ref=f5e335]:
+                      - /placeholder: 0,00
+                      - text: "57.50"
+                  - cell "Attendue Échéance 1 sur 4 Saisie à la main" [ref=f5e336]:
+                    - text: Attendue
+                    - generic [ref=f5e337]: Échéance 1 sur 4
+                    - generic [ref=f5e338]: Saisie à la main
+                  - cell [ref=f5e339]:
+                    - button "Supprimer Darty" [ref=f5e340] [cursor=pointer]
+                - row [ref=f5e343]:
+                  - cell [ref=f5e344]:
+                    - checkbox "Annoncer Bouygues Telecom dans les charges à venir" [checked] [ref=f5e346]
+                  - cell "Bouygues Telecom 09xxxxx800" [ref=f5e347]:
+                    - text: Bouygues Telecom
+                    - generic [ref=f5e348]: 09xxxxx800
+                  - cell "Téléphone / Internet" [ref=f5e349]
+                  - cell [ref=f5e350]:
+                    - combobox [ref=f5e351] [cursor=pointer]:
+                      - listbox [ref=f5e353]:
+                        - option "Tous les mois" [selected] [ref=f5e354]
+                  - cell [ref=f5e355]:
+                    - generic [ref=f5e356]:
+                      - spinbutton "Jour d'échéance de Bouygues Telecom" [ref=f5e357]: "14"
+                      - combobox [ref=f5e358] [cursor=pointer]:
+                        - listbox [ref=f5e360]:
+                          - option "Oct" [selected] [ref=f5e361]
+                  - cell "Estimé 52,99" [ref=f5e362]:
+                    - textbox "Montant de Bouygues Telecom, vide pour garder l'estimation" [ref=f5e363]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e365]
+                  - cell [ref=f5e366]:
+                    - button "Effacer le réglage de Bouygues Telecom" [ref=f5e367] [cursor=pointer]
+                - row [ref=f5e370]:
+                  - cell [ref=f5e371]:
+                    - checkbox "Annoncer Bouygues Telecom dans les charges à venir" [checked] [ref=f5e373]
+                  - cell "Bouygues Telecom 06xxxxx891" [ref=f5e374]:
+                    - text: Bouygues Telecom
+                    - generic [ref=f5e375]: 06xxxxx891
+                  - cell "Téléphone / Internet" [ref=f5e376]
+                  - cell [ref=f5e377]:
+                    - combobox [ref=f5e378] [cursor=pointer]:
+                      - listbox [ref=f5e380]:
+                        - option "Tous les mois" [selected] [ref=f5e381]
+                  - cell [ref=f5e382]:
+                    - generic [ref=f5e383]:
+                      - spinbutton "Jour d'échéance de Bouygues Telecom" [ref=f5e384]: "14"
+                      - combobox [ref=f5e385] [cursor=pointer]:
+                        - listbox [ref=f5e387]:
+                          - option "Oct" [selected] [ref=f5e388]
+                  - cell "Estimé 48,98" [ref=f5e389]:
+                    - textbox "Montant de Bouygues Telecom, vide pour garder l'estimation" [ref=f5e390]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e392]
+                  - cell [ref=f5e393]:
+                    - button "Effacer le réglage de Bouygues Telecom" [ref=f5e394] [cursor=pointer]
+                - row [ref=f5e397]:
+                  - cell [ref=f5e398]:
+                    - checkbox "Annoncer Crédit Agricole - Assurance automobile dans les charges à venir" [checked] [ref=f5e400]
+                  - cell "Crédit Agricole - Assurance automobile" [ref=f5e401]
+                  - cell "Assurances et taxes auto" [ref=f5e402]
+                  - cell [ref=f5e403]:
+                    - combobox [ref=f5e404] [cursor=pointer]:
+                      - listbox [ref=f5e406]:
+                        - option "Tous les mois" [selected] [ref=f5e407]
+                  - cell [ref=f5e408]:
+                    - generic [ref=f5e409]:
+                      - spinbutton "Jour d'échéance de Crédit Agricole - Assurance automobile" [ref=f5e410]: "15"
+                      - combobox [ref=f5e411] [cursor=pointer]:
+                        - listbox [ref=f5e413]:
+                          - option "Oct" [selected] [ref=f5e414]
+                  - cell "Estimé 44,88" [ref=f5e415]:
+                    - textbox "Montant de Crédit Agricole - Assurance automobile, vide pour garder l'estimation" [ref=f5e416]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e418]
+                  - cell [ref=f5e419]:
+                    - button "Effacer le réglage de Crédit Agricole - Assurance automobile" [ref=f5e420] [cursor=pointer]
+                - row [ref=f5e423]:
+                  - cell [ref=f5e424]:
+                    - checkbox "Annoncer Deezer Luxem dans les charges à venir" [checked] [ref=f5e426]
+                  - cell "Deezer Luxem" [ref=f5e427]
+                  - cell "Abonnements" [ref=f5e428]
+                  - cell [ref=f5e429]:
+                    - combobox [ref=f5e430] [cursor=pointer]:
+                      - listbox [ref=f5e432]:
+                        - option "Tous les mois" [selected] [ref=f5e433]
+                  - cell [ref=f5e434]:
+                    - generic [ref=f5e435]:
+                      - spinbutton "Jour d'échéance de Deezer Luxem" [ref=f5e436]: "19"
+                      - combobox [ref=f5e437] [cursor=pointer]:
+                        - listbox [ref=f5e439]:
+                          - option "Oct" [selected] [ref=f5e440]
+                  - cell "Estimé 11,99" [ref=f5e441]:
+                    - textbox "Montant de Deezer Luxem, vide pour garder l'estimation" [ref=f5e442]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e444]
+                  - cell [ref=f5e445]:
+                    - button "Effacer le réglage de Deezer Luxem" [ref=f5e446] [cursor=pointer]
+                - row [ref=f5e449]:
+                  - cell [ref=f5e450]:
+                    - checkbox "Annoncer ENGIE dans les charges à venir" [checked] [ref=f5e452]
+                  - cell "ENGIE" [ref=f5e453]
+                  - cell "Électricité / Gaz" [ref=f5e454]
+                  - cell [ref=f5e455]:
+                    - combobox [ref=f5e456] [cursor=pointer]:
+                      - listbox [ref=f5e458]:
+                        - option "Tous les mois" [selected] [ref=f5e459]
+                  - cell [ref=f5e460]:
+                    - generic [ref=f5e461]:
+                      - spinbutton "Jour d'échéance de ENGIE" [ref=f5e462]: "19"
+                      - combobox [ref=f5e463] [cursor=pointer]:
+                        - listbox [ref=f5e465]:
+                          - option "Oct" [selected] [ref=f5e466]
+                  - cell "119.34 Estimé 134,62" [ref=f5e467]:
+                    - textbox "Montant de ENGIE, vide pour garder l'estimation" [ref=f5e468]:
+                      - /placeholder: 0,00
+                      - text: "119.34"
+                    - generic [ref=f5e469]: Estimé 134,62
+                  - cell "Attendue" [ref=f5e470]
+                  - cell [ref=f5e471]:
+                    - button "Effacer le réglage de ENGIE" [ref=f5e472] [cursor=pointer]
+                - row [ref=f5e475]:
+                  - cell [ref=f5e476]:
+                    - checkbox "Annoncer Microsoft LU dans les charges à venir" [checked] [ref=f5e478]
+                  - cell "Microsoft LU" [ref=f5e479]
+                  - cell "Abonnements" [ref=f5e480]
+                  - cell [ref=f5e481]:
+                    - combobox [ref=f5e482] [cursor=pointer]:
+                      - listbox [ref=f5e484]:
+                        - option "Tous les mois" [selected] [ref=f5e485]
+                  - cell [ref=f5e486]:
+                    - generic [ref=f5e487]:
+                      - spinbutton "Jour d'échéance de Microsoft LU" [ref=f5e488]: "19"
+                      - combobox [ref=f5e489] [cursor=pointer]:
+                        - listbox [ref=f5e491]:
+                          - option "Oct" [selected] [ref=f5e492]
+                  - cell "Estimé 2,00" [ref=f5e493]:
+                    - textbox "Montant de Microsoft LU, vide pour garder l'estimation" [ref=f5e494]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e496]
+                  - cell [ref=f5e497]:
+                    - button "Effacer le réglage de Microsoft LU" [ref=f5e498] [cursor=pointer]
+                - row [ref=f5e501]:
+                  - cell [ref=f5e502]:
+                    - checkbox "Annoncer Netflix dans les charges à venir" [checked] [ref=f5e504]
+                  - cell "Netflix" [ref=f5e505]
+                  - cell "Abonnements" [ref=f5e506]
+                  - cell [ref=f5e507]:
+                    - combobox [ref=f5e508] [cursor=pointer]:
+                      - listbox [ref=f5e510]:
+                        - option "Tous les mois" [selected] [ref=f5e511]
+                  - cell [ref=f5e512]:
+                    - generic [ref=f5e513]:
+                      - spinbutton "Jour d'échéance de Netflix" [ref=f5e514]: "21"
+                      - combobox [ref=f5e515] [cursor=pointer]:
+                        - listbox [ref=f5e517]:
+                          - option "Oct" [selected] [ref=f5e518]
+                  - cell "Estimé 21,98" [ref=f5e519]:
+                    - textbox "Montant de Netflix, vide pour garder l'estimation" [ref=f5e520]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e522]
+                  - cell [ref=f5e523]:
+                    - button "Effacer le réglage de Netflix" [ref=f5e524] [cursor=pointer]
+                - row [ref=f5e527]:
+                  - cell [ref=f5e528]:
+                    - checkbox "Annoncer Github INC L dans les charges à venir" [checked] [ref=f5e530]
+                  - cell "Github INC L" [ref=f5e531]
+                  - cell "Abonnements" [ref=f5e532]
+                  - cell [ref=f5e533]:
+                    - combobox [ref=f5e534] [cursor=pointer]:
+                      - listbox [ref=f5e536]:
+                        - option "Tous les mois" [selected] [ref=f5e537]
+                  - cell [ref=f5e538]:
+                    - generic [ref=f5e539]:
+                      - spinbutton "Jour d'échéance de Github INC L" [ref=f5e540]: "28"
+                      - combobox [ref=f5e541] [cursor=pointer]:
+                        - listbox [ref=f5e543]:
+                          - option "Oct" [selected] [ref=f5e544]
+                  - cell "Estimé 3,62" [ref=f5e545]:
+                    - textbox "Montant de Github INC L, vide pour garder l'estimation" [ref=f5e546]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e548]
+                  - cell [ref=f5e549]:
+                    - button "Effacer le réglage de Github INC L" [ref=f5e550] [cursor=pointer]
+                - row [ref=f5e553]:
+                  - cell [ref=f5e554]:
+                    - checkbox "Annoncer Zwift Luxemb dans les charges à venir" [checked] [ref=f5e556]
+                  - cell "Zwift Luxemb" [ref=f5e557]
+                  - cell "Abonnements" [ref=f5e558]
+                  - cell [ref=f5e559]:
+                    - combobox [ref=f5e560] [cursor=pointer]:
+                      - listbox [ref=f5e562]:
+                        - option "Tous les mois" [selected] [ref=f5e563]
+                  - cell [ref=f5e564]:
+                    - generic [ref=f5e565]:
+                      - spinbutton "Jour d'échéance de Zwift Luxemb" [ref=f5e566]: "28"
+                      - combobox [ref=f5e567] [cursor=pointer]:
+                        - listbox [ref=f5e569]:
+                          - option "Oct" [selected] [ref=f5e570]
+                  - cell "Estimé 19,99" [ref=f5e571]:
+                    - textbox "Montant de Zwift Luxemb, vide pour garder l'estimation" [ref=f5e572]:
+                      - /placeholder: 0,00
+                  - cell "Attendue" [ref=f5e574]
+                  - cell [ref=f5e575]:
+                    - button "Effacer le réglage de Zwift Luxemb" [ref=f5e576] [cursor=pointer]
+                - row [ref=f5e579]:
+                  - cell [ref=f5e580]:
+                    - checkbox "Annoncer Jetbrainssr dans les charges à venir" [ref=f5e582]
+                  - cell "Jetbrainssr" [ref=f5e583]
+                  - cell "Abonnements" [ref=f5e584]
+                  - cell [ref=f5e585]:
+                    - combobox [ref=f5e586] [cursor=pointer]:
+                      - listbox [ref=f5e588]:
+                        - option "Tous les mois" [selected] [ref=f5e589]
+                  - cell [ref=f5e590]:
+                    - generic [ref=f5e591]:
+                      - spinbutton "Jour d'échéance de Jetbrainssr" [ref=f5e592]: "29"
+                      - combobox [ref=f5e593] [cursor=pointer]:
+                        - listbox [ref=f5e595]:
+                          - option "Oct" [selected] [ref=f5e596]
+                  - cell "Estimé 7,80" [ref=f5e597]:
+                    - textbox "Montant de Jetbrainssr, vide pour garder l'estimation" [ref=f5e598]:
+                      - /placeholder: 0,00
+                  - cell "Ignorée" [ref=f5e600]
+                  - cell [ref=f5e601]:
+                    - button "Effacer le réglage de Jetbrainssr" [ref=f5e602] [cursor=pointer]
+            - paragraph [ref=f5e606]: Un montant laissé vide reprend l'estimation tirée de l'historique, rappelée sous le champ.
+  - status [ref=f5e607]
+  - toolbar "Symfony Web Debug Toolbar" [ref=f5e608]:
+    - generic [ref=f5e611]:
+      - link "Symfony Loading…" [ref=f5e613] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/58a19d?panel=request
+        - generic [ref=f5e614]:
+          - img "Symfony" [ref=f5e615]
+          - generic [ref=f5e617]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f5e618] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f5e619]

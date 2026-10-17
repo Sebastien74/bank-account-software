@@ -5,174 +5,1608 @@
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
-    Palette sombre relevée sur le gabarit de référence (voir .claude/charte-back).
-    Les valeurs sont posées sur les variables Bootstrap plutôt que dupliquées en
-    règles : c'est ce qui fait suivre tous les composants sans les redéclarer.
+    Charte du corps de page, relevée sur le gabarit de référence : voir
+    `.claude/charte-back`. Les valeurs sont posées sur les variables Bootstrap
+    dans `assets/scss/vendor/variables.scss` ; ce fichier ne porte que ce que
+    Bootstrap ne sait pas faire seul, et ce que les feuilles « tableau de bord »
+    du projet avaient imposé par-dessus.
+
+    Le rail et le bandeau ne sont pas concernés : ils gardent leur aspect, et
+    leurs jetons sont figés dans `variables.scss` ($dash-*).
+
+    1 ) Jetons
+    2 ) Fond de travail et texte
+    3 ) Cartes
+    4 ) Tableaux
+    5 ) Pastilles
+    6 ) Boutons
+    7 ) Champs
+    8 ) Moteurs : recherche, filtres, tri, navigation de période
+    9 ) Pagination et fil d'Ariane
+   10 ) Modales, alertes, toasts
+   11 ) États vides
 
 ----------------------------------------------------------------------------------------- */
 
+/*-----------------------------------
+   1 ) Jetons
+-----------------------------------*/
+
+/* Le reste du back lit ces propriétés personnalisées plutôt que les variables
+   Sass : `_dashboard-stats.scss` en dépend entièrement, et une teinte corrigée
+   ici descend partout sans recompiler une règle de plus. */
 :root {
-    --bas-paper: #25293c;
-    --bas-surface: #2f3349;
-    --bas-surface-raised: #363b54;
-    --bas-body: #acabc1;
-    --bas-heading: #cfcde4;
-    --bas-muted: #76778e;
-    --bas-line: #44485e;
+    --bas-paper: #{$paper};
+    --bas-surface: #{$surface};
+    --bas-surface-raised: #{$surface-raised};
+    --bas-body: #{$ink};
+    --bas-heading: #{$heading};
+    --bas-muted: #{$muted};
+    --bas-line: #{$rule};
+    --bas-line-strong: #{$rule-strong};
 
-    --bas-primary: #7367f0;
-    --bas-primary-subtle: #3a3b64;
-    --bas-success: #28c76f;
-    --bas-success-subtle: #2e4b4f;
-    --bas-info: #00bad1;
-    --bas-warning: #ff9f43;
-    --bas-danger: #ff4c51;
-    --bas-danger-subtle: #50374a;
+    /* Deux violets, et ce n'est pas une hésitation : #7367f0 est la teinte de
+       la démo, lisible en aplat décoratif ; #685dd8 est la seule qui porte un
+       libellé blanc à 4,5:1. Voir ecarts-projet.md, défaut n°1. */
+    --bas-primary: #{$brand};
+    --bas-primary-fill: #{$primary};
+    --bas-primary-fill-hover: #5f54cc;
+    --bas-primary-text: #{$brand-text};
+    --bas-primary-subtle: #{$brand-subtle};
+    --bas-primary-border: #{$brand-border};
 
-    --bas-radius: 0.375rem;
-    --bas-radius-lg: 0.5rem;
-    --bas-shadow: 0 0.1875rem 0.75rem 0 rgba(47, 43, 61, 0.14);
+    --bas-success: #{$moss};
+    --bas-success-subtle: #{$moss-subtle};
+    --bas-success-text: #{$moss-text};
+    --bas-info: #{$lagoon};
+    --bas-info-subtle: #{$lagoon-subtle};
+    --bas-info-text: #{$lagoon-text};
+    --bas-warning: #{$amber};
+    --bas-warning-subtle: #{$amber-subtle};
+    --bas-warning-text: #{$amber-text};
+    --bas-danger: #{$ember};
+    --bas-danger-subtle: #{$ember-subtle};
+    --bas-danger-text: #{$ember-text};
 
-    --bs-body-bg: var(--bas-paper);
-    --bs-body-color: var(--bas-body);
-    --bs-heading-color: var(--bas-heading);
-    --bs-secondary-color: var(--bas-muted);
-    --bs-border-color: var(--bas-line);
-    --bs-card-bg: var(--bas-surface);
-    --bs-primary: var(--bas-primary);
-    --bs-primary-rgb: 115, 103, 240;
-    --bs-link-color: #aba4f6;
-    --bs-link-hover-color: #c5c0f9;
+    --bas-radius: #{$border-radius};
+    --bas-radius-sm: #{$border-radius-sm};
+    --bas-radius-lg: #{$border-radius-lg};
+    --bas-shadow: #{$shadow};
+    --bas-shadow-lg: #{$shadow-lg};
 }
+
+/*-----------------------------------
+   1 bis ) Prise de focus
+-----------------------------------*/
+
+/* La charte éteint le halo de Bootstrap à cinq endroits — pagination, champ,
+   case à cocher, sélecteur, bouton — parce qu'il jure avec un fond sombre.
+   Éteint sans remplaçant, le back devient inutilisable au clavier seul.
+
+   Un seul trait blanc tient tous les fonds du back : 12,4:1 sur la carte,
+   14,4:1 sur la page, 10,0:1 sur un bouton de pagination, 5,1:1 sur le
+   primaire plein. Il est posé en `outline`, qui ne déplace rien. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible,
+.btn:focus-visible,
+.page-link:focus-visible,
+.row-action:focus-visible,
+.sort:focus-visible,
+.period-step:focus-visible,
+.period-year a:focus-visible,
+.index-link:focus-visible,
+/* Choices pose `is-focused` aussi bien au clic qu'au clavier : un trait blanc
+   là cernerait chaque liste dès qu'on la touche à la souris. Le clavier reste
+   servi par le conteneur focusable ci-dessous ; l'état actif, lui, se dit par
+   le filet primaire. */
+.choices:focus-visible .choices__inner {
+    box-shadow: none;
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/*-----------------------------------
+   2 ) Fond de travail et texte
+-----------------------------------*/
 
 body {
     background-color: var(--bas-paper);
     color: var(--bas-body);
-    font-size: 0.9375rem;
-    line-height: 1.375;
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+}
+
+/* Le corps de page est un aplat. Le dégradé d'avant posait trois couches sur
+   chaque écran, et une carte sans filet ne s'en détachait plus. */
+#main-container {
+    background: var(--bas-paper) !important;
 }
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     color: var(--bas-heading);
-    font-weight: 500;
+    font-weight: $headings-font-weight;
 }
 
-.text-secondary {
-    color: var(--bas-muted) !important;
+/* Sur fond sombre, les teintes pleines de Bootstrap manquent de contraste pour
+   du texte : la charte prévoit pour chacune une variante claire. */
+.text-success { color: var(--bas-success-text) !important; }
+.text-danger { color: var(--bas-danger-text) !important; }
+.text-info { color: var(--bas-info-text) !important; }
+.text-warning { color: var(--bas-warning-text) !important; }
+.text-primary { color: var(--bas-primary-text) !important; }
+.text-secondary { color: var(--bas-muted) !important; }
+
+
+
+/* Deux héritages du parti « verre dépoli » : un blanc jamais tout à fait blanc
+   et un gris à 50 %, qui tombaient tous deux sous le plancher de contraste. */
+#main-container {
+
+    .text-white {
+        color: #ffffff !important;
+        opacity: 1;
+    }
+
+    .text-muted {
+        color: var(--bas-muted) !important;
+    }
 }
 
-/* Sur fond sombre, les teintes pleines de Bootstrap manquent de contraste :
-   on utilise les variantes claires prévues pour du texte. */
-.text-success {
-    color: #7edda9 !important;
+a {
+    color: var(--bas-primary-text);
+    text-decoration: none;
+
+    &:hover {
+        color: #c5c0f9;
+    }
 }
 
-.text-danger {
-    color: #ff9497 !important;
+hr {
+    border-color: var(--bas-line);
+    opacity: 1;
 }
 
-.text-info {
-    color: #66d6e3 !important;
+/* Le couple titre plus sous-titre est systématique dans la référence, sur une
+   carte comme en tête d'écran. */
+.page-head {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-bottom: 1.5rem;
+
+    &__title {
+        color: var(--bas-heading);
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.4;
+        margin-bottom: .25rem;
+    }
+
+    &__subtitle {
+        color: var(--bas-muted);
+        font-size: .8125rem;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
+
+    &__actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-left: auto;
+    }
 }
 
-.text-warning {
-    color: #ffc58e !important;
-}
+/*-----------------------------------
+   3 ) Cartes
+-----------------------------------*/
 
-/* La carte ne porte aucun filet : elle se détache par le seul écart de fond. */
+/* Aucun filet : onze points d'écart de luminosité suffisent à détacher la
+   carte du fond, et c'est ce qui donne au gabarit son air calme. */
 .card {
+    background: var(--bas-surface);
     background-color: var(--bas-surface);
-    border: 0;
+    border: 0 !important;
     border-radius: var(--bas-radius);
     box-shadow: var(--bas-shadow);
     color: var(--bas-body);
 
-    &.bg-dark {
-        background-color: var(--bas-surface) !important;
+    &::before,
+    &::after {
+        content: none !important;
     }
 }
 
 .card-header {
+    align-items: center;
     background-color: transparent;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
     color: var(--bas-heading);
+    display: flex;
+    font-size: 1.0625rem;
     font-weight: 500;
+    gap: .5rem .75rem;
     padding: 1rem 1.5rem;
+
+    /* Une carte peut porter un titre et son rappel chiffré sur la même ligne.
+
+       L'interligne est explicite : à 1,375 hérité du corps, le jambage du « p »
+       de « Compte » passait sous la zone visible d'un titre tronqué, et le
+       sous-titre venait s'y coller. La charte mesure un écart de 0,5rem entre
+       les deux ; l'interligne en fournit la moitié. */
+    .card-title {
+        color: var(--bas-heading);
+        font-size: 1.0625rem;
+        font-weight: 500;
+        line-height: 1.45;
+        margin-bottom: .25rem;
+    }
+
+    .card-subtitle {
+        color: var(--bas-muted);
+        font-size: .8125rem;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
 }
 
 .card-body {
     padding: 1.5rem;
 }
 
-.table-dark {
-    --bs-table-bg: transparent;
-    --bs-table-color: var(--bas-body);
-    --bs-table-border-color: rgba(255, 255, 255, 0.06);
+/* `$dropdown-box-shadow` passe par le mixin box-shadow(), que
+   `$enable-shadows: false` neutralise : sans cette règle, le menu déroulant
+   flotte sans ombre sur la carte. */
+.dropdown-menu {
+    box-shadow: var(--bas-shadow-lg);
+}
 
-    > :not(caption) > * > * {
-        padding: 0.782rem 1.25rem;
+.card-footer {
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    padding: 1rem 1.5rem;
+}
+
+/* La tuile de chiffre est une carte à part entière, pas une cellule d'un bloc
+   soudé : un fond partagé se voit par la fente de l'animation d'arrivée. */
+.stat-tile {
+
+    &__icon {
+        align-items: center;
+        background-color: var(--bas-primary-subtle);
+        border-radius: var(--bas-radius);
+        color: var(--bas-primary-text);
+        display: inline-flex;
+        flex: 0 0 auto;
+        height: 2.5rem;
+        justify-content: center;
+        width: 2.5rem;
+
+        svg {
+            height: 1.25rem;
+            width: 1.25rem;
+        }
     }
 
-    thead th {
+    &__value {
+        color: var(--bas-heading);
+        font-size: 1.625rem;
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: .25rem;
+    }
+
+    &__meta {
         color: var(--bas-muted);
-        font-size: 0.75rem;
-        font-weight: 500;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
+        font-size: .8125rem;
+        margin-bottom: 0;
+    }
+
+    /* Second chiffre d'une tuile : il compte, mais il ne prime pas sur le
+       premier. Même famille, un cran en dessous. */
+    &__value--minor {
+        font-size: 1.25rem;
+        margin-top: .75rem;
     }
 }
 
-/* Champ transparent, dessiné par son seul filet. */
-.form-control,
-.form-select {
-    background-color: transparent;
-    border-color: var(--bas-line);
-    border-radius: var(--bas-radius);
+/*-----------------------------------
+   4 ) Tableaux
+-----------------------------------*/
+
+/* `$table-bg` vaut `var(--bs-body-bg)` par défaut et chaque cellule repeint ce
+   fond : sans `transparent`, la table efface la carte qui la porte. Le point
+   est posé en variable ; ce qui suit ne traite que la lecture. */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bas-body);
+    --bs-table-border-color: rgba(255, 255, 255, .06);
+    --bs-table-striped-bg: rgba(255, 255, 255, .025);
+    --bs-table-striped-color: var(--bas-body);
+    --bs-table-hover-bg: rgba(255, 255, 255, .04);
+    --bs-table-hover-color: var(--bas-heading);
+
     color: var(--bas-body);
-    padding: 0.426rem 0.9375rem;
+    margin-bottom: 0;
+    vertical-align: middle;
+
+    > :not(caption) > * > * {
+        background-color: transparent;
+        padding: .782rem 1.25rem;
+    }
+
+    /* L'en-tête de colonne est une étiquette, pas un titre : petites capitales
+       grises, comme sur `app-user-list`. */
+    > thead {
+
+        th, td {
+            border-bottom-color: rgba(255, 255, 255, .08);
+            color: var(--bas-muted);
+            font-size: .75rem;
+            font-weight: 500;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+    }
+
+    > tbody {
+
+        tr:last-child > * {
+            border-bottom-width: 0;
+        }
+
+        td {
+            border-top-color: rgba(255, 255, 255, .06);
+        }
+    }
+
+    /* Le nom d'une ligne est ce qu'on lit en premier, et c'est lui qui mène à
+       la fiche. */
+    .cell-title {
+        color: var(--bas-heading);
+        font-weight: 500;
+    }
+
+    /* Second niveau d'une cellule : la référence d'un contrat sous le nom du
+       fournisseur, par exemple. */
+    .cell-meta {
+        color: var(--bas-muted);
+        display: block;
+        font-size: .75rem;
+    }
+
+    .cell-amount {
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .cell-actions {
+        text-align: right;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    .media-col {
+        width: 60px;
+
+        svg {
+            max-height: 20px;
+            max-width: 35px;
+        }
+    }
+
+    a:not(.btn) {
+        color: var(--bas-primary-text);
+
+        &:hover {
+            color: #c5c0f9;
+        }
+    }
+}
+
+/* Une table enfermée dans une carte ne reprend pas la marge de la carte : ses
+   cellules portent déjà la leur, et un double rembourrage décale l'en-tête. */
+.card > .table-responsive,
+.card > .table,
+.card > .card-body.p-0 > .table-responsive {
+    border-bottom-left-radius: var(--bas-radius);
+    border-bottom-right-radius: var(--bas-radius);
+}
+
+/*-----------------------------------
+   5 ) Pastilles
+-----------------------------------*/
+
+/* Fond atténué plus texte emphasé, jamais du blanc sur teinte pleine : c'est
+   ce couple qui tient le contraste par construction. */
+.badge {
+    border-radius: $badge-border-radius;
+    font-weight: 500;
+    letter-spacing: .01em;
+}
+
+@each $name, $subtle, $text in (
+    (primary, $brand-subtle, $brand-text),
+    (success, $moss-subtle, $moss-text),
+    (info, $lagoon-subtle, $lagoon-text),
+    (warning, $amber-subtle, $amber-text),
+    (danger, $ember-subtle, $ember-text)
+) {
+    .badge-#{$name},
+    .badge.text-bg-#{$name} {
+        background-color: $subtle !important;
+        color: $text !important;
+    }
+}
+
+/* Une ligne prévisionnelle n'est pas une écriture : elle se lit en retrait,
+   sur un fond ambré très léger, et son filet gauche la rattache au bandeau
+   « Reste à payer ». Sans cette distinction, un montant estimé se confondrait
+   avec un montant constaté. */
+.row-forecast > * {
+    background-color: rgba(255, 159, 67, .06) !important;
+    color: var(--bas-muted);
+}
+
+.row-forecast > :first-child {
+    box-shadow: inset 2px 0 0 0 var(--bas-warning);
+}
+
+.badge-warning {
+    background-color: #{$amber-subtle} !important;
+    color: #{$amber-text} !important;
+}
+
+.badge-neutral {
+    background-color: rgba(255, 255, 255, .08) !important;
+    color: var(--bas-body) !important;
+}
+
+/* Un compteur accolé à un libellé : même registre que la pastille, en plus
+   discret, pour ne pas concurrencer le mot qu'il qualifie. */
+.badge-count {
+    background-color: rgba(255, 255, 255, .08);
+    border-radius: $badge-border-radius;
+    color: var(--bas-body);
+    font-size: .75rem;
+    font-weight: 500;
+    padding: .2rem .45rem;
+}
+
+/*-----------------------------------
+   6 ) Boutons
+-----------------------------------*/
+
+/* Trois niveaux, comme la référence : plein pour l'action principale, teinte
+   atténuée pour l'action secondaire utile, effacé pour l'action neutre. La
+   démo ne se sert pas du contour clair, elle se sert de la couleur atténuée. */
+.btn {
+    --bs-btn-focus-box-shadow: 0 0 0 .15rem #{rgba($brand, .4)};
+    align-items: center;
+    border-radius: var(--bas-radius);
+    font-weight: 500;
+    gap: .5rem;
+    line-height: 1.375;
+}
+
+/* Le pictogramme d'un bouton est un glyphe à hauteur de ligne, aligné sur le
+   libellé. La tuile colorée qu'il portait avant faisait une boîte dans une
+   boîte, et sa couleur ne suivait pas celle du bouton. */
+.btn-glyph {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+
+    svg {
+        height: 1.0625rem;
+        width: 1.0625rem;
+    }
+}
+
+.btn:has(.btn-glyph) {
+    display: inline-flex;
+    justify-content: center;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--bas-primary-fill);
+    --bs-btn-border-color: var(--bas-primary-fill);
+    --bs-btn-color: #ffffff;
+    --bs-btn-hover-bg: var(--bas-primary-fill-hover);
+    --bs-btn-hover-border-color: var(--bas-primary-fill-hover);
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-active-bg: var(--bas-primary-fill-hover);
+    --bs-btn-active-border-color: #564db4;
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-disabled-bg: var(--bas-primary-fill);
+    --bs-btn-disabled-border-color: var(--bas-primary-fill);
+    --bs-btn-disabled-color: #ffffff;
+}
+
+/* Les teintes pleines de la charte sont claires : sous un libellé blanc,
+   #ff4c51 ne mesure que 3,2:1 et #28c76f 1,9:1. Bootstrap répondrait par un
+   libellé noir, que la référence n'emploie pas. On assombrit donc l'aplat
+   jusqu'au point où le blanc tient 4,5:1 — la teinte claire reste celle du
+   texte et de la pastille, elle n'est pas perdue. */
+@each $name, $fill, $hover in (
+    (success, #15794a, #126440),
+    (danger, #c22d31, #a82529),
+    (warning, #96551a, #7e4715),
+    (info, #0b6e7c, #095a66),
+    (secondary, #5c5f6b, #4e515b)
+) {
+    .btn-#{$name} {
+        --bs-btn-bg: #{$fill};
+        --bs-btn-border-color: #{$fill};
+        --bs-btn-color: #ffffff;
+        --bs-btn-hover-bg: #{$hover};
+        --bs-btn-hover-border-color: #{$hover};
+        --bs-btn-hover-color: #ffffff;
+        --bs-btn-active-bg: #{$hover};
+        --bs-btn-active-border-color: #{$hover};
+        --bs-btn-active-color: #ffffff;
+        --bs-btn-disabled-bg: #{$fill};
+        --bs-btn-disabled-border-color: #{$fill};
+        --bs-btn-disabled-color: #ffffff;
+    }
+}
+
+/* Le niveau intermédiaire de la charte : fond atténué, libellé en teinte
+   claire. Il remplace le contour clair, que la référence n'emploie pas. */
+@each $name, $subtle, $text, $hover in (
+    (primary, $brand-subtle, $brand-text, #474a7d),
+    (secondary, #3c4054, #b3b5bc, #4a4f66),
+    (success, $moss-subtle, $moss-text, #3a5f63),
+    (info, $lagoon-subtle, $lagoon-text, #335b74),
+    (warning, $amber-subtle, $amber-text, #64555a),
+    (danger, $ember-subtle, $ember-text, #65455c)
+) {
+    .btn-label-#{$name} {
+        --bs-btn-bg: #{$subtle};
+        --bs-btn-border-color: #{$subtle};
+        --bs-btn-color: #{$text};
+        --bs-btn-hover-bg: #{$hover};
+        --bs-btn-hover-border-color: #{$hover};
+        --bs-btn-hover-color: #{$text};
+        --bs-btn-active-bg: #{$hover};
+        --bs-btn-active-border-color: #{$hover};
+        --bs-btn-active-color: #{$text};
+        --bs-btn-disabled-bg: #{$subtle};
+        --bs-btn-disabled-border-color: #{$subtle};
+        --bs-btn-disabled-color: #{$text};
+    }
+}
+
+/* `btn-outline-secondary` est la classe la plus employée du back ; sur fond
+   sombre son libellé tombait à 3,3:1. Repris par les propriétés du composant,
+   sans réécrire la classe. */
+.btn-outline-secondary {
+    --bs-btn-color: #{$ink};
+    --bs-btn-border-color: #{$rule-strong};
+    --bs-btn-hover-bg: rgba(255, 255, 255, .06);
+    --bs-btn-hover-border-color: #{$rule-strong};
+    --bs-btn-hover-color: #{$heading};
+    --bs-btn-active-bg: rgba(255, 255, 255, .1);
+    --bs-btn-active-border-color: #{$rule-strong};
+    --bs-btn-active-color: #{$heading};
+    --bs-btn-disabled-color: #{$muted};
+    --bs-btn-disabled-border-color: #{$rule};
+}
+
+/* L'action d'une ligne de tableau : un pictogramme neutre, qui prend sa
+   couleur de sens au survol. Trois corbeilles rouges par ligne feraient d'un
+   index une alerte. */
+.row-action {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--bas-radius);
+    color: var(--bas-muted);
+    cursor: pointer;
+    display: inline-flex;
+    height: 1.875rem;
+    justify-content: center;
+    padding: 0;
+    transition: background-color .12s ease, color .12s ease;
+    width: 1.875rem;
+
+    svg {
+        height: 1rem;
+        width: 1rem;
+    }
+
+    &:hover {
+        background-color: rgba(255, 255, 255, .06);
+        color: var(--bas-heading);
+    }
+
+    &--danger:hover {
+        background-color: #{$ember-subtle};
+        color: var(--bas-danger-text);
+    }
+
+    &--primary:hover {
+        background-color: var(--bas-primary-subtle);
+        color: var(--bas-primary-text);
+    }
+}
+
+/* La croix de fermeture est une commande, pas un ornement : à 60 % sur la
+   surface d'une carte elle se devinait plus qu'elle ne se lisait. Pleine
+   opacité, et une pastille au survol qui dit la zone cliquable.
+
+   Aucun filtre : dans ce projet le SVG est déjà blanc. Voir le commentaire de
+   `$btn-close-filter-dark` dans `variables.scss`. */
+.btn-close {
+    align-items: center;
+    background-size: .8rem;
+    border-radius: var(--bas-radius);
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 2rem;
+    justify-content: center;
+    opacity: .9;
+    padding: 0 !important;
+    transition: background-color .12s ease, opacity .12s ease;
+    width: 2rem;
+
+    &:hover,
+    &:focus-visible {
+        background-color: rgba(255, 255, 255, .1);
+        opacity: 1;
+    }
+}
+
+/*-----------------------------------
+   7 ) Champs
+-----------------------------------*/
+
+/* Le champ est transparent : il prend le fond de sa carte et n'est dessiné que
+   par son filet. C'est ce qui fait qu'un formulaire ne ressemble pas à une
+   grille de boîtes. */
+.form-control,
+.form-select,
+.input-group-text {
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border-color: var(--bas-line-strong);
+    border-radius: var(--bas-radius);
+    box-shadow: none !important;
+    color: var(--bas-body);
+    font-size: .9375rem;
+    min-height: 0;
 
     &:focus {
-        background-color: transparent;
-        border-color: var(--bas-primary);
-        box-shadow: none;
+        background: transparent;
+        border-color: var(--bas-primary) !important;
+        box-shadow: none !important;
         color: var(--bas-heading);
     }
 
     &::placeholder {
         color: var(--bas-muted);
+        opacity: 1;
+    }
+
+    &:disabled {
+        background-color: rgba(255, 255, 255, .03);
+        color: var(--bas-muted);
     }
 }
 
-.btn {
+form {
+
+    .form-control,
+    .form-select {
+        min-height: 2.5rem;
+
+        &:active,
+        &:focus {
+            border-color: var(--bas-primary) !important;
+        }
+
+        &.is-invalid {
+            background-image: none !important;
+            border-color: var(--bas-danger) !important;
+        }
+    }
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23acabc1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>");
+
+    option {
+        background-color: var(--bas-surface);
+        color: var(--bas-body);
+    }
+}
+
+/* Le libellé se lit nettement plus clair que le gabarit de saisie : sur les
+   captures de formulaire, c'est lui qui porte l'information, le placeholder
+   n'est qu'un exemple. */
+.form-label,
+form label {
+    color: var(--bas-heading);
+    font-size: .8125rem;
+    margin-bottom: .3125rem;
+}
+
+/* Le libellé flottant est la seule entorse retenue à la référence : il reste
+   en position haute en permanence, ce qui rend le gabarit de saisie lisible au
+   repos. Bootstrap le prévoit pour un champ rempli et l'affaiblit à 65 % ;
+   sur fond sombre cela mesurait 3,3:1. */
+.form-floating > label {
+    color: var(--bas-heading);
+    opacity: 1 !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    color: var(--bas-heading);
+    opacity: 1 !important;
+}
+
+.form-floating > label::after {
+    background-color: transparent !important;
+}
+
+.form-check-input {
+    background-color: transparent;
+    border-color: var(--bas-line-strong);
+
+    &:checked {
+        background-color: var(--bas-primary);
+        border-color: var(--bas-primary);
+    }
+
+    &:focus {
+        border-color: var(--bas-primary);
+        box-shadow: none;
+    }
+}
+
+.form-check-label {
+    color: var(--bas-body);
+}
+
+.form-text,
+.help-text {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, .08);
     border-radius: var(--bas-radius);
+    color: var(--bas-muted);
+    font-size: .8125rem;
+    padding: .375rem .75rem;
+}
+
+.invalid-feedback {
+    color: var(--bas-danger-text) !important;
+    font-size: .75rem;
+}
+
+.asterisk {
+    color: var(--bas-danger-text);
+}
+
+.input-group-text {
+    border-color: var(--bas-line-strong);
+    color: var(--bas-muted);
+}
+
+/* Choices.js arrive en morceau différé, donc après cette feuille : son fond se
+   reprend par un sélecteur de même poids, jamais par un !important. */
+form .choices__inner,
+.choices .choices__inner {
+    background: transparent;
+    background-color: transparent;
+    border: 1px solid var(--bas-line-strong);
+    border-radius: var(--bas-radius);
+    box-shadow: none;
+    color: var(--bas-body);
+    min-height: 2.5rem;
+    padding: .426rem 2.25rem .426rem .9375rem;
+}
+
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+    border-color: var(--bas-primary);
+    box-shadow: none;
+}
+
+.choices .choices__list--dropdown,
+.choices .choices__list[aria-expanded] {
+    background: var(--bas-surface);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: var(--bas-radius);
+    box-shadow: var(--bas-shadow-lg);
+
+    .choices__list {
+        background: var(--bas-surface);
+    }
+}
+
+.choices .choices__list--dropdown .choices__item--choice,
+.choices .choices__list[aria-expanded] .choices__item--choice {
+    background: var(--bas-surface);
+    border-radius: var(--bas-radius-sm);
+    color: var(--bas-body);
+
+    &.is-highlighted {
+        background: var(--bas-primary-subtle);
+        color: var(--bas-heading);
+    }
+
+    &.is-selected {
+        background: var(--bas-primary-subtle);
+        color: var(--bas-primary-text);
+    }
+}
+
+.choices .choices__input--cloned {
+    background: transparent;
+    border: 1px solid var(--bas-line-strong);
+    color: var(--bas-body);
+}
+
+.choices__input,
+.choices__input--cloned {
+    background: transparent !important;
+    color: var(--bas-body) !important;
+}
+
+/* La puce d'un choix multiple arrive en cyan : c'est la couleur d'usine de
+   Choices, dont la feuille est chargée après celle-ci. Un sélecteur de même
+   poids ne la reprend pas ; on en ajoute un niveau, toujours sans !important. */
+.choices .choices__list--multiple .choices__item {
+    background-color: var(--bas-primary-fill);
+    border: 1px solid var(--bas-primary-fill);
+    border-radius: $badge-border-radius;
+    color: #ffffff;
+    font-size: .8125rem;
     font-weight: 500;
+
+    &.is-highlighted {
+        background-color: var(--bas-primary-fill-hover);
+        border-color: var(--bas-primary-fill-hover);
+    }
+
+    .choices__button {
+        border-left: 1px solid rgba(255, 255, 255, .35);
+        opacity: .85;
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
 }
 
-.btn-primary {
-    --bs-btn-bg: #{'var(--bas-primary)'};
-    --bs-btn-border-color: #{'var(--bas-primary)'};
-    --bs-btn-hover-bg: #6355ee;
-    --bs-btn-hover-border-color: #6355ee;
-    --bs-btn-active-bg: #5a4de9;
+.choices[data-type*='select-one']::after {
+    border-color: var(--bas-body) transparent transparent;
 }
 
-.badge {
-    border-radius: 0.125rem;
-    font-weight: 500;
+/*-----------------------------------
+   8 ) Moteurs
+-----------------------------------*/
+
+/* La référence enferme recherche, filtres, tableau et pied dans une seule
+   carte. La barre d'outils est donc l'en-tête de cette carte, pas un bloc
+   posé au-dessus d'elle. */
+.index-toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding: 1rem 1.5rem;
+
+    &__actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-left: auto;
+    }
+
+    @include mediaQuery(max-sm) {
+
+        &__actions {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .btn,
+        .btn-icon {
+            width: 100%;
+        }
+    }
 }
 
-.accordion {
-    --bs-accordion-bg: transparent;
-    --bs-accordion-color: var(--bas-body);
-    --bs-accordion-border-color: rgba(255, 255, 255, 0.06);
-    --bs-accordion-btn-color: var(--bas-body);
-    --bs-accordion-btn-bg: transparent;
-    --bs-accordion-active-bg: transparent;
-    --bs-accordion-active-color: var(--bas-heading);
-    --bs-accordion-btn-focus-box-shadow: none;
+/* Barre de filtres d'un écran de statistiques : le titre à gauche, les
+   sélecteurs et leur bouton à droite. */
+.dashboard-toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1.5rem;
+
+    /* Un sélecteur de filtre ne se comprime pas et ne s'étale pas : « Le mois »
+       passait sur deux lignes quand la barre manquait de place, et le conteneur
+       de Choices prend 100 % par défaut, ce qui rejetait chaque sélecteur sur
+       sa propre ligne. C'est ce conteneur qu'il faut dimensionner : le `select`
+       d'origine, lui, est masqué. */
+    select.form-select,
+    .form-select,
+    .choices {
+        background-color: transparent;
+        color: var(--bas-body);
+        flex: 0 0 auto;
+        min-width: 8rem;
+        white-space: nowrap;
+        width: auto;
+    }
+
+    select.form-select,
+    .form-select {
+        border-color: var(--bas-line-strong);
+    }
+}
+
+/* Tri d'une colonne. Les deux chevrons n'ont aucun contenu : ils sont dessinés
+   ici, et le sens actif se lit à la couleur, pas à la seule opacité. */
+.th-sortable {
+
+    .th-label {
+        display: inline-block;
+    }
+
+    .sort-controls {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 2px;
+        line-height: 0;
+        vertical-align: middle;
+    }
+
+    /* Pleine opacité : à 45 %, le gris composait #585c72, soit 1,89:1 sur la
+       carte, pour un élément d'interface qui porte une information. La
+       distinction entre le sens actif et l'autre tient par la seule couleur,
+       3,8:1 contre 5,5:1. */
+    .sort {
+        border-left: .3125rem solid transparent;
+        border-right: .3125rem solid transparent;
+        display: block;
+        height: 0;
+        transition: border-color .12s ease;
+        width: 0;
+    }
+
+    .sort-asc {
+        border-bottom: .3125rem solid var(--bas-muted);
+
+        &:hover,
+        &.is-active {
+            border-bottom-color: var(--bas-primary-text);
+        }
+    }
+
+    .sort-desc {
+        border-top: .3125rem solid var(--bas-muted);
+
+        &:hover,
+        &.is-active {
+            border-top-color: var(--bas-primary-text);
+        }
+    }
+}
+
+/* Navigation de période : un seul groupe segmenté, filet unique, et le mois
+   courant en action atténuée à côté. Les tuiles noires d'avant faisaient
+   quatre boutons séparés là où il n'y a qu'une commande. */
+.dates-controls {
+
+    flex-wrap: wrap;
+
+    /* Le groupe ne se comprime pas : sur un téléphone, les chevrons d'année et
+       le mois suivant disparaissaient derrière le bouton voisin. */
+    .period-nav {
+        align-items: stretch;
+        border: 1px solid var(--bas-line-strong);
+        border-radius: var(--bas-radius);
+        display: inline-flex;
+        flex: 0 0 auto;
+        overflow: hidden;
+    }
+
+    .period-step,
+    .period-year a {
+        align-items: center;
+        background: transparent;
+        color: var(--bas-muted);
+        display: flex;
+        justify-content: center;
+        transition: background-color .12s ease, color .12s ease;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, .06);
+            color: var(--bas-heading);
+        }
+    }
+
+    .period-step {
+        width: 2.25rem;
+
+        svg {
+            height: 1.0625rem;
+            width: 1.0625rem;
+        }
+    }
+
+    .period-label {
+        align-items: center;
+        border-left: 1px solid var(--bas-line-strong);
+        border-right: 1px solid var(--bas-line-strong);
+        color: var(--bas-heading);
+        display: flex;
+        font-weight: 500;
+        justify-content: center;
+        padding: .426rem .9375rem;
+        white-space: nowrap;
+
+        @include mediaQuery(min-sm) {
+            min-width: 10.5rem;
+        }
+    }
+
+    .period-year {
+        border-right: 1px solid var(--bas-line-strong);
+        display: flex;
+        flex-direction: column;
+        width: 1.75rem;
+
+        a {
+            flex: 1 1 50%;
+
+            svg {
+                height: .875rem;
+                width: .875rem;
+            }
+        }
+
+        a + a {
+            border-top: 1px solid var(--bas-line-strong);
+        }
+    }
+}
+
+/*-----------------------------------
+   9 ) Pagination et fil d'Ariane
+-----------------------------------*/
+
+/* Pied de liste : le compte à gauche, la pagination à droite, le tout dans la
+   carte du tableau. */
+.pagination-nav {
+    padding: 1rem 1.5rem;
+
+    .pagination-counter {
+        color: var(--bas-muted) !important;
+        font-size: .8125rem;
+    }
+
+    nav > .pagination {
+        gap: .375rem;
+        margin: 0;
+    }
+}
+
+/* Bootstrap dimensionne un bouton par son contenu : « … » sortait plus large
+   qu'un chiffre. Le carré de 38 px est la seule chose que la référence fait et
+   qu'aucune variable ne porte. */
+.pagination {
+    --bs-pagination-bg: #3d4159;
+    --bs-pagination-border-width: 0;
+    --bs-pagination-hover-bg: #474c67;
+    --bs-pagination-focus-bg: #474c67;
+    --bs-pagination-focus-box-shadow: none;
+    --bs-pagination-active-bg: var(--bas-primary-fill);
+    --bs-pagination-active-border-color: var(--bas-primary-fill);
+    --bs-pagination-active-color: #ffffff;
+
+    .page-link {
+        align-items: center;
+        border: 0;
+        box-shadow: none;
+        display: inline-flex;
+        font-weight: 500;
+        justify-content: center;
+        min-height: 2.375rem;
+        min-width: 2.375rem;
+        transition: background-color .12s ease, color .12s ease;
+    }
+
+    .page-item.disabled .page-link {
+        background: #353950;
+        color: var(--bas-muted);
+        opacity: 1;
+    }
+}
+
+/* Fil d'Ariane : une ligne de texte, pas une carte de verre. Il nomme le
+   chemin, il n'a pas à peser autant que le contenu. */
+.breadcrumb-container {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    padding: 0;
+    transition: none;
+
+    &:hover {
+        border: 0;
+        box-shadow: none;
+        transform: none;
+    }
+}
+
+.page-breadcrumb {
+
+    .breadcrumb-item {
+        color: var(--bas-muted);
+        font-size: .8125rem;
+
+        a {
+            color: var(--bas-muted) !important;
+
+            &:hover {
+                color: var(--bas-heading) !important;
+            }
+        }
+
+        /* Bootstrap pose déjà .5rem à gauche de l'item : un rembourrage des deux
+           côtés du séparateur portait l'écart réel à 1,5rem. */
+        + .breadcrumb-item::before {
+            color: var(--bas-muted);
+            content: '/';
+            padding-right: .5rem;
+        }
+
+        &.active,
+        &:last-child a {
+            color: var(--bas-heading) !important;
+            font-weight: 500;
+        }
+    }
+}
+
+/*-----------------------------------
+   10 ) Modales, alertes, toasts
+-----------------------------------*/
+
+.modal-content {
+    background: var(--bas-surface);
+    border: 0;
+    border-radius: var(--bas-radius-lg) !important;
+    box-shadow: var(--bas-shadow-lg);
+
+    &::before,
+    &::after {
+        content: none !important;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
+        color: var(--bas-heading);
+    }
+
+    .modal-title,
+    .modal-header strong {
+        color: var(--bas-heading);
+        font-size: 1.0625rem;
+        font-weight: 500;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, .06) !important;
+        gap: .5rem;
+
+        > * {
+            margin: 0;
+        }
+    }
+
+    .modal-body {
+
+        .delete-alert {
+            color: var(--bas-heading);
+            font-size: 1.0625rem;
+        }
+
+        svg.large {
+            height: 3rem;
+            width: 3rem;
+        }
+    }
+}
+
+/* Fond atténué, filet atténué, texte emphasé : la couleur de sens n'est jamais
+   un aplat sous du texte. */
+.alert {
+    border-radius: var(--bas-radius);
+    font-size: .875rem;
+    overflow: hidden;
+
+    .icon {
+        align-items: center;
+        border-radius: 0;
+        display: flex;
+        flex: 0 0 2.75rem;
+        justify-content: center;
+        margin: 0;
+
+        svg {
+            height: 1.125rem;
+            width: 1.125rem;
+        }
+    }
+
+    .message {
+        color: inherit;
+        font-size: .875rem;
+
+        * {
+            color: inherit !important;
+        }
+    }
+}
+
+@each $name, $subtle, $border, $text, $base in (
+    (primary, $brand-subtle, $brand-border, $brand-text, $brand),
+    (success, $moss-subtle, #2c6d58, $moss-text, $moss),
+    (info, $lagoon-subtle, #1d687e, $lagoon-text, $lagoon),
+    (warning, $amber-subtle, #805d47, $amber-text, $amber),
+    (danger, $ember-subtle, #803d4c, $ember-text, $ember),
+    (secondary, #3c4054, #4f5265, #b3b5bc, #808390)
+) {
+    .alert-#{$name} {
+        background: $subtle;
+        border: 1px solid $border;
+        color: $text;
+
+        .icon {
+            background-color: rgba($base, .22) !important;
+            color: $text;
+
+            svg {
+                color: $text !important;
+            }
+        }
+    }
+}
+
+/* Le toast reste la surface : la couleur de sens est dans la seule icône.
+   Un fond translucide ferait dépendre le contraste de ce qui défile dessous. */
+.toast-container .toast {
+    background: var(--bas-surface) !important;
+    border: 1px solid rgba(255, 255, 255, .08) !important;
+    border-radius: var(--bas-radius) !important;
+    box-shadow: var(--bas-shadow-lg);
+    color: var(--bas-body);
+    width: 350px !important;
+
+    &.bg-primary,
+    &.bg-success,
+    &.bg-info,
+    &.bg-warning,
+    &.bg-danger,
+    &.bg-secondary {
+        background: var(--bas-surface) !important;
+    }
+
+    .toast-header {
+        background: transparent !important;
+        color: var(--bas-heading) !important;
+        padding: .75rem 1rem !important;
+    }
+
+    .message {
+        color: var(--bas-body);
+        font-size: .875rem;
+    }
+
+    &.bg-success .toast-header svg { color: var(--bas-success-text) !important; }
+    &.bg-danger .toast-header svg { color: var(--bas-danger-text) !important; }
+    &.bg-warning .toast-header svg { color: var(--bas-warning-text) !important; }
+    &.bg-info .toast-header svg,
+    &.bg-primary .toast-header svg { color: var(--bas-primary-text) !important; }
+}
+
+.tooltip {
+    --bs-tooltip-bg: #1f2333;
+    --bs-tooltip-border-radius: #{$border-radius};
+    --bs-tooltip-color: #{$heading};
+    --bs-tooltip-font-size: .75rem;
+
+    .tooltip-inner {
+        border: 1px solid rgba(255, 255, 255, .08);
+        box-shadow: var(--bas-shadow);
+    }
+}
+
+.accordion-button,
+.accordion-button:not(.collapsed) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: transparent;
+    border: 0;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: var(--bas-heading) !important;
+
+    &:hover {
+        background: rgba(255, 255, 255, .03);
+        border: 0;
+        box-shadow: none;
+        transform: none;
+    }
 }
 
 .accordion-button::after {
     filter: invert(75%);
+}
+
+/*-----------------------------------
+   11 ) États vides
+-----------------------------------*/
+
+/* Une liste vide dit pourquoi elle l'est. Une carte muette laisse croire à une
+   panne. */
+.empty-state {
+    align-items: center;
+    color: var(--bas-muted);
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+
+    svg {
+        color: var(--bas-muted);
+        height: 2rem;
+        opacity: .6;
+        width: 2rem;
+    }
+
+    &__title {
+        color: var(--bas-heading);
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+
+    &__text {
+        font-size: .875rem;
+        margin-bottom: 0;
+    }
+}
+
+/*-----------------------------------
+   12 ) Pièces d'écran
+-----------------------------------*/
+
+/* Ligne de total : elle ferme le tableau, elle n'en est pas une ligne de plus. */
+.row-total > * {
+    background-color: rgba(255, 255, 255, .03);
+    border-top: 1px solid var(--bas-line-strong);
+    color: var(--bas-heading);
+    font-weight: 600;
+}
+
+/* Tableau de bord des enveloppes. La jauge double le chiffre, elle ne le
+   remplace pas : seule, une barre ne se lit ni au clavier ni a la voix. */
+#dashboard {
+
+    .budget-gauge-col {
+        min-width: 11rem;
+        width: 18%;
+    }
+
+    .budget-gauge {
+        background-color: rgba(255, 255, 255, .07);
+        border-radius: 999px;
+        display: block;
+        height: .375rem;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .budget-gauge__fill {
+        border-radius: inherit;
+        display: block;
+        height: 100%;
+        min-width: .125rem;
+    }
+
+    .budget-gauge__fill--success { background-color: var(--bas-success-text); }
+    .budget-gauge__fill--warning { background-color: var(--bas-warning-text); }
+    .budget-gauge__fill--danger { background-color: var(--bas-danger-text); }
+
+    .row-inactive > * {
+        opacity: .55;
+    }
+}
+
+/* Écran des opérations programmées. Une charge ignorée reste lisible mais
+   s'efface : elle n'est pas supprimée, seulement mise de côté. */
+#recurring-charges {
+
+    .row-inactive > * {
+        opacity: .55;
+    }
+
+    /* Arrivé depuis l'index des opérations, l'oeil doit retrouver la ligne
+       visée dans une liste d'une vingtaine d'entrées. */
+    tr:target > * {
+        background-color: rgba(115, 103, 240, .16);
+        box-shadow: inset 0 0 0 1px rgba(171, 164, 246, .35);
+    }
+
+    /* Les champs d'échéance ne se compriment pas : serré, « Oct » se brisait
+       en trois lignes d'une lettre. */
+    .field-day {
+        flex: 0 0 4.5rem;
+        width: 4.5rem;
+    }
+
+    .field-month {
+        flex: 0 0 6.5rem;
+        width: 6.5rem;
+    }
+
+    .field-amount {
+        max-width: 7.5rem;
+    }
+
+    td .d-flex {
+        flex-wrap: nowrap;
+    }
+
+    /* « Tous les mois » se brisait en deux lignes dans un sélecteur au plus
+       juste : la colonne garde la largeur du plus long de ses choix. */
+    td > select.form-select {
+        min-width: 10.5rem;
+    }
+
+    /* Une ligne de réglage aligne un sélecteur, deux champs et une case : s'ils
+       n'ont pas exactement la même hauteur, l'œil lit une colonne bancale.
+       La hauteur est posée une fois et tous s'y conforment, y compris le
+       conteneur de Choices qui, lui, se dimensionne sur son contenu. */
+    --field-height: 2.25rem;
+
+    .form-select-sm,
+    .form-control-sm,
+    .choices__inner {
+        font-size: .875rem;
+        height: var(--field-height);
+        line-height: 1.25;
+        min-height: var(--field-height);
+        padding: 0 .5rem;
+    }
+
+    .form-select-sm {
+        padding-right: 1.75rem;
+    }
+
+    .choices,
+    .choices__inner {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Les flèches natives d'un champ numérique le grandissent et décalent sa
+       valeur : le jour se saisit au clavier. */
+    input[type='number'] {
+        appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    }
+
+    td {
+        vertical-align: middle;
+    }
+}
+
+/* Lien d'évitement : invisible tant qu'il n'a pas le focus, puis posé par
+   dessus le bandeau. Sans lui, le clavier traverse l'en-tête et les deux rails
+   avant d'atteindre le contenu, sur chaque page. */
+.skip-link {
+    left: .75rem;
+    position: absolute;
+    top: .75rem;
+    z-index: 6000;
+}
+
+/* Les deux chiffres qui qualifient le solde d'un compte. Une définition, pas
+   un tableau : il n'y a pas de colonnes à aligner entre deux cartes. */
+.wallet-figures {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 1.25rem 0 0;
+
+    dt {
+        color: var(--bas-muted);
+        font-size: .75rem;
+        font-weight: 400;
+        letter-spacing: .04em;
+        margin-bottom: .125rem;
+        text-transform: uppercase;
+    }
+
+    dd {
+        color: var(--bas-heading);
+        font-size: 1rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+}
+
+/* Un lien de rebond en cellule de tableau, avec son compteur. */
+.index-link {
+    color: var(--bas-primary-text);
+
+    &:hover {
+        color: #c5c0f9;
+    }
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+/* Tuile d'icône d'un toast : la seule chose qui porte la couleur de sens. */
+.toast-icon {
+    align-items: center;
+    border-radius: var(--bas-radius);
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 2.25rem;
+    justify-content: center;
+    width: 2.25rem;
+
+    svg {
+        height: 1.125rem;
+        width: 1.125rem;
+    }
+}
+
+@each $name, $subtle, $text in (
+    (primary, $brand-subtle, $brand-text),
+    (success, $moss-subtle, $moss-text),
+    (info, $lagoon-subtle, $lagoon-text),
+    (warning, $amber-subtle, $amber-text),
+    (danger, $ember-subtle, $ember-text)
+) {
+    .toast-icon--#{$name} {
+        background-color: $subtle;
+        color: $text;
+    }
+}
+
+/* Le pied de carte n'a pas à ajouter sa marge quand il ne porte que la
+   pagination, qui pose déjà la sienne. */
+.card-footer.p-0 .pagination-nav {
+    padding: 1rem 1.5rem;
 }

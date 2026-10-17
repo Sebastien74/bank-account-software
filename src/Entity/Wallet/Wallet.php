@@ -31,12 +31,64 @@ class Wallet extends BaseEntity
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $initialAmount = null;
 
+    /**
+     * Nature du compte.
+     *
+     * Un compte d'épargne n'est pas alimenté par un relevé bancaire mais par
+     * les virements émis depuis le compte courant : il n'a ni import, ni
+     * dépenses courantes, et son « reste à dépenser » n'aurait aucun sens.
+     */
+    public const string CURRENT = 'current';
+    public const string SAVINGS = 'savings';
+
+    #[ORM\Column(type: 'string', length: 16, options: ['default' => self::CURRENT])]
+    private string $type = self::CURRENT;
+
+    /**
+     * Compte alimenté par les virements d'épargne de celui-ci.
+     *
+     * Le lien est porté par le compte courant : c'est lui qui émet, et c'est
+     * depuis lui que le rapprochement se décide.
+     */
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?self $savingsWallet = null;
+
     // Chargement paresseux : la collection compte plusieurs milliers d'opérations,
     // les soldes et moyennes sont calculés en base (OperationRepository).
     #[ORM\OneToMany(targetEntity: Operation::class, mappedBy: 'wallet', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['date' => 'DESC'])]
     #[Assert\Valid(groups: ['form_submission'])]
     private ArrayCollection|PersistentCollection $operations;
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = self::SAVINGS === $type ? self::SAVINGS : self::CURRENT;
+
+        return $this;
+    }
+
+    public function isSavings(): bool
+    {
+        return self::SAVINGS === $this->type;
+    }
+
+    public function getSavingsWallet(): ?self
+    {
+        return $this->savingsWallet;
+    }
+
+    public function setSavingsWallet(?self $savingsWallet): static
+    {
+        $this->savingsWallet = $savingsWallet;
+
+        return $this;
+    }
 
     /**
      * Wallet constructor.

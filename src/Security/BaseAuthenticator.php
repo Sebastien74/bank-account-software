@@ -275,7 +275,7 @@ class BaseAuthenticator
             if ($asResponse) {
                 return false;
             }
-            $message = $this->translator->trans('The captcha is invalid. Please reload the page and try again.', [], 'security_cms');
+            $message = $this->translator->trans('Le captcha est invalide. Rechargez la page puis réessayez.', [], 'security_cms');
             throw new SecurityException\CustomUserMessageAccountStatusException($message);
         }
 
@@ -299,7 +299,7 @@ class BaseAuthenticator
      */
     public function getInactiveMessage(): string
     {
-        return $this->translator->trans('Your account is not activated.', [], 'security_cms');
+        return $this->translator->trans("Votre compte n'est pas activé.", [], 'security_cms');
     }
 
     /**

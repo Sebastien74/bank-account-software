@@ -3,13 +3,32 @@
 /* --------------------------------------------------------------------------------------
 
     Module : Back form
-    Copyright : 2025
+    Copyright : 2026
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
+    Le champ de la charte est transparent : il prend le fond de sa carte et
+    n'est dessiné que par son filet (formes-typo.md, « Fond des champs »).
+    C'est ce qui fait qu'un formulaire ne ressemble pas à une grille de boîtes.
+    Les dégradés d'avant posaient une surface sous chaque champ.
+
+    Le libellé flottant reste, seule entorse retenue à la référence : il met le
+    gabarit de saisie en position haute en permanence, ce qui rend le champ
+    lisible au repos.
+
+    1 ) Champs
+    2 ) Choices.js
+    3 ) Étiquettes, calendrier
+    4 ) Remplissage automatique
+
 ----------------------------------------------------------------------------------------- */
 
+/*-----------------------------------
+   1 ) Champs
+-----------------------------------*/
+
 html body form {
+
     fieldset.mb-3 {
         margin-bottom: 0 !important;
     }
@@ -17,61 +36,65 @@ html body form {
 
 form {
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
 
-        min-height: 45px;
+        background: transparent;
         border-radius: $input-border-radius;
         box-shadow: none !important;
+        min-height: 2.5rem;
 
-        &:active, &:focus {
+        &:active,
+        &:focus {
+            border-color: $brand !important;
             box-shadow: none !important;
-            border-color: $input-border-color !important;
         }
 
+        /* Un champ refusé se signale par son filet et son message, pas par un
+           fond : la charte garde le champ transparent dans tous ses états. */
         &.is-invalid {
-            background-image: $input-invalid-bg !important;
-            background-size: initial !important;
-            background-position: initial !important;
-            border-color: $input-border-color !important;
+            background-image: none !important;
+            border-color: $ember !important;
         }
     }
 
     .form-floating .form-label {
-        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        transform: scale(.85) translateY(-.5rem) translateX(.15rem);
     }
 
-    .choices[data-type*="select-one"]::after {
-        border-color: $input-color transparent transparent transparent;
+    /* Le libellé est remonté en permanence par la règle ci-dessus : sans
+       réserve haute, le placeholder vient se coller sous lui tant que le champ
+       n'a pas reçu le focus. On pose donc en continu le rembourrage que
+       Bootstrap ne met qu'aux états :focus et :not(:placeholder-shown). */
+    .form-floating > .form-control,
+    .form-floating > .form-select,
+    .form-floating > .input-group > .form-control {
+        padding-bottom: .625rem;
+        padding-top: 1.625rem;
     }
 
-    .choices, .choices__inner {
-        overflow: initial;
+    .form-check-label {
+        color: $ink;
     }
 
-    .choices__item--selectable img {
-        max-height: 20px;
-    }
-
-    .choices {
-        margin-bottom: 0;
-    }
-
+    /* Groupe de bascule : l'option retenue prend la teinte atténuée de la
+       charte, les autres restent effacées. */
     .btn-group-toggle {
 
         label {
-            border: 1px solid $input-border-color !important;
+            border: 1px solid $rule-strong !important;
             border-radius: $input-border-radius !important;
         }
 
         .active {
-            background: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%),
-            linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !important;
+            background: $brand-subtle !important;
+            color: $brand-text !important;
         }
 
         label:not(.active) {
 
             background-color: transparent !important;
-            color: transparentize($white, .3) !important;
+            color: $ink !important;
 
             i {
                 display: none;
@@ -79,488 +102,400 @@ form {
         }
     }
 
-    .form-check-label {
-        color: $input-color;
-    }
-
-    .choices__inner {
-        border-radius: $input-border-radius;
-        background-color: $input-bg;
-        border: 0;
-        color: $input-color;
-    }
-
-    .choices:not([data-type="select-multiple"]) {
-        .choices__inner {
-            height: 58px;
-            border-radius: 12px;
-        }
-    }
-
-    .choices[data-type="select-multiple"] {
-        .choices__inner {
-            min-height: 58px;
-            height: auto;
-            padding-top: 1.75rem;
-        }
-    }
-
-    .choices__input {
-        background-color: $input-bg;
-        color: $gray-300;
-        opacity: 1;
-        padding-left: .25rem;
-        font-weight: 400;
-        font-size: 0.875rem;
-    }
-
-    .choices__list--multiple .choices__item {
-        background-color: $primary;
-        border: 1px solid $primary;
-        border-radius: $input-border-radius;
-    }
-
-    .choices__list--multiple .choices__item.is-highlighted {
-        background-color: $primary-darken;
-        border: 1px solid $primary-darken;
-    }
-
-    .choices__item[data-value=""]:not(.choices__placeholder) {
-        display: none !important;
-    }
-
-    .choices[data-type*="select-one"] .choices__button {
-        background: rgba(111, 66, 193, 0.5) url(../../../medias/images/back/times-white.svg) no-repeat center;
-        background-size: 8px !important;
-        position: absolute;
-        top: -2.75rem;
-        right: -3rem;
-        z-index: 1000;
-        opacity: 1;
-        border: 1px solid rgba(111, 66, 193, 0.28);
-        height: 23px;
-        width: 23px;
-        border-radius: 10px;
-        margin: 0 !important;
-    }
-
-    .choices[data-type*="select-multiple"] .choices__button,
-    .choices[data-type*="text"] .choices__button {
-        border-left: 1px solid transparentize($white, .85);
-        background-size: 9px;
-        width: 9px;
-    }
-
-    .choices__heading {
-        background-color: $input-bg;
-        border: 0;
-        color: $input-color;
-    }
-
-    .choices__list--single {
-        position: relative;
-        top: 20px;
-        font-size: $input-font-size;
-    }
-
-    .choices__list--dropdown {
-        z-index: 500 !important;
-    }
-
-    .choices__list--dropdown .choices__placeholder,
-    .is-open .choices__list--dropdown,
-    .is-open .choices__list[aria-expanded] {
-        background-color: #14161e !important;
-        color: $gray-900 !important;
-        border: 0 !important;
-        border-radius: 14px;
-    }
-
-    .choices__list--dropdown .choices__item--selectable.is-highlighted {
-        background-color: $gray-600 !important;
-        color: $gray-900 !important;
-    }
-
-    .choices[data-type*="select-one"] .choices__input {
-        background-color: $gray-400;
-        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJtNTA4LjUgNDgxLjYtMTI5LTEyOWMtMi4zLTIuMy01LjMtMy41LTguNS0zLjVoLTEwLjNDMzk1IDMxMiA0MTYgMjYyLjUgNDE2IDIwOCA0MTYgOTMuMSAzMjIuOSAwIDIwOCAwUzAgOTMuMSAwIDIwOHM5My4xIDIwOCAyMDggMjA4YzU0LjUgMCAxMDQtMjEgMTQxLjEtNTUuMlYzNzFjMCAzLjIgMS4zIDYuMiAzLjUgOC41bDEyOSAxMjljNC43IDQuNyAxMi4zIDQuNyAxNyAwbDkuOS05LjljNC43LTQuNyA0LjctMTIuMyAwLTE3TTIwOCAzODRjLTk3LjMgMC0xNzYtNzguNy0xNzYtMTc2UzExMC43IDMyIDIwOCAzMnMxNzYgNzguNyAxNzYgMTc2LTc4LjcgMTc2LTE3NiAxNzYiLz48L3N2Zz4=);
-        color: $gray-700;
-        border: 0;
-        background-repeat: no-repeat;
-        background-position-x: 97%;
-        background-position-y: 11px;
-        background-size: 20px;
-    }
-
-    .use-bootstrap-tag {
-
-        height: auto !important;
-        padding-top: 2.1rem !important;
-        background-color: $input-bg !important;
-
-        &.focus {
-            box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25) !important;
-        }
-
-        .input-wrapper {
-
-            margin-left: .25rem;
-
-            input[type="text"] {
-                color: transparentize($white, 0.3) !important;
-            }
-
-            input[type="text"]::placeholder {
-                color: transparentize($white, 0.3) !important;
-            }
-        }
-
-        button {
-            background-color: $primary;
-            padding: .3rem 1rem !important;
-            font-size: 14px;
-        }
-    }
-
     .invalid-feedback {
-        font-size: 11px;
-        color: $red-400 !important;
+        color: $ember-text !important;
+        font-size: .75rem;
     }
 
     .btn {
-        font-size: 14px;
+        font-size: .9375rem;
     }
 
     .asterisk {
-        color: $red;
-        font-size: 14px;
+        color: $ember-text;
+        font-size: .875rem;
         top: -.2em;
     }
 }
 
-.mc-picker {
-    background-color: $gray-800 !important;
-}
+/*-----------------------------------
+   2 ) Choices.js
+-----------------------------------*/
 
-.mc-table__weekday,
-.mc-btn--success {
-    color: $purple-400 !important;
-}
-
-.mc-picker.mc-date--today {
-    color: $gray-800 !important;
-}
-
-.mc-date--active.mc-date--today {
-    background-color: $gray-900 !important;
-}
-
-.mc-picker.mc-date--today,
-.mc-date--active {
-    color: $gray-300 !important;
-}
-
-.mc-calendar--modal.mc-calendar--opened {
-    z-index: 5000
-}
-
-/* --------------------------------------------------------------------------------------
-    Module : Back choices (Choices.js)
-    Copyright : 2025
-    Author : Sébastien FOURNIER
------------------------------------------------------------------------------------------ */
-
+/* Choices arrive en morceau différé, donc après cette feuille : son fond se
+   reprend par un sélecteur de même poids, jamais par un !important. */
 .choices {
 
-    width: 100%;
+    font-size: .875rem;
+    line-height: 1.375;
+    margin-bottom: 0;
     max-width: 100%;
     min-width: 0;
-    font-size: 13px;
-    line-height: 1.1;
-    margin-bottom: 0;
+    width: 100%;
 
     &,
     * {
         box-sizing: border-box;
     }
 
-    /* Keep aligned with your inputs */
     .choices__inner {
-
-        width: 100%;
+        background: transparent;
+        border: 1px solid $rule-strong;
+        border-radius: $input-border-radius;
+        box-shadow: none;
+        color: $ink;
         max-width: 100%;
-        min-height: 44px;
-        padding: 10px 38px 10px 12px; /* right padding for arrow */
-        border-radius: 12px;
-        background: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%),
-        linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3);
-        border: 1px solid $dash-border;
-        color: $dash-text;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-        transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease;
-    }
-
-    &:hover .choices__inner {
-        border-color: $dash-border-hover;
+        min-height: 2.5rem;
+        padding: .426rem 2.25rem .426rem .9375rem;
+        transition: border-color .12s ease;
+        width: 100%;
     }
 
     &.is-focused .choices__inner,
     &.is-open .choices__inner {
-        border-color: $dash-border-focus;
-        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55),
-        0 0 0 2px rgba(124, 108, 255, 0.28);
+        border-color: $brand;
+        box-shadow: none;
     }
 
     &.is-disabled {
-        opacity: 0.55;
+        opacity: .55;
         pointer-events: none;
     }
 }
 
-/* ------------------------------------------------------------------
-   Selected value (single)
-------------------------------------------------------------------- */
+form {
 
-.choices[data-type*="select-one"] {
+    .choices,
+    .choices__inner {
+        overflow: initial;
+    }
+
+    .choices {
+        margin-bottom: 0;
+    }
+
+    .choices__item--selectable img {
+        max-height: 20px;
+    }
+
+    /* Réserve haute, et seulement là où un libellé flottant la demande. Hors
+       `.form-floating` — une barre de filtres, par exemple — le sélecteur
+       garde la hauteur d'un champ ordinaire, sinon sa valeur descend sous le
+       vide d'un libellé qui n'existe pas.
+
+       La valeur est descendue par ce seul rembourrage. Un `top` sur la liste
+       s'y ajoutait et la faisait sortir du cadre. */
+    .form-floating .choices:not([data-type="select-multiple"]) .choices__inner {
+        align-items: flex-end;
+        display: flex;
+        height: 58px;
+        padding-bottom: .625rem;
+        padding-top: 1.625rem;
+    }
+
+    .form-floating .choices[data-type="select-multiple"] .choices__inner {
+        height: auto;
+        min-height: 58px;
+        padding-top: 1.75rem;
+    }
 
     .choices__list--single {
+        font-size: $input-font-size;
         padding: 0;
     }
 
-    .choices__item {
-
-        color: $dash-text;
-        font-weight: 300;
-        font-size: 12px;
-
-        &.choices__placeholder {
-            color: $dash-muted;
-            font-weight: 300;
-            font-size: 12px;
-        }
+    .choices__item[data-value=""]:not(.choices__placeholder) {
+        display: none !important;
     }
 
-    /* Arrow */
-    &:after {
-        content: "";
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        width: 10px;
-        height: 10px;
-        transform: translateY(-50%) rotate(45deg);
-        border-right: 2px solid rgba(255, 255, 255, 0.55);
-        border-bottom: 2px solid rgba(255, 255, 255, 0.55);
-        pointer-events: none;
-        transition: transform .12s ease, border-color .12s ease;
+    .choices__list--dropdown {
+        z-index: 500 !important;
     }
 
-    &.is-open:after {
-        transform: translateY(-50%) rotate(-135deg);
-        border-color: rgba(255, 255, 255, 0.78);
+    /* Choices pose un bouton de retrait sur un sélecteur simple, hors du cadre
+       du champ. La charte n'a pas ce contrôle : il flottait au-dessus de la
+       page, détaché du champ qu'il visait, et sans nom accessible. Une valeur
+       unique se reprend en rouvrant la liste. */
+    .choices[data-type*="select-one"] .choices__button {
+        display: none;
+    }
+
+    .choices[data-type*="select-multiple"] .choices__button,
+    .choices[data-type*="text"] .choices__button {
+        background-size: 9px;
+        border-left: 1px solid rgba(255, 255, 255, .25);
+        width: 9px;
     }
 }
 
-/* ------------------------------------------------------------------
-   Dropdown panel (forced to match input width)
-------------------------------------------------------------------- */
+.choices[data-type*="select-one"] {
+
+    .choices__item {
+
+        color: $ink;
+        font-size: .875rem;
+        font-weight: 400;
+
+        &.choices__placeholder {
+            color: $muted;
+        }
+    }
+
+    /* Le chevron du sélecteur, dessiné plutôt que chargé. */
+    &::after {
+        border-bottom: 2px solid $ink;
+        border-right: 2px solid $ink;
+        content: "";
+        height: 8px;
+        pointer-events: none;
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-65%) rotate(45deg);
+        transition: transform .12s ease, border-color .12s ease;
+        width: 8px;
+    }
+
+    &.is-open::after {
+        border-color: $heading;
+        transform: translateY(-25%) rotate(-135deg);
+    }
+}
 
 .choices__list--dropdown,
 .choices__list[aria-expanded] {
 
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
+    background: $surface;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: $border-radius;
+    box-shadow: $shadow-lg;
     left: 0 !important;
-    right: auto !important;
-    margin-top: 8px;
-    border-radius: 12px;
-    background: $dash-surface;
-    border: 1px solid rgba(124, 108, 255, 0.22);
-    box-shadow: $dash-shadow;
+    margin-top: .375rem;
+    max-width: 100% !important;
+    min-width: 100% !important;
     overflow: hidden;
+    right: auto !important;
+    width: 100% !important;
 
-    /* Avoid the bright default + control internal padding */
     .choices__list {
-        background: $dash-surface;
-        padding: 6px;
+        background: $surface;
         max-height: 280px;
         overflow: auto;
+        padding: .375rem;
     }
 }
 
-/* Sometimes Choices injects transform that shifts the dropdown */
 .choices.is-open .choices__list--dropdown,
 .choices.is-open .choices__list[aria-expanded] {
     transform: none !important;
 }
 
-/* ------------------------------------------------------------------
-   Search input inside dropdown
-------------------------------------------------------------------- */
+.choices__heading {
+    background: transparent;
+    border: 0;
+    color: $muted;
+    font-size: .75rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.choices__input,
+.choices__input--cloned {
+    background: transparent !important;
+    color: $ink !important;
+    font-size: .875rem;
+    opacity: 1;
+    padding-left: .25rem;
+}
 
 .choices__input--cloned {
 
-    width: calc(100% - 16px) !important;
-
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 10px !important;
-
-    color: $dash-text !important;
-
-    padding: 10px 12px !important;
-    margin: 8px 8px 6px 8px !important;
-
-    outline: none !important;
+    border: 1px solid $rule-strong !important;
+    border-radius: $border-radius-sm !important;
     box-shadow: none !important;
+    margin: .5rem !important;
+    outline: none !important;
+    padding: .375rem .625rem !important;
+    width: calc(100% - 1rem) !important;
 
     &::placeholder {
-        color: rgba(255, 255, 255, 0.45);
+        color: $muted;
         opacity: 1;
     }
 
     &:focus {
-        border-color: rgba(124, 108, 255, 0.55) !important;
-        box-shadow: 0 0 0 2px rgba(124, 108, 255, 0.22) !important;
+        border-color: $brand !important;
     }
 }
-
-/* ------------------------------------------------------------------
-   Items
-------------------------------------------------------------------- */
 
 .choices__item--choice {
 
-    border-radius: 10px;
-    padding: 10px 10px;
-    color: rgba(255, 255, 255, 0.86);
+    border-radius: $border-radius-sm;
+    color: $ink;
+    padding: .5rem .625rem;
+    transition: background-color .1s ease, color .1s ease;
 
-    transition: background-color .10s ease, color .10s ease;
-
-    /* hover / highlighted */
     &.is-highlighted {
-        background: $dash-item-hover;
-        color: #fff;
+        background: $brand-subtle;
+        color: $heading;
     }
 
-    /* selected (works for single + multi) */
     &.is-selected {
-        background: $dash-item-active;
-        color: #fff;
+        background: $brand-subtle;
+        color: $brand-text;
+    }
+
+    &.is-disabled {
+        opacity: .45;
     }
 }
 
-/* Empty / disabled choices */
-.choices__item--choice.is-disabled {
-    opacity: 0.45;
+.choices__list--multiple .choices__item {
+    background-color: $primary;
+    border: 1px solid $primary;
+    border-radius: $badge-border-radius;
+    color: $white;
+
+    &.is-highlighted {
+        background-color: shade-color($primary, 12%);
+        border-color: shade-color($primary, 12%);
+    }
 }
 
-/* ------------------------------------------------------------------
-   Scrollbar (optional, matches dark UI)
-------------------------------------------------------------------- */
-.choices__list--dropdown .choices__list::-webkit-scrollbar {
-    width: 10px;
+.choices__list--dropdown .choices__list {
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, .12);
+        border: 2px solid $surface;
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba($brand, .35);
+    }
 }
 
-.choices__list--dropdown .choices__list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    border: 2px solid $dash-surface;
+/*-----------------------------------
+   3 ) Étiquettes, calendrier
+-----------------------------------*/
+
+.use-bootstrap-tag {
+
+    background-color: transparent !important;
+    height: auto !important;
+    padding-top: 2.1rem !important;
+
+    &.focus {
+        box-shadow: none !important;
+    }
+
+    .input-wrapper {
+
+        margin-left: .25rem;
+
+        input[type="text"],
+        input[type="text"]::placeholder {
+            color: $ink !important;
+        }
+    }
+
+    button {
+        background-color: $primary;
+        font-size: .875rem;
+        padding: .3rem 1rem !important;
+    }
 }
 
-.choices__list--dropdown .choices__list::-webkit-scrollbar-thumb:hover {
-    background: rgba(124, 108, 255, 0.25);
+.mc-picker {
+    background-color: $surface !important;
 }
 
-/* ----------------------------------------------------------
-   AUTOFILL ONLY: replace underline with border-bottom
-   Prevent layout shift by keeping 2px border always,
-   and changing only the color on focus/invalid.
------------------------------------------------------------ */
+.mc-table__weekday,
+.mc-btn--success {
+    color: $brand-text !important;
+}
 
+.mc-picker.mc-date--today {
+    color: $heading !important;
+}
 
-$form-autofill-bg: $input-bg !default;                // same as your inputs
-$form-autofill-text: $input-color !default;           // same as your inputs
-$form-autofill-border: $dash-border !default;
-$form-autofill-border-hover: $dash-border-hover !default;
-$form-autofill-border-focus: $dash-border-focus !default;
+.mc-date--active.mc-date--today {
+    background-color: $primary !important;
+}
 
-$form-autofill-ring: 0 0 0 2px rgba(124, 108, 255, 0.28) !default; // align with your choices focus
-$form-autofill-inset: 0 0 0 1000px $form-autofill-bg inset !default;
+.mc-picker.mc-date--today,
+.mc-date--active {
+    color: $heading !important;
+}
 
-/**
- * Apply consistent autofill styles.
- *
- * @param string $selector
- */
+.mc-calendar--modal.mc-calendar--opened {
+    z-index: 5000;
+}
+
+/*-----------------------------------
+   4 ) Remplissage automatique
+-----------------------------------*/
+
+/* WebKit repeint un champ rempli automatiquement avec son propre fond jaune et
+   son propre texte sombre. Il faut lui rendre le champ transparent sans
+   déplacer la géométrie, sinon la ligne saute au remplissage. */
 @mixin dash-autofill($selector) {
+
     #{$selector}:-webkit-autofill,
     #{$selector}:-webkit-autofill:hover,
     #{$selector}:-webkit-autofill:focus,
     #{$selector}:-webkit-autofill:active {
-        /* Keep same background as normal field */
         -webkit-box-shadow: none !important;
-        box-shadow: none !important;
-
-        /* Force text color (WebKit may force dark text otherwise) */
-        -webkit-text-fill-color: $form-autofill-text !important;
-        color: $form-autofill-text !important;
-
-        /* Keep caret visible */
-        caret-color: $form-autofill-text !important;
-
-        /* Prevent the “yellow flash” and unwanted transitions */
-        transition: background-color 9999s ease-out 0s, color 9999s ease-out 0s !important;
-
-        /* Keep geometry stable */
-        min-height: 45px; // match your global min-height
-        line-height: normal;
+        -webkit-text-fill-color: $ink !important;
         background-clip: padding-box;
+        box-shadow: none !important;
+        caret-color: $ink !important;
+        color: $ink !important;
+        line-height: normal;
+        min-height: 2.5rem;
+        transition: background-color 9999s ease-out 0s, color 9999s ease-out 0s !important;
     }
 
-    /* Focus state (same ring as the rest of your UI) */
     #{$selector}:-webkit-autofill:focus {
-        border-color: $form-autofill-border-focus !important;
+        border-color: $brand !important;
         box-shadow: none !important;
     }
 
-    /* Hover state */
     #{$selector}:-webkit-autofill:hover {
-        border-color: $form-autofill-border-hover !important;
+        border-color: $rule-strong !important;
     }
 
-    /* Invalid state */
     #{$selector}.is-invalid:-webkit-autofill,
     #{$selector}:invalid:-webkit-autofill {
-        border-color: $input-border-color !important; // keep your existing logic
+        background-image: none !important;
+        border-color: $ember !important;
         box-shadow: none !important;
-        background-image: none !important; // remove bootstrap invalid bg image in autofill
     }
 
-    /* Disabled */
     #{$selector}:disabled:-webkit-autofill {
-        opacity: 0.55;
+        opacity: .55;
     }
 }
 
-/* Apply to common controls */
 @include dash-autofill('input.form-control');
 @include dash-autofill('textarea.form-control');
 @include dash-autofill('select.form-select');
 
-/* Floating labels: ensure label stays readable when field is autofilled */
+/* Le libellé flottant reste lisible sur un champ rempli automatiquement. */
 .form-floating {
+
     > .form-control:-webkit-autofill ~ label,
     > .form-select:-webkit-autofill ~ label {
-        color: rgba($white, 0.65) !important;
+        color: #a6a7bc !important;
     }
 }
 
-/* Placeholder consistency (autofill sometimes affects it visually) */
 .form-control::placeholder,
 .form-select::placeholder {
-    color: rgba($white, 0.45);
+    color: $muted;
     opacity: 1;
 }

@@ -53,6 +53,7 @@ body {
 .security-brand {
     align-items: center;
     display: flex;
+    flex-direction: column;
     gap: 0.625rem;
     justify-content: center;
     margin-bottom: 1.5rem;

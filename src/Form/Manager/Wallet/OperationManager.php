@@ -72,7 +72,7 @@ readonly class OperationManager implements OperationInterface
         'brasserie-du-pa-anne' => 'expenses-leisure-activities-outings', // BRASSERIE DU PA ANNE
         'brin-de-terroir-vaun' => 'expenses-leisure-activities-vacation', // BRIN DE TERROIR VAUN
         'buffalo-grill-epagny' => 'expenses-restaurants', // BUFFALO GRILL EPAGNY
-        'c-p-annecy' => 'C&P ANNECY', // C&P ANNECY
+        'c-p-annecy' => 'expenses-restaurants', // C&P ANNECY
         'cabaia-annecy' => 'expenses-various-gifts', // CABAIA ANNECY
         'cafe-de-la-ville-ann' => 'expenses-leisure-activities-outings', // CAFE DE LA VILLE ANN
         'camp-beauregard-mor' => 'expenses-leisure-activities-vacation', // CAMP. BEAUREGARD MOR
@@ -84,7 +84,29 @@ readonly class OperationManager implements OperationInterface
         'casa-tabacpress-anne' => 'expenses-various-tobacco', // CASA TABACPRESS ANNE
         'tabac' => 'expenses-various-tobacco', // Tabac
         'cave-de-la-poste-la' => 'expenses-leisure-activities-vacation', // CAVE DE LA POSTE LA
-        'certas-essof100-anne' => 'CERTAS ESSOF100 ANNE', // CERTAS ESSOF100 ANNE
+        // Les stations Esso portent un numero de site qui change d'une station a
+        // l'autre : ESSOF100, ESSOF088... Le prefixe seul doit suffire, sans quoi
+        // chaque nouvelle station retombe dans la categorie par defaut.
+        'certas-esso' => 'expenses-automobile-fuel', // CERTAS ESSOF0xx
+        'certas-essof100-anne' => 'expenses-automobile-fuel', // CERTAS ESSOF100 ANNE
+        'certas-essof088-cran' => 'expenses-automobile-fuel', // CERTAS ESSOF088 CRAN
+        // Enseignes identifiees a la main, faute de segment reconnaissable.
+        'point-b-annecy' => 'expenses-restaurants', // POINT B ANNECY - restauration rapide
+        'pasha' => 'expenses-restaurants', // PASHA - restaurant
+        'cafe-de-la-paix-bour' => 'expenses-leisure-activities-outings', // CAFE DE LA PAIX BOUR - bar
+        'aoraki-seez' => 'expenses-leisure-activities-outings', // AORAKI SEEZ - bar
+        'le-val-d-arly-ugine' => 'expenses-various-tobacco', // LE VAL D'ARLY UGINE - tabac
+        'santa-fe-sainte-foy' => 'expenses-various-tobacco', // SANTA FE SAINTE FOY - tabac
+        'papelaria-america' => 'expenses-various-tobacco', // PAPELARIA AMERICA - tabac
+        'melba-annecy-vins' => 'expenses-leisure-activities-outings', // MELBA ANNECY - VINS - bar
+        'photomaton' => 'expenses-leisure-activities-outings', // PHOTOMATON - loisir
+        'mont-blanc-annecy' => 'expenses-life-food', // MONT BLANC ANNECY - boulangerie Chevallier
+        'bruyere-nicolas-mariage' => 'expenses-leisure-activities-outings', // BRUYERE NICOLAS Mariage
+        // Ristourne d'interets debiteurs : c'est un revenu financier, pas une
+        // recette non ventilee. Le sens doit etre lu, le libelle est le meme.
+        'franchise-interets' => 'incomes-income-financial-income',
+        'cwa-annecy' => 'expenses-leisure-activities-outings', // CWA ANNECY - bar
+        'jardin-sauvage-bourg' => 'expenses-leisure-activities-outings', // JARDIN SAUVAGE BOURG - bar
         'chaclema-annecy' => 'expenses-life-food', // CHACLEMA ANNECY
         'cheque-emis-665370000000000' => '', // CHEQUE EMIS 665370000000000
         'chevallier-annecy' => 'expenses-life-food', // CHEVALLIER ANNECY
@@ -532,17 +554,42 @@ readonly class OperationManager implements OperationInterface
         'sarl-felix-creation' => 'incomes-income-remuneration',
         'fournier-sebastien' => 'incomes-other-deposits',
         'remise-de-cheque' => 'incomes-other-deposits',
-        'fournier-chantal' => 'incomes-refunds-miscellaneous-refunds',
-        'voiture-madame-fournier-chanta' => 'incomes-refunds-miscellaneous-refunds',
-        // Tiers apparaissant dans les deux sens : virements entre particuliers.
-        'magali-belmonte' => [
-            'expenses' => 'expenses-other',
+        'fournier-chantal' => [
+            'expenses' => 'expenses-refunds-third-parties',
             'incomes' => 'incomes-refunds-miscellaneous-refunds',
         ],
+        'voiture-madame-fournier-chanta' => 'incomes-refunds-miscellaneous-refunds',
+        // Tiers apparaissant dans les deux sens : virements entre particuliers.
+        // Le sens compte : l'argent qui part et celui qui revient ne relevent
+        // pas du meme poste, et les ranger ensemble gonflerait les depenses.
+        'magali-belmonte' => [
+            'expenses' => 'expenses-refunds-third-parties',
+            'incomes' => 'incomes-refunds-miscellaneous-refunds',
+        ],
+        // Virement vers le compte d'epargne du titulaire, et retour. Ce n'est
+        // pas une depense de consommation : elle sort des postes courants.
         'fournier-sebast' => [
-            'expenses' => 'expenses-other',
+            'expenses' => 'expenses-savings-transfer',
             'incomes' => 'incomes-other-deposits',
         ],
+        'coinbase' => 'expenses-savings-crypto',
+        // La banque prefixe parfois le virement de « WEB MONSIEUR » : la cle
+        // est le segment complet, pas un fragment, d'ou cette seconde entree.
+        'web-monsieur-fournier-sebast' => [
+            'expenses' => 'expenses-savings-transfer',
+            'incomes' => 'incomes-other-deposits',
+        ],
+        'web-chantal-fournier' => [
+            'expenses' => 'expenses-refunds-third-parties',
+            'incomes' => 'incomes-refunds-miscellaneous-refunds',
+        ],
+        'izi' => 'expenses-housing-energy', // IZI - fournisseur d'energie
+        'ophelie-trav' => 'expenses-miscellaneous',
+        'on-participe-asniere' => 'expenses-miscellaneous',
+        'comune-di-gallipol' => 'expenses-fines', // amende
+        'la-boutique-de-m-la' => 'expenses-various-gifts', // LA BOUTIQUE DE M LA - cadeau
+        'gare-du-nord-v36-par' => 'expenses-various-travel', // Gare du Nord - voyage
+        'ts-lyon-grolee' => 'expenses-leisure-activities-outings', // TS LYON GROLEE - loisirs
         'dgfip-finances-publiques-1p' => 'incomes-refunds-miscellaneous-refunds',
         'interets-crediteurs' => 'incomes-income-financial-income',
         'franchise-interets-debiteurs' => 'incomes-income-financial-income',
@@ -651,6 +698,11 @@ readonly class OperationManager implements OperationInterface
         'interest' => 'Intérêts',
         'refund' => 'Avoir',
     ];
+
+    /** Sous-categorie des salaires, et jour a partir duquel un versement est lu
+     *  comme la paie du mois suivant. Voir payrollDate(). */
+    private const SALARY_SUB_CATEGORY = 'incomes-income-remuneration';
+    private const SALARY_SHIFT_DAY = 20;
 
     private const DEFAULT_EXPENSE = 'expenses-other';
     private const DEFAULT_INCOME = 'incomes-other-income-to-be-categorized';
@@ -923,6 +975,8 @@ readonly class OperationManager implements OperationInterface
             $isExpense = $debit > 0;
             $amount = round($isExpense ? $debit : $credit, 2);
             $parsed = $this->parseLabel($rawLabel);
+            $subCategorySlug = $this->resolveSubCategorySlug($rawLabel, $parsed, $isExpense);
+            $date = $this->payrollDate($date, $subCategorySlug);
 
             $entries[] = [
                 'date' => $date,
@@ -930,8 +984,8 @@ readonly class OperationManager implements OperationInterface
                 'amount' => $amount,
                 'expense' => $isExpense,
                 'merchant' => $parsed['merchant'],
-                'subCategory' => $this->resolveSubCategorySlug($rawLabel, $parsed, $isExpense),
-                'key' => $this->operationKey($date, $amount, $isExpense, $label),
+                'subCategory' => $subCategorySlug,
+                'key' => $this->operationKey($date, $amount, $isExpense),
             ];
             ++$report['parsed'];
         }
@@ -964,7 +1018,6 @@ readonly class OperationManager implements OperationInterface
                 $result['date'],
                 (float) $result['amount'],
                 'expenses' === $result['type'],
-                (string) $result['adminName']
             );
             $counts[$key] = ($counts[$key] ?? 0) + 1;
         }
@@ -975,13 +1028,26 @@ readonly class OperationManager implements OperationInterface
     /**
      * Clé de rapprochement d'une opération.
      */
-    private function operationKey(\DateTimeInterface $date, float $amount, bool $isExpense, string $label): string
+    private function operationKey(\DateTimeInterface $date, float $amount, bool $isExpense): string
     {
+        /*
+         * La cle ne porte plus le libelle.
+         *
+         * L'import reecrit le libelle qu'il enregistre (« PAIEMENT PAR CARTE
+         * X9322 CASA… » devient « Paiement par carte - X9322 CASA… - Casa »).
+         * Une cle qui le contenait ne pouvait donc jamais reconnaitre une
+         * operation deja importee : tout relevé qui recouvrait l'historique
+         * recreait ses lignes en double, et la banque renomme en plus ses
+         * commercants d'un relevé a l'autre.
+         *
+         * Date, montant et sens suffisent, parce que le rapprochement compare
+         * des *nombres* d'occurrences : deux achats identiques le meme jour
+         * donnent deux en base comme dans le fichier, et rien n'est perdu.
+         */
         return implode('|', [
             $date->format('Y-m-d'),
             number_format($amount, 2, '.', ''),
             $isExpense ? 'D' : 'C',
-            mb_strtolower(trim(preg_replace('/\s+/u', ' ', $label)), 'UTF-8'),
         ]);
     }
 
@@ -1236,6 +1302,33 @@ readonly class OperationManager implements OperationInterface
      * Le format des exports bancaires français est jj/mm/aaaa : il est appliqué
      * strictement, sans heuristique sur la valeur du premier groupe.
      */
+    /**
+     * Rattache un salaire verse en fin de mois au mois qu'il remunere.
+     *
+     * L'employeur vire parfois la paie les tout derniers jours du mois
+     * precedent. Laissee a sa date bancaire, elle fait deux salaires sur un
+     * mois et aucun sur le suivant : les revenus mensuels, le taux d'epargne
+     * et la comparaison d'une annee sur l'autre deviennent faux.
+     *
+     * Le seuil est pose au 20 : sur tout l'historique du compte, les versements
+     * anticipes tombent entre le 27 et le 31, les versements normaux entre le
+     * 1er et le 4. Aucune valeur observee entre les deux.
+     *
+     * Le decalage est applique avant le calcul de la cle de rapprochement, pour
+     * qu'un reimport reconnaisse l'operation a sa date corrigee et ne la
+     * recree pas.
+     */
+    private function payrollDate(\DateTimeInterface $date, ?string $subCategorySlug): \DateTimeInterface
+    {
+        if (self::SALARY_SUB_CATEGORY !== $subCategorySlug || (int) $date->format('j') < self::SALARY_SHIFT_DAY) {
+            return $date;
+        }
+
+        return (new \DateTime($date->format('Y-m-d')))
+            ->modify('first day of next month')
+            ->setTime(0, 0);
+    }
+
     private function parseDate(mixed $value): ?\DateTimeInterface
     {
         if ($value instanceof \DateTimeInterface) {

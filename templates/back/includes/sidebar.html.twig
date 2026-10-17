@@ -1,36 +1,41 @@
 {% trans_default_domain 'back' %}
 
+{# La rubrique active se déduit du nom de route, pas de l'URI : /wallets/outsiders/
+   contient "wallets", ce qui allumait "Gestion des comptes" en même temps que
+   "Gestion des bénéficiaires". #}
+{% set route = app.request.attributes.get('_route')|default('') %}
+
 <aside id="sidebar-menu" class="sidebar py-4">
     <nav class="nav nav-pills flex-column pt-4 gap-3 h-100">
-        {% set active = 'wallets' in app.request.uri %}
+        {% set active = route starts with 'back_dashboard' %}
+        <a href="{{ path('back_dashboard') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
+            <span class="label-icon d-inline-flex align-items-center justify-content-center">
+                <twig:ux:icon name="tabler:gauge" />
+            </span>
+            <span class="mx-1 label">{{ 'Tableau de bord'|trans|raw }}</span>
+        </a>
+        {% set active = route starts with 'back_wallet_' or route starts with 'back_operation_' %}
         <a href="{{ path('back_wallet_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
                 <twig:ux:icon name="tabler:wallet" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des comptes'|trans|raw }}</span>
         </a>
-        {% set active = 'budgets' in app.request.uri %}
+        {% set active = route starts with 'back_budget_' %}
         <a href="{{ path('back_budget_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
                 <twig:ux:icon name="tabler:mail-dollar" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des budgets'|trans|raw }}</span>
         </a>
-        {% set active = 'objectives' in app.request.uri %}
-        <a href="{{ path('back_objective_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
-            <span class="label-icon d-inline-flex align-items-center justify-content-center">
-                <twig:ux:icon name="tabler:target-arrow" />
-            </span>
-            <span class="mx-1 label">{{ 'Gestion des objectifs'|trans|raw }}</span>
-        </a>
-        {% set active = 'operations-types' in app.request.uri %}
+        {% set active = route starts with 'back_operationtype_' or route starts with 'back_category_' or route starts with 'back_subcategory_' %}
         <a href="{{ path('back_operationtype_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
                 <twig:ux:icon name="tabler:list-details" />
             </span>
             <span class="mx-1 label">{{ 'Gestion des catégories'|trans|raw }}</span>
         </a>
-        {% set active = 'outsiders' in app.request.uri %}
+        {% set active = route starts with 'back_outsider_' %}
         <a href="{{ path('back_outsider_index') }}" class="nav-link d-inline-flex align-items-center text-white mx-auto py-2 px-4{% if active %} active{% endif %}">
             <span class="label-icon d-inline-flex align-items-center justify-content-center">
                 <twig:ux:icon name="tabler:list-details" />

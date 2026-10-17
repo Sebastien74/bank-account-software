@@ -7,12 +7,12 @@
 {% set excludedFields = ['save', 'saveEdit', 'saveBack', 'saveAdd', '_token'] %}
 
 <!doctype html>
-<html lang="{{ app.request.locale }}" data-bs-theme="auto">
+<html lang="{{ app.request.locale }}" data-bs-theme="dark">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
-        <meta name="description" content="" />
+        <meta name="description" content="{{ "Administration"|trans|striptags }} - {{ companyName|striptags }}" />
         <meta name="author" content="{{ companyName|striptags }}" />
         <title>{{ pageTitle|striptags ~' | '~companyName|striptags }}</title>
         <link rel="icon" type="image/png" href="{{ asset('medias/favicon/favicon-96x96.png') }}" sizes="96x96" />
@@ -27,7 +27,10 @@
         {% endblock %}
     </head>
     <body id="body-{{ pageCode }}"{% if granted('ROLE_DEV') %} class="role-dev"{% endif %}>
-        {% include 'back/includes/flashbag.html.twig' %}
+        {# Avant d'atteindre le contenu, le clavier traverse le bandeau et les
+           deux rails, sur chaque page. #}
+        <a href="#main-container" class="visually-hidden-focusable skip-link btn btn-primary">{{ "Aller au contenu"|trans|striptags }}</a>
+        {% include 'back/includes/flashbag.html.twig' with {} only %}
         {% include 'back/includes/header.html.twig' with {
             companyName: companyName,
             pageIcon: pageIcon,
@@ -36,7 +39,7 @@
         <div class="d-flex">
             {% include 'back/includes/sidebar.html.twig' with {} only %}
             {% include 'back/includes/sidebar-opposite.html.twig' with {} only %}
-            <main id="main-container">
+            <main id="main-container" tabindex="-1">
                 {% include 'back/includes/loader.html.twig' with {} only %}
                 <div id="main-container-inner" class="px-3 px-lg-3 px-xxl-5 position-relative">
                     {% include 'back/includes/breadcrumb.html.twig' with {
@@ -58,5 +61,8 @@
              data-deselect="{{ "Deselect"|trans|raw }}"
              data-ok="{{ "OK"|trans|raw }}"
         ></div>
+        {# Le pointage d'une operation ecrit en base sans rien afficher :
+           cette zone rend compte de la reponse aux lecteurs d'ecran. #}
+        <div id="ajax-status" class="visually-hidden" role="status" aria-live="polite"></div>
     </body>
 </html>

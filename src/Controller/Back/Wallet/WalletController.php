@@ -12,6 +12,7 @@ use App\Form\Manager\GlobalManagerInterface;
 use App\Form\Type\Wallet\WalletType;
 use App\Service\AdminLocatorInterface;
 use App\Service\CoreLocatorInterface;
+use App\Service\Wallet\RecurringChargeForecast;
 use App\Service\Wallet\Statistics\StatisticsBuilder;
 use App\Service\Wallet\Statistics\SubCategoryDetailBuilder;
 use Knp\Component\Pager\PaginatorInterface;
@@ -44,6 +45,7 @@ class WalletController extends BaseController
         protected mixed $formManager,
         private readonly StatisticsBuilder $statisticsBuilder,
         private readonly SubCategoryDetailBuilder $subCategoryDetailBuilder,
+        private readonly RecurringChargeForecast $forecast,
     ) {
         parent::__construct($coreLocator, $adminLocator, $globalFormManager, $formManager);
     }
@@ -81,13 +83,45 @@ class WalletController extends BaseController
         $remainingDays = (int) $now->format('t') - $currentDay + 1;
         $stats = [];
 
+        $year = (int) $now->format('Y');
+        $month = (int) $now->format('n');
+
         foreach ($wallets as $wallet) {
             $balance = $repository->sumBalance($wallet);
+
+            /*
+             * Un compte d'epargne ne depense rien : moyenne de depenses, reste
+             * par jour et echeances a venir n'y repondent a aucune question.
+             * Seuls le solde et ce qui y a ete verse cette annee comptent.
+             */
+            if ($wallet->isSavings()) {
+                $stats[$wallet->getId()] = [
+                    'savings' => true,
+                    'balance' => round($balance, 2),
+                    'fundedThisYear' => round($repository->yearToDateIncomes($wallet), 2),
+                ];
+                continue;
+            }
+
             $totals = $repository->currentMonthTotals($wallet);
+            /*
+             * Deux « reste par jour », parce qu'ils ne répondent pas à la même
+             * question. Le premier divise le solde tel quel : c'est ce dont on
+             * dispose à l'instant. Le second retranche d'abord les échéances du
+             * mois qui ne sont pas encore tombées — loyer, abonnements — donc
+             * ce qu'on peut réellement dépenser sans se mettre en défaut.
+             */
+            $pending = $this->forecast->total($this->forecast->pending($wallet, $year, $month));
+            $available = $balance - $pending;
             $stats[$wallet->getId()] = [
+                'savings' => false,
                 'balance' => round($balance, 2),
                 'dailyAverageExpenses' => $currentDay > 0 ? round($totals['expenses'] / $currentDay, 2) : 0.0,
                 'remainingDailyBudget' => $remainingDays > 0 ? round($balance / $remainingDays, 2) : 0.0,
+                'remainingDailyBudgetAfterCharges' => $remainingDays > 0 ? round($available / $remainingDays, 2) : 0.0,
+                'pendingCharges' => round($pending, 2),
+                // Là où le compte atterrit une fois les échéances du mois passées.
+                'projectedBalance' => round($available, 2),
             ];
         }
 
@@ -108,7 +142,7 @@ class WalletController extends BaseController
     /**
      * Wallet delete.
      */
-    #[Route('/delete/{wallet}', name: 'back_wallet_delete', methods: 'GET')]
+    #[Route('/delete/{wallet}', name: 'back_wallet_delete', methods: 'POST')]
     public function delete(Wallet $wallet): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($wallet));

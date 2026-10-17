@@ -33,11 +33,10 @@ class PasswordRequestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('email', Type\EmailType::class, [
-            'label' => $this->translator->trans('Your email', [], 'security_form'),
+            'label' => $this->translator->trans('Votre adresse e-mail', [], 'security_form'),
             'label_html' => true,
             'attr' => [
-                'placeholder' => $this->translator->trans('Enter your email address', [], 'security_form'),
-                'class' => 'pt-2 pb-2',
+                'placeholder' => $this->translator->trans('Saisissez votre adresse e-mail', [], 'security_form'),
             ],
             'constraints' => [
                 new Assert\NotBlank(),
@@ -48,7 +47,7 @@ class PasswordRequestType extends AbstractType
         $builder->add('secure', RecaptchaType::class);
 
         $builder->add('submit', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Send', [], 'security_form'),
+            'label' => $this->translator->trans('Envoyer', [], 'security_form'),
             'row_attr' => ['class' => 'col-lg-12'],
             'attr' => ['class' => 'btn btn-primary w-100', 'icon' => false],
         ]);

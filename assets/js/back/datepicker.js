@@ -9,6 +9,42 @@
 import MCDatepicker from 'mc-datepicker';
 import moment from "moment";
 
+/*
+ * MCDatepicker n'ouvre qu'un seul calendrier, accroche a <body> et garde en
+ * memoire de module. Turbo remplace <body> a chaque navigation : le noeud
+ * part avec l'ancien corps, mais la bibliotheque continue de le croire pose
+ * et refuse d'en reconstruire un. Les champs de date rendus apres un
+ * enregistrement n'ouvraient donc plus rien.
+ *
+ * Les instances sont suivies ici pour etre detruites pendant que l'ancien
+ * corps est encore en place -- `remove()` decroche le calendrier de son
+ * parent, et le faire trop tard leverait sur un noeud deja detache. La
+ * bibliotheque remet alors sa reference a zero et le prochain passage
+ * reconstruit le calendrier.
+ */
+let instances = [];
+
+const teardown = () => {
+    const current = instances;
+    instances = [];
+    current.forEach(instance => {
+        try {
+            instance.destroy();
+        } catch (error) {
+            console.error(error.message);
+        }
+    });
+};
+
+/*
+ * `turbo:before-cache` precede l'instantane : le calendrier en est retire,
+ * sans quoi un retour arriere en afficherait une copie morte. Une visite non
+ * mise en cache ne l'emet pas, d'ou le second point d'accroche, qui precede
+ * lui aussi l'echange du corps.
+ */
+document.addEventListener('turbo:before-cache', teardown);
+document.addEventListener('turbo:before-render', teardown);
+
 export default function (pickers) {
 
     const trans = document.getElementById('data-translation');
@@ -42,6 +78,7 @@ export default function (pickers) {
         }
 
         const datePicker = MCDatepicker.create(options);
+        instances.push(datePicker);
 
         datePicker.onOpen(() => {
             const minYear = minDate ? minDate.getFullYear() : null;

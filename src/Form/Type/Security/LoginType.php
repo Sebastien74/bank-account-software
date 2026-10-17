@@ -37,10 +37,10 @@ class LoginType extends AbstractType
         $loginInputName = 'email' == $options['login_type'] ? 'email' : 'login';
         $loginLabel = 'email' == $options['login_type']
             ? $this->translator->trans('E-mail', [], 'security_form')
-            : $this->translator->trans("Username", [], 'security_form');
+            : $this->translator->trans('Identifiant', [], 'security_form');
         $loginPlaceholder = 'email' == $options['login_type']
-            ? $this->translator->trans('Enter your e-mail', [], 'security_form')
-            : $this->translator->trans("Enter your username", [], 'security_form');
+            ? $this->translator->trans('Saisissez votre e-mail', [], 'security_form')
+            : $this->translator->trans('Saisissez votre identifiant', [], 'security_form');
         $constraints = [new NotBlank()];
         if (Type\EmailType::class === $loginType) {
             $constraints[] = new Email();
@@ -54,26 +54,24 @@ class LoginType extends AbstractType
                 'placeholder' => $loginPlaceholder,
                 'autocomplete' => 'off',
                 'autofocus' => false,
-                'class' => 'py-2',
             ],
             'constraints' => $constraints,
         ]);
 
         $builder->add('_password', Type\PasswordType::class, [
-            'label' => $this->translator->trans('Password', [], 'security_form'),
+            'label' => $this->translator->trans('Mot de passe', [], 'security_form'),
             'label_html' => true,
             'row_attr' => ['class' => 'col-lg-12 mb-3'],
             'attr' => [
-                'placeholder' => $this->translator->trans('Enter your password', [], 'security_form'),
+                'placeholder' => $this->translator->trans('Saisissez votre mot de passe', [], 'security_form'),
                 'autocomplete' => 'off',
                 'autofocus' => false,
-                'class' => 'py-2',
             ],
             'constraints' => [new NotBlank()],
         ]);
 
         $builder->add('_remember_me', Type\CheckboxType::class, [
-            'label' => $this->translator->trans('Remember me', [], 'security_form'),
+            'label' => $this->translator->trans('Se souvenir de moi', [], 'security_form'),
             'label_html' => true,
             'required' => false,
             'label_attr' => ['class' => 'lh-1 d-inline-block'],
@@ -83,7 +81,7 @@ class LoginType extends AbstractType
         $builder->add('secure', RecaptchaType::class);
 
         $builder->add('submit', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Log in', [], 'security_form'),
+            'label' => $this->translator->trans('Se connecter', [], 'security_form'),
             'row_attr' => ['class' => 'col-lg-12'],
             'attr' => ['class' => 'btn btn-primary w-100', 'icon' => false],
         ]);

@@ -12,6 +12,17 @@ import displayLoader from './display-loader';
 /** Stimulus : Turbo et Chart.js sont enregistrés via assets/controllers.json */
 import '../../bootstrap';
 
+/**
+ * Public Sans, la police du gabarit de référence (voir .claude/charte-back,
+ * décision n°3). Auto-hébergée par @fontsource : le projet a un plancher
+ * Lighthouse à tenir, et une requête tierce bloquante y coûte cher.
+ * Quatre graisses, 300 à 600, celles qu'emploie la charte.
+ */
+import '@fontsource/public-sans/300.css';
+import '@fontsource/public-sans/400.css';
+import '@fontsource/public-sans/500.css';
+import '@fontsource/public-sans/600.css';
+
 /** Import CSS */
 import '../../scss/back/vendor.scss';
 
@@ -51,6 +62,20 @@ onPageReady(function () {
         }).catch(error => console.error(error.message));
     }
 
+    const usualCategories = document.querySelectorAll('[data-usual-sub-categories]');
+    if (usualCategories.length > 0) {
+        import('./usual-category').then(({default: UsualCategory}) => {
+            new UsualCategory(usualCategories);
+        }).catch(error => console.error(error.message));
+    }
+
+    const scheduleFields = document.querySelectorAll('[data-schedule-target]');
+    if (scheduleFields.length > 0) {
+        import('./schedule-fields').then(({default: ScheduleFields}) => {
+            new ScheduleFields(scheduleFields);
+        }).catch(error => console.error(error.message));
+    }
+
     const datepickers = document.querySelectorAll('.js-datepicker');
     if (datepickers.length > 0) {
         import('./datepicker').then(({default: Datepicker}) => {
@@ -79,13 +104,60 @@ onPageReady(function () {
         }).catch(error => console.error(error.message));
     }
 
+    /*
+     * Une case qui ecrit une operation ne peut pas se contenter d'un appel en
+     * arriere-plan : la ligne disparait de la liste et le solde change. Elle
+     * envoie donc son formulaire, et la page revient a jour.
+     */
+    document.querySelectorAll('.checkbox-submit').forEach(el => {
+        el.addEventListener('change', () => {
+            const form = el.closest('form');
+            if (form) {
+                el.disabled = true;
+                form.submit();
+            }
+        });
+    });
+
+    /**
+     * Le statut passe dans le corps, pas dans la chaîne de requête : il est
+     * écrit en base, et le jeton CSRF du formulaire part avec lui.
+     */
     document.querySelectorAll('.checkbox-ajax').forEach(el => {
         el.addEventListener('change', () => {
-            const checked = el.checked ? '1' : '0';
             const form = el.closest('form');
+            const body = new FormData(form);
+            body.set('status', el.checked ? '1' : '0');
             const xHttp = new XMLHttpRequest();
-            xHttp.open('POST', form.getAttribute('action') + '?status=' + checked, true);
-            xHttp.send(new FormData(form));
+            xHttp.open('POST', form.getAttribute('action'), true);
+
+            /*
+             * Le serveur refuse un jeton périmé par un 403. Sans ce retour, la
+             * case restait cochée à l'écran alors que rien n'avait été écrit.
+             * L'état visuel revient en arrière et la zone d'annonce le dit, pour
+             * que le refus ne passe pas que par la couleur.
+             */
+            const status = document.querySelector('#ajax-status');
+            xHttp.onload = () => {
+                if (200 === xHttp.status) {
+                    if (status) {
+                        status.textContent = el.checked ? 'Opération pointée.' : 'Pointage retiré.';
+                    }
+                    return;
+                }
+                el.checked = !el.checked;
+                if (status) {
+                    status.textContent = "Le pointage n'a pas été enregistré. Rechargez la page et réessayez.";
+                }
+            };
+            xHttp.onerror = () => {
+                el.checked = !el.checked;
+                if (status) {
+                    status.textContent = "Le pointage n'a pas été enregistré. Vérifiez votre connexion.";
+                }
+            };
+
+            xHttp.send(body);
         });
     });
 

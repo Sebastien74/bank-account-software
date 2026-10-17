@@ -3,7 +3,7 @@
 /* --------------------------------------------------------------------------------------
 
     Module : Back vendor
-    Copyright : 2025
+    Copyright : 2026
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
@@ -24,8 +24,6 @@
 @import 'layout/pagination';
 @import 'layout/loader';
 
-@import 'components/card';
-@import 'components/buttons';
 
 /* Thème sombre et dashboard : chargés en dernier pour primer sur les composants. */
 @import 'theme';
@@ -38,66 +36,22 @@
 body {
 
     #main-container {
-        min-height: calc(100dvh - 70px);
+
         margin-top: 70px;
-    }
+        min-height: calc(100dvh - 70px);
 
-    #main-container {
-
-        @include mediaQuery(max-md) {
-            background: #0b0c15;
-        }
-
-        @include mediaQuery(min-md) {
-            background: radial-gradient(
-                    900px 520px at 18% 0%,
-                    rgba($dash-accent, 0.045),
-                    transparent 62%
-            ),
-            radial-gradient(
-                    1100px 780px at 70% 35%,
-                    rgba(255, 255, 255, 0.012),
-                    transparent 68%
-            ),
-            linear-gradient(
-                    180deg,
-                    $dash-bg-2,
-                    $dash-bg-1 48%,
-                    $dash-bg-0
-            );
-        }
-
-        .main-subtitle {
-
-            display: inline-flex;
-            width: 100%;
-            align-items: center;
-            gap: .75rem;
-            padding: .5rem 1rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-            background: $bg-gradient-primary;
-            border-radius: 12px;
-            border: 1px solid $crumb-border;
-            font-size: 1rem;
-            color: transparentize($white, .5);
-
-            i:not(.initial) {
-                width: 30px !important;
-                height: 30px !important;
-                flex: 0 0 30px !important;
-                border-radius: 10px !important;
-                font-size: 12px !important;
-            }
-        }
+        /* Le corps de page est un aplat. Les trois couches de dégradé d'avant
+           venaient du parti « verre dépoli » : sur un fond travaillé, une
+           carte sans filet ne se détache plus (couleurs.md). */
+        background: $paper;
 
         @include mediaQuery(max-lg) {
             width: 100%;
         }
 
         @include mediaQuery(min-lg) {
-            width: calc(100% - 350px);
             margin-left: 350px;
+            width: calc(100% - 350px);
         }
     }
 
@@ -105,104 +59,45 @@ body {
         text-decoration: none;
     }
 
-    .fz-xs {
-        font-size: 10px;
-    }
-
-    .fz-sm {
-        font-size: 12px;
-    }
-
-    .fz-md {
-        font-size: 14px;
-    }
-
-    .text-muted {
-        color: transparentize($white, .5) !important;
-    }
-
     .text-italic {
         font-style: italic !important;
     }
 
-    .btn-white-50, .btn-white-50:hover, .btn-white-50:focus, .btn-white-50:active {
-        background-color: $white !important;
-        opacity: .1 !important;
+    /* Employé par `core/data-formater.html.twig`, hors corps de page refondu. */
+    .text-primary-lighten {
+        color: $brand-text !important;
+    }
+
+    /* Le rail lit encore ce blanc atténué : il garde son aspect, et le corps
+       de page le reprend en gris de la charte dans `_theme.scss`. */
+    .text-muted {
+        color: transparentize($white, .5) !important;
     }
 
     .text-white {
         opacity: .9;
     }
 
-    .opacity-70 {
-        opacity: .3 !important;
-    }
-
-    .text-primary-lighten {
-        color: $primary-lighten !important;
-    }
-
     .radius {
         border-radius: $border-radius;
-    }
-
-    .no-shadow {
-        box-shadow: none !important;
     }
 
     .cursor {
         cursor: pointer;
     }
 
-    .title-border-bottom-light {
-        color: transparentize($white, .3);
-        padding-bottom: .75rem;
-        border-bottom: 1px solid rgba($dash-accent, 0.28);
-    }
-
-    .small-icon {
-
-        width: 34px;
-        height: 34px;
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba($dash-accent, 0.14);
-        border: 1px solid rgba($dash-accent, 0.28);
-        color: $crumb-text;
-        flex: 0 0 auto;
-
-        i {
-            font-size: 1.05rem;
-            opacity: .7;
-        }
-    }
-
-    @include mediaQuery(max-md) {
-        .w-100-max-md {
-            width: 100% !important;
-        }
-    }
-
-    @include mediaQuery(max-lg) {
-        .w-100-max-lg {
-            width: 100% !important;
-        }
+    .cursor-not-allowed {
+        cursor: not-allowed !important;
     }
 
     .vertical-align {
-        position: absolute;
-        top: 50%;
         left: 0;
+        position: absolute;
         right: 0;
+        text-align: center;
+        top: 50%;
         transform: translateY(-50%);
         width: 100%;
-        text-align: center;
-    }
-
-    .cursor-not-allowed {
-        cursor: not-allowed !important;
     }
 
     svg {

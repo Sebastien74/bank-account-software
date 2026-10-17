@@ -19,6 +19,12 @@
     align-items: center;
     justify-content: center;
 
+    .logo-wrap svg {
+        color: var(--bas-primary);
+        height: 5rem;
+        width: 5rem;
+    }
+
     .logo-wrap img {
         max-height: 150px;
         height: 150px;

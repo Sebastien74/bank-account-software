@@ -45,7 +45,7 @@ class CaptchaTokenValidator extends ConstraintValidator
             $this->coreLocator->request()->getSession()->getFlashBag()->get('captcha');
             $this->coreLocator->request()->getSession()->getFlashBag()->add(
                 'error',
-                $this->coreLocator->translator()->trans("The captcha is invalid. Please reload the page and try again.", [], 'validators')
+                $this->coreLocator->translator()->trans('Le captcha est invalide. Rechargez la page puis réessayez.', [], 'validators')
             );
         }
     }

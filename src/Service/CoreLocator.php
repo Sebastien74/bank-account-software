@@ -178,8 +178,18 @@ class CoreLocator implements CoreLocatorInterface
         $currentRoutes = ['back_history_corrected', 'api_front_domain_check'];
         $currentRoute = $this->request()->getSession()->get('this_route');
         $previousRoute = in_array($currentRouteName, $currentRoutes) ? $currentRoute : $this->request()->getSession()->get('last_route');
+        /*
+         * Les parametres de la derniere visite completent ceux qu'on vient de
+         * calculer, ils ne les remplacent pas.
+         *
+         * Dans l'autre sens, un lien « Sous-categories » pose sur la ligne de
+         * la categorie 3 repartait vers la categorie 15 des lors qu'on avait
+         * consulte celle-ci juste avant : la memoire de session gagnait sur
+         * l'identifiant de la ligne, et toutes les lignes de l'index menaient
+         * au meme endroit.
+         */
         if ($route && $previousRoute && $previousRoute->name === $route && !str_contains($route, '_edit')) {
-            $parameters = array_merge($parameters, $previousRoute->params);
+            $parameters = array_merge($previousRoute->params, $parameters);
         }
 
         return $haveParams && empty($parameters) ? [] : $parameters;

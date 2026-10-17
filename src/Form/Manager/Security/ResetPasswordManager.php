@@ -36,7 +36,7 @@ readonly class ResetPasswordManager
         $user = $this->coreLocator->em()->getRepository(User::class)->findOneBy(['email' => $email]);
         if (!$user) {
             $session = $this->coreLocator->request()->getSession();
-            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('No account found for this email address.', [], 'security_cms'));
+            $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans("Aucun compte n'est associé à cette adresse e-mail.", [], 'security_cms'));
             return false;
         }
         $token = $this->setToken($user, $email);
@@ -73,7 +73,7 @@ readonly class ResetPasswordManager
      */
     private function sendEmail(User $user, string $email, string $token): void
     {
-        $subject = $this->coreLocator->translator()->trans('Password reset', [], 'security_cms');
+        $subject = $this->coreLocator->translator()->trans('Réinitialisation du mot de passe', [], 'security_cms');
 
         $this->mailer->setSubject($subject);
         $this->mailer->setTo([$email]);
@@ -82,6 +82,6 @@ readonly class ResetPasswordManager
         $this->mailer->send();
 
         $session = $this->coreLocator->request()->getSession();
-        $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("We’ve sent you an email. If you don’t see it, please check your spam folder.", [], 'security_cms'));
+        $session->getFlashBag()->add('success', $this->coreLocator->translator()->trans("Un e-mail vous a été envoyé. S'il n'apparaît pas, pensez à vérifier vos spams.", [], 'security_cms'));
     }
 }

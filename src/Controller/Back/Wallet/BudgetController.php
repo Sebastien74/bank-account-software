@@ -52,7 +52,7 @@ class BudgetController extends BaseController
     /**
      * Budget delete.
      */
-    #[Route('/delete/{budget}', name: 'back_budget_delete', methods: 'GET')]
+    #[Route('/delete/{budget}', name: 'back_budget_delete', methods: 'POST')]
     public function delete(Budget $budget): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($budget));

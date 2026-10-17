@@ -6,6 +6,7 @@ namespace App\Form\Type;
 
 use App\Form\Validator as Validators;
 use App\Service\CoreLocatorInterface;
+use App\Service\CryptServiceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,16 +24,16 @@ class RecaptchaType extends AbstractType
 
     private ?string $secretKey;
     private ?string $publicKey;
-    private int $tokenLength;
 
     /**
      * RecaptchaType constructor.
      */
-    public function __construct(private readonly CoreLocatorInterface $coreLocator)
-    {
+    public function __construct(
+        private readonly CoreLocatorInterface $coreLocator,
+        private readonly CryptServiceInterface $cryptService,
+    ) {
         $this->secretKey = !empty($_ENV['APP_SECRET_KEY']) ? $_ENV['APP_SECRET_KEY'] : self::APP_SECRET_KEY;
         $this->publicKey = !empty($_ENV['APP_PUBLIC_KEY']) ? $_ENV['APP_PUBLIC_KEY'] : self::APP_PUBLIC_KEY;
-        $this->tokenLength = !empty($_ENV['CAPTCHA_TOKEN_LENGTH']) ? intval($_ENV['CAPTCHA_TOKEN_LENGTH']) : 16;
     }
 
     /**
@@ -67,13 +68,17 @@ class RecaptchaType extends AbstractType
     /**
      * To generate token
      *
+     * Le jeton doit être chiffré par CryptService : c'est lui qui le déchiffre
+     * côté validation (CaptchaTokenValidator, RecaptchaManager). Chiffrer ici
+     * avec APP_SECRET_KEY/APP_PUBLIC_KEY donnait une clé et un IV différents
+     * de ceux du service, donc un déchiffrement toujours en échec et un
+     * captcha systématiquement refusé.
+     *
      * @return string
      */
     private function generateToken(): string
     {
-        $key = hash('sha256', $this->secretKey);
-        $iv = substr(hash('sha256', $this->publicKey), 0, $this->tokenLength);
-        return base64_encode(openssl_encrypt($this->secretKey, "AES-256-CBC", $key, 0, $iv));
+        return (string) $this->cryptService->execute($this->secretKey, 'e');
     }
 
     /**

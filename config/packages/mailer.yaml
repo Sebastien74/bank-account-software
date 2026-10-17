@@ -6,10 +6,10 @@ when@local:
     framework:
         mailer:
             envelope:
-                recipients: ['dev@agence-felix.fr']
+                recipients: ['fournier.sebastien@outlook.com']
 
 when@dev:
     framework:
         mailer:
             envelope:
-                recipients: ['dev@agence-felix.fr']
+                recipients: ['fournier.sebastien@outlook.com']

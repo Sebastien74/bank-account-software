@@ -2,35 +2,36 @@
 
 /* --------------------------------------------------------------------------------------
 
-    Module : Back card
-    Copyright : 2025
+    Module : Back accordion
+    Copyright : 2026
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
+    L'accordéon vit dans une carte : il n'a pas à porter sa propre surface, son
+    filet ni son rayon. Il n'est plus qu'une ligne de titre et sa séparation.
+
 ----------------------------------------------------------------------------------------- */
 
-$dash-accent: $primary !default;
-$crumb-surface: rgba(255, 255, 255, 0.015) !default;
-$crumb-border: rgba(255, 255, 255, 0.06) !default;
-$crumb-border-hover: rgba(255, 255, 255, 0.10) !default;
-$crumb-shadow: 0 18px 45px rgba(0, 0, 0, 0.55) !default;
+.accordion {
+    --bs-accordion-bg: transparent;
+    --bs-accordion-color: #{$ink};
+    --bs-accordion-border-color: rgba(255, 255, 255, .08);
+    --bs-accordion-btn-color: #{$heading};
+    --bs-accordion-btn-bg: transparent;
+    --bs-accordion-active-bg: transparent;
+    --bs-accordion-active-color: #{$heading};
+    --bs-accordion-btn-focus-box-shadow: none;
+}
 
-.accordion-button, .accordion-button:not(.collapsed) {
-
-    border-radius: 16px !important;
-    background: radial-gradient(520px 160px at 12% 0%, rgba($dash-accent, 0.10), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%),
-    $crumb-surface;
-    border: 1px solid $crumb-border;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+.accordion-button,
+.accordion-button:not(.collapsed) {
+    background: transparent;
+    border: 0;
     box-shadow: none !important;
-    color: $dash-text !important;
+    color: $heading;
+    font-weight: 500;
 
     &:hover {
-        border-color: $crumb-border-hover;
-        box-shadow: $crumb-shadow;
-        transform: translateY(-1px);
+        background: rgba(255, 255, 255, .03);
     }
 }

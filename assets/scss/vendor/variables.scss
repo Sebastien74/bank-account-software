@@ -12,6 +12,8 @@
     5 ) Button
     6 ) Form
     7 ) Cards
+    8 ) Function
+    9 ) Charte back-office
 
 ----------------------------------------------------------------------------------------- */
 
@@ -53,14 +55,32 @@ $container-max-widths: (
 -----------------------------------*/
 
 $fonts-weights: (100, 200, 300, 400, 500, 600, 700, 800, 900);
-$border-radius: 16px !default;
+
+/* Rayon de la charte (.claude/charte-back/formes-typo.md) : 0.375rem, et son
+   echelle. Le 16px d'avant venait du parti "verre depoli" du tableau de bord ;
+   la charte pose une carte franche, nettement moins arrondie. */
+$border-radius: .375rem !default;
+$border-radius-sm: .25rem !default;
+$border-radius-lg: .5rem !default;
+$border-radius-xl: .625rem !default;
+$border-radius-xxl: .75rem !default;
+$border-radius-pill: 50rem !default;
+
 $theme-color-interval: 8% !default;
 
 /*-----------------------------------
    3 ) Colors
 -----------------------------------*/
 
-$primary: #6f42c1 !default;
+/* Violet de la charte. La teinte pleine relevee sur la demo est #7367f0, mais
+   elle ne mesure que 4,26:1 sous un libelle blanc : Bootstrap bascule alors le
+   libelle en noir par color-contrast(). On prend le survol de la demo,
+   #685dd8, ou le blanc tient 5,07:1 (voir ecarts-projet.md, defaut n.1).
+   #7367f0 reste disponible par $brand pour tout ce qui ne porte pas de texte :
+   barres, pastilles, filets, icones. */
+$primary: #685dd8 !default;
+$brand: #7367f0 !default;
+$brand-text: #aba4f6 !default;
 $primary-lighten: tint-color($primary, 25%) !default;
 $primary-darken: shade-color($primary, 40%) !default;
 $red: #dc3545 !default;
@@ -93,7 +113,9 @@ $dash-item-active: rgba(124, 108, 255, 0.24) !default;
 
 $dash-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !default;
 
-$dash-accent: $primary !default;
+/* Accent du rail et du bandeau. Fige sur sa valeur d'origine : la refonte
+   porte sur les corps de page, le rail garde son aspect au pixel pres. */
+$dash-accent: #6f42c1 !default;
 $dash-side-surface: #07090d !default;
 
 /* Balanced dark – slightly darker, still readable */
@@ -123,41 +145,340 @@ linear-gradient(
 );
 
 /*-----------------------------------
+   3 bis ) Palette de la charte
+-----------------------------------*/
+
+/* Valeurs relevées dans le bloc [data-bs-theme=dark] de la feuille du gabarit
+   de référence. Voir .claude/charte-back/couleurs.md : elles sont mesurées,
+   pas interprétées. Deux fonds seulement, et la carte se lit sur la page par
+   leur seul écart. */
+
+$paper: #25293c !default;           // fond de page
+$surface: #2f3349 !default;         // fond de carte
+$surface-raised: #363b54 !default;  // survol, piste de barre
+$ink: #acabc1 !default;             // texte courant, 6,4:1 sur la carte
+$heading: #cfcde4 !default;         // titres
+$muted: #9c9eb4 !default;           // texte secondaire : 4,71:1 sur la carte, 5,45:1 sur la page
+                                    // (#76778e mesurait 3,1:1 et #8b8da3 3,81:1 : tous deux sous le plancher)
+$rule: #44485e !default;            // filet
+$rule-strong: #565a73 !default;     // filet d'un contrôle, les 3:1 dus
+
+/* Chaque couleur de sens vient par trois : la teinte pleine pour un aplat, un
+   fond atténué pour une pastille, une teinte claire pour du texte sur sombre.
+   C'est la mécanique qui tient le contraste par construction. */
+$moss: #28c76f !default;
+$moss-subtle: #2e4b4f !default;
+$moss-text: #7edda9 !default;
+$ember: #ff4c51 !default;
+$ember-subtle: #50374a !default;
+$ember-text: #ff9497 !default;
+$amber: #ff9f43 !default;
+$amber-subtle: #504448 !default;
+$amber-text: #ffc58e !default;
+$lagoon: #00bad1 !default;
+$lagoon-subtle: #27495f !default;
+$lagoon-text: #66d6e3 !default;
+$brand-subtle: #3a3b64 !default;
+$brand-border: #4a478a !default;
+
+$shadow-sm: 0 .125rem .5rem 0 rgba(47, 43, 61, .3) !default;
+$shadow: 0 .1875rem .75rem 0 rgba(47, 43, 61, .35) !default;
+$shadow-lg: 0 .25rem 1.125rem 0 rgba(47, 43, 61, .45) !default;
+
+/* Couleurs de sens passées à Bootstrap. Elles alimentent $theme-colors, donc
+   .text-*, .bg-*, .btn-*, .alert-* et les pastilles d'un seul coup. */
+$secondary: #808390 !default;
+$success: $moss !default;
+$info: $lagoon !default;
+$warning: $amber !default;
+$danger: $ember !default;
+$light: #494a5d !default;
+$dark: #6b6c9d !default;
+
+/* Corps et typographie. Le gabarit est à 15 px, pas 16 : c'est ce qui explique
+   sa densité (formes-typo.md). La police est Public Sans, auto-hébergée par
+   @fontsource depuis les entrées JS — pas Google Fonts : une requête tierce
+   bloquante coûte cher au plancher Lighthouse du projet. */
+$font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', sans-serif !default;
+$font-family-sans-serif: $font-family !default;
+$font-size-base: .9375rem !default;
+$line-height-base: 1.375 !default;
+$body-bg: $paper !default;
+$body-color: $ink !default;
+$body-secondary-color: $muted !default;
+$body-tertiary-color: $muted !default;
+$body-emphasis-color: #ffffff !default;
+$border-color: $rule !default;
+$border-color-translucent: rgba(255, 255, 255, .15) !default;
+$headings-color: $heading !default;
+$headings-font-weight: 500 !default;
+$link-color: $brand-text !default;
+$link-hover-color: #c5c0f9 !default;
+/* Aucun soulignement, ni au repos ni au survol : la charte ne s'en sert nulle
+   part, et dans un tableau le trait au survol faisait sauter la ligne d'un
+   pixel. Le lien se distingue par sa couleur, qui tient 4,5:1 sur la carte, et
+   le survol l'eclaircit. */
+$link-decoration: none !default;
+$link-hover-decoration: none !default;
+$component-active-bg: $primary !default;
+$component-active-color: #ffffff !default;
+$box-shadow-sm: $shadow-sm !default;
+$box-shadow: $shadow !default;
+$box-shadow-lg: $shadow-lg !default;
+$enable-shadows: false !default;
+
+/* Le back n'a qu'un mode. Poser les valeurs sombres à la même teinte que les
+   claires évite qu'un composant lu hors d'une portée data-bs-theme bascule
+   (ecarts-projet.md, section 5). */
+$body-bg-dark: $paper !default;
+$body-color-dark: $ink !default;
+$body-secondary-color-dark: $muted !default;
+$body-tertiary-color-dark: $muted !default;
+$body-emphasis-color-dark: #ffffff !default;
+$border-color-dark: $rule !default;
+$border-color-translucent-dark: rgba(255, 255, 255, .15) !default;
+$headings-color-dark: $heading !default;
+$link-color-dark: $brand-text !default;
+$link-hover-color-dark: #c5c0f9 !default;
+$primary-text-emphasis-dark: $brand-text !default;
+$success-text-emphasis-dark: $moss-text !default;
+$info-text-emphasis-dark: $lagoon-text !default;
+$warning-text-emphasis-dark: $amber-text !default;
+$danger-text-emphasis-dark: $ember-text !default;
+$primary-bg-subtle-dark: $brand-subtle !default;
+$success-bg-subtle-dark: $moss-subtle !default;
+$info-bg-subtle-dark: $lagoon-subtle !default;
+$warning-bg-subtle-dark: $amber-subtle !default;
+$danger-bg-subtle-dark: $ember-subtle !default;
+$primary-border-subtle-dark: $brand-border !default;
+$form-valid-color-dark: $moss-text !default;
+$form-valid-border-color-dark: $moss !default;
+$form-invalid-color-dark: $ember-text !default;
+$form-invalid-border-color-dark: $ember !default;
+
+/* Les fonds de composant valent var(--bs-body-bg) par défaut : sans valeur
+   explicite ils repeindraient la page par dessus la carte. La table est le
+   piège classique, relevé le 27 août dans la charte. */
+$table-bg: transparent !default;
+$table-color: $ink !default;
+$table-border-color: rgba(255, 255, 255, .06) !default;
+$table-cell-padding-y: .782rem !default;
+$table-cell-padding-x: 1.25rem !default;
+$table-cell-padding-y-sm: .5rem !default;
+$table-cell-padding-x-sm: .75rem !default;
+$table-striped-bg: rgba(255, 255, 255, .025) !default;
+$table-hover-bg: rgba(255, 255, 255, .04) !default;
+$table-active-bg: rgba($brand, .12) !default;
+$table-th-font-weight: 500 !default;
+
+$dropdown-bg: $surface !default;
+$dropdown-border-color: rgba(255, 255, 255, .08) !default;
+$dropdown-border-radius: $border-radius !default;
+$dropdown-link-color: $ink !default;
+$dropdown-link-hover-color: $heading !default;
+$dropdown-link-hover-bg: rgba($brand, .16) !default;
+$dropdown-link-active-bg: $primary !default;
+// `$enable-shadows: false` neutralise le mixin box-shadow() de Bootstrap :
+// cette variable ne produit rien. L'ombre du menu déroulant est posée en
+// règle dans `_theme.scss`.
+$dropdown-box-shadow: $shadow-lg !default;
+
+$modal-content-bg: $surface !default;
+$modal-content-border-width: 0 !default;
+$modal-content-border-radius: $border-radius-lg !default;
+$modal-content-box-shadow-xs: $shadow-lg !default;
+$modal-content-box-shadow-sm-up: $shadow-lg !default;
+$modal-header-border-color: rgba(255, 255, 255, .08) !default;
+$modal-footer-border-color: rgba(255, 255, 255, .08) !default;
+/* Le voile assombrit une page deja sombre : au-dela de la moitie, la carte et
+   le fond se rejoignent et l'ecran derriere disparait au lieu de reculer. */
+$modal-backdrop-bg: #16192a !default;
+$modal-backdrop-opacity: .55 !default;
+$modal-inner-padding: 1.5rem !default;
+$modal-header-padding-y: 1.25rem !default;
+$modal-header-padding-x: 1.5rem !default;
+
+$popover-bg: $surface !default;
+$popover-border-color: rgba(255, 255, 255, .08) !default;
+$list-group-bg: transparent !default;
+$list-group-color: $ink !default;
+$list-group-border-color: rgba(255, 255, 255, .08) !default;
+$list-group-hover-bg: rgba(255, 255, 255, .04) !default;
+$accordion-bg: transparent !default;
+$accordion-color: $ink !default;
+$accordion-border-color: rgba(255, 255, 255, .08) !default;
+$accordion-button-active-bg: transparent !default;
+$accordion-button-active-color: $heading !default;
+$accordion-button-focus-box-shadow: none !default;
+$toast-background-color: $surface !default;
+$toast-border-color: rgba(255, 255, 255, .08) !default;
+$toast-header-background-color: $surface !default;
+$toast-header-color: $heading !default;
+$toast-box-shadow: $shadow-lg !default;
+$progress-bg: rgba(255, 255, 255, .08) !default;
+$progress-bar-bg: $brand !default;
+$tooltip-bg: #1f2333 !default;
+$tooltip-color: $heading !default;
+$tooltip-opacity: 1 !default;
+$offcanvas-bg-color: $surface !default;
+
+/* La pastille reste nettement moins arrondie que la carte : lue en tableau,
+   elle ne doit pas se confondre avec un bouton (formes-typo.md). */
+$badge-border-radius: .125rem !default;
+$badge-font-size: .8667em !default;
+$badge-font-weight: 500 !default;
+$badge-padding-y: .4235em !default;
+$badge-padding-x: .77em !default;
+
+/* Carrés à coins doux de 38 px, relevés sur la démo (ecarts-projet.md,
+   « La pagination »). Le blanc sur le primaire vient de $component-active-*. */
+$pagination-padding-y: .4809rem !default;
+$pagination-padding-x: .5rem !default;
+$pagination-font-size: .9375rem !default;
+/* Le bouton est un aplat sans filet, un cran plus clair que la carte : c'est
+   ce que montrent `app-user-list` et `app-ecommerce-product-list`. */
+// $ink sur ce fond ne mesure que 4,45:1 : le bouton de pagination porte
+// donc la teinte des titres, 6,44:1.
+$pagination-color: $heading !default;
+$pagination-bg: #3d4159 !default;
+$pagination-border-width: 0 !default;
+$pagination-border-color: transparent !default;
+$pagination-border-radius: $border-radius !default;
+$pagination-hover-color: $heading !default;
+$pagination-hover-bg: #474c67 !default;
+$pagination-hover-border-color: transparent !default;
+$pagination-focus-bg: #474c67 !default;
+$pagination-focus-color: $heading !default;
+$pagination-focus-box-shadow: none !default;
+$pagination-disabled-color: $muted !default;
+$pagination-disabled-bg: #353950 !default;
+$pagination-disabled-border-color: transparent !default;
+
+$breadcrumb-font-size: .8125rem !default;
+$breadcrumb-padding-y: 0 !default;
+$breadcrumb-padding-x: 0 !default;
+$breadcrumb-margin-bottom: 0 !default;
+$breadcrumb-bg: transparent !default;
+$breadcrumb-active-color: $heading !default;
+$breadcrumb-item-padding-x: .5rem !default;
+
+$nav-pills-border-radius: $border-radius !default;
+$nav-link-font-size: .9375rem !default;
+$nav-link-color: $ink !default;
+$nav-link-hover-color: $brand-text !default;
+$nav-tabs-border-color: rgba(255, 255, 255, .08) !default;
+
+$alert-border-radius: $border-radius !default;
+$alert-padding-y: .75rem !default;
+$alert-padding-x: 1rem !default;
+$alert-border-width: 1px !default;
+
+$hr-color: $rule !default;
+$hr-opacity: 1 !default;
+
+/* La croix de fermeture est déjà blanche dans ce projet : `$btn-close-color`
+   vaut `$white` (bootstrap/_variables.scss:1731), donc le SVG sort en
+   `fill='#fff'`. Or le mode sombre de Bootstrap lui applique un
+   `invert(1) grayscale(100%) brightness(200%)`, prévu pour une croix noire :
+   il la repeignait en noir sur toutes les modales, les toasts et les alertes
+   du back. Le filtre n'a plus lieu d'être. */
+$btn-close-filter-dark: none !default;
+
+/*-----------------------------------
    4 ) Breadcrumb
 -----------------------------------*/
 
-$breadcrumb-divider-color: $gray-500 !default;
-$breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='#{$breadcrumb-divider-color}'/></svg>");
+/* Le séparateur est posé en règle dans `_theme.scss` : une barre oblique, pas
+   un chevron. Bootstrap lit `$breadcrumb-divider` au moment de composer le
+   `::before`, donc la valeur reste ici pour ne pas casser la compilation. */
+$breadcrumb-divider: quote("/") !default;
 
 /*-----------------------------------
    5 ) Button
 -----------------------------------*/
 
-$btn-padding-y: .65rem !default;
-$btn-padding-x: 1.5rem !default;
+/* La charte mesure un bouton dense : le gabarit resserre tout d'un cran. */
+$btn-padding-y: .4854rem !default;
+$btn-padding-x: 1.25rem !default;
+$btn-padding-y-sm: .3rem !default;
+$btn-padding-x-sm: .8rem !default;
+$btn-font-size: .9375rem !default;
+$btn-font-size-sm: .8125rem !default;
+$btn-font-weight: 500 !default;
+$btn-border-radius: $border-radius !default;
+$btn-border-radius-sm: $border-radius-sm !default;
+$btn-border-radius-lg: $border-radius-lg !default;
+$btn-focus-width: .15rem !default;
+$btn-focus-box-shadow: 0 0 0 $btn-focus-width rgba($brand, .4) !default;
 
 /*-----------------------------------
    6 ) Form
 -----------------------------------*/
 
-$form-label-color: $gray-600 !default;
-$input-bg: radial-gradient(520px 160px at 12% 0%, mix($primary, $dash-surface, 10%), $dash-surface 62%), linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !default;
-$input-invalid-bg: radial-gradient(520px 160px at 12% 0%, mix($red, $dash-surface, 10%), $dash-surface 62%), linear-gradient(180deg, $dash-surface-2, $dash-surface 45%, $dash-surface-3) !default;
-$input-border-color: $dash-border !default;
-$input-border-radius: 12px !default;
-$input-font-size: 12px !default;
-$input-color: $gray-300 !default;
+/* Le champ de la charte est transparent : il prend le fond de sa carte et
+   n'est dessine que par son filet (formes-typo.md, "Fond des champs"). Les
+   degrades d'avant fabriquaient une grille de boites sur chaque formulaire. */
+$input-bg: transparent !default;
+$input-disabled-bg: rgba(255, 255, 255, .03) !default;
+$input-border-color: #565a73 !default;
+$input-border-radius: $border-radius !default;
+$input-border-radius-sm: $border-radius-sm !default;
+$input-border-radius-lg: $border-radius-lg !default;
 $input-border-width: 1px !default;
-$input-placeholder-color: transparentize($white, .6) !default;
-$form-invalid-border-color: $input-bg !default;
-$input-font-size: 14px !default;
+$input-font-size: .9375rem !default;
+$input-padding-y: .426rem !default;
+$input-padding-x: .9375rem !default;
+$input-line-height: 1.625 !default;
+$input-color: #acabc1 !default;
+$input-placeholder-color: $muted !default;
+$input-focus-bg: transparent !default;
+$input-focus-border-color: $brand !default;
+$input-focus-box-shadow: none !default;
+$input-focus-width: 0 !default;
+$input-focus-color: #cfcde4 !default;
 $input-group-addon-bg: transparent !default;
+$input-group-addon-color: #acabc1 !default;
+$input-group-addon-border-color: $input-border-color !default;
+
+$form-label-color: $heading !default;
+$form-label-font-size: .8125rem !default;
+$form-text-color: $muted !default;
+$form-invalid-border-color: #ff4c51 !default;
+$form-invalid-color: #ff9497 !default;
+$form-valid-border-color: #28c76f !default;
+$form-valid-color: #7edda9 !default;
+$form-check-input-bg: transparent !default;
+$form-check-input-border: 1px solid #565a73 !default;
+$form-check-input-checked-bg-color: $brand !default;
+$form-check-input-checked-border-color: $brand !default;
+$form-check-input-focus-box-shadow: none !default;
+$form-select-indicator-color: #acabc1 !default;
+$form-select-bg: transparent !default;
+$form-select-color: #acabc1 !default;
+$form-select-border-color: $input-border-color !default;
+$form-select-focus-box-shadow: none !default;
 
 /*-----------------------------------
    7 ) Cards
 -----------------------------------*/
 
-$card-inner-border-radius: .25rem !default;
+/* La carte de la charte ne porte aucun filet : elle se détache du fond de page
+   par le seul écart de luminosité, onze points (couleurs.md). */
+$card-bg: $surface !default;
+$card-color: $ink !default;
+$card-border-width: 0 !default;
+$card-border-color: transparent !default;
+$card-border-radius: $border-radius !default;
+$card-inner-border-radius: $border-radius !default;
+$card-spacer-y: 1.5rem !default;
+$card-spacer-x: 1.5rem !default;
+$card-cap-padding-y: 1rem !default;
+$card-cap-padding-x: 1.5rem !default;
+$card-cap-bg: transparent !default;
+$card-cap-color: $heading !default;
+$card-title-color: $heading !default;
+$card-subtitle-color: $muted !default;
+$card-box-shadow: $shadow !default;
 
 /*-----------------------------------
    8 ) Function

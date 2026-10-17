@@ -43,14 +43,14 @@ class OutsiderType extends AbstractType
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => 'col-12'],
         ]);
 
         if (!$isNew) {
             $builder->add('saveBack', Type\SubmitType::class, [
                 'label' => $this->translator->trans('Enregistrer et retourner aux bénéficiares', [], 'back'),
                 'attr' => [
-                    'class' => 'btn-secondary',
+                    'class' => 'btn-label-primary',
                 ],
                 'row_attr' => ['class' => 'ms-2'],
             ]);

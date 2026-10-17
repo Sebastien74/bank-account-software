@@ -35,23 +35,22 @@ class PasswordResetType extends AbstractType
         $builder->add('plainPassword', Type\RepeatedType::class, [
             'label' => false,
             'type' => Type\PasswordType::class,
-            'invalid_message' => $this->translator->trans('The passwords do not match.', [], 'security_form'),
+            'invalid_message' => $this->translator->trans('Les mots de passe ne correspondent pas.', [], 'security_form'),
             'first_options' => [
-                'label' => $this->translator->trans('Password', [], 'security_form'),
+                'label' => $this->translator->trans('Mot de passe', [], 'security_form'),
                 'label_html' => true,
                 'attr' => [
-                    'placeholder' => $this->translator->trans('Enter password', [], 'security_form'),
+                    'placeholder' => $this->translator->trans('Saisissez un mot de passe', [], 'security_form'),
                     'group' => 'col-12 mb-3',
-                    'class' => 'pt-2 pb-2 password-checker',
+                    'class' => 'password-checker',
                 ],
             ],
             'second_options' => [
-                'label' => $this->translator->trans('Confirm password', [], 'security_form'),
+                'label' => $this->translator->trans('Confirmez le mot de passe', [], 'security_form'),
                 'label_html' => true,
                 'attr' => [
-                    'placeholder' => $this->translator->trans('Enter password', [], 'security_form'),
+                    'placeholder' => $this->translator->trans('Saisissez un mot de passe', [], 'security_form'),
                     'group' => 'col-12 mb-3',
-                    'class' => 'pt-2 pb-2',
                 ],
             ],
         ]);
@@ -59,7 +58,7 @@ class PasswordResetType extends AbstractType
         $builder->add('secure', RecaptchaType::class);
 
         $builder->add('submit', Type\SubmitType::class, [
-            'label' => $this->translator->trans('Save', [], 'security_form'),
+            'label' => $this->translator->trans('Enregistrer', [], 'security_form'),
             'row_attr' => ['class' => 'col-lg-12'],
             'attr' => ['class' => 'btn btn-primary w-100', 'icon' => false],
         ]);

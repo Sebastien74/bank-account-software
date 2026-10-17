@@ -65,6 +65,12 @@ readonly class IconRuntime implements RuntimeExtensionInterface
         'chevron-down' => 'tabler:chevron-down',
         'chevron-left' => 'tabler:chevron-left',
         'chevron-right' => 'tabler:chevron-right',
+        'save' => 'tabler:device-floppy',
+        'trash' => 'tabler:trash',
+        'pencil' => 'tabler:pencil',
+        'eye' => 'tabler:eye',
+        'plus' => 'tabler:plus',
+        'search' => 'tabler:search',
     ];
 
     /**

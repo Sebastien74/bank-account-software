@@ -7,6 +7,7 @@ namespace App\Command\Wallet;
 use App\Entity\Wallet\Operation;
 use App\Entity\Wallet\Wallet;
 use App\Form\Manager\Wallet\OperationInterface;
+use App\Service\Wallet\SavingsReconciler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -35,6 +36,7 @@ class ImportOperationsCommand extends Command
     public function __construct(
         private readonly OperationInterface $operationManager,
         private readonly EntityManagerInterface $entityManager,
+        private readonly SavingsReconciler $reconciler,
     ) {
         parent::__construct();
     }
@@ -64,19 +66,6 @@ class ImportOperationsCommand extends Command
 
         $dryRun = (bool) $input->getOption('dry-run');
 
-        if ($input->getOption('purge') && !$dryRun) {
-            $deleted = $this->entityManager->getRepository(Operation::class)
-                ->createQueryBuilder('o')
-                ->delete()
-                ->andWhere('o.wallet = :wallet')
-                ->setParameter('wallet', $wallet)
-                ->getQuery()
-                ->execute();
-            $this->entityManager->clear();
-            $wallet = $this->entityManager->getRepository(Wallet::class)->findOneBy(['slug' => $walletSlug]);
-            $io->warning(sprintf('%d opérations supprimées avant import.', (int) $deleted));
-        }
-
         $bounds = [];
         foreach (['from', 'until'] as $bound) {
             $value = $input->getOption($bound);
@@ -91,6 +80,36 @@ class ImportOperationsCommand extends Command
                 return Command::FAILURE;
             }
             $bounds[$bound] = $date;
+        }
+
+        /*
+         * Le purge respecte la fenêtre demandée.
+         *
+         * Il effaçait tout le compte, ce qui le rendait inutilisable pour
+         * réimporter un relevé qui ne couvre qu'une période : il fallait
+         * choisir entre perdre l'historique antérieur et vivre avec les
+         * doublons. Borné, il rend l'import d'une fenêtre idempotent.
+         */
+        if ($input->getOption('purge') && !$dryRun) {
+            $qb = $this->entityManager->getRepository(Operation::class)
+                ->createQueryBuilder('o')
+                ->delete()
+                ->andWhere('o.wallet = :wallet')
+                ->setParameter('wallet', $wallet);
+            if ($bounds['from'] instanceof \DateTimeInterface) {
+                $qb->andWhere('o.date >= :from')->setParameter('from', $bounds['from']);
+            }
+            if ($bounds['until'] instanceof \DateTimeInterface) {
+                $qb->andWhere('o.date <= :until')->setParameter('until', $bounds['until']);
+            }
+            $deleted = $qb->getQuery()->execute();
+            $this->entityManager->clear();
+            $wallet = $this->entityManager->getRepository(Wallet::class)->findOneBy(['slug' => $walletSlug]);
+            $io->warning(sprintf(
+                '%d opérations supprimées avant import%s.',
+                (int) $deleted,
+                $bounds['from'] || $bounds['until'] ? ' sur la période demandée' : ' (tout le compte)'
+            ));
         }
 
         $report = $this->operationManager->import(
@@ -154,6 +173,22 @@ class ImportOperationsCommand extends Command
             }
 
             $io->success('Import terminé, solde conforme au relevé.');
+        }
+
+        /*
+         * Un relevé apporte de nouveaux virements d'épargne : sans
+         * rapprochement dans la foulée, le compte d'épargne reste en retard
+         * d'un import sur le compte courant.
+         */
+        if (!$dryRun) {
+            $mirrored = $this->reconciler->reconcile($wallet);
+            if ($mirrored['created'] > 0 || $mirrored['updated'] > 0) {
+                $io->text(sprintf(
+                    "%d virement(s) reporté(s) sur le compte d'épargne, %d mis à jour.",
+                    $mirrored['created'],
+                    $mirrored['updated']
+                ));
+            }
         }
 
         return Command::SUCCESS;

@@ -54,7 +54,7 @@ class SubCategoryController extends BaseController
     /**
      * SubCategory delete.
      */
-    #[Route('/delete/{subcategory}', name: 'back_subcategory_delete', methods: 'GET')]
+    #[Route('/delete/{subcategory}', name: 'back_subcategory_delete', methods: 'POST')]
     public function delete(SubCategory $subcategory): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($subcategory));

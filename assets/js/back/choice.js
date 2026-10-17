@@ -28,6 +28,12 @@ export default function (selectors, returnElem = false) {
 
     selectors.forEach(function (selector) {
 
+        /* Deux initialisations sur le meme select empilent deux widgets : le
+           second repond, le premier reste affiche. */
+        if (selector._choices) {
+            return;
+        }
+
         let searchTrans = trans.dataset.hasOwnProperty('search') ? selector.dataset.search : 'Search';
         let searchPlaceholderValue = selector.dataset.hasOwnProperty('searchPlaceholder') ? selector.dataset.searchPlaceholder : searchTrans;
         let placeholderValue = selector.getAttribute('placeholder') ? selector.getAttribute('placeholder') : '';
@@ -53,6 +59,10 @@ export default function (selectors, returnElem = false) {
                 }
             },
         });
+
+        /* L'instance est gardee sur l'element : une valeur posee par le code
+           ne traverse pas Choices, qui continuerait d'afficher l'ancienne. */
+        selector._choices = choice;
 
         if (selector.classList.contains('select-icons')) {
             const choices = selector.closest('.choices');

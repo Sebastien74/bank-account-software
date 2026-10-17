@@ -45,7 +45,7 @@ class CategoryType extends AbstractType
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-md-9'],
         ]);
 
         if (!$isNew) {
@@ -53,7 +53,7 @@ class CategoryType extends AbstractType
                 'label_html' => true,
                 'required' => false,
                 'attr' => ['class' => 'select-icons'],
-                'row_attr' => ['class' => 'col-lg-3'],
+                'row_attr' => ['class' => 'col-md-3'],
             ]);
         }
 

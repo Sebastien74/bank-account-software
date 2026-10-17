@@ -1,21 +1,26 @@
 {% trans_default_domain 'back' %}
 
+{# Action principale d'un index : bouton violet plein, précédé d'un plus.
+   C'est la seule action pleine de la barre d'outils (app-user-list). #}
 {% if form %}
-    <button type="button" class="btn btn-dark p-0 d-flex align-items-center text-white add-btn btn-icon{% if formErrors %} btn-form-errors{% endif %}" data-bs-toggle="modal" data-bs-target="#add-entity-modal">
-        <twig:ux:icon name="tabler:circle-plus" class="btn-square bg-primary" /><span class="btn text-white py-0 px-3">{{ addBtnLabel|striptags }}</span>
+    <button type="button"
+            class="btn btn-primary d-inline-flex align-items-center gap-2{% if formErrors %} btn-form-errors{% endif %}"
+            data-bs-toggle="modal" data-bs-target="#add-entity-modal">
+        <twig:ux:icon name="tabler:plus" width="17" height="17" />
+        <span>{{ addBtnLabel|striptags }}</span>
     </button>
-    <div class="modal fade" id="add-entity-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="add-entity-modal" tabindex="-1" aria-hidden="true" aria-labelledby="add-entity-modal-title">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content bg-dark">
+            <div class="modal-content">
                 {{ form_start(form, {attr: {
                     novalidate: "novalidate",
                 }}) }}
                     <div class="modal-header">
-                        <strong class="text-white fs-5 d-flex align-items-center"><twig:ux:icon name="tabler:circle-plus" class="text-primary me-2" />{{ "Ajouter"|trans|raw }}</strong>
+                        <h2 class="modal-title" id="add-entity-modal-title">{{ "Ajouter"|trans|raw }}</h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
                     </div>
-                    <div class="modal-body pt-4 pb-0">
-                        <div class="row">
+                    <div class="modal-body">
+                        <div class="row g-3">
                             {% for field in form.children %}
                                 {% set notExcluded = field.vars.name not in excludedFields %}
                                 {% if notExcluded %}
@@ -24,8 +29,9 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="modal-footer pt-0 pb-4">
-                        <button type="button" class="btn btn-dark me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
+                    {# Actions graduées : neutre à gauche, pleine à droite. #}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-label-secondary me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
                         {% if form.saveEdit is defined %}
                             {{ form_widget(form.saveEdit) }}
                         {% endif %}

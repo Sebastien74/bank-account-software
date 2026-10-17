@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - link "Aller au contenu principal" [ref=e2] [cursor=pointer]:
+    - /url: "#body-page"
+  - link "Aller au pied de page" [ref=e3] [cursor=pointer]:
+    - /url: "#footer"
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - link "Pâtes Grand'Mère" [ref=e7] [cursor=pointer]:
+        - /url: https://localhost
+        - img "Pâtes Grand'Mère" [ref=e8]
+      - navigation "Navigation principale" [ref=e10]:
+        - list:
+          - listitem [ref=e11]:
+            - button "Nos produits" [ref=e12] [cursor=pointer]: Nos produits 
+          - listitem [ref=e13]:
+            - link "Nos recettes" [ref=e14] [cursor=pointer]:
+              - /url: https://localhost/nos-recettes
+          - listitem [ref=e15]:
+            - link "Notre histoire" [ref=e16] [cursor=pointer]:
+              - /url: https://localhost/notre-histoire
+          - listitem [ref=e17]:
+            - link "Boutique en ligne" [ref=e18] [cursor=pointer]:
+              - /url: https://localhost/ou-acheter
+          - listitem [ref=e19]:
+            - link "Nous rejoindre" [ref=e20] [cursor=pointer]:
+              - /url: https://localhost/recrutement
+          - listitem [ref=e21]:
+            - link "Où acheter" [ref=e22] [cursor=pointer]:
+              - /url: https://localhost/nos-produits
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - link "English" [ref=e26] [cursor=pointer]:
+            - /url: https://en.grand-mere-2026.local
+            - img "English" [ref=e27]
+  - generic [ref=e32]:
+    - main [ref=e33]:
+      - generic [ref=e37]:
+        - generic [ref=e43]: Oups !
+        - heading "404" [level=2] [ref=e44]
+        - heading "Page non trouvée." [level=2] [ref=e45]
+        - paragraph [ref=e46]: Désolé, la page que vous recherchez n'existe pas, a été supprimée, son nom a été modifié ou est temporairement indisponible.
+        - link "Retourner sur la page d'accueil" [ref=e48] [cursor=pointer]:
+          - /url: /
+    - contentinfo [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e53]:
+          - link "Pâtes Grand'Mère" [ref=e54] [cursor=pointer]:
+            - /url: https://localhost
+          - navigation "Navigation des liens sociaux" [ref=e55]:
+            - button "Linkedin - nouvelle fenêtre" [ref=e56] [cursor=pointer]:
+              - generic [aria-hidden] [ref=e57]: 
+            - button "Instagram - nouvelle fenêtre" [ref=e59] [cursor=pointer]:
+              - generic [aria-hidden] [ref=e60]: 
+            - button "Facebook - nouvelle fenêtre" [ref=e62] [cursor=pointer]:
+              - generic [aria-hidden] [ref=e63]: 
+        - generic [ref=e65]:
+          - strong [ref=e66]: Une question ?
+          - generic [ref=e67]: Nous sommes à votre écoute
+          - link "Contactez-nous" [ref=e68] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e70]:
+          - navigation "Liens utiles" [ref=e71]:
+            - list [ref=e72]:
+              - listitem [ref=e73]:
+                - link "Nos produits" [ref=e74] [cursor=pointer]:
+                  - /url: https://localhost/nos-produits
+              - listitem [ref=e75]:
+                - link "Nos recettes" [ref=e76] [cursor=pointer]:
+                  - /url: https://localhost/nos-recettes
+              - listitem [ref=e77]:
+                - link "Notre histoire" [ref=e78] [cursor=pointer]:
+                  - /url: https://localhost/notre-histoire
+          - navigation "Liens utiles" [ref=e79]:
+            - list [ref=e80]:
+              - listitem [ref=e81]:
+                - link "Nous rejoindre" [ref=e82] [cursor=pointer]:
+                  - /url: https://localhost/recrutement
+              - listitem [ref=e83]:
+                - link "Où acheter" [ref=e84] [cursor=pointer]:
+                  - /url: https://localhost/nos-produits
+              - listitem [ref=e85]:
+                - link "La boutique en ligne" [ref=e86] [cursor=pointer]:
+                  - /url: https://localhost/ou-acheter
+      - navigation "Liens utiles" [ref=e89]:
+        - list [ref=e90]:
+          - listitem [ref=e91]:
+            - link "Plan de site" [ref=e92] [cursor=pointer]:
+              - /url: https://localhost/plan-de-site
+            - generic [ref=e93]: "-"
+          - listitem [ref=e94]:
+            - link "Mentions légales" [ref=e95] [cursor=pointer]:
+              - /url: https://localhost/mentions-legales
+            - generic [ref=e96]: "-"
+          - listitem [ref=e97]:
+            - link "Politique cookies" [ref=e98] [cursor=pointer]:
+              - /url: https://localhost/politique-cookies
+          - listitem [ref=e99]:
+            - generic [ref=e100]: "-"
+            - link "Gestion des Cookies" [ref=e101] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e102]:
+            - generic [ref=e103]: "-"
+            - 'link "Réalisation : Agence Félix" [ref=e104] [cursor=pointer]':
+              - /url: https://www.felix-creation.fr
+  - link "Connectez-vous" [ref=e106] [cursor=pointer]:
+    - /url: /secure/user/fr/4ee1d15b5558cf7ec621d08b4d585e72b94bb71d/login
+    - generic [ref=e107]: 
+  - region "Symfony Web Debug Toolbar" [ref=e108]:
+    - generic [ref=e111]:
+      - link "Symfony Loading…" [ref=e113] [cursor=pointer]:
+        - /url: https://localhost/_profiler/bb3b9e?panel=request
+        - generic [ref=e114]:
+          - img "Symfony" [ref=e115]
+          - generic [ref=e117]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=e118] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=e119]
+  - generic:
+    - generic:
+      - generic:
+        - 'dialog "Plateforme de Gestion du Consentement : Personnalisez vos Options"':
+          - generic [aria-hidden] [ref=e124]:
+            - text: Axeptio consent
+            - checkbox [ref=e125]
+          - generic [ref=e126]:
+            - paragraph [ref=e127]: "Plateforme de Gestion du Consentement : Personnalisez vos Options"
+            - paragraph [ref=e128]: Notre plateforme vous permet d'adapter et de gérer vos paramètres de confidentialité, en garantissant la conformité avec les réglementations. Personnalisez vos préférences pour contrôler la manière dont vos informations sont manipulées.
+        - button "Gérez vos préférences en matière de cookies et données personnelles" [ref=e129] [cursor=pointer]

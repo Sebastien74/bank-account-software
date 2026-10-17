@@ -29,12 +29,19 @@ class SubmitType
         $data = $builder->getData();
         $isNew = !$data || method_exists($data, 'getId') && !$data->getId() || !method_exists($data, 'getId');
 
+        /*
+         * Gradation de la charte (voir .claude/charte-back/composants.md) :
+         * l'action principale est pleine, l'action secondaire utile prend la
+         * teinte atténuée. Le bouton plein est le dernier de la rangée, donc
+         * « Enregistrer » ; l'enregistrement avec retour reste au niveau en
+         * dessous. C'était l'inverse, ce qui mettait en avant le détour.
+         */
         $btnName = $isNew ? 'saveEdit' : 'saveBack';
         $btnLabel = $isNew ? $this->translator->trans('Enregistrer et éditer', [], 'back') : $this->translator->trans('Enregistrer et retourner à la liste', [], 'back');
         $builder->add($btnName, SymfonySubmitType::class, [
             'label' => $btnLabel,
             'attr' => [
-                'class' => $isNew ? 'btn-secondary-dark' : 'btn-primary',
+                'class' => 'btn-label-primary',
             ],
             'row_attr' => ['class' => $isNew ? 'me-2' : 'ms-2'],
         ]);
@@ -42,7 +49,7 @@ class SubmitType
         $builder->add('save', SymfonySubmitType::class, [
             'label' => $this->translator->trans('Enregistrer', [], 'back'),
             'attr' => [
-                'class' => $isNew ? 'btn-primary ms-2' : 'btn-secondary ms-2',
+                'class' => 'btn-primary ms-2',
             ],
         ]);
     }

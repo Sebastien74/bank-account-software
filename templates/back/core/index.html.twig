@@ -2,57 +2,150 @@
 
 {% trans_default_domain 'back' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
-
 {% block body %}
-    <div id="entities-index-page" class="container-fluid pt-4 pb-5 position-relative">
-        {% include 'back/core/new-modal.html.twig' with {
-            excludedFields: excludedFields,
-            addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
-            form: form is defined and form ? form : false,
-            formErrors: formErrors is defined and formErrors ? formErrors : false,
-        } only %}
-        {% if pagination is defined %}
-            <div id="entities-index" class="mt-4">
-                <table class="table table-striped table-dark">
-                    <tbody>
-                        {% for entity in pagination %}
+    {# La référence enferme barre d'outils, tableau et pied dans une seule
+       carte (tables-datatables-basic, app-ecommerce-product-list). Un index
+       n'est pas trois blocs posés les uns sur les autres. #}
+    <div id="entities-index-page" class="container-fluid pt-2 pb-5 position-relative">
+        <div class="card" id="entities-index">
+            <div class="card-header index-toolbar">
+                <div>
+                    <h1 class="card-title">{{ pageTitle|striptags }}</h1>
+                    {# Le projet n'a pas de catalogue de traduction en fichiers : une clé à
+                       marqueurs ressortirait telle quelle, « {count} enregistrements ». #}
+                    {% if pagination is defined and pagination.getTotalItemCount is defined %}
+                        {% set total = pagination.getTotalItemCount() %}
+                        <p class="card-subtitle">
+                            {{ total }} {{ (total > 1 ? "enregistrements" : "enregistrement")|trans|striptags }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="index-toolbar__actions">
+                    {% include 'back/core/new-modal.html.twig' with {
+                        excludedFields: excludedFields,
+                        addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+                        form: form is defined and form ? form : false,
+                        formErrors: formErrors is defined and formErrors ? formErrors : false,
+                    } only %}
+                </div>
+            </div>
+
+            {% if pagination is defined and pagination|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <caption class="visually-hidden">{{ pageTitle|striptags }}</caption>
+                        <thead>
                             <tr>
-                                {% if referClass.icon is defined %}
-                                    {% set icon = entity.icon ? entity.icon : 'far exclamation' %}
-                                    <td class="align-middle text-center media-col">{{ icon|icon(null, 25, 'white') }}</td>
-                                {% endif %}
-                                <td class="px-4 align-middle">
-                                    {{ entity.adminName|raw }}
-                                </td>
+                                {% if referClass.icon is defined %}<th scope="col" class="media-col"><span class="visually-hidden">{{ "Icône"|trans|striptags }}</span></th>{% endif %}
+                                <th scope="col">{{ "Libellé"|trans|striptags }}</th>
+                                {# Colonnes declarees par l'entite, dans `$interface['columns']` :
+                                   un index ne dit rien d'utile s'il ne montre que l'intitule
+                                   d'un enregistrement qui porte un montant. #}
+                                {% for property, column in interface.columns|default({}) %}
+                                    <th scope="col"{% if 'amount' == column.format|default('text') %} class="text-end"{% endif %}>
+                                        {{ column.label|default(property)|trans|striptags }}
+                                    </th>
+                                {% endfor %}
                                 {% if buttons is not empty %}
                                     {% for buttonsProperty, route in interface.buttons %}
-                                        {% set label = labels[route] is defined ? labels[route] : route %}
-                                        {% set routeArgs = route|routeArgs(entity) %}
-                                        <td>
-                                            <a href="{{ path(route, routeArgs) }}" class="">
-                                                {% set counter = entity|countCollection(buttonsProperty) %}
-                                                {{ label }}{% if counter %}<span class="badge badge-info-darken ms-2">{{ counter }}</span>{% endif %}
-                                            </a>
-                                        </td>
+                                        <th scope="col">{{ labels[route] is defined ? labels[route] : route }}</th>
                                     {% endfor %}
                                 {% endif %}
-                                <td class="text-end px-4">
-                                    {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity} only %}
-                                    {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
-                                </td>
+                                <th scope="col" class="cell-actions text-end">{{ "Actions"|trans|striptags }}</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% include 'back/includes/pagination.html.twig' with {pagination: pagination} only %}
-            </div>
-        {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for entity in pagination %}
+                                <tr>
+                                    {% if referClass.icon is defined %}
+                                        {% set icon = entity.icon ? entity.icon : 'far exclamation' %}
+                                        <td class="media-col text-center">{{ icon|icon(null, 25, 'white') }}</td>
+                                    {% endif %}
+                                    {# `adminName` est saisi en base : il sort échappé. Le `|raw`
+                                       d'avant en faisait une XSS stockée sur les onze index. #}
+                                    <td><span class="cell-title">{{ entity.adminName|striptags }}</span></td>
+                                    {% for property, column in interface.columns|default({}) %}
+                                        {% set value = attribute(entity, property) %}
+                                        {% if 'amount' == column.format|default('text') %}
+                                            <td class="cell-amount text-end">{{ value|default(0)|number_format(2, ',', ' ') }} €</td>
+                                        {% elseif 'names' == column.format|default('text') %}
+                                            {# Une collection d'entites : on en nomme les elements. Vide,
+                                               on le dit en clair, sinon la case muette passerait pour un
+                                               oubli d'affichage plutot que pour un rattachement manquant. #}
+                                            {% set names = [] %}
+                                            {% for item in value %}{% set names = names|merge([item.adminName|striptags]) %}{% endfor %}
+                                            <td>
+                                                {%- if names is empty -%}
+                                                    <span class="state state--off">{{ "Non rattaché"|trans|striptags }}</span>
+                                                {%- else -%}
+                                                    <span class="text-secondary">{{ names|join(', ') }}</span>
+                                                {%- endif -%}
+                                            </td>
+                                        {% else %}
+                                            <td class="text-secondary">{{ value is empty ? '—' : value|striptags }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if buttons is not empty %}
+                                        {% for buttonsProperty, route in interface.buttons %}
+                                            {% set label = labels[route] is defined ? labels[route] : route %}
+                                            {% set routeArgs = route|routeArgs(entity) %}
+                                            {% set counter = entity|countCollection(buttonsProperty) %}
+                                            <td>
+                                                <a href="{{ path(route, routeArgs) }}" class="index-link d-inline-flex align-items-center gap-2">
+                                                    <span>{{ label }}</span>
+                                                    {% if counter %}<span class="badge-count">{{ counter }}</span>{% endif %}
+                                                </a>
+                                            </td>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <td class="cell-actions text-end">
+                                        {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity} only %}
+                                        {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% set amountColumns = interface.columns|default({})|filter(c => 'amount' == c.format|default('text')) %}
+                        {% if amountColumns is not empty and pagination|length > 1 %}
+                            {# Une liste de montants sans total oblige à les additionner de
+                               tête : c'est le chiffre qu'on vient chercher. #}
+                            <tfoot>
+                                <tr class="row-total">
+                                    <th scope="row"{% if referClass.icon is defined %} colspan="2"{% endif %}>
+                                        {{ "Total"|trans|striptags }}
+                                    </th>
+                                    {% for property, column in interface.columns|default({}) %}
+                                        {% if 'amount' == column.format|default('text') %}
+                                            {% set total = 0 %}
+                                            {% for entity in pagination %}
+                                                {% set total = total + attribute(entity, property)|default(0) %}
+                                            {% endfor %}
+                                            <td class="cell-amount text-end">{{ total|number_format(2, ',', ' ') }} €</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if buttons is not empty %}
+                                        {% for buttonsProperty, route in interface.buttons %}<td></td>{% endfor %}
+                                    {% endif %}
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+                <div class="card-footer p-0">
+                    {% include 'back/includes/pagination.html.twig' with {pagination: pagination} only %}
+                </div>
+            {% else %}
+                {# Une liste vide dit pourquoi elle l'est : une carte muette
+                   laisse croire à une panne. #}
+                <div class="empty-state">
+                    <twig:ux:icon name="tabler:inbox" />
+                    <p class="empty-state__title">{{ "Rien à afficher"|trans|striptags }}</p>
+                    <p class="empty-state__text">{{ "Aucun enregistrement pour le moment."|trans|striptags }}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

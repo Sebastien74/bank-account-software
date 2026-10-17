@@ -86,12 +86,33 @@ final class WalletModel extends BaseModel
 
         // We must calculate balances chronologically regardless of the display order
         $chronologicalOperations = $operations;
-        usort($chronologicalOperations, function($a, $b) {
+        usort($chronologicalOperations, static function ($a, $b): int {
             $dateDiff = $a->getDate() <=> $b->getDate();
-            return 0 !== $dateDiff ? $dateDiff : $a->getId() <=> $b->getId();
+            if (0 !== $dateDiff) {
+                return $dateDiff;
+            }
+
+            /*
+             * À date égale, un encaissement passe avant un décaissement.
+             *
+             * La banque crédite la paie avant de présenter les prélèvements du
+             * jour, et c'est encore plus vrai d'un salaire versé en fin de mois
+             * précédent puis rattaché au 1er : classé après les dépenses du 1er,
+             * il faisait apparaître sur le relevé un découvert qui n'a jamais eu
+             * lieu. Le solde final est le même dans les deux ordres, seules les
+             * valeurs intermédiaires changent — ce sont elles qu'on lit.
+             */
+            $aIncome = 'incomes' === $a->getOperationType()?->getType();
+            $bIncome = 'incomes' === $b->getOperationType()?->getType();
+            if ($aIncome !== $bIncome) {
+                return $aIncome ? -1 : 1;
+            }
+
+            return $a->getId() <=> $b->getId();
         });
 
         $balances = [];
+        $rank = 0;
         foreach ($chronologicalOperations as $operation) {
             $model = OperationModel::fromEntity($operation, self::$coreLocator);
             $runningBalance = $model->income ? $runningBalance + $operation->getAmount() : $runningBalance - $operation->getAmount();
@@ -99,6 +120,16 @@ final class WalletModel extends BaseModel
                 'model' => $model,
                 'amount' => $operation->getAmount(),
                 'balance' => round($runningBalance, 2),
+                /*
+                 * Le rang chronologique, que l'ordre d'affichage perd.
+                 *
+                 * Les echeances a venir se glissent entre deux ecritures : sans
+                 * ce reperage, les y placer demanderait de rejouer ici le
+                 * departage par date, par sens puis par identifiant, et deux
+                 * copies d'une meme regle finissent toujours par diverger.
+                 */
+                'rank' => $rank++,
+                'date' => $operation->getDate(),
             ];
         }
 

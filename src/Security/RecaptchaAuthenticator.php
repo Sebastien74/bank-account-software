@@ -53,7 +53,7 @@ class RecaptchaAuthenticator
             }
         }
 
-        $this->session->getFlashBag()->add('error', $this->translator->trans('The captcha is invalid. Please reload the page and try again.', [], 'core_form'));
+        $this->session->getFlashBag()->add('error', $this->translator->trans('Le captcha est invalide. Rechargez la page puis réessayez.', [], 'core_form'));
 
         $logger = new Logger('SECURITY_FORM');
         $logger->pushHandler(new RotatingFileHandler($this->logDir.'/recaptcha.log', 10, Level::Critical));

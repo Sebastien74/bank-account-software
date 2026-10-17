@@ -65,11 +65,11 @@
         "symfony/validator": "^6.4 || ^7.0 || ^8.0",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0 || ^8.0",
         "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
-        "twig/twig": "^3.21.1"
+        "twig/twig": "^3.21.1 || ^4"
     },
     "conflict": {
         "doctrine/orm": "<3.0 || >=4.0",
-        "twig/twig": "<3.0.4"
+        "twig/twig": "<3.0.4 || >=5"
     },
     "suggest": {
         "ext-pdo": "*",

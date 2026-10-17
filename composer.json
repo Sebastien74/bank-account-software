@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-gd": "*",
@@ -117,7 +117,11 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "nunomaduro/phpinsights": "^2.13",
+        "phpunit/phpunit": "^13.0",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/css-selector": "8.1.*",
         "symfony/debug-bundle": "8.1.*",
+        "symfony/dom-crawler": "8.1.*",
         "symfony/maker-bundle": "^1.64",
         "symfony/stopwatch": "8.1.*",
         "symfony/web-profiler-bundle": "8.1.*"

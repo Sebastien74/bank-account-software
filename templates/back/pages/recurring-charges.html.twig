@@ -1,0 +1,312 @@
+{% extends "back/base.html.twig" %}
+
+{% trans_default_domain 'back' %}
+
+{% block body %}
+    {# Les charges ne sont pas saisies : elles sont déduites de l'historique.
+       Cet écran ne sert qu'à corriger ce que l'historique ne peut pas savoir —
+       un abonnement résilié, un tarif qui change, une échéance annuelle. #}
+    <div id="recurring-charges" class="container-fluid pt-2 pb-5 position-relative">
+
+        <div class="page-head">
+            <div>
+                <h1 class="page-head__title">{{ "Opérations programmées"|trans|striptags }}</h1>
+                <p class="page-head__subtitle">
+                    {{ "Détectées dans l'historique du compte %wallet%. Corrigez ce que l'historique ne peut pas deviner."|trans|striptags|replace({'%wallet%': wallet.adminName|striptags}) }}
+                </p>
+            </div>
+            <div class="page-head__actions">
+                <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}"
+                   class="btn btn-label-secondary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                    <twig:ux:icon name="tabler:arrow-left" width="16" height="16" />
+                    <span>{{ "Mes opérations"|trans|striptags }}</span>
+                </a>
+            </div>
+        </div>
+
+        {# Une charge qui démarre ce mois-ci n'a pas de passé : la détection ne
+           la verra qu'au bout de sept mois. La saisir est le seul moyen de
+           l'annoncer dès maintenant. #}
+        <form method="post" action="{{ path('back_recurring_add', {wallet: wallet.id}) }}" class="mb-3">
+            <input type="hidden" name="_token" value="{{ csrf_token('recurring-add-' ~ wallet.id) }}">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">{{ "Ajouter une charge"|trans|striptags }}</h2>
+                        <p class="card-subtitle">{{ "Pour une échéance que l'historique ne connaît pas encore."|trans|striptags }}</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {# Tiers et poste se saisissent comme sur une opération : dans les
+                       listes connues, ou par le champ libre qui crée le tiers. Choisir
+                       un tiers propose le poste que son historique montre. #}
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label" for="new-outsider">{{ "Tiers"|trans|striptags }}</label>
+                            <select id="new-outsider" name="outsider" class="form-select"
+                                    data-placeholder="{{ "Sélectionnez"|trans|striptags }}"
+                                    data-usual-sub-categories="{{ usualSubCategories|json_encode }}"
+                                    data-usual-target="new-subcategory">
+                                <option value="">{{ "Sélectionnez"|trans|striptags }}</option>
+                                {% for outsider in outsiders %}
+                                    <option value="{{ outsider.id }}">{{ outsider.adminName|striptags }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="new-name">{{ "Nouveau tiers"|trans|striptags }}</label>
+                            <input type="text" id="new-name" name="name" class="form-control"
+                                   placeholder="{{ "Saisissez un tiers"|trans|striptags }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="new-subcategory">{{ "Catégorie"|trans|striptags }}</label>
+                            <select id="new-subcategory" name="subCategory" class="form-select"
+                                    data-placeholder="{{ "Sélectionnez"|trans|striptags }}">
+                                <option value="">{{ "Sélectionnez"|trans|striptags }}</option>
+                                {% for subCategory in subCategories %}
+                                    <option value="{{ subCategory.id }}">{{ subCategory.adminName|striptags }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-end mt-0">
+                        <div class="col-md-3">
+                            <label class="form-label" for="new-frequency">{{ "Périodicité"|trans|striptags }}</label>
+                            <select id="new-frequency" name="frequency" class="form-select"
+                                    data-schedule-target="new-instalments-fields">
+                                <option value="monthly">{{ "Tous les mois"|trans|striptags }}</option>
+                                <option value="yearly">{{ "Une fois par an"|trans|striptags }}</option>
+                                <option value="instalments">{{ "En plusieurs fois"|trans|striptags }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label" for="new-day">{{ "Jour"|trans|striptags }}</label>
+                            <input type="number" id="new-day" name="day" class="form-control" min="1" max="31" value="1">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label" for="new-month">{{ "Mois"|trans|striptags }}</label>
+                            <select id="new-month" name="dueMonth" class="form-select">
+                                {% for number in 1..12 %}
+                                    <option value="{{ number }}"{% if number == currentMonth %} selected{% endif %}>
+                                        {{ ('2000-' ~ '%02d'|format(number) ~ '-01')|date('M')|capitalize }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {# Un paiement en quatre fois se dit par son nombre d'échéances et
+                           son mois de départ : il s'éteint alors tout seul au terme, sans
+                           qu'on ait à penser à le désactiver. Les deux champs ne paraissent
+                           que pour lui — ils n'ont aucun sens sur une charge mensuelle. #}
+                        <div id="new-instalments-fields" class="col-md-4 d-none">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-4">
+                                    <label class="form-label" for="new-instalments">{{ "Échéances"|trans|striptags }}</label>
+                                    <input type="number" id="new-instalments" name="instalments" class="form-control"
+                                           min="2" max="60" value="4">
+                                </div>
+                                <div class="col-8">
+                                    <label class="form-label" for="new-start-month">{{ "Première échéance"|trans|striptags }}</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <select id="new-start-month" name="startMonth" class="form-select">
+                                            {% for number in 1..12 %}
+                                                <option value="{{ number }}"{% if number == currentMonth %} selected{% endif %}>
+                                                    {{ ('2000-' ~ '%02d'|format(number) ~ '-01')|date('M')|capitalize }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="number" id="new-start-year" name="startYear" class="form-control"
+                                               min="2000" max="2100" value="{{ currentYear }}"
+                                               aria-label="{{ "Année de la première échéance"|trans|striptags }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="new-amount">{{ "Montant"|trans|striptags }}</label>
+                            <input type="text" inputmode="decimal" id="new-amount" name="amount" class="form-control text-end" placeholder="0,00">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-label-primary w-100 d-inline-flex align-items-center justify-content-center gap-2">
+                                <twig:ux:icon name="tabler:plus" width="17" height="17" />
+                                <span>{{ "Ajouter"|trans|striptags }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="post" action="{{ path('back_recurring_save', {wallet: wallet.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('recurring-' ~ wallet.id) }}">
+            <div class="card">
+                <div class="card-header index-toolbar">
+                    <div>
+                        <h2 class="card-title">{{ "Charges détectées"|trans|striptags }}</h2>
+                        <p class="card-subtitle">
+                            {{ charges|length }} {{ (charges|length > 1 ? "charges" : "charge")|trans|striptags }}
+                        </p>
+                    </div>
+                    <div class="index-toolbar__actions">
+                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                            <twig:ux:icon name="tabler:device-floppy" width="17" height="17" />
+                            <span>{{ "Enregistrer"|trans|striptags }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                {% if charges is not empty %}
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <caption class="visually-hidden">{{ "Charges programmées du compte"|trans|striptags }}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{{ "Active"|trans|striptags }}</th>
+                                    <th scope="col">{{ "Tiers"|trans|striptags }}</th>
+                                    <th scope="col">{{ "Catégorie"|trans|striptags }}</th>
+                                    <th scope="col">{{ "Périodicité"|trans|striptags }}</th>
+                                    <th scope="col">{{ "Échéance"|trans|striptags }}</th>
+                                    <th scope="col" class="text-end">{{ "Montant"|trans|striptags }}</th>
+                                    <th scope="col">{{ "État du mois"|trans|striptags }}</th>
+                                    <th scope="col" class="cell-actions text-end">{{ "Actions"|trans|striptags }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for charge in charges %}
+                                    {% set field = 'charges[' ~ charge.key ~ ']' %}
+                                    {# L'index des opérations renvoie ici avec l'ancre de la ligne :
+                                       sans identifiant, le lien retomberait en haut de la liste. #}
+                                    <tr id="charge-{{ charge.key }}"{% if not charge.active %} class="row-inactive"{% endif %}>
+                                        <td>
+                                            <input type="hidden" name="{{ field }}[name]" value="{{ charge.name }}">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" value="1"
+                                                       id="active-{{ charge.key }}" name="{{ field }}[active]"
+                                                       {% if charge.active %}checked{% endif %}
+                                                       aria-label="{{ "Annoncer %name% dans les charges à venir"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="cell-title">{{ charge.name }}</span>
+                                            {%- if charge.reference %}<span class="cell-meta">{{ charge.reference }}</span>{% endif -%}
+                                        </td>
+                                        <td class="text-secondary">{{ charge.category }}</td>
+                                        <td>
+                                            <select name="{{ field }}[frequency]" class="form-select form-select-sm"
+                                                    data-schedule-target="instalments-{{ charge.key }}"
+                                                    aria-label="{{ "Périodicité de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                <option value="monthly"{% if 'monthly' == charge.frequency %} selected{% endif %}>{{ "Tous les mois"|trans|striptags }}</option>
+                                                <option value="yearly"{% if 'yearly' == charge.frequency %} selected{% endif %}>{{ "Une fois par an"|trans|striptags }}</option>
+                                                <option value="instalments"{% if 'instalments' == charge.frequency %} selected{% endif %}>{{ "En plusieurs fois"|trans|striptags }}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="number" min="1" max="31" step="1" class="form-control form-control-sm field-day"
+                                                       name="{{ field }}[day]" value="{{ charge.day }}"
+                                                       aria-label="{{ "Jour d'échéance de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                {# Le mois ne sert qu'à une échéance annuelle ; il reste
+                                                   affiché pour que le choix de périodicité n'ait pas à
+                                                   recharger la page pour se comprendre. #}
+                                                <select name="{{ field }}[dueMonth]" class="form-select form-select-sm field-month"
+                                                        aria-label="{{ "Mois d'échéance de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                    {% for number in 1..12 %}
+                                                        <option value="{{ number }}"{% if number == (charge.dueMonth ?? currentMonth) %} selected{% endif %}>
+                                                            {{ ('2000-' ~ '%02d'|format(number) ~ '-01')|date('M')|capitalize }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {# Terme et départ d'un échéancier : seize lignes mensuelles
+                                               n'ont que faire de trois champs qui ne les concernent
+                                               pas. Ils ne paraissent que sur un échéancier, et le
+                                               choix de périodicité les fait apparaître sans recharger. #}
+                                            {% set startsOn = charge.startsOn ?? null %}
+                                            <div id="instalments-{{ charge.key }}"{% if 'instalments' != charge.frequency %} class="d-none"{% endif %}>
+                                            <div class="d-flex align-items-center gap-2 mt-2">
+                                                <input type="number" min="2" max="60" step="1" class="form-control form-control-sm field-day"
+                                                       name="{{ field }}[instalments]" value="{{ charge.instalments ?? '' }}" placeholder="4"
+                                                       aria-label="{{ "Nombre d'échéances de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                <select name="{{ field }}[startMonth]" class="form-select form-select-sm field-month"
+                                                        aria-label="{{ "Mois de la première échéance de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                    {% for number in 1..12 %}
+                                                        <option value="{{ number }}"{% if number == (startsOn ? startsOn|date('n') : currentMonth) %} selected{% endif %}>
+                                                            {{ ('2000-' ~ '%02d'|format(number) ~ '-01')|date('M')|capitalize }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <input type="number" min="2000" max="2100" step="1" class="form-control form-control-sm field-day"
+                                                       name="{{ field }}[startYear]" value="{{ startsOn ? startsOn|date('Y') : currentYear }}"
+                                                       aria-label="{{ "Année de la première échéance de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                            </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <input type="text" inputmode="decimal" class="form-control form-control-sm text-end field-amount"
+                                                   name="{{ field }}[amount]"
+                                                   value="{{ charge.amount|number_format(2, ',', '') }}"
+                                                   aria-label="{{ "Montant de %name%, vide pour revenir à l'estimation"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                        </td>
+                                        <td>
+                                            {% if charge.paid %}
+                                                <span class="state state--on">{{ "Déjà passée"|trans|striptags }}</span>
+                                            {% elseif not charge.active %}
+                                                <span class="state state--off">{{ "Ignorée"|trans|striptags }}</span>
+                                            {% else %}
+                                                <span class="state state--warn">{{ "Attendue"|trans|striptags }}</span>
+                                            {% endif %}
+                                            {# Un échéancier se lit à son rang : « 2 / 4 » dit où l'on
+                                               en est, ce qu'« attendue » ne dit pas. Épuisé, il n'a
+                                               plus de rang, et la ligne le dit plutôt que de se taire. #}
+                                            {% if 'instalments' == charge.frequency and charge.instalments %}
+                                                <span class="cell-meta">
+                                                    {{ charge.instalment
+                                                        ? "Échéance %rank% sur %total%"|trans|striptags|replace({'%rank%': charge.instalment, '%total%': charge.instalments})
+                                                        : "Échéancier terminé"|trans|striptags }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="cell-actions text-end">
+                                            {# La suppression vit dans son propre formulaire : imbriquer
+                                               un formulaire dans un autre n'est pas permis, et elle ne
+                                               doit pas enregistrer la ligne au passage. #}
+                                            <button type="submit" class="row-action row-action--danger"
+                                                    form="delete-{{ charge.key }}"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-title="{{ charge.manual
+                                                        ? "Supprimer cette charge"|trans|striptags
+                                                        : "Effacer le réglage et revenir à l'historique"|trans|striptags }}"
+                                                    aria-label="{{ charge.manual
+                                                        ? "Supprimer %name%"|trans|striptags|replace({'%name%': charge.name})
+                                                        : "Effacer le réglage de %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                                <twig:ux:icon name="tabler:trash" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <p class="text-secondary small mb-0">
+                            {{ "Le montant proposé vient de l'historique. Le corriger fige la charge sur la valeur saisie ; vider le champ la ramène à l'estimation."|trans|striptags }}
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <twig:ux:icon name="tabler:calendar-off" />
+                        <p class="empty-state__title">{{ "Aucune charge détectée"|trans|striptags }}</p>
+                        <p class="empty-state__text">{{ "L'historique ne montre pas encore d'échéance régulière sur ce compte."|trans|striptags }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+
+        {% for charge in charges %}
+            <form id="delete-{{ charge.key }}" method="post" class="d-none"
+                  action="{{ path('back_recurring_delete', {wallet: wallet.id, charge: charge.key}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('recurring-delete-' ~ charge.key) }}">
+            </form>
+        {% endfor %}
+
+    </div>
+{% endblock %}

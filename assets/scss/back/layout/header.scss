@@ -46,6 +46,12 @@ $dash-text: rgba(255, 255, 255, 0.92) !default;
 
 header.navbar {
 
+    /* Le bandeau est fixe et haut de 70 px. Sous la rupture, la marque prend
+       presque toute la largeur et le bloc de droite passait à la ligne : le
+       bouton de menu sortait du bandeau et venait recouvrir le fil d'Ariane
+       de la page. Le bandeau tient sur une seule ligne, la marque se tronque. */
+    flex-wrap: nowrap;
+
     height: 70px;
     position: fixed;
     z-index: 5000;
@@ -53,6 +59,22 @@ header.navbar {
     linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 48%),
     $dash-topbar-bg;
     border-bottom: 1px solid $dash-border;
+
+    .navbar-brand {
+        min-width: 0;
+        overflow: hidden;
+
+        > div {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .right {
+        flex: 0 0 auto;
+    }
 
     .icon-wrap {
         width: 40px;
@@ -70,11 +92,6 @@ header.navbar {
 
         @include mediaQuery(min-lg) {
             width: 350px;
-        }
-
-        img, picture {
-            max-width: 24px;
-            display: flex;
         }
 
         i, span, small {

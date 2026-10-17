@@ -46,8 +46,15 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
         }
 
+        // Decoded strictly, as getMessageType() does, so that both read the same bytes: a lax
+        // decode silently drops characters the alphabet does not allow, leaving the type the
+        // signature is checked against to be read from a different payload than the one decoded.
         if (!str_ends_with($encodedEnvelope['body'], '}')) {
-            $encodedEnvelope['body'] = base64_decode($encodedEnvelope['body']);
+            if (false === $body = base64_decode($encodedEnvelope['body'], true)) {
+                return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode the envelope body: it is neither a serialized payload nor valid base64.');
+            }
+
+            $encodedEnvelope['body'] = $body;
         }
 
         if ('' === $serializeEnvelope = stripslashes($encodedEnvelope['body'])) {
@@ -84,26 +91,42 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         $body = stripslashes($body);
 
         // Fast path: when the body carries no Serializable (`C:`) payload, native
-        // unserialize() with allowed_classes restricted to Envelope is safe and fast.
-        // The carried message becomes a __PHP_Incomplete_Class with no constructor /
-        // __wakeup / __unserialize executed. This skips the in-PHP tokenizer below.
+        // unserialize() with allowed_classes restricted to Envelope turns the carried
+        // message into a __PHP_Incomplete_Class with no constructor / __wakeup /
+        // __unserialize executed. This skips the in-PHP tokenizer below.
+        // allowed_classes does not cover enums: unserialize() autoloads the class of an
+        // enum case whatever the list. So once Envelope is loaded, autoloading is refused
+        // while unserialize() runs, and the tokenizer takes over when it was needed.
         // The "allowed_classes" allowlist is the SOLE line of defense here: this call
         // intentionally runs without installing the unserialize_callback_func / error
         // handler guards used by safelyUnserialize(). Any future change that widens
         // "allowed_classes" beyond Envelope MUST re-introduce those guards.
         if (!str_contains($body, 'C:')) {
+            class_exists(Envelope::class);
+            $autoloadAttempted = false;
+            $autoloadGuard = static function () use (&$autoloadAttempted): never {
+                $autoloadAttempted = true;
+
+                throw new \LogicException('Autoloading is not allowed while reading the message type.');
+            };
+            spl_autoload_register($autoloadGuard, true, true);
+
             try {
                 $envelope = @unserialize($body, ['allowed_classes' => [Envelope::class]]);
-
-                if (!$envelope instanceof Envelope) {
-                    return null;
-                }
-                $message = $envelope->getMessage();
+                $message = $envelope instanceof Envelope ? $envelope->getMessage() : null;
             } catch (\Throwable) {
-                return null;
+                $message = null;
+            } finally {
+                spl_autoload_unregister($autoloadGuard);
             }
 
-            return $message instanceof \__PHP_Incomplete_Class ? ((array) $message)['__PHP_Incomplete_Class_Name'] : $message::class;
+            if (!$autoloadAttempted) {
+                return match (true) {
+                    null === $message => null,
+                    $message instanceof \__PHP_Incomplete_Class => ((array) $message)['__PHP_Incomplete_Class_Name'],
+                    default => $message::class,
+                };
+            }
         }
 
         // Slow path: parse the serialized envelope without invoking unserialize() so that
@@ -119,19 +142,24 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         // PHP unserialize() accepts all three property-name encodings and routes any of
         // them to Envelope::$message, so the scanner must recognize all three forms too,
         // otherwise an attacker can hide the real message behind a non-canonical key.
+        // The declared length is read as an integer, the way unserialize() reads it, rather than
+        // compared as bytes: a length written with leading zeros denotes the very same property.
         $messageKeys = [
-            's:45:"'."\0".Envelope::class."\0".'message";',
-            's:10:"'."\0*\0".'message";',
-            's:7:"message";',
+            "\0".Envelope::class."\0message",
+            "\0*\0message",
+            'message',
         ];
         $messageType = null;
 
         for ($i = 0; $i < $count; ++$i) {
             $isMessageKey = false;
-            foreach ($messageKeys as $key) {
-                if (0 === substr_compare($body, $key, $offset, \strlen($key))) {
-                    $isMessageKey = true;
-                    break;
+
+            if (preg_match('/\Gs:(\d++):"/A', $body, $m, 0, $offset)) {
+                $nameLength = (int) $m[1];
+                $nameOffset = $offset + \strlen($m[0]);
+
+                if ('";' === substr($body, $nameOffset + $nameLength, 2)) {
+                    $isMessageKey = \in_array(substr($body, $nameOffset, $nameLength), $messageKeys, true);
                 }
             }
 

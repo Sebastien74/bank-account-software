@@ -2,54 +2,149 @@
 
 {% trans_default_domain 'back' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
-
 {% block body %}
-    <div id="wallets-dashboard" class="container-fluid pt-4 pb-5 position-relative">
-        {% include 'back/core/new-modal.html.twig' with {
-            excludedFields: excludedFields,
-            addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
-            form: form is defined and form ? form : false,
-            formErrors: formErrors is defined and formErrors ? formErrors : false,
-        } only %}
-        <div id="wallets-index" class="row mt-4">
-            {% for wallet in pagination %}
-                {% set stats = walletsStats[wallet.id]|default({'balance': 0, 'dailyAverageExpenses': 0, 'remainingDailyBudget': 0}) %}
-                <div class="col-lg-4">
-                    <div class="card bg-dark">
-                        <div class="card-header py-3">
-                            <h3 class="title h5 text-white mb-0">{{ wallet.adminName|raw }}</h3>
-                        </div>
-                        <div class="card-body text-white">
-                            <div class="mb-2"><strong>Solde :</strong> {{ stats.balance|number_format(2, ',', '') }} €</div>
-                            <div class="mb-2"><strong>Moyennes dépenses quotidiennes :</strong> {{ stats.dailyAverageExpenses|number_format(2, ',', '') }} €</div>
-                            <div><strong>Reste à dépenser / jour :</strong> {{ stats.remainingDailyBudget|number_format(2, ',', '') }} €</div>
-                        </div>
-                        <div class="card-footer d-flex align-items-center py-3">
-                            <a href="{{ path('back_wallet_edit', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-2"
-                               data-bs-toggle="tooltip" data-bs-title="{{ "Configuration"|trans|striptags }}">
-                                <twig:ux:icon name="tabler:settings" />
-                            </a>
-                            <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-3"
-                               data-bs-toggle="tooltip" data-bs-title="{{ "Mes opérations"|trans|striptags }}">
-                                <twig:ux:icon name="tabler:list-details" />
-                            </a>
-                            <a href="{{ path('back_operation_statistics', {wallet: wallet.id}) }}" class="btn btn-primary btn-circle d-flex align-items-center justify-content-center me-3"
-                               data-bs-toggle="tooltip" data-bs-title="{{ "Statistiques"|trans|striptags }}">Stats
-                                <twig:ux:icon name="tabler:chart-bar" />
-                            </a>
-                            <span class="ms-auto">{% include 'back/core/delete-modal.html.twig' with {entity: wallet} %}</span>
+    <div id="wallets-dashboard" class="container-fluid pt-2 pb-5 position-relative">
+
+        {# En-tête d'écran hors carte : titre, sous-titre, et l'action pleine à
+           droite (app-ecommerce-product-add). #}
+        <div class="page-head">
+            <div>
+                <h1 class="page-head__title">{{ "Mes comptes"|trans|raw }}</h1>
+                <p class="page-head__subtitle">{{ "Solde, dépenses quotidiennes et reste à dépenser, compte par compte."|trans|striptags }}</p>
+            </div>
+            <div class="page-head__actions">
+                {% include 'back/core/new-modal.html.twig' with {
+                    excludedFields: excludedFields,
+                    addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+                    form: form is defined and form ? form : false,
+                    formErrors: formErrors is defined and formErrors ? formErrors : false,
+                } only %}
+            </div>
+        </div>
+
+        {% if pagination|length > 0 %}
+            <div id="wallets-index" class="row g-3">
+                {% for wallet in pagination %}
+                    {% set stats = walletsStats[wallet.id]|default({'savings': false, 'balance': 0, 'dailyAverageExpenses': 0, 'remainingDailyBudget': 0, 'remainingDailyBudgetAfterCharges': 0, 'pendingCharges': 0, 'projectedBalance': 0, 'fundedThisYear': 0}) %}
+                    {% set isSavings = stats.savings|default(false) %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <span class="stat-tile__icon">
+                                    <twig:ux:icon name="{{ isSavings ? 'tabler:pig-money' : 'tabler:building-bank' }}" />
+                                </span>
+                                <div class="min-w-0">
+                                    <h2 class="card-title text-truncate">{{ wallet.adminName|striptags }}</h2>
+                                    <p class="card-subtitle">{{ (isSavings ? "Compte d'épargne" : "Compte bancaire")|trans|striptags }}</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {# Le solde est le chiffre qu'on lit en premier ;
+                                   les deux autres le qualifient. #}
+                                <p class="stat-tile__value {{ stats.balance < 0 ? 'text-danger' : '' }}">
+                                    {{ stats.balance|number_format(2, ',', ' ') }} €
+                                </p>
+                                <p class="stat-tile__meta">{{ "Solde du compte"|trans|striptags }}</p>
+                                {% if isSavings %}
+                                    {# Un compte d'épargne n'est alimenté que par les virements
+                                       du compte courant : ce qu'on y a mis cette année est le
+                                       seul chiffre qui le qualifie. #}
+                                    <dl class="wallet-figures">
+                                        <div>
+                                            <dt>{{ "Versé cette année"|trans|raw }}</dt>
+                                            <dd class="text-success">{{ stats.fundedThisYear|default(0)|number_format(2, ',', ' ') }} €</dd>
+                                        </div>
+                                    </dl>
+                                    <p class="stat-tile__meta d-flex align-items-center gap-1 mt-2">
+                                        <twig:ux:icon name="tabler:arrow-narrow-right" width="14" height="14" />
+                                        <span>{{ "Alimenté par les virements du compte courant"|trans|striptags }}</span>
+                                    </p>
+                                {% endif %}
+                                {# Le solde à venir répond à « où j'atterris », que le solde
+                                   du jour ne dit pas : il ignore ce qui est déjà dû. #}
+                                {% if not isSavings and stats.pendingCharges > 0 %}
+                                    <p class="stat-tile__value stat-tile__value--minor {{ stats.projectedBalance < 0 ? 'text-danger' : 'text-warning' }}">
+                                        {{ stats.projectedBalance|number_format(2, ',', ' ') }} €
+                                    </p>
+                                    <p class="stat-tile__meta">{{ "Solde à venir, échéances du mois déduites"|trans|striptags }}</p>
+                                {% endif %}
+                                {% if not isSavings %}
+                                <dl class="wallet-figures">
+                                    <div>
+                                        <dt>{{ "Dépenses / jour"|trans|raw }}</dt>
+                                        <dd>{{ stats.dailyAverageExpenses|number_format(2, ',', ' ') }} €</dd>
+                                    </div>
+                                    <div>
+                                        <dt>{{ "Reste / jour"|trans|raw }}</dt>
+                                        <dd class="{{ stats.remainingDailyBudget < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ stats.remainingDailyBudget|number_format(2, ',', ' ') }} €
+                                        </dd>
+                                    </div>
+                                    {# Le second chiffre retranche les échéances du mois qui ne sont
+                                       pas encore tombées : c'est lui qui dit ce qu'on peut réellement
+                                       dépenser, l'autre ignore ce qu'on doit déjà. #}
+                                    <div>
+                                        <dt>{{ "Reste / jour, charges déduites"|trans|raw }}</dt>
+                                        <dd class="{{ stats.remainingDailyBudgetAfterCharges < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ stats.remainingDailyBudgetAfterCharges|number_format(2, ',', ' ') }} €
+                                        </dd>
+                                    </div>
+                                </dl>
+                                {% endif %}
+                                {% if not isSavings and stats.pendingCharges > 0 %}
+                                    <p class="stat-tile__meta d-flex align-items-center gap-1 mt-2">
+                                        <twig:ux:icon name="tabler:clock" width="14" height="14" />
+                                        <span>{{ "Reste à payer ce mois-ci"|trans|striptags }} : {{ stats.pendingCharges|number_format(2, ',', ' ') }} €</span>
+                                    </p>
+                                {% endif %}
+                            </div>
+                            {# Trois actions plus deux pictogrammes sur une colonne d'un tiers :
+                               le pied passe à la ligne plutôt que de déborder. #}
+                            <div class="card-footer d-flex flex-wrap align-items-center gap-2">
+                                <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}"
+                                   class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                                    <twig:ux:icon name="tabler:list-details" width="16" height="16" />
+                                    <span>{{ "Mes opérations"|trans|striptags }}</span>
+                                </a>
+                                <a href="{{ path('back_operation_statistics', {wallet: wallet.id}) }}"
+                                   class="btn btn-label-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                                    <twig:ux:icon name="tabler:chart-bar" width="16" height="16" />
+                                    <span>{{ "Statistiques"|trans|striptags }}</span>
+                                </a>
+                                {% if not isSavings %}
+                                    <a href="{{ path('back_dashboard', {wallet: wallet.id}) }}"
+                                       class="btn btn-label-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                                        <twig:ux:icon name="tabler:mail-dollar" width="16" height="16" />
+                                        <span>{{ "Budgets"|trans|striptags }}</span>
+                                    </a>
+                                    <a href="{{ path('back_recurring_index', {wallet: wallet.id}) }}"
+                                       class="btn btn-label-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                                        <twig:ux:icon name="tabler:calendar-repeat" width="16" height="16" />
+                                        <span>{{ "Programmées"|trans|striptags }}</span>
+                                    </a>
+                                {% endif %}
+                                <span class="ms-auto d-inline-flex align-items-center gap-1 flex-shrink-0">
+                                    <a href="{{ path('back_wallet_edit', {wallet: wallet.id}) }}" class="row-action row-action--primary"
+                                       data-bs-toggle="tooltip" data-bs-title="{{ "Configuration"|trans|striptags }}"
+                                       aria-label="{{ "Configuration"|trans|striptags }}">
+                                        <twig:ux:icon name="tabler:settings" />
+                                    </a>
+                                    {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: wallet} only %}
+                                </span>
+                            </div>
                         </div>
                     </div>
+                {% endfor %}
+            </div>
+            {% include 'back/includes/pagination.html.twig' with {pagination: pagination, class: 'px-0'} only %}
+        {% else %}
+            <div class="card">
+                <div class="empty-state">
+                    <twig:ux:icon name="tabler:building-bank" />
+                    <p class="empty-state__title">{{ "Aucun compte"|trans|striptags }}</p>
+                    <p class="empty-state__text">{{ "Ajoutez un premier compte pour suivre vos opérations."|trans|striptags }}</p>
                 </div>
-            {% endfor %}
-        </div>
-        {% include 'back/includes/pagination.html.twig' with {pagination: pagination, class: 'mt-4'} only %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

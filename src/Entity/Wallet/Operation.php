@@ -56,6 +56,18 @@ class Operation extends BaseEntity
     #[ORM\JoinColumn(name: 'outsider_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Outsider $outsider = null;
 
+    /**
+     * Opération dont celle-ci est la contrepartie.
+     *
+     * Un virement vers l'épargne est un seul mouvement vu de deux comptes :
+     * un débit ici, un crédit là-bas. Les lier évite qu'une suppression d'un
+     * côté laisse l'autre orpheline, et que le rapprochement recrée une
+     * contrepartie qui existe déjà.
+     */
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?self $counterpartOf = null;
+
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
@@ -112,6 +124,18 @@ class Operation extends BaseEntity
     public function setSubCategory(?SubCategory $subCategory): static
     {
         $this->subCategory = $subCategory;
+
+        return $this;
+    }
+
+    public function getCounterpartOf(): ?self
+    {
+        return $this->counterpartOf;
+    }
+
+    public function setCounterpartOf(?self $counterpartOf): static
+    {
+        $this->counterpartOf = $counterpartOf;
 
         return $this;
     }

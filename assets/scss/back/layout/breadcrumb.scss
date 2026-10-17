@@ -3,80 +3,52 @@
 /* --------------------------------------------------------------------------------------
 
     Module : Back breadcrumb
-    Copyright : 2025
+    Copyright : 2026
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
 
+    Le fil d'Ariane nomme le chemin : il n'a pas à peser autant que le contenu.
+    La carte de verre d'avant le posait au même niveau qu'une carte de données.
+
 ----------------------------------------------------------------------------------------- */
 
-$dash-accent: $primary !default;
-
-$crumb-surface: rgba(255, 255, 255, 0.015) !default;
-$crumb-border: rgba(255, 255, 255, 0.06) !default;
-$crumb-border-hover: rgba(255, 255, 255, 0.10) !default;
-
-$crumb-text: rgba(255, 255, 255, 0.92) !default;
-$crumb-muted: rgba(255, 255, 255, 0.68) !default;
-
-$crumb-shadow: 0 18px 45px rgba(0, 0, 0, 0.55) !default;
-
 .breadcrumb-container {
-    padding: 10px 14px;
-    border-radius: 16px;
-    background: radial-gradient(520px 160px at 12% 0%, rgba($dash-accent, 0.10), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%),
-    $crumb-surface;
-    border: 1px solid $crumb-border;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
-}
-
-.breadcrumb-container:hover {
-    border-color: $crumb-border-hover;
-    box-shadow: $crumb-shadow;
-    transform: translateY(-1px);
-}
-
-/* Ensure container doesn't add unwanted padding in the breadcrumb row */
-.breadcrumb-container .container-fluid {
-    padding-left: 0;
-    padding-right: 0;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    padding: 0;
 }
 
 .page-breadcrumb {
-
     align-items: center;
+    flex-wrap: wrap;
     margin: 0;
 
     .breadcrumb-item {
-        color: $crumb-muted;
+        color: $muted;
+        font-size: .8125rem;
         font-weight: 400;
-        font-size: 13px;
-        letter-spacing: -0.01em;
-    }
 
-    /* Replace Bootstrap "/" with a subtle dot */
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "•";
-        color: rgba(255, 255, 255, 0.30);
-        padding: 0 10px;
-    }
+        a {
+            color: $muted;
+            transition: color .12s ease;
 
-    /* Links inside breadcrumb */
-    .breadcrumb-item a {
-        color: $crumb-muted !important;
-        text-decoration: none;
-        transition: color 120ms ease;
-
-        &:hover {
-            color: $crumb-text !important;
+            &:hover {
+                color: $heading;
+            }
         }
-    }
 
-    /* Active item (usually last) */
-    .breadcrumb-item.active {
-        color: $crumb-text;
-        font-weight: 650;
+        + .breadcrumb-item::before {
+            color: $muted;
+            content: '/';
+            padding: 0 .5rem;
+        }
+
+        /* Le dernier maillon est la page où l'on est : il se lit, il ne mène
+           nulle part de plus. */
+        &:last-child a,
+        &.active {
+            color: $heading;
+            font-weight: 500;
+        }
     }
 }

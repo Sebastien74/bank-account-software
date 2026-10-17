@@ -1,0 +1,101 @@
+- generic [active] [ref=f3e1]:
+  - link "Aller au contenu" [ref=f3e2] [cursor=pointer]:
+    - /url: "#main-container"
+  - banner [ref=f3e3]:
+    - link "Bank Account Software" [ref=f3e4] [cursor=pointer]:
+      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+    - paragraph [ref=f3e16]: Gestion des comptes
+  - generic [ref=f3e17]:
+    - complementary [ref=f3e18]:
+      - navigation [ref=f3e19]:
+        - link "Tableau de bord" [ref=f3e20] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/dashboard
+        - link "Gestion des comptes" [ref=f3e27] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+        - link "Gestion des budgets" [ref=f3e34] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/budgets/index
+        - link "Gestion des catégories" [ref=f3e41] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/operations-types/index
+        - link "Gestion des bénéficiaires" [ref=f3e46] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/outsiders/index
+        - link "Logout" [ref=f3e53] [cursor=pointer]:
+          - /url: /logout
+    - navigation [ref=f3e59]
+    - main [ref=f3e60]:
+      - generic [ref=f3e61]:
+        - navigation "Fil d'Ariane" [ref=f3e62]:
+          - list [ref=f3e63]:
+            - listitem [ref=f3e64]: Mes comptes
+        - generic [ref=f3e65]:
+          - generic [ref=f3e66]:
+            - generic [ref=f3e67]:
+              - heading "Mes comptes" [level=1] [ref=f3e68]
+              - paragraph [ref=f3e69]: Solde, dépenses quotidiennes et reste à dépenser, compte par compte.
+            - button "Ajouter un compte" [ref=f3e71] [cursor=pointer]
+          - generic [ref=f3e75]:
+            - generic [ref=f3e77]:
+              - generic [ref=f3e82]:
+                - heading "Compte courant" [level=2] [ref=f3e83]
+                - paragraph [ref=f3e84]: Compte bancaire
+              - generic [ref=f3e85]:
+                - paragraph [ref=f3e86]: 1 276,52 €
+                - paragraph [ref=f3e87]: Solde du compte
+                - paragraph [ref=f3e88]: 914,44 €
+                - paragraph [ref=f3e89]: Solde à venir, échéances du mois déduites
+                - generic [ref=f3e90]:
+                  - generic [ref=f3e91]:
+                    - term [ref=f3e92]: Dépenses / jour
+                    - definition [ref=f3e93]: 301,98 €
+                  - generic [ref=f3e94]:
+                    - term [ref=f3e95]: Reste / jour
+                    - definition [ref=f3e96]: 47,28 €
+                  - generic [ref=f3e97]:
+                    - term [ref=f3e98]: Reste / jour, charges déduites
+                    - definition [ref=f3e99]: 33,87 €
+                - paragraph [ref=f3e100]:
+                  - generic [ref=f3e105]: "Reste à payer ce mois-ci : 362,08 €"
+              - generic [ref=f3e106]:
+                - link "Mes opérations" [ref=f3e107] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1
+                - link "Statistiques" [ref=f3e111] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/1
+                - link "Budgets" [ref=f3e115] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/dashboard/1
+                - link "Programmées" [ref=f3e121] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1
+                - generic [ref=f3e125]:
+                  - link "Configuration" [ref=f3e126] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/edit/1
+                  - button "Supprimer" [ref=f3e132] [cursor=pointer]
+            - generic [ref=f3e136]:
+              - generic [ref=f3e143]:
+                - heading "Compte épargne" [level=2] [ref=f3e144]
+                - paragraph [ref=f3e145]: Compte d'épargne
+              - generic [ref=f3e146]:
+                - paragraph [ref=f3e147]: 502,68 €
+                - paragraph [ref=f3e148]: Solde du compte
+                - generic [ref=f3e150]:
+                  - term [ref=f3e151]: Versé cette année
+                  - definition [ref=f3e152]: 4 112,50 €
+                - paragraph [ref=f3e153]:
+                  - generic [ref=f3e156]: Alimenté par les virements du compte courant
+              - generic [ref=f3e157]:
+                - link "Mes opérations" [ref=f3e158] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/2
+                - link "Statistiques" [ref=f3e162] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/statistics/2
+                - generic [ref=f3e166]:
+                  - link "Configuration" [ref=f3e167] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/edit/2
+                  - button "Supprimer" [ref=f3e173] [cursor=pointer]
+          - generic [ref=f3e176]: Affichage de 1 à 2 sur 2
+  - status [ref=f3e178]
+  - toolbar "Symfony Web Debug Toolbar" [ref=f3e179]:
+    - generic [ref=f3e182]:
+      - link "Symfony Loading…" [ref=f3e184] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/edb0fb?panel=request
+        - generic [ref=f3e185]:
+          - img "Symfony" [ref=f3e186]
+          - generic [ref=f3e188]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f3e189] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f3e190]

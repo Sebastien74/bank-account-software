@@ -1,0 +1,60 @@
+{% trans_default_domain 'back' %}
+
+{#
+    Pagination de la charte (voir .claude/charte-back/ecarts-projet.md,
+    « La pagination ») : carrés à coins doux, page active en blanc sur le
+    primaire, et quatre flèches — première, précédente, suivante, dernière.
+
+    Chaque flèche est un lien nommé, glyphe masqué aux lecteurs d'écran. Quand
+    elle ne mène nulle part elle devient un `span` : un lien inerte de plus
+    n'apprend rien, les numéros disent déjà où l'on est.
+
+    Le balisage des quatre est écrit une seule fois, dans la macro `arrow`.
+    Une macro Twig n'hérite pas du contexte : tout ce dont elle a besoin lui
+    est passé en paramètre, `pageParameterName` compris.
+#}
+
+{% import _self as macro %}
+
+{% macro arrow(enabled, page, label, icon, route, query, pageParameterName) %}
+    {% if enabled %}
+        <li class="page-item">
+            <a class="page-link" rel="nofollow" aria-label="{{ label }}"
+               href="{{ path(route, query|merge({(pageParameterName): page})) }}">
+                <twig:ux:icon name="{{ icon }}" aria-hidden="true" />
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-hidden="true"><twig:ux:icon name="{{ icon }}" /></span>
+        </li>
+    {% endif %}
+{% endmacro %}
+
+{% if pageCount > 1 %}
+    {% set param = pageParameterName|default('page') %}
+    <nav aria-label="{{ "Pagination"|trans|striptags }}">
+        <ul class="pagination">
+            {{ macro.arrow(current > first, first, "Première page"|trans|striptags, 'tabler:chevrons-left', route, query, param) }}
+            {{ macro.arrow(previous is defined, previous|default(first), "Page précédente"|trans|striptags, 'tabler:chevron-left', route, query, param) }}
+
+            {% for page in pagesInRange %}
+                {% if page != current %}
+                    <li class="page-item">
+                        <a class="page-link" rel="nofollow"
+                           aria-label="{{ "Page %page%"|trans|striptags|replace({'%page%': page}) }}"
+                           href="{{ path(route, query|merge({(param): page})) }}">{{ page }}</a>
+                    </li>
+                {% else %}
+                    {# L'état courant est porté par ARIA, pas par la seule classe. #}
+                    <li class="page-item active">
+                        <span class="page-link" aria-current="page">{{ page }}</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {{ macro.arrow(next is defined, next|default(last), "Page suivante"|trans|striptags, 'tabler:chevron-right', route, query, param) }}
+            {{ macro.arrow(current < last, last, "Dernière page"|trans|striptags, 'tabler:chevrons-right', route, query, param) }}
+        </ul>
+    </nav>
+{% endif %}

@@ -432,6 +432,120 @@ final readonly class StatisticsRepository
     /**
      * Base de requête bornée à un compte et à une période.
      */
+    /**
+     * Totaux mensuels par tiers, restreints a une liste de sous-categories.
+     *
+     * Sert a distinguer un engagement recurrent d'une depense simplement
+     * frequente : on fait ses courses tous les mois sans rien devoir a
+     * personne. C'est la nature du poste qui tranche, pas la regularite.
+     *
+     * @param array<int, string> $subCategorySlugs
+     *
+     * @return array<string, array<string, float>>
+     */
+    public function commitmentMonthlyTotals(Wallet $wallet, Period $period, array $subCategorySlugs): array
+    {
+        if ($period->isEmpty() || [] === $subCategorySlugs) {
+            return [];
+        }
+
+        $rows = $this->scoped($wallet, $period)
+            ->leftJoin('o.outsider', 'os')
+            ->select('os.adminName AS name, SUBSTRING(o.date, 1, 7) AS period, COALESCE(SUM(o.amount), 0) AS total')
+            ->andWhere(sprintf('NOT %s', self::IS_INCOME))
+            ->andWhere('sc.slug IN (:slugs)')
+            ->setParameter('slugs', $subCategorySlugs)
+            ->groupBy('os.id')
+            ->addGroupBy('period')
+            ->getQuery()
+            ->getArrayResult();
+
+        $totals = [];
+        foreach ($rows as $row) {
+            $totals[(string) ($row['name'] ?? 'Non identifié')][(string) $row['period']] = round((float) $row['total'], 2);
+        }
+
+        return $totals;
+    }
+
+    /**
+     * Lignes brutes des postes d'engagement, pour analyse de recurrence.
+     *
+     * Renvoie le detail plutot que des totaux : le service a besoin du libelle
+     * pour distinguer deux contrats chez un meme fournisseur, et du jour pour
+     * annoncer l'echeance. Agreger ici le priverait des deux.
+     *
+     * @param array<int, string> $subCategorySlugs
+     *
+     * @return array<int, array{name: string, label: string, category: string, date: \DateTimeInterface, amount: float}>
+     */
+    public function commitmentRows(Wallet $wallet, Period $period, array $subCategorySlugs): array
+    {
+        if ($period->isEmpty() || [] === $subCategorySlugs) {
+            return [];
+        }
+
+        $rows = $this->scoped($wallet, $period)
+            ->leftJoin('o.outsider', 'os')
+            ->select('os.adminName AS name, os.id AS outsiderId, o.adminName AS label, o.date AS date, o.amount AS amount, sc.adminName AS category, sc.slug AS categorySlug')
+            ->andWhere(sprintf('NOT %s', self::IS_INCOME))
+            ->andWhere('sc.slug IN (:slugs)')
+            ->setParameter('slugs', $subCategorySlugs)
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            if (!$row['date'] instanceof \DateTimeInterface) {
+                continue;
+            }
+            $result[] = [
+                'name' => (string) ($row['name'] ?? 'Non identifié'),
+                'outsiderId' => null !== $row['outsiderId'] ? (int) $row['outsiderId'] : null,
+                'label' => (string) ($row['label'] ?? ''),
+                'category' => (string) ($row['category'] ?? ''),
+                'categorySlug' => (string) ($row['categorySlug'] ?? ''),
+                'date' => $row['date'],
+                'amount' => round((float) $row['amount'], 2),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Jours du mois auxquels chaque tiers a ete preleve sur la periode.
+     *
+     * Sert a annoncer l'echeance d'une charge a venir : sans elle, la liste
+     * des depenses courantes du mois ne pourrait pas etre ordonnee autrement
+     * que par montant, ce qui ne dit rien de ce qui tombe en premier.
+     *
+     * @return array<string, array<int, int>>
+     */
+    public function beneficiaryDays(Wallet $wallet, Period $period): array
+    {
+        if ($period->isEmpty()) {
+            return [];
+        }
+
+        $rows = $this->scoped($wallet, $period)
+            ->leftJoin('o.outsider', 'os')
+            ->select('os.adminName AS name, o.date AS date')
+            ->andWhere(sprintf('NOT %s', self::IS_INCOME))
+            ->getQuery()
+            ->getArrayResult();
+
+        $days = [];
+        foreach ($rows as $row) {
+            if (!$row['date'] instanceof \DateTimeInterface) {
+                continue;
+            }
+            $days[(string) ($row['name'] ?? 'Non identifié')][] = (int) $row['date']->format('j');
+        }
+
+        return $days;
+    }
+
     private function scoped(Wallet $wallet, Period $period): QueryBuilder
     {
         return $this->entityManager->createQueryBuilder()

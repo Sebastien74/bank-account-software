@@ -1,22 +1,21 @@
 {% trans_default_domain 'back' %}
 
+{# Pied de liste de la référence : le compte à gauche, la pagination à droite,
+   tous deux dans la carte du tableau. #}
 {% if pagination.getTotalItemCount is defined and (pagination.getTotalItemCount / pagination.itemNumberPerPage) > 0 %}
     {% set class = class is defined and class ? class : false %}
-    <div class="pagination-nav mt-3 mt-md-4{% if class %} {{ class }}{% endif %}">
-        <div class="row">
-            <div class="col-md-4 my-auto d-flex justify-content-center justify-content-md-start mb-3 mb-md-0">
-                {% set delta = (pagination.itemNumberPerPage - pagination|length) %}
-                {% set itemsCountStart = pagination.currentPageNumber == 1 ? 1 : (pagination.itemNumberPerPage * pagination.currentPageNumber) - pagination.itemNumberPerPage + 1 %}
-                {% set itemsCountEnd = (pagination.itemNumberPerPage * pagination.currentPageNumber) - delta %}
-                <span class="pagination-counter text-white">
-                    {{ 'Results from {countStart} to {countEnd} of {totalCount}'|trans({
-                        'countStart': itemsCountStart,
-                        'countEnd': itemsCountEnd,
-                        'totalCount': pagination.getTotalItemCount(),
-                    }) }}
-                </span>
-            </div>
-            <div class="col-md-8 my-auto d-flex justify-content-center justify-content-md-end">{{ knp_pagination_render(pagination) }}</div>
-        </div>
+    <div class="pagination-nav d-flex flex-wrap align-items-center gap-3{% if class %} {{ class }}{% endif %}">
+        {% set delta = (pagination.itemNumberPerPage - pagination|length) %}
+        {% set itemsCountStart = pagination.currentPageNumber == 1 ? 1 : (pagination.itemNumberPerPage * pagination.currentPageNumber) - pagination.itemNumberPerPage + 1 %}
+        {% set itemsCountEnd = (pagination.itemNumberPerPage * pagination.currentPageNumber) - delta %}
+        {# Le compte est composé en Twig, pas par le traducteur : le projet n'a
+           pas de catalogue de fichiers, et une clé non trouvée ressortirait
+           avec ses marqueurs en clair — ce qu'elle faisait. #}
+        <span class="pagination-counter">
+            {{ "Affichage de"|trans|striptags }}
+            {{ itemsCountStart }} {{ "à"|trans|striptags }} {{ itemsCountEnd }}
+            {{ "sur"|trans|striptags }} {{ pagination.getTotalItemCount() }}
+        </span>
+        <div class="ms-auto">{{ knp_pagination_render(pagination) }}</div>
     </div>
 {% endif %}

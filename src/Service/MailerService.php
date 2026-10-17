@@ -116,7 +116,7 @@ class MailerService
         }
 
         $this->schemeAndHttpHost = $this->coreLocator->schemeAndHttpHost();
-        $this->name = $_ENV['APP_COMPANY_NAME'];
+        $this->name = $this->coreLocator->companyName();
         $this->from = $_ENV['EMAIL_FROM'];
         $this->replyTo = $_ENV['EMAIL_NO_REPLY'];
         $this->host = $request->getHost();
@@ -146,7 +146,7 @@ class MailerService
         $this->arguments['host'] = $this->host;
         $this->arguments['schemeAndHttpHost'] = $this->schemeAndHttpHost;
         $this->arguments['locale'] = $this->locale;
-        $this->arguments['companyName'] = $_ENV['APP_COMPANY_NAME'];
+        $this->arguments['companyName'] = $this->coreLocator->companyName();
 
         if (empty($this->to)) {
             $this->to = $_ENV['EMAIL_TO'];

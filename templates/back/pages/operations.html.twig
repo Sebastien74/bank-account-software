@@ -4,141 +4,340 @@
 
 {% import _self as macro %}
 
-{% block stylesheets %}
-{#    {{ encore_entry_link_tags('back-operations', null, 'back', {nonce: csp_nonce()}) }}#}
-{#    <link rel="modulepreload" href="{{ preload(asset('build/back/back-operations.js', 'back'), {as: 'script', importance: 'low'}) }}" nonce="{{ csp_nonce() }}" as="script" fetchpriority="low">#}
-    {{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-{#    {{ encore_entry_script_tags('back-operations', null, 'back', {defer: true, nonce: csp_nonce()}) }}#}
-{% endblock %}
-
+{#
+    En-tête de colonne triable. Les deux chevrons n'ont aucun contenu : ils
+    sont dessinés en CSS, et le sens actif se lit à la couleur.
+#}
 {% macro sort(wallet, label, sort, date) %}
-    <div class="d-flex w-100 align-items-center">
-        <span class="th-label me-3">{{ label|striptags }}</span>
-        <span class="sort-controls ms-auto" role="group" aria-label="Trier la colonne Tiers">
+    <span class="d-inline-flex align-items-center gap-2">
+        <span class="th-label">{{ label|striptags }}</span>
+        <span class="sort-controls" role="group" aria-label="{{ "Trier la colonne %column%"|trans({'%column%': label|striptags})|striptags }}">
             <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'asc'}) }}"
-               class="sort sort-asc{% if 'asc' == app.request.get('order') and sort == app.request.get('sort') %} is-active{% endif %}"
+               class="sort sort-asc{% if 'asc' == app.request.query.get('order') and sort == app.request.query.get('sort') %} is-active{% endif %}"
                data-bs-toggle="tooltip"
                data-bs-title="{{ "Trier par ordre croissant"|trans|striptags }}"
-               aria-label="{{ "Trier par ordre croissant"|trans|striptags }}">
-            </a>
+               aria-label="{{ "Trier par ordre croissant"|trans|striptags }}"></a>
             <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: date|date('Y'), sort: sort, order: 'desc'}) }}"
-               class="sort sort-desc{% if ('desc' == app.request.get('order') and sort == app.request.get('sort')) or (not app.request.get('sort') and 'dt' == sort) %} is-active{% endif %}"
+               class="sort sort-desc{% if ('desc' == app.request.query.get('order') and sort == app.request.query.get('sort')) or (not app.request.query.get('sort') and 'dt' == sort) %} is-active{% endif %}"
                data-bs-toggle="tooltip"
                data-bs-title="{{ "Trier par ordre décroissant"|trans|striptags }}"
-               aria-label="{{ "Trier par ordre décroissant"|trans|striptags }}">
-            </a>
+               aria-label="{{ "Trier par ordre décroissant"|trans|striptags }}"></a>
         </span>
-    </div>
+    </span>
+{% endmacro %}
+
+{#
+    Ligne prévisionnelle : une charge récurrente qui n'est pas encore tombée.
+
+    Ce n'est pas une écriture — pas de case à pointer, pas de suppression —
+    mais elle tombe à une date comme les autres, et se range donc parmi elles.
+    Le fond ambré et le filet de gauche suffisent à la distinguer : les
+    montants, eux, se lisent dans le même rouge et le même vert que le reste
+    de la colonne.
+#}
+{% macro forecastRow(charge, withBalance, period, walletId) %}
+                                <tr class="row-forecast">
+                                    <td class="text-nowrap">
+                                        {{ "%day%/%month%"|trans|striptags|replace({
+                                            '%day%': '%02d'|format(charge.day),
+                                            '%month%': period
+                                        }) }}
+                                    </td>
+                                    <td class="text-center">
+                                        {# Cocher ne « pointe » rien : une prévision n'est pas une
+                                           écriture. Cela veut dire que l'échéance est tombée en
+                                           avance, et cela ne peut s'écrire que d'une façon : elle
+                                           devient une opération réelle, datée du jour. #}
+                                        <form method="post" action="{{ path('back_recurring_settle', {wallet: walletId, charge: charge.key}) }}" class="d-inline-flex">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('recurring-settle-' ~ charge.key) }}">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input checkbox-submit" type="checkbox" value="1"
+                                                       id="settle-{{ charge.key }}"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="{{ "Déjà encaissé : enregistrer l'échéance à la date du jour"|trans|striptags }}"
+                                                       aria-label="{{ "Enregistrer %name% comme payée aujourd'hui"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>{{ charge.category }}</td>
+                                    <td>
+                                        <span class="cell-title" data-bs-toggle="tooltip" data-bs-title="{{ charge.instalment is defined and charge.instalment
+                                            ? "Échéance %rank% sur %total%"|trans|striptags|replace({'%rank%': charge.instalment, '%total%': charge.instalments})
+                                            : (charge.yearly
+                                                ? "Échéance annuelle, montant saisi"|trans|striptags
+                                                : "Estimé sur %months% des %observed% derniers mois"|trans|striptags|replace({
+                                                    '%months%': charge.months, '%observed%': charge.observed
+                                                })) }}">{{ charge.name }}</span>
+                                        {%- if charge.reference %} <span class="cell-meta">{{ charge.reference }}</span>{% endif -%}
+                                    </td>
+                                    <td class="cell-amount text-end text-danger">-{{ charge.amount|number_format(2, ',', ' ') }} €</td>
+                                    {% if withBalance %}
+                                        {# Solde projeté : le solde d'aujourd'hui diminué des échéances
+                                           qui précèdent celle-ci. Il répond à « où vais-je atterrir »,
+                                           que la liste des écritures passées ne dit pas. #}
+                                        <td class="cell-amount text-end {{ charge.projected < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ charge.projected|number_format(2, ',', ' ') }} €
+                                        </td>
+                                    {% endif %}
+                                    {# Une échéance prévue n'est pas une écriture : elle se corrige
+                                       là où elle est définie, sur l'écran des opérations programmées,
+                                       qui s'ouvre directement sur sa ligne. #}
+                                    <td class="cell-actions text-end">
+                                        <a href="{{ path('back_recurring_index', {wallet: walletId}) }}#charge-{{ charge.key }}"
+                                           class="row-action row-action--primary"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="{{ "Modifier cette échéance"|trans|striptags }}"
+                                           aria-label="{{ "Modifier l'échéance %name%"|trans|striptags|replace({'%name%': charge.name}) }}">
+                                            <twig:ux:icon name="tabler:pencil" />
+                                        </a>
+                                    </td>
+                                </tr>
 {% endmacro %}
 
 {% block body %}
 
-    <div id="operations-index" class="container-fluid pt-4 pb-5 position-relative">
+    <div id="operations-index" class="container-fluid pt-2 pb-5 position-relative">
 
-        <div class="top d-flex align-items-center">
-            {% include 'back/core/new-modal.html.twig' with {
-                excludedFields: excludedFields,
-                addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
-                form: form is defined and form ? form : false,
-                formErrors: formErrors is defined and formErrors ? formErrors : false,
-            } only %}
-            {% include 'back/core/import-modal.html.twig' with {
-                form: importForm is defined and importForm ? importForm : false,
-            } only %}
-            <div class="dates-controls d-flex align-items-center ms-4">
-                <a href="{{ path('back_operation_index', {wallet: wallet.id, month: previousMonth, year: previousYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
-                   class="icon-wrap prev bg-dark d-flex align-items-center justify-content-center h-100"
-                   data-bs-toggle="tooltip"
-                   data-bs-title="{{ "Mois précedent"|trans|striptags }}">
-                    <twig:ux:icon name="tabler:chevron-left" class="text-white" />
-                </a>
-                <span class="date bg-dark d-flex align-items-center justify-content-center px-3 h-100"><span class="text-white">{{ date|format_datetime(pattern="MMMM Y"|trans, locale=app.request.locale)|capitalize }}</span></span>
-                <div class="years-controls d-flex flex-column">
-                    <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: nextYear - 1, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
-                       class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
-                         data-bs-toggle="tooltip"
-                         data-bs-title="{{ "Année précedente"|trans|striptags }}">
-                        <twig:ux:icon name="tabler:chevron-up" class="text-white" />
-                    </a>
-                    <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: nextYear + 1, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
-                       class="icon-wrap-year bg-dark d-flex align-items-center justify-content-center"
-                         data-bs-toggle="tooltip"
-                         data-bs-title="{{ "Année suivante"|trans|striptags }}">
-                        <twig:ux:icon name="tabler:chevron-down" class="text-white" />
-                    </a>
-                </div>
-                <a href="{{ path('back_operation_index', {wallet: wallet.id, month: nextMonth, year: nextYear, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
-                   class="icon-wrap next bg-dark d-flex align-items-center justify-content-center h-100"
-                   data-bs-toggle="tooltip"
-                   data-bs-title="{{ "Mois suivant"|trans|striptags }}">
-                    <twig:ux:icon name="tabler:chevron-right" class="text-white" />
-                </a>
-                {% set asCurrent = (app.request.get('year') == 'now'|date('Y') and app.request.get('month') == 'now'|date('m')) or (not app.request.get('month') and not app.request.get('year')) %}
-                {% if not asCurrent %}
-                    <a href="{{ path('back_operation_index', {wallet: wallet.id, sort: app.request.get('sort'), order: app.request.get('order')}) }}"
-                       class="icon-wrap now bg-primary d-flex align-items-center justify-content-center h-100 ms-2"
-                       data-bs-toggle="tooltip"
-                       data-bs-title="{{ "Mois en cours"|trans|striptags }}">
-                        <twig:ux:icon name="tabler:calendar-star" class="text-white" />
-                    </a>
-                {% endif %}
+        <div class="page-head">
+            <div>
+                <h1 class="page-head__title">{{ wallet.title|default(pageTitle)|striptags }}</h1>
+                <p class="page-head__subtitle">{{ "Écritures du compte, mois par mois."|trans|striptags }}</p>
+            </div>
+            <div class="page-head__actions">
+                {% include 'back/core/import-modal.html.twig' with {
+                    form: importForm is defined and importForm ? importForm : false,
+                } only %}
+                {% include 'back/core/new-modal.html.twig' with {
+                    excludedFields: excludedFields,
+                    addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
+                    form: form is defined and form ? form : false,
+                    formErrors: formErrors is defined and formErrors ? formErrors : false,
+                } only %}
             </div>
         </div>
 
-        <table class="table mt-4 table-dark table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Date'|trans, 'dt', date) }}</th>
-                    <th scope="col" class="th-sortable bg-black text-center px-3">{{ macro.sort(wallet, 'État'|trans, 'pt', date) }}</th>
-                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Catégorie'|trans, 'ct', date) }}</th>
-                    <th scope="col" class="th-sortable bg-black px-3">{{ macro.sort(wallet, 'Tiers'|trans, 'os', date) }}</th>
-                    <th scope="col" class="th-sortable bg-black px-3 text-end">{{ macro.sort(wallet, 'Montant'|trans, 'at', date) }}</th>
-                    <th scope="col" class="text-end bg-black px-3">{{ "Solde"|trans|striptags }}</th>
-                    <th scope="col" class="text-end bg-black"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entity in pagination %}
-                    <tr>
-                        <td class="align-middle px-3">{% if entity.date %}{{ entity.date|format_datetime(pattern="dd/M/Y"|trans, locale=app.request.locale) }}{% endif %}</td>
-                        <td class="align-middle px-3 text-center">
-                            <form action="{{ path('back_operation_pointed', {operation: entity.id}) }}" class="d-inline-flex">
-                                <div class="form-check">
-                                    <label class="form-check-label position-relative" for="pointed-{{ entity.id }}">
-                                        <input class="form-check-input checkbox-ajax" type="checkbox" value="{{ entity.pointed }}" id="pointed-{{ entity.id }}" {% if entity.pointed %} checked{% endif %}>
-                                    </label>
-                                </div>
-                            </form>
-                        </td>
-                        <td class="align-middle px-3">{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
-                        <td class="align-middle px-3">{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</td>
-                        <td class="text-end align-middle px-3">{% if entity.amount is not null %}{{ entity.amount|number_format(2, ',', ' ') }}{% endif %}</td>
-                        <td class="text-end align-middle px-3">
-                            {% if wallet.currentOperations[entity.id].balance is defined %}
-                                {{ wallet.currentOperations[entity.id].balance|number_format(2, ',', ' ') }}
-                            {% endif %}
-                        </td>
-                        <td class="text-end align-middle">
-                            {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity, asBtn: false} only %}
-                            {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity, asBtn: false} only %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {# Le tableau, sa barre de période et son pied tiennent dans une seule
+           carte, comme tables-datatables-basic. #}
+        <div class="card">
+            <div class="card-header index-toolbar">
+                {% if unlinkedOnly|default(false) %}
+                    {# Le filtre sort de la période : le dire, sinon la liste paraît
+                       contredire le mois affiché. #}
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="badge badge-warning">{{ "Hors période"|trans|striptags }}</span>
+                        <span>{{ "Opérations non rattachées à un poste, tout l'historique"|trans|striptags }}</span>
+                        <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}"
+                           class="btn btn-label-secondary btn-sm d-inline-flex align-items-center gap-2 text-nowrap ms-2">
+                            <twig:ux:icon name="tabler:arrow-left" width="16" height="16" />
+                            <span>{{ "Revenir au mois"|trans|striptags }}</span>
+                        </a>
+                    </div>
+                {% else %}
+                <div class="dates-controls d-flex align-items-center gap-2">
+                    {# Une seule commande, un seul filet : mois précédent,
+                       période, année, mois suivant. #}
+                    <span class="period-nav">
+                        <a href="{{ path('back_operation_index', {wallet: wallet.id, month: previousMonth, year: previousYear, sort: app.request.query.get('sort'), order: app.request.query.get('order')}) }}"
+                           class="period-step"
+                           data-bs-toggle="tooltip" data-bs-title="{{ "Mois précédent"|trans|striptags }}"
+                           aria-label="{{ "Mois précédent"|trans|striptags }}">
+                            <twig:ux:icon name="tabler:chevron-left" />
+                        </a>
+                        <span class="period-label">{{ date|format_datetime(pattern="MMMM Y"|trans, locale=app.request.locale)|capitalize }}</span>
+                        {# `nextYear` est l'année du mois suivant : en décembre, « année
+                           précédente » renvoyait sur l'année courante et « année
+                           suivante » en sautait une. C'est l'année affichée qu'il
+                           faut décaler. #}
+                        <span class="period-year">
+                            <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: currentYear - 1, sort: app.request.query.get('sort'), order: app.request.query.get('order')}) }}"
+                               data-bs-toggle="tooltip" data-bs-title="{{ "Année précédente"|trans|striptags }}"
+                               aria-label="{{ "Année précédente"|trans|striptags }}">
+                                <twig:ux:icon name="tabler:chevron-up" />
+                            </a>
+                            <a href="{{ path('back_operation_index', {wallet: wallet.id, month: date|date('m'), year: currentYear + 1, sort: app.request.query.get('sort'), order: app.request.query.get('order')}) }}"
+                               data-bs-toggle="tooltip" data-bs-title="{{ "Année suivante"|trans|striptags }}"
+                               aria-label="{{ "Année suivante"|trans|striptags }}">
+                                <twig:ux:icon name="tabler:chevron-down" />
+                            </a>
+                        </span>
+                        <a href="{{ path('back_operation_index', {wallet: wallet.id, month: nextMonth, year: nextYear, sort: app.request.query.get('sort'), order: app.request.query.get('order')}) }}"
+                           class="period-step"
+                           data-bs-toggle="tooltip" data-bs-title="{{ "Mois suivant"|trans|striptags }}"
+                           aria-label="{{ "Mois suivant"|trans|striptags }}">
+                            <twig:ux:icon name="tabler:chevron-right" />
+                        </a>
+                    </span>
+                    {% if pendingChargesTotal|default(0) > 0 %}
+                        <span class="badge badge-warning d-inline-flex align-items-center gap-1" data-bs-toggle="tooltip"
+                              data-bs-title="{{ "Charges récurrentes qui ne sont pas encore passées ce mois-ci"|trans|striptags }}">
+                            <twig:ux:icon name="tabler:clock" width="14" height="14" />
+                            <span>{{ "Reste à payer"|trans|striptags }} {{ pendingChargesTotal|number_format(2, ',', ' ') }} €</span>
+                        </span>
+                    {% endif %}
+                    {# Les non rattachées sont dispersées sur tout l'historique : le
+                       bouton ne paraît que s'il y en a, et il annonce combien. #}
+                    {% if unlinkedCount|default(0) > 0 and not unlinkedOnly|default(false) %}
+                        <a href="{{ path('back_operation_index', {wallet: wallet.id, unlinked: 1}) }}"
+                           class="btn btn-label-warning btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                            <twig:ux:icon name="tabler:help-circle" width="16" height="16" />
+                            <span>{{ "Non rattachées"|trans|striptags }}</span>
+                            <span class="badge-count">{{ unlinkedCount }}</span>
+                        </a>
+                    {% endif %}
+                    {% set asCurrent = (app.request.query.get('year') == 'now'|date('Y') and app.request.query.get('month') == 'now'|date('m')) or (not app.request.query.get('month') and not app.request.query.get('year')) %}
+                    {% if not asCurrent %}
+                        <a href="{{ path('back_operation_index', {wallet: wallet.id, sort: app.request.query.get('sort'), order: app.request.query.get('order')}) }}"
+                           class="btn btn-label-primary btn-sm d-inline-flex align-items-center gap-2"
+                           data-bs-toggle="tooltip" data-bs-title="{{ "Mois en cours"|trans|striptags }}">
+                            <twig:ux:icon name="tabler:calendar-star" width="16" height="16" />
+                            <span>{{ "Mois en cours"|trans|striptags }}</span>
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
 
-        {% if pagination is empty %}
-            {% include 'back/includes/alert.html.twig' with {
-                display: 'alert',
-                size: 'small',
-                alert: 'info',
-                message: 'Aucune opération.'
-            } only %}
-        {% endif %}
+            {#
+                Écritures et échéances prévues forment une seule liste.
+
+                Une échéance à venir n'est pas un bloc à part posé en tête de
+                tableau : elle tombe le 19 comme l'écriture du 19, et c'est
+                dans cet ordre qu'on lit un relevé. Les deux listes sont donc
+                fondues, puis triées sur la colonne active — la date par
+                défaut — dans le sens choisi.
+
+                Le tri est stable : à valeur égale, les écritures gardent
+                l'ordre que le repository leur a donné, départage du solde
+                compris.
+            #}
+            {% set sortField = {
+                'dt': 'date', 'at': 'amount', 'ct': 'category', 'os': 'outsider', 'pt': 'pointed'
+            }[app.request.query.get('sort')]|default('date') %}
+            {% set descending = 'asc' != app.request.query.get('order')|lower %}
+            {% set period = date|date('m/Y') %}
+
+            {% set rows = [] %}
+            {% for entity in pagination %}
+                {% set rows = rows|merge([{
+                    forecast: false,
+                    entity: entity,
+                    chrono: wallet.currentOperations[entity.id].rank|default(0),
+                    date: entity.date ? entity.date|date('Y-m-d') : '',
+                    amount: entity.amount|default(0),
+                    category: entity.subCategory.adminName is defined ? entity.subCategory.adminName|striptags : '',
+                    outsider: entity.outsider.adminName is defined ? entity.outsider.adminName|striptags : '',
+                    pointed: entity.pointed ? 1 : 0,
+                }]) %}
+            {% endfor %}
+            {% for charge in pendingCharges|default([]) %}
+                {# Une échéance du jour vient après les écritures du même jour :
+                   elle n'est justement pas encore tombée. Le décalage la range
+                   derrière le dernier rang chronologique possible. #}
+                {% set rows = rows|merge([{
+                    forecast: true,
+                    charge: charge,
+                    chrono: 100000 + loop.index0,
+                    date: '%s-%02d'|format(date|date('Y-m'), charge.day),
+                    amount: charge.amount,
+                    category: charge.category,
+                    outsider: charge.name,
+                    pointed: 0,
+                }]) %}
+            {% endfor %}
+            {#
+                À valeur égale, le rang chronologique départage, inversé avec le
+                sens de lecture — c'est la règle que le repository applique déjà
+                aux écritures. Sans elle, les échéances d'un même jour se
+                lisaient à l'envers des autres et la colonne Solde remontait au
+                milieu d'une journée.
+            #}
+            {% set rows = rows|sort((a, b) => descending
+                ? ([b[sortField], b.chrono] <=> [a[sortField], a.chrono])
+                : ([a[sortField], a.chrono] <=> [b[sortField], b.chrono])) %}
+
+            {% if rows|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <caption class="visually-hidden">{{ "Opérations du compte sur la période affichée"|trans|striptags }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="th-sortable">{{ macro.sort(wallet, 'Date'|trans, 'dt', date) }}</th>
+                                <th scope="col" class="th-sortable text-center">{{ macro.sort(wallet, 'État'|trans, 'pt', date) }}</th>
+                                <th scope="col" class="th-sortable">{{ macro.sort(wallet, 'Catégorie'|trans, 'ct', date) }}</th>
+                                <th scope="col" class="th-sortable">{{ macro.sort(wallet, 'Tiers'|trans, 'os', date) }}</th>
+                                <th scope="col" class="th-sortable text-end">{{ macro.sort(wallet, 'Montant'|trans, 'at', date) }}</th>
+                                {% if not unlinkedOnly|default(false) %}
+                                    <th scope="col" class="text-end">{{ "Solde"|trans|striptags }}</th>
+                                {% endif %}
+                                <th scope="col" class="cell-actions text-end">{{ "Actions"|trans|striptags }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                {% if row.forecast %}
+                                    {{ macro.forecastRow(row.charge, not unlinkedOnly|default(false), period, wallet.id) }}
+                                {% else %}
+                                {% set entity = row.entity %}
+                                <tr>
+                                    <td class="text-nowrap">{% if entity.date %}{{ entity.date|format_datetime(pattern="dd/MM/Y"|trans, locale=app.request.locale) }}{% endif %}</td>
+                                    <td class="text-center">
+                                        <form action="{{ path('back_operation_pointed', {operation: entity.id}) }}" method="post" class="d-inline-flex">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('operation-pointed-' ~ entity.id) }}">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input checkbox-ajax" type="checkbox" value="{{ entity.pointed }}"
+                                                       id="pointed-{{ entity.id }}" {% if entity.pointed %}checked{% endif %}
+                                                       aria-label="{{ "Pointer l'opération du %date% : %tiers%"|trans|striptags|replace({
+                                                           '%date%': entity.date ? entity.date|format_datetime(pattern="dd MMMM Y", locale=app.request.locale) : '',
+                                                           '%tiers%': entity.outsider.adminName is defined ? entity.outsider.adminName|striptags : ''
+                                                       }) }}">
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>{% if entity.subCategory.adminName is defined %}{{ entity.subCategory.adminName|striptags }}{% endif %}</td>
+                                    <td><span class="cell-title">{% if entity.outsider.adminName is defined %}{{ entity.outsider.adminName|striptags }}{% endif %}</span></td>
+                                    {# Le sens est porté par le type d'opération, pas par le signe du
+                                       montant : la banque fournit débits et crédits en colonnes
+                                       séparées, tous deux en valeur absolue. #}
+                                    {% set isIncome = entity.operationType and 'incomes' == entity.operationType.type %}
+                                    <td class="cell-amount text-end {{ isIncome ? 'text-success' : 'text-danger' }}">
+                                        {%- if entity.amount is not null -%}
+                                            {{ isIncome ? '+' : '-' }}{{ entity.amount|number_format(2, ',', ' ') }} €
+                                        {%- endif -%}
+                                    </td>
+                                    {% if not unlinkedOnly|default(false) %}
+                                        {% set balance = balances[entity.id]|default(null) %}
+                                        <td class="cell-amount text-end {{ balance is not null and balance < 0 ? 'text-danger' : 'text-success' }}">
+                                            {%- if balance is not null -%}
+                                                {{ balance|number_format(2, ',', ' ') }} €
+                                            {%- endif -%}
+                                        </td>
+                                    {% endif %}
+                                    <td class="cell-actions text-end">
+                                        {% include 'back/core/edit-btn.html.twig' with {interface: interface, entity: entity} only %}
+                                        {% include 'back/core/delete-modal.html.twig' with {interface: interface, entity: entity} only %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer p-0">
+                    {% include 'back/includes/pagination.html.twig' with {pagination: pagination} only %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <twig:ux:icon name="tabler:receipt-off" />
+                    {% if unlinkedOnly|default(false) %}
+                        <p class="empty-state__title">{{ "Tout est rattaché"|trans|striptags }}</p>
+                        <p class="empty-state__text">{{ "Aucune opération ne reste dans un poste fourre-tout."|trans|striptags }}</p>
+                    {% else %}
+                        <p class="empty-state__title">{{ "Aucune opération"|trans|striptags }}</p>
+                        <p class="empty-state__text">{{ "Rien n'est enregistré sur cette période."|trans|striptags }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
 
     </div>
 

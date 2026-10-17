@@ -1,3 +1,5 @@
 knp_paginator:
     template:
-        pagination: '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig'
+        # Gabarit du projet : carrés à coins doux, quatre flèches nommées, page
+        # active en blanc sur le primaire. Voir .claude/charte-back.
+        pagination: 'back/includes/pagination-links.html.twig'

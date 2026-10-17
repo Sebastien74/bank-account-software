@@ -31,7 +31,10 @@ class Category extends BaseEntity
         'buttons' => [
             'subCategories' => 'back_subcategory_index',
         ],
-    ];
+            'columns' => [
+            'budgets' => ['label' => 'Budget', 'format' => 'names'],
+        ],
+];
 
     protected static array $labels = [
         'back_subcategory_index' => 'Sous-catégories',
@@ -66,6 +69,27 @@ class Category extends BaseEntity
         $this->type = $this->operationtype->getType();
 
         parent::prePersist();
+    }
+
+    /**
+     * Enveloppes qui couvrent ce poste, via ses sous-postes.
+     *
+     * Le budget porte sur la sous-categorie : une categorie peut donc se
+     * trouver repartie sur plusieurs enveloppes, et l'index doit le dire
+     * plutot que d'en nommer une seule.
+     *
+     * @return list<Budget>
+     */
+    public function getBudgets(): array
+    {
+        $budgets = [];
+        foreach ($this->subCategories as $subCategory) {
+            foreach ($subCategory->getBudgets() as $budget) {
+                $budgets[(int) $budget->getId()] = $budget;
+            }
+        }
+
+        return array_values($budgets);
     }
 
     public function getType(): ?string

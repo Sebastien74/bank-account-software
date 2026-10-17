@@ -2,16 +2,214 @@
 
 {% trans_default_domain 'back' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
-
 {% block body %}
-    <div id="dashboard" class="container-fluid pt-4 pb-5 position-relative">
+    {# Le tableau de bord ne se saisit pas : il confronte les enveloppes à ce
+       qui est réellement sorti du compte ce mois-ci. #}
+    <div id="dashboard" class="container-fluid pt-2 pb-5 position-relative">
+
+        <div class="page-head">
+            <div>
+                <h1 class="page-head__title">{{ "Tableau de bord des budgets"|trans|striptags }}</h1>
+                <p class="page-head__subtitle">
+                    {{ "Enveloppes du compte %wallet%, confrontées aux dépenses du mois."|trans|striptags|replace({'%wallet%': wallet.adminName|striptags}) }}
+                </p>
+            </div>
+            <div class="page-head__actions">
+                <a href="{{ path('back_budget_index') }}"
+                   class="btn btn-label-secondary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                    <twig:ux:icon name="tabler:adjustments" width="16" height="16" />
+                    <span>{{ "Régler les enveloppes"|trans|striptags }}</span>
+                </a>
+                <a href="{{ path('back_operation_index', {wallet: wallet.id}) }}"
+                   class="btn btn-label-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap">
+                    <twig:ux:icon name="tabler:list-details" width="16" height="16" />
+                    <span>{{ "Mes opérations"|trans|striptags }}</span>
+                </a>
+            </div>
+        </div>
+
+        {% set reste = (totalBudget - totalSpent)|round(2) %}
+
+        <div class="card mb-3">
+            <div class="card-header index-toolbar">
+                <div class="dates-controls d-flex align-items-center gap-3">
+                <div class="period-nav d-inline-flex align-items-center">
+                    <a href="{{ path('back_dashboard', {wallet: wallet.id, year: previous|date('Y'), month: previous|date('n')}) }}"
+                       class="period-step" aria-label="{{ "Mois précédent"|trans|striptags }}"
+                       data-bs-toggle="tooltip" data-bs-title="{{ "Mois précédent"|trans|striptags }}">
+                        <twig:ux:icon name="tabler:chevron-left" />
+                    </a>
+                    <span class="period-label">{{ period|date('m/Y') }}</span>
+                    <a href="{{ path('back_dashboard', {wallet: wallet.id, year: next|date('Y'), month: next|date('n')}) }}"
+                       class="period-step" aria-label="{{ "Mois suivant"|trans|striptags }}"
+                       data-bs-toggle="tooltip" data-bs-title="{{ "Mois suivant"|trans|striptags }}">
+                        <twig:ux:icon name="tabler:chevron-right" />
+                    </a>
+                </div>
+                </div>
+                {% if isCurrentMonth %}
+                    {# Un mois en cours n'est pas comparable à un mois clos : le
+                       dire évite de lire un dépassement là où il n'y a qu'un début. #}
+                    <span class="cell-meta">{{ "Mois en cours : les dépenses ne sont pas closes."|trans|striptags }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <dl class="wallet-figures">
+                    {# Le revenu de référence, pas celui du mois : le 3 du mois,
+                       l'encaissé ne vaut presque rien, et comparer les enveloppes
+                       à lui ferait croire à un plan intenable. #}
+                    <div>
+                        <dt>{{ "Revenu de référence"|trans|raw }}</dt>
+                        <dd class="text-success">{{ reference|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                    <div>
+                        <dt>{{ "Total budgété"|trans|raw }}</dt>
+                        <dd>{{ totalBudget|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                    <div>
+                        <dt>{{ "Prévu en fin de mois"|trans|raw }}</dt>
+                        <dd class="{{ headroom < 0 ? 'text-danger' : 'text-success' }}">{{ headroom|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                    <div>
+                        <dt>{{ "Encaissé ce mois-ci"|trans|raw }}</dt>
+                        <dd>{{ income|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                    <div>
+                        <dt>{{ "Dépensé ce mois-ci"|trans|raw }}</dt>
+                        <dd class="{{ totalSpent > totalBudget ? 'text-danger' : '' }}">{{ totalSpent|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                    <div>
+                        <dt>{{ "Reste sur les enveloppes"|trans|raw }}</dt>
+                        <dd class="{{ reste < 0 ? 'text-danger' : 'text-success' }}">{{ reste|number_format(2, ',', ' ') }} €</dd>
+                    </div>
+                </dl>
+                {% if headroom < 0 %}
+                    {# Un plan qui dépasse le revenu de référence conduit au
+                       découvert : le dire ici, pas seulement en console. #}
+                    <p class="stat-tile__meta d-flex align-items-center gap-1 mt-2 text-danger">
+                        <twig:ux:icon name="tabler:alert-triangle" width="14" height="14" />
+                        <span>{{ "Les enveloppes dépassent le revenu de référence de %gap% € : le plan mène au découvert."|trans|striptags|replace({'%gap%': (0 - headroom)|number_format(2, ',', ' ')}) }}</span>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">{{ "Enveloppes"|trans|striptags }}</h2>
+                    <p class="card-subtitle">
+                        {{ lines|length }} {{ (lines|length > 1 ? "postes" : "poste")|trans|striptags }}
+                    </p>
+                </div>
+            </div>
+
+            {% if lines is not empty %}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <caption class="visually-hidden">{{ "Consommation des enveloppes du mois"|trans|striptags }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ "Poste"|trans|striptags }}</th>
+                                <th scope="col" class="budget-gauge-col">{{ "Consommation"|trans|striptags }}</th>
+                                <th scope="col" class="text-end">{{ "Dépensé"|trans|striptags }}</th>
+                                <th scope="col" class="text-end">{{ "Budget"|trans|striptags }}</th>
+                                <th scope="col" class="text-end">{{ "Reste"|trans|striptags }}</th>
+                                <th scope="col" class="cell-actions text-end">{{ "Actions"|trans|striptags }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in lines %}
+                                {# Sur une mise de côté, la lecture s'inverse : atteindre
+                                   l'enveloppe est le but, rester en dessous est le
+                                   manquement, et la dépasser n'est pas un incident. #}
+                                {% set ton = line.saving|default(false)
+                                    ? (line.ratio >= 100 ? 'success' : (line.ratio >= 50 ? 'warning' : 'danger'))
+                                    : (line.over ? 'danger' : (line.ratio >= 80 ? 'warning' : 'success')) %}
+                                <tr{% if not line.budget.active %} class="row-inactive"{% endif %}>
+                                    <td>
+                                        <span class="cell-title">{{ line.name }}</span>
+                                        {# Les postes couverts sont rappelés : une enveloppe peut en
+                                           porter plusieurs, et son intitulé ne les nomme pas tous. #}
+                                        {%- if line.postes is empty %}
+                                            <span class="cell-meta text-warning">{{ "Aucun poste associé"|trans|striptags }}</span>
+                                        {%- elseif line.postes|length > 1 or line.postes.0 != line.name %}
+                                            <span class="cell-meta">{{ line.postes|join(', ') }}</span>
+                                        {% endif -%}
+                                        {%- if not line.budget.active %}<span class="cell-meta">{{ "Hors total"|trans|striptags }}</span>{% endif -%}
+                                    </td>
+                                    <td class="budget-gauge-col">
+                                        {# La jauge double le chiffre, elle ne le remplace pas :
+                                           une barre seule ne se lit pas au clavier ni en lecture d'écran. #}
+                                        <div class="budget-gauge" role="img"
+                                             aria-label="{{ "%percent% % de l'enveloppe %name% consommés"|trans|striptags|replace({
+                                                 '%percent%': line.ratio, '%name%': line.name
+                                             }) }}">
+                                            <span class="budget-gauge__fill budget-gauge__fill--{{ ton }}" style="width: {{ line.ratio }}%"></span>
+                                        </div>
+                                        <span class="cell-meta">{{ line.ratio }} %</span>
+                                    </td>
+                                    <td class="cell-amount text-end">{{ line.spent|number_format(2, ',', ' ') }} €</td>
+                                    <td class="cell-amount text-end">{{ line.amount|number_format(2, ',', ' ') }} €</td>
+                                    {# Le reste prend la teinte de la jauge : c'est la meme
+                                       lecture, et deux codes couleur pour une seule situation
+                                       obligeraient a les rapprocher de tete. #}
+                                    <td class="cell-amount text-end text-{{ ton }}">
+                                        {{ line.remaining|number_format(2, ',', ' ') }} €
+                                    </td>
+                                    <td class="cell-actions text-end">
+                                        <a href="{{ path('back_budget_edit', {budget: line.budget.id}) }}"
+                                           class="row-action row-action--primary"
+                                           data-bs-toggle="tooltip" data-bs-title="{{ "Régler cette enveloppe"|trans|striptags }}"
+                                           aria-label="{{ "Régler l'enveloppe %name%"|trans|striptags|replace({'%name%': line.name}) }}">
+                                            <twig:ux:icon name="tabler:pencil" />
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <twig:ux:icon name="tabler:mail-dollar" />
+                    <p class="empty-state__title">{{ "Aucune enveloppe"|trans|striptags }}</p>
+                    <p class="empty-state__text">{{ "Lancez « app:wallet:budgets --apply » pour en proposer une par poste."|trans|striptags }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if unbudgeted is not empty %}
+            {# Sans ce bloc, un plan paraîtrait tenu alors que l'argent est
+               sorti sur un poste qui n'a pas d'enveloppe. #}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">{{ "Dépensé hors enveloppe"|trans|striptags }}</h2>
+                        <p class="card-subtitle">{{ "Postes sans budget défini, pourtant débités ce mois-ci."|trans|striptags }}</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <caption class="visually-hidden">{{ "Dépenses sans enveloppe"|trans|striptags }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ "Poste"|trans|striptags }}</th>
+                                <th scope="col" class="text-end">{{ "Dépensé"|trans|striptags }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in unbudgeted %}
+                                <tr>
+                                    <td><span class="cell-title">{{ row.name }}</span></td>
+                                    <td class="cell-amount text-end text-warning">{{ row.spent|number_format(2, ',', ' ') }} €</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
 
     </div>
 {% endblock %}

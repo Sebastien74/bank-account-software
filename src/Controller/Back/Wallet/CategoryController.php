@@ -52,7 +52,7 @@ class CategoryController extends BaseController
     /**
      * Category delete.
      */
-    #[Route('/delete/{category}', name: 'back_category_delete', methods: 'GET')]
+    #[Route('/delete/{category}', name: 'back_category_delete', methods: 'POST')]
     public function delete(Category $category): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($category));

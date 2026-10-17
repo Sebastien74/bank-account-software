@@ -3,91 +3,55 @@
 /* --------------------------------------------------------------------------------------
 
     Module : Back modal
-    Copyright : 2025
+    Copyright : 2026
     Author : Sébastien FOURNIER <fournier.sebastien@outlook.com>
     Licensed under MIT (https://github.com/Sebastien74/MIT-LICENSE/blob/main/LICENSE.md)
+
+    La modale est une carte posée sur le voile : même surface, même rayon, même
+    ombre. Le dégradé et le halo d'avant la faisaient d'une autre matière que
+    les cartes de l'écran qu'elle recouvre.
 
 ----------------------------------------------------------------------------------------- */
 
 .modal-content {
 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px !important;
-    background: radial-gradient(900px 520px at 82% 100%, rgba(111, 66, 193, 0.045), transparent 62%),
-    radial-gradient(1100px 780px at 30% 65%, rgba(255, 255, 255, 0.012), transparent 68%),
-    linear-gradient(0deg, #121726, #0e1219 48%, #0a0d12);
-
-    &:before {
-        content: "";
-        background: radial-gradient(520px 220px at 18% 0%, rgba(124, 108, 255, 0.22), transparent 62%);
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        border-radius: 14px !important;
-        z-index: -1;
-    }
-
-    > *:first-child {
-        position: relative;
-    }
-
-    .modal-header {
-        border-bottom: 0 !important;
-    }
-
-    .modal-body,
-    .modal-footer {
-        border: 0 !important;
-    }
+    background: $surface;
+    border: 0;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
 
     .modal-header,
     .modal-body,
     .modal-footer {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
 
-        .icon-plus-circle,
-        .icon-minus-circle {
-            font-size: 24px;
-        }
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
 
-        .btn-close {
-            color: $white;
-        }
+    .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, .06);
     }
 
     .modal-body {
 
-        i.large {
-            font-size: 60px;
-        }
-
         .delete-alert {
-            font-size: 18px;
+            font-size: 1.0625rem;
         }
     }
 
-    .modal-header,
-    .modal-body,
-    .modal-footer {
-        padding-right: 1.5rem !important;
-        padding-left: 1.5rem !important;
-    }
-
+    /* Sous le point de rupture, les actions passent en pile et l'annulation
+       disparaît : la croix et le voile la portent déjà. */
     @include mediaQuery(max-sm) {
 
-        .modal-footer {
+        .modal-footer .btn {
+            margin: 0 0 .75rem !important;
+            width: 100%;
 
-            .btn {
-
-                width: 100%;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                margin-bottom: .75rem !important;
-
-                &[data-bs-dismiss="modal"] {
-                    display: none !important;
-                }
+            &[data-bs-dismiss="modal"] {
+                display: none !important;
             }
         }
     }

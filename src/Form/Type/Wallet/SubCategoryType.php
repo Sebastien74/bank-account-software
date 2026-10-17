@@ -45,7 +45,7 @@ class SubCategoryType extends AbstractType
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un initulé.', [], 'back'))
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-6'],
+            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-md-6'],
         ]);
 
         if (!$isNew) {
@@ -59,13 +59,13 @@ class SubCategoryType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un code.', [], 'back'))
                 ],
-                'row_attr' => ['class' => 'col-lg-3'],
+                'row_attr' => ['class' => 'col-md-3'],
             ]);
 
             $builder->add('icon', FontawesomeType::class, [
                 'required' => false,
                 'attr' => ['class' => 'select-icons'],
-                'row_attr' => ['class' => 'col-lg-3'],
+                'row_attr' => ['class' => 'col-md-3'],
             ]);
         }
 

@@ -1,0 +1,46 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - link "Bank Account Software" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - paragraph [ref=e8]: Connexion
+      - paragraph [ref=e9]: Accédez à la gestion de vos comptes
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - textbox "Identifiant *" [ref=e12]:
+            - /placeholder: Saisissez votre identifiant
+          - generic:
+            - text: Identifiant
+            - superscript: "*"
+        - generic [ref=e13]:
+          - textbox "Mot de passe *" [ref=e15]:
+            - /placeholder: Saisissez votre mot de passe
+          - generic:
+            - text: Mot de passe
+            - superscript: "*"
+        - generic [ref=e22]:
+          - generic [ref=e25]:
+            - checkbox "Se souvenir de moi" [checked] [ref=e26]
+            - generic [ref=e27]: Se souvenir de moi
+          - link "Mot de passe oublié ?" [ref=e29] [cursor=pointer]:
+            - /url: /secure/user/reset-password/fr/request
+        - group:
+          - generic [ref=e31]:
+            - generic [ref=e32]:
+              - textbox "Required field" [ref=e33]
+              - generic: Required field
+            - generic [ref=e34]:
+              - textbox "Required field *" [ref=e35]: SVJLWGxKOGpQdCtSdXlST2pGOHVyNzVwbUxTNi9nOU1JdnQzQ2dwYnQyTmh1TWREV3JNL3ZrQnJDQXUxVEF2Yw==
+              - generic:
+                - text: Required field
+                - superscript: "*"
+        - button "Se connecter" [ref=e37] [cursor=pointer]
+  - toolbar "Symfony Web Debug Toolbar":
+    - generic [ref=e38]:
+      - link "Symfony Loading…" [ref=e40] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/dbae1d?panel=request
+        - generic [ref=e41]:
+          - img "Symfony" [ref=e42]
+          - generic [ref=e44]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=e45] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=e46]

@@ -52,7 +52,7 @@ class OperationTypeController extends BaseController
     /**
      * OperationType delete.
      */
-    #[Route('/delete/{operationtype}', name: 'back_operationtype_delete', methods: 'GET')]
+    #[Route('/delete/{operationtype}', name: 'back_operationtype_delete', methods: 'POST')]
     public function delete(OperationType $operationtype): RedirectResponse
     {
         return $this->redirect($this->globalFormManager->delete($operationtype));

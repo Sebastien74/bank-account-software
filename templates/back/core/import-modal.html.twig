@@ -1,28 +1,33 @@
 {% trans_default_domain 'back' %}
 
+{# Action secondaire utile : teinte atténuée, pas un contour clair. La
+   référence ne se sert pas du contour pour ce niveau. #}
 {% if form %}
-    <button type="button" class="btn btn-dark p-0 d-flex align-items-center text-white add-btn btn-icon ms-2" data-bs-toggle="modal" data-bs-target="#import-operations-modal">
-        <twig:ux:icon name="tabler:file-spreadsheet" class="btn-square bg-primary" /><span class="btn text-white py-0 px-3">{{ "Importer"|trans|striptags }}</span>
+    <button type="button"
+            class="btn btn-label-primary d-inline-flex align-items-center gap-2"
+            data-bs-toggle="modal" data-bs-target="#import-operations-modal">
+        <twig:ux:icon name="tabler:file-spreadsheet" width="17" height="17" />
+        <span>{{ "Importer"|trans|striptags }}</span>
     </button>
-    <div class="modal fade" id="import-operations-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="import-operations-modal" tabindex="-1" aria-hidden="true" aria-labelledby="import-operations-modal-title">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark">
+            <div class="modal-content">
                 {{ form_start(form, {attr: {
                     novalidate: "novalidate",
                     enctype: "multipart/form-data",
                 }}) }}
                     <div class="modal-header">
-                        <strong class="text-white fs-5 d-flex align-items-center"><twig:ux:icon name="tabler:file-spreadsheet" class="text-primary me-2" />{{ "Importer des opérations"|trans|raw }}</strong>
+                        <h2 class="modal-title" id="import-operations-modal-title">{{ "Importer des opérations"|trans|raw }}</h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "Fermer"|trans|raw }}"></button>
                     </div>
-                    <div class="modal-body pt-4 pb-0">
-                        <p class="text-white-50">{{ "Déposez le relevé de compte au format XLSX à importer."|trans|raw }}</p>
-                        <div class="row">
+                    <div class="modal-body">
+                        <p class="text-secondary small">{{ "Déposez le relevé de compte au format XLSX à importer."|trans|raw }}</p>
+                        <div class="row g-3">
                             {{ form_row(form.file) }}
                         </div>
                     </div>
-                    <div class="modal-footer pt-0 pb-4">
-                        <button type="button" class="btn btn-dark me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-label-secondary me-auto" data-bs-dismiss="modal">{{ "Annuler"|trans|raw }}</button>
                         {{ form_widget(form.submit) }}
                     </div>
                 {{ form_end(form) }}

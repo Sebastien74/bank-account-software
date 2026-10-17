@@ -1,0 +1,127 @@
+- generic [active] [ref=f1e1]:
+  - link "Aller au contenu principal" [ref=f1e2] [cursor=pointer]:
+    - /url: "#body-page"
+  - link "Aller au pied de page" [ref=f1e3] [cursor=pointer]:
+    - /url: "#footer"
+  - banner [ref=f1e5]:
+    - generic [ref=f1e6]:
+      - link "Pâtes Grand'Mère" [ref=f1e7] [cursor=pointer]:
+        - /url: https://localhost
+        - img "Pâtes Grand'Mère" [ref=f1e8]
+      - navigation "Navigation principale" [ref=f1e10]:
+        - list:
+          - listitem [ref=f1e11]:
+            - button "Nos produits" [ref=f1e12] [cursor=pointer]: Nos produits 
+          - listitem [ref=f1e13]:
+            - link "Nos recettes" [ref=f1e14] [cursor=pointer]:
+              - /url: https://localhost/nos-recettes
+          - listitem [ref=f1e15]:
+            - link "Notre histoire" [ref=f1e16] [cursor=pointer]:
+              - /url: https://localhost/notre-histoire
+          - listitem [ref=f1e17]:
+            - link "Boutique en ligne" [ref=f1e18] [cursor=pointer]:
+              - /url: https://localhost/ou-acheter
+          - listitem [ref=f1e19]:
+            - link "Nous rejoindre" [ref=f1e20] [cursor=pointer]:
+              - /url: https://localhost/recrutement
+          - listitem [ref=f1e21]:
+            - link "Où acheter" [ref=f1e22] [cursor=pointer]:
+              - /url: https://localhost/nos-produits
+      - list [ref=f1e24]:
+        - listitem [ref=f1e25]:
+          - link "English" [ref=f1e26] [cursor=pointer]:
+            - /url: https://en.grand-mere-2026.local
+            - img "English" [ref=f1e27]
+  - generic [ref=f1e32]:
+    - main [ref=f1e33]:
+      - generic [ref=f1e37]:
+        - generic [ref=f1e43]: Oups !
+        - heading "404" [level=2] [ref=f1e44]
+        - heading "Page non trouvée." [level=2] [ref=f1e45]
+        - paragraph [ref=f1e46]: Désolé, la page que vous recherchez n'existe pas, a été supprimée, son nom a été modifié ou est temporairement indisponible.
+        - link "Retourner sur la page d'accueil" [ref=f1e48] [cursor=pointer]:
+          - /url: /
+    - contentinfo [ref=f1e49]:
+      - generic [ref=f1e51]:
+        - generic [ref=f1e53]:
+          - link "Pâtes Grand'Mère" [ref=f1e54] [cursor=pointer]:
+            - /url: https://localhost
+          - navigation "Navigation des liens sociaux" [ref=f1e55]:
+            - button "Linkedin - nouvelle fenêtre" [ref=f1e56] [cursor=pointer]:
+              - generic [aria-hidden] [ref=f1e57]: 
+            - button "Instagram - nouvelle fenêtre" [ref=f1e59] [cursor=pointer]:
+              - generic [aria-hidden] [ref=f1e60]: 
+            - button "Facebook - nouvelle fenêtre" [ref=f1e62] [cursor=pointer]:
+              - generic [aria-hidden] [ref=f1e63]: 
+        - generic [ref=f1e65]:
+          - strong [ref=f1e66]: Une question ?
+          - generic [ref=f1e67]: Nous sommes à votre écoute
+          - link "Contactez-nous" [ref=f1e68] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=f1e70]:
+          - navigation "Liens utiles" [ref=f1e71]:
+            - list [ref=f1e72]:
+              - listitem [ref=f1e73]:
+                - link "Nos produits" [ref=f1e74] [cursor=pointer]:
+                  - /url: https://localhost/nos-produits
+              - listitem [ref=f1e75]:
+                - link "Nos recettes" [ref=f1e76] [cursor=pointer]:
+                  - /url: https://localhost/nos-recettes
+              - listitem [ref=f1e77]:
+                - link "Notre histoire" [ref=f1e78] [cursor=pointer]:
+                  - /url: https://localhost/notre-histoire
+          - navigation "Liens utiles" [ref=f1e79]:
+            - list [ref=f1e80]:
+              - listitem [ref=f1e81]:
+                - link "Nous rejoindre" [ref=f1e82] [cursor=pointer]:
+                  - /url: https://localhost/recrutement
+              - listitem [ref=f1e83]:
+                - link "Où acheter" [ref=f1e84] [cursor=pointer]:
+                  - /url: https://localhost/nos-produits
+              - listitem [ref=f1e85]:
+                - link "La boutique en ligne" [ref=f1e86] [cursor=pointer]:
+                  - /url: https://localhost/ou-acheter
+      - navigation "Liens utiles" [ref=f1e89]:
+        - list [ref=f1e90]:
+          - listitem [ref=f1e91]:
+            - link "Plan de site" [ref=f1e92] [cursor=pointer]:
+              - /url: https://localhost/plan-de-site
+            - generic [ref=f1e93]: "-"
+          - listitem [ref=f1e94]:
+            - link "Mentions légales" [ref=f1e95] [cursor=pointer]:
+              - /url: https://localhost/mentions-legales
+            - generic [ref=f1e96]: "-"
+          - listitem [ref=f1e97]:
+            - link "Politique cookies" [ref=f1e98] [cursor=pointer]:
+              - /url: https://localhost/politique-cookies
+          - listitem [ref=f1e99]:
+            - generic [ref=f1e100]: "-"
+            - link "Gestion des Cookies" [ref=f1e101] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f1e102]:
+            - generic [ref=f1e103]: "-"
+            - 'link "Réalisation : Agence Félix" [ref=f1e104] [cursor=pointer]':
+              - /url: https://www.felix-creation.fr
+  - link "Connectez-vous" [ref=f1e106] [cursor=pointer]:
+    - /url: /secure/user/fr/4ee1d15b5558cf7ec621d08b4d585e72b94bb71d/login
+    - generic [ref=f1e107]: 
+  - region "Symfony Web Debug Toolbar" [ref=f1e108]:
+    - generic [ref=f1e111]:
+      - link "Symfony Loading…" [ref=f1e113] [cursor=pointer]:
+        - /url: https://localhost/_profiler/b22f3c?panel=request
+        - generic [ref=f1e114]:
+          - img "Symfony" [ref=f1e115]
+          - generic [ref=f1e117]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f1e118] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f1e119]
+  - generic:
+    - generic:
+      - generic:
+        - 'dialog "Plateforme de Gestion du Consentement : Personnalisez vos Options"':
+          - generic [aria-hidden] [ref=f1e124]:
+            - text: Axeptio consent
+            - checkbox [ref=f1e125]
+          - generic [ref=f1e126]:
+            - paragraph [ref=f1e127]: "Plateforme de Gestion du Consentement : Personnalisez vos Options"
+            - paragraph [ref=f1e128]: Notre plateforme vous permet d'adapter et de gérer vos paramètres de confidentialité, en garantissant la conformité avec les réglementations. Personnalisez vos préférences pour contrôler la manière dont vos informations sont manipulées.
+        - button "Gérez vos préférences en matière de cookies et données personnelles" [ref=f1e129] [cursor=pointer]

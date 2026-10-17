@@ -74,29 +74,3 @@ h2 {
     }
 }
 
-/*-----------------------------------
-   2 ) Base theme
------------------------------------*/
-
-.base-theme {
-
-    $theme-color: $primary;
-
-    .badge-lp {
-
-        width: 70px;
-        height: 70px;
-        flex: 0 0 70px;
-        background: rgba($theme-color, 0.18) !important;
-        border: 1px solid rgba($theme-color, 0.55) !important;
-        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.75), 0 0 0 4px rgba($theme-color, 0.16);
-        font-size: 1rem;
-        border-radius: 20px;
-
-        i {
-            font-size: 40px;
-            color: transparentize($white, .2);
-        }
-    }
-}
-

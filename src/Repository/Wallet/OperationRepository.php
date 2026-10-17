@@ -22,6 +22,12 @@ use Exception;
  */
 class OperationRepository extends ServiceEntityRepository
 {
+    /** Categories fourre-tout de l'import : une operation qui y tombe n'est pas classee. */
+    private const GENERIC_SUB_CATEGORIES = [
+        'expenses-other',
+        'incomes-other-income-to-be-categorized',
+    ];
+
     /**
      * OperationRepository constructor.
      */
@@ -132,6 +138,116 @@ class OperationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Depense du mois, sous-poste par sous-poste.
+     *
+     * Le tableau de bord confronte ces totaux aux enveloppes : il lui faut
+     * aussi les postes depenses sans enveloppe, sinon le plan paraitrait tenu
+     * alors que l'argent est sorti ailleurs.
+     *
+     * @return array<int, array{name: string, category: string, total: float}> indexe par sous-categorie
+     */
+    public function monthlyTotalsBySubCategory(Wallet $wallet, int $year, int $month, string $type = 'expenses'): array
+    {
+        $tz = new \DateTimeZone('Europe/Paris');
+        $start = new \DateTimeImmutable(sprintf('%04d-%02d-01 00:00:00', $year, $month), $tz);
+        $end = $start->modify('first day of next month');
+
+        $rows = $this->createQueryBuilder('o')
+            ->select('sc.id AS subCategoryId, sc.adminName AS name, c.adminName AS categoryName, SUM(o.amount) AS total')
+            ->join('o.subCategory', 'sc')
+            ->join('sc.category', 'c')
+            ->join('o.operationType', 'ot')
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('ot.type = :type')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date < :end')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('type', $type)
+            ->setParameter('start', $start, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->setParameter('end', $end, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->groupBy('sc.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        $totals = [];
+        foreach ($rows as $row) {
+            $totals[(int) $row['subCategoryId']] = [
+                'name' => (string) $row['name'],
+                'category' => (string) $row['categoryName'],
+                'total' => (float) $row['total'],
+            ];
+        }
+
+        return $totals;
+    }
+
+    /**
+     * Categorie habituelle de chaque tiers, deduite de l'historique.
+     *
+     * A la saisie, le tiers suffit presque toujours a dire la categorie : la
+     * proposer evite de la rechercher dans une liste de plusieurs dizaines
+     * d'entrees. Les categories fourre-tout sont ecartees, suggerer
+     * « Autres depenses » reviendrait a ne rien suggerer.
+     *
+     * @return array<int, int> identifiant de tiers => identifiant de categorie
+     */
+    public function usualSubCategoryByOutsider(): array
+    {
+        $rows = $this->createQueryBuilder('o')
+            ->select('IDENTITY(o.outsider) AS outsider, IDENTITY(o.subCategory) AS subCategory, COUNT(o.id) AS total')
+            ->join('o.subCategory', 'sc')
+            ->andWhere('o.outsider IS NOT NULL')
+            ->andWhere('sc.slug NOT IN (:generic)')
+            ->setParameter('generic', self::GENERIC_SUB_CATEGORIES)
+            ->groupBy('o.outsider')
+            ->addGroupBy('o.subCategory')
+            ->orderBy('total', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $usual = [];
+        foreach ($rows as $row) {
+            // Les lignes arrivent de la plus frequente a la moins frequente :
+            // la premiere vue pour un tiers est la bonne.
+            $outsider = (int) $row['outsider'];
+            if (!isset($usual[$outsider])) {
+                $usual[$outsider] = (int) $row['subCategory'];
+            }
+        }
+
+        return $usual;
+    }
+
+    /**
+     * Total encaisse par le compte depuis le 1er janvier.
+     *
+     * C'est le chiffre qui a un sens sur un compte d'epargne : il ne depense
+     * rien, donc ni moyenne de depenses ni reste a vivre ; ce qu'on veut
+     * savoir, c'est ce qu'on y a mis cette annee.
+     */
+    public function yearToDateIncomes(Wallet $wallet, ?\DateTimeZone $tz = null): float
+    {
+        $tz ??= new \DateTimeZone('Europe/Paris');
+        $start = new \DateTimeImmutable('first day of January this year 00:00:00', $tz);
+        $end = $start->modify('+1 year');
+
+        $total = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sc')
+            ->leftJoin('o.operationType', 'ot')
+            ->select("COALESCE(SUM(CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN o.amount ELSE 0 END), 0)")
+            ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.date >= :start')
+            ->andWhere('o.date < :end')
+            ->setParameter('wallet', $wallet)
+            ->setParameter('start', $start, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->setParameter('end', $end, \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (float) $total;
+    }
+
+    /**
      * sumPerMonthNet.=
      *
      * @throws Exception
@@ -175,6 +291,50 @@ class OperationRepository extends ServiceEntityRepository
      *
      * @throws Exception
      */
+    /**
+     * Operations tombees dans une categorie fourre-tout, ou sans categorie.
+     *
+     * L'import range dans « Virements et cheques » ou « Revenus non ventiles »
+     * tout libelle qu'il ne sait pas rapprocher d'une enseigne connue. Ces
+     * operations faussent toutes les ventilations tant qu'elles n'ont pas ete
+     * reclassees a la main : il faut pouvoir les retrouver.
+     *
+     * @return Operation[]
+     */
+    public function findUnlinked(?Wallet $wallet = null): array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.subCategory', 'sb')
+            ->leftJoin('o.outsider', 'os')
+            ->addSelect('sb')
+            ->addSelect('os')
+            ->andWhere('sb.id IS NULL OR sb.slug IN (:generic)')
+            ->setParameter('generic', self::GENERIC_SUB_CATEGORIES)
+            ->orderBy('o.date', 'DESC')
+            ->addOrderBy('o.id', 'DESC');
+
+        if ($wallet instanceof Wallet) {
+            $qb->andWhere('o.wallet = :wallet')->setParameter('wallet', $wallet);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countUnlinked(?Wallet $wallet = null): int
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->leftJoin('o.subCategory', 'sb')
+            ->andWhere('sb.id IS NULL OR sb.slug IN (:generic)')
+            ->setParameter('generic', self::GENERIC_SUB_CATEGORIES);
+
+        if ($wallet instanceof Wallet) {
+            $qb->andWhere('o.wallet = :wallet')->setParameter('wallet', $wallet);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function findByYearMonth(
         string $year,
         string $month,
@@ -210,9 +370,29 @@ class OperationRepository extends ServiceEntityRepository
         }
 
         $sort = 'dt' === $sort ? 'date' : ('pt' === $sort ? 'pointed': ('ct' === $sort ? 'category' : ('os' === $sort ? 'outsider' : ('at' === $sort ? 'amount' : $sort))));
-        $order = strtoupper($order);
+        // `$order` est concaténé tel quel dans la clause ORDER BY : seules deux
+        // valeurs sont admises, tout le reste retombe sur l'ordre décroissant.
+        // `$sort`, lui, est comparé par === à une liste blanche juste au-dessus.
+        $order = 'ASC' === strtoupper((string) $order) ? 'ASC' : 'DESC';
 
-        if ('date' === $sort or 'amount' === $sort or 'pointed' === $sort) {
+        if ('date' === $sort) {
+            /*
+             * À date égale, l'affichage suit l'ordre dans lequel le solde est
+             * calculé : encaissement d'abord, décaissements ensuite (voir
+             * WalletModel::currentOperations). Sans ce départage, la colonne
+             * « Solde » sautait d'une ligne à l'autre à l'intérieur d'un même
+             * jour, puisque les deux ordres divergeaient.
+             *
+             * Le tri est inversé avec la date : en lecture décroissante, le
+             * crédit du jour se lit en bas du groupe, comme sur un relevé.
+             */
+            $qb->addSelect('CASE WHEN ot.type = :incomeType THEN 0 ELSE 1 END AS HIDDEN incomeFirst')
+                ->leftJoin('o.operationType', 'ot')
+                ->setParameter('incomeType', 'incomes')
+                ->orderBy('o.date', $order)
+                ->addOrderBy('incomeFirst', 'ASC' === $order ? 'ASC' : 'DESC')
+                ->addOrderBy('o.id', $order);
+        } elseif ('amount' === $sort or 'pointed' === $sort) {
             $qb->orderBy('o.'.$sort, $order);
             $qb->addOrderBy('o.id', $order);
         } elseif ('category' === $sort) {

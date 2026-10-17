@@ -50,7 +50,7 @@ class ResetPasswordController extends BaseController
 
         if ($request->request->get('expire')) {
             $session = new Session();
-            $session->getFlashBag()->add('warning', $this->coreLocator->translator()->trans('Your password has expired. You must reset it.', [], 'security_cms'));
+            $session->getFlashBag()->add('warning', $this->coreLocator->translator()->trans('Votre mot de passe a expiré. Vous devez le réinitialiser.', [], 'security_cms'));
         }
 
         return $this->render('security/password-request.html.twig', array_merge($this->defaultArguments(), [
@@ -83,14 +83,14 @@ class ResetPasswordController extends BaseController
 
         if ($form->isSubmitted() && $form->isValid() && $baseAuthenticator->checkRecaptcha($request, true, $form)) {
             $manager->confirm($form->getData(), $user);
-            $this->addFlash('success', $this->coreLocator->translator()->trans('Your password has been successfully updated.', [], 'security_cms'));
+            $this->addFlash('success', $this->coreLocator->translator()->trans('Votre mot de passe a bien été mis à jour.', [], 'security_cms'));
             return $this->redirectToRoute('security_login');
         }
 
         if ($authorizationChecker->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('back_wallet_index');
         } elseif (!$user) {
-            throw $this->createAccessDeniedException($this->coreLocator->translator()->trans('Access denied.', [], 'security_cms'));
+            throw $this->createAccessDeniedException($this->coreLocator->translator()->trans('Accès refusé.', [], 'security_cms'));
         }
 
         return $this->render('security/password-confirm.html.twig', array_merge($this->defaultArguments(), [

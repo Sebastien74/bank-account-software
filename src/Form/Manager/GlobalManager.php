@@ -8,7 +8,10 @@ use App\Service\CoreLocatorInterface;
 use App\Service\Urlizer;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * GlobalManager.
@@ -26,6 +29,7 @@ class GlobalManager implements GlobalManagerInterface
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         private readonly CoreLocatorInterface $coreLocator,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
         $this->form = null;
         $this->redirection = null;
@@ -74,28 +78,84 @@ class GlobalManager implements GlobalManagerInterface
      */
     public function delete(mixed $entityToDelete): ?string
     {
-        $session = $this->coreLocator->request()->getSession();
+        $request = $this->coreLocator->request();
+        $session = $request->getSession();
         $allowed = $this->coreLocator->authorizationChecker()->isGranted('ROLE_DELETE');
-        $this->redirection = $this->coreLocator->request()->headers->get('referer');
+        // `redirect()` exige une chaîne : un referer absent levait un TypeError.
+        $this->redirection = $request->headers->get('referer') ?: '/';
 
         if (!is_object($entityToDelete)) {
             $session->getFlashBag()->add('error', $this->coreLocator->translator()->trans('An error has occurred!', [], 'back'));
+
             return $this->redirection;
         }
 
+        /*
+         * La suppression se faisait par un lien GET sans jeton. SameSite=lax
+         * laisse passer le cookie de session sur une navigation GET de premier
+         * niveau : un lien depuis une page externe suffisait donc à supprimer
+         * un enregistrement. Le contrôle est posé ici plutôt que dans chacun
+         * des huit contrôleurs, pour qu'il ne puisse pas être oublié au
+         * prochain module.
+         *
+         * Il refuse par défaut : une entité sans `getId()` n'a pas de jeton
+         * calculable, donc elle ne passe pas. L'inverse aurait laissé entrer
+         * sans contrôle le module que ce garde-fou prétend protéger.
+         *
+         * Le nom du jeton porte l'interface en plus de l'identifiant : sans
+         * elle, `delete-5` vaut aussi bien pour un compte que pour une
+         * opération.
+         */
+        if (!method_exists($entityToDelete, 'getId')) {
+            throw new AccessDeniedHttpException($this->coreLocator->translator()->trans('Invalid CSRF token.', [], 'back'));
+        }
+
+        $interface = $this->coreLocator->entityInterface($entityToDelete);
+        $token = new CsrfToken(
+            'delete-'.($interface['name'] ?? '').'-'.$entityToDelete->getId(),
+            (string) $request->request->get('_token'),
+        );
+        if (!$this->csrfTokenManager->isTokenValid($token)) {
+            throw new AccessDeniedHttpException($this->coreLocator->translator()->trans('Invalid CSRF token.', [], 'back'));
+        }
+
         if ($allowed) {
-            $interface = $this->coreLocator->entityInterface($entityToDelete);
             if ($interface['name']) {
                 $repository = $this->coreLocator->em()->getRepository(get_class($entityToDelete));
                 $currentPosition = method_exists($entityToDelete, 'getPosition') ? $entityToDelete->getPosition() : false;
                 $this->coreLocator->em()->remove($entityToDelete);
                 if (is_numeric($currentPosition)) {
-                    $entities = $interface['masterField'] ? $repository->findBy([$interface['masterField'] => $entityToDelete->$interface['masterFieldGetter']()]) : $repository->findAll();
-                    foreach ($entities as $entity) {
-                        if ($entity->getPosition() > $currentPosition) {
-                            $entity->setPosition($entity->getPosition() - 1);
-                            $this->coreLocator->em()->persist($entity);
-                        }
+                    /*
+                     * Les accolades ne sont pas decoratives.
+                     *
+                     * Depuis PHP 7, `$objet->$tableau['cle']()` se lit
+                     * `($objet->$tableau)['cle']()` : on cherchait une
+                     * propriete dont le nom etait un tableau, et toute
+                     * suppression d'une entite ayant un `masterField` --
+                     * c'est-a-dire toutes les operations -- levait une erreur
+                     * avant d'avoir rien renumerote.
+                     */
+                    $getter = $interface['masterFieldGetter'];
+                    $master = $interface['masterField'] && $getter && method_exists($entityToDelete, $getter)
+                        ? $entityToDelete->{$getter}()
+                        : null;
+
+                    /*
+                     * Seules les lignes situees apres celle qu'on retire sont
+                     * chargees. Les prendre toutes hydratait les deux mille
+                     * operations du compte a chaque suppression d'une seule.
+                     */
+                    $builder = $repository->createQueryBuilder('e')
+                        ->andWhere('e.position > :position')
+                        ->setParameter('position', $currentPosition);
+                    if (null !== $master) {
+                        $builder->andWhere(sprintf('e.%s = :master', $interface['masterField']))
+                            ->setParameter('master', $master);
+                    }
+
+                    foreach ($builder->getQuery()->getResult() as $entity) {
+                        $entity->setPosition($entity->getPosition() - 1);
+                        $this->coreLocator->em()->persist($entity);
                     }
                 }
                 $this->coreLocator->em()->flush();

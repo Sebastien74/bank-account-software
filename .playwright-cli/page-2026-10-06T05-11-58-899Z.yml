@@ -1,0 +1,537 @@
+- generic [active] [ref=f2e1]:
+  - link "Aller au contenu" [ref=f2e2] [cursor=pointer]:
+    - /url: "#main-container"
+  - banner [ref=f2e3]:
+    - link "Bank Account Software" [ref=f2e4] [cursor=pointer]:
+      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+    - paragraph [ref=f2e16]: "Mes opérations : Compte courant"
+  - generic [ref=f2e17]:
+    - complementary [ref=f2e18]:
+      - navigation [ref=f2e19]:
+        - link "Tableau de bord" [ref=f2e20] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/dashboard
+        - link "Gestion des comptes" [ref=f2e27] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+        - link "Gestion des budgets" [ref=f2e34] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/budgets/index
+        - link "Gestion des catégories" [ref=f2e41] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/operations-types/index
+        - link "Gestion des bénéficiaires" [ref=f2e46] [cursor=pointer]:
+          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/outsiders/index
+        - link "Logout" [ref=f2e53] [cursor=pointer]:
+          - /url: /logout
+    - navigation [ref=f2e59]
+    - main [ref=f2e60]:
+      - generic [ref=f2e61]:
+        - navigation "Fil d'Ariane" [ref=f2e62]:
+          - list [ref=f2e63]:
+            - listitem [ref=f2e64]:
+              - link "Comptes" [ref=f2e65] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f2e66]:
+              - text: /
+              - link "Mes comptes" [ref=f2e67] [cursor=pointer]:
+                - /url: https://bank-account-software.local/back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/index
+            - listitem [ref=f2e68]: / Opérations
+        - generic [ref=f2e69]:
+          - generic [ref=f2e70]:
+            - generic [ref=f2e71]:
+              - heading "Compte courant" [level=1] [ref=f2e72]
+              - paragraph [ref=f2e73]: Écritures du compte, mois par mois.
+            - button "Ajouter" [ref=f2e75] [cursor=pointer]
+          - generic [ref=f2e79]:
+            - generic [ref=f2e81]:
+              - generic [ref=f2e82]:
+                - link "Mois précédent" [ref=f2e83] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=09&year=2026
+                - generic [ref=f2e86]: Octobre 2026
+                - generic [ref=f2e87]:
+                  - link "Année précédente" [ref=f2e88] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2025
+                  - link "Année suivante" [ref=f2e91] [cursor=pointer]:
+                    - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2027
+                - link "Mois suivant" [ref=f2e94] [cursor=pointer]:
+                  - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=11&year=2026
+              - generic [ref=f2e97]: Reste à payer 419,58 €
+            - table [ref=f2e104]:
+              - caption [ref=f2e105]: Opérations du compte sur la période affichée
+              - rowgroup [ref=f2e106]:
+                - row [ref=f2e107]:
+                  - columnheader "Date Trier la colonne Date" [ref=f2e108]:
+                    - generic [ref=f2e109]:
+                      - generic [ref=f2e110]: Date
+                      - group "Trier la colonne Date" [ref=f2e111]:
+                        - link "Trier par ordre croissant" [ref=f2e112] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=dt&order=asc
+                        - link "Trier par ordre décroissant" [ref=f2e113] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=dt&order=desc
+                  - columnheader "État Trier la colonne État" [ref=f2e114]:
+                    - generic [ref=f2e115]:
+                      - generic [ref=f2e116]: État
+                      - group "Trier la colonne État" [ref=f2e117]:
+                        - link "Trier par ordre croissant" [ref=f2e118] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=pt&order=asc
+                        - link "Trier par ordre décroissant" [ref=f2e119] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=pt&order=desc
+                  - columnheader "Catégorie Trier la colonne Catégorie" [ref=f2e120]:
+                    - generic [ref=f2e121]:
+                      - generic [ref=f2e122]: Catégorie
+                      - group "Trier la colonne Catégorie" [ref=f2e123]:
+                        - link "Trier par ordre croissant" [ref=f2e124] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=ct&order=asc
+                        - link "Trier par ordre décroissant" [ref=f2e125] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=ct&order=desc
+                  - columnheader "Tiers Trier la colonne Tiers" [ref=f2e126]:
+                    - generic [ref=f2e127]:
+                      - generic [ref=f2e128]: Tiers
+                      - group "Trier la colonne Tiers" [ref=f2e129]:
+                        - link "Trier par ordre croissant" [ref=f2e130] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=os&order=asc
+                        - link "Trier par ordre décroissant" [ref=f2e131] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=os&order=desc
+                  - columnheader "Montant Trier la colonne Montant" [ref=f2e132]:
+                    - generic [ref=f2e133]:
+                      - generic [ref=f2e134]: Montant
+                      - group "Trier la colonne Montant" [ref=f2e135]:
+                        - link "Trier par ordre croissant" [ref=f2e136] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=at&order=asc
+                        - link "Trier par ordre décroissant" [ref=f2e137] [cursor=pointer]:
+                          - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/index/1?month=10&year=2026&sort=at&order=desc
+                  - columnheader "Solde" [ref=f2e138]
+                  - columnheader "Actions" [ref=f2e139]
+              - rowgroup [ref=f2e140]:
+                - row [ref=f2e141]:
+                  - cell "30/10/2026" [ref=f2e142]
+                  - cell [ref=f2e143]:
+                    - 'checkbox "Pointer l''opération du 30 octobre 2026 : SIM promotion" [ref=f2e146]'
+                  - cell "Revenus financiers" [ref=f2e147]
+                  - cell "SIM promotion" [ref=f2e148]
+                  - cell "+100,00 €" [ref=f2e149]
+                  - cell "448,91 €" [ref=f2e150]
+                  - cell [ref=f2e151]:
+                    - link "Éditer" [ref=f2e152] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3465
+                    - button "Supprimer" [ref=f2e156] [cursor=pointer]
+                - row [ref=f2e159]:
+                  - cell "28/10/2026" [ref=f2e160]
+                  - cell [ref=f2e161]:
+                    - checkbox "Enregistrer Zwift Luxemb comme payée aujourd'hui" [ref=f2e164]
+                  - cell "Abonnements" [ref=f2e165]
+                  - cell "Zwift Luxemb" [ref=f2e166]
+                  - cell "-19,99 €" [ref=f2e167]
+                  - cell "352,53 €" [ref=f2e168]
+                  - cell [ref=f2e169]:
+                    - link "Modifier l'échéance Zwift Luxemb" [ref=f2e170] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-zwift-luxemb
+                - row [ref=f2e173]:
+                  - cell "28/10/2026" [ref=f2e174]
+                  - cell [ref=f2e175]:
+                    - checkbox "Enregistrer Github INC L comme payée aujourd'hui" [ref=f2e178]
+                  - cell "Abonnements" [ref=f2e179]
+                  - cell "Github INC L" [ref=f2e180]
+                  - cell "-3,62 €" [ref=f2e181]
+                  - cell "348,91 €" [ref=f2e182]
+                  - cell [ref=f2e183]:
+                    - link "Modifier l'échéance Github INC L" [ref=f2e184] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-github-inc-l
+                - row [ref=f2e187]:
+                  - cell "21/10/2026" [ref=f2e188]
+                  - cell [ref=f2e189]:
+                    - checkbox "Enregistrer Netflix comme payée aujourd'hui" [ref=f2e192]
+                  - cell "Abonnements" [ref=f2e193]
+                  - cell "Netflix" [ref=f2e194]
+                  - cell "-21,98 €" [ref=f2e195]
+                  - cell "372,52 €" [ref=f2e196]
+                  - cell [ref=f2e197]:
+                    - link "Modifier l'échéance Netflix" [ref=f2e198] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-netflix
+                - row [ref=f2e201]:
+                  - cell "19/10/2026" [ref=f2e202]
+                  - cell [ref=f2e203]:
+                    - checkbox "Enregistrer ENGIE comme payée aujourd'hui" [ref=f2e206]
+                  - cell "Électricité / Gaz" [ref=f2e207]
+                  - cell "ENGIE" [ref=f2e208]
+                  - cell "-119,34 €" [ref=f2e209]
+                  - cell "408,49 €" [ref=f2e210]
+                  - cell [ref=f2e211]:
+                    - link "Modifier l'échéance ENGIE" [ref=f2e212] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-engie
+                - row [ref=f2e215]:
+                  - cell "19/10/2026" [ref=f2e216]
+                  - cell [ref=f2e217]:
+                    - checkbox "Enregistrer Deezer Luxem comme payée aujourd'hui" [ref=f2e220]
+                  - cell "Abonnements" [ref=f2e221]
+                  - cell "Deezer Luxem" [ref=f2e222]
+                  - cell "-11,99 €" [ref=f2e223]
+                  - cell "396,50 €" [ref=f2e224]
+                  - cell [ref=f2e225]:
+                    - link "Modifier l'échéance Deezer Luxem" [ref=f2e226] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-deezer-luxem
+                - row [ref=f2e229]:
+                  - cell "19/10/2026" [ref=f2e230]
+                  - cell [ref=f2e231]:
+                    - checkbox "Enregistrer Microsoft LU comme payée aujourd'hui" [ref=f2e234]
+                  - cell "Abonnements" [ref=f2e235]
+                  - cell "Microsoft LU" [ref=f2e236]
+                  - cell "-2,00 €" [ref=f2e237]
+                  - cell "394,50 €" [ref=f2e238]
+                  - cell [ref=f2e239]:
+                    - link "Modifier l'échéance Microsoft LU" [ref=f2e240] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-microsoft-lu
+                - row [ref=f2e243]:
+                  - cell "15/10/2026" [ref=f2e244]
+                  - cell [ref=f2e245]:
+                    - checkbox "Enregistrer Crédit Agricole - Assurance automobile comme payée aujourd'hui" [ref=f2e248]
+                  - cell "Assurances et taxes auto" [ref=f2e249]
+                  - cell "Crédit Agricole - Assurance automobile" [ref=f2e250]
+                  - cell "-44,88 €" [ref=f2e251]
+                  - cell "527,83 €" [ref=f2e252]
+                  - cell [ref=f2e253]:
+                    - link "Modifier l'échéance Crédit Agricole - Assurance automobile" [ref=f2e254] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-credit-agricole-assurance-automobile
+                - row [ref=f2e257]:
+                  - cell "14/10/2026" [ref=f2e258]
+                  - cell [ref=f2e259]:
+                    - checkbox "Enregistrer Bouygues Telecom comme payée aujourd'hui" [ref=f2e262]
+                  - cell "Téléphone / Internet" [ref=f2e263]
+                  - cell "Bouygues Telecom 09xxxxx800" [ref=f2e264]:
+                    - text: Bouygues Telecom
+                    - generic [ref=f2e265]: 09xxxxx800
+                  - cell "-52,99 €" [ref=f2e266]
+                  - cell "621,69 €" [ref=f2e267]
+                  - cell [ref=f2e268]:
+                    - link "Modifier l'échéance Bouygues Telecom" [ref=f2e269] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-bouygues-telecom-09xxxxx800
+                - row [ref=f2e272]:
+                  - cell "14/10/2026" [ref=f2e273]
+                  - cell [ref=f2e274]:
+                    - checkbox "Enregistrer Bouygues Telecom comme payée aujourd'hui" [ref=f2e277]
+                  - cell "Téléphone / Internet" [ref=f2e278]
+                  - cell "Bouygues Telecom 06xxxxx891" [ref=f2e279]:
+                    - text: Bouygues Telecom
+                    - generic [ref=f2e280]: 06xxxxx891
+                  - cell "-48,98 €" [ref=f2e281]
+                  - cell "572,71 €" [ref=f2e282]
+                  - cell [ref=f2e283]:
+                    - link "Modifier l'échéance Bouygues Telecom" [ref=f2e284] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-bouygues-telecom-06xxxxx891
+                - row [ref=f2e287]:
+                  - cell "11/10/2026" [ref=f2e288]
+                  - cell [ref=f2e289]:
+                    - 'checkbox "Pointer l''opération du 11 octobre 2026 : Jean-Pierre REMBARZ" [ref=f2e292]'
+                  - cell "Revenus financiers" [ref=f2e293]
+                  - cell "Jean-Pierre REMBARZ" [ref=f2e294]
+                  - cell "+100,00 €" [ref=f2e295]
+                  - cell "674,68 €" [ref=f2e296]
+                  - cell [ref=f2e297]:
+                    - link "Éditer" [ref=f2e298] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3464
+                    - button "Supprimer" [ref=f2e302] [cursor=pointer]
+                - row [ref=f2e305]:
+                  - cell "11/10/2026" [ref=f2e306]
+                  - cell [ref=f2e307]:
+                    - 'checkbox "Pointer l''opération du 11 octobre 2026 : Mini Golf" [ref=f2e310]'
+                  - cell "Revenus financiers" [ref=f2e311]
+                  - cell "Mini Golf" [ref=f2e312]
+                  - cell "+100,00 €" [ref=f2e313]
+                  - cell "574,68 €" [ref=f2e314]
+                  - cell [ref=f2e315]:
+                    - link "Éditer" [ref=f2e316] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3462
+                    - button "Supprimer" [ref=f2e320] [cursor=pointer]
+                - row [ref=f2e323]:
+                  - cell "05/10/2026" [ref=f2e324]
+                  - cell [ref=f2e325]:
+                    - 'checkbox "Pointer l''opération du 05 octobre 2026 : Picard" [ref=f2e328]'
+                  - cell "Frais alimentaires" [ref=f2e329]
+                  - cell "Picard" [ref=f2e330]
+                  - cell "-21,93 €" [ref=f2e331]
+                  - cell "562,17 €" [ref=f2e332]
+                  - cell [ref=f2e333]:
+                    - link "Éditer" [ref=f2e334] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3472
+                    - button "Supprimer" [ref=f2e338] [cursor=pointer]
+                - row [ref=f2e341]:
+                  - cell "05/10/2026" [ref=f2e342]
+                  - cell [ref=f2e343]:
+                    - 'checkbox "Pointer l''opération du 05 octobre 2026 : Casa" [ref=f2e346]'
+                  - cell "Tabac" [ref=f2e347]
+                  - cell "Casa" [ref=f2e348]
+                  - cell "-13,50 €" [ref=f2e349]
+                  - cell "584,10 €" [ref=f2e350]
+                  - cell [ref=f2e351]:
+                    - link "Éditer" [ref=f2e352] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3471
+                    - button "Supprimer" [ref=f2e356] [cursor=pointer]
+                - row [ref=f2e359]:
+                  - cell "05/10/2026" [ref=f2e360]
+                  - cell [ref=f2e361]:
+                    - 'checkbox "Pointer l''opération du 05 octobre 2026 : OVH" [ref=f2e364]'
+                  - cell "Informatique" [ref=f2e365]
+                  - cell "OVH" [ref=f2e366]
+                  - cell "-305,35 €" [ref=f2e367]
+                  - cell "597,60 €" [ref=f2e368]
+                  - cell [ref=f2e369]:
+                    - link "Éditer" [ref=f2e370] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3469
+                    - button "Supprimer" [ref=f2e374] [cursor=pointer]
+                - row [ref=f2e377]:
+                  - cell "05/10/2026" [ref=f2e378]
+                  - cell [ref=f2e379]:
+                    - 'checkbox "Pointer l''opération du 05 octobre 2026 : 2m" [ref=f2e382]'
+                  - cell "Tabac" [ref=f2e383]
+                  - cell "2m" [ref=f2e384]
+                  - cell "-3,50 €" [ref=f2e385]
+                  - cell "902,95 €" [ref=f2e386]
+                  - cell [ref=f2e387]:
+                    - link "Éditer" [ref=f2e388] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3468
+                    - button "Supprimer" [ref=f2e392] [cursor=pointer]
+                - row [ref=f2e395]:
+                  - cell "05/10/2026" [ref=f2e396]
+                  - cell [ref=f2e397]:
+                    - checkbox "Enregistrer Darty comme payée aujourd'hui" [ref=f2e400]
+                  - cell "Cadeaux" [ref=f2e401]
+                  - cell "Darty" [ref=f2e402]
+                  - cell "-57,50 €" [ref=f2e403]
+                  - cell "504,67 €" [ref=f2e404]
+                  - cell [ref=f2e405]:
+                    - link "Modifier l'échéance Darty" [ref=f2e406] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-darty
+                - row [ref=f2e409]:
+                  - cell "05/10/2026" [ref=f2e410]
+                  - cell [ref=f2e411]:
+                    - checkbox "Enregistrer CANAL+ comme payée aujourd'hui" [ref=f2e414]
+                  - cell "Abonnements" [ref=f2e415]
+                  - cell "CANAL+" [ref=f2e416]
+                  - cell "-29,99 €" [ref=f2e417]
+                  - cell "474,68 €" [ref=f2e418]
+                  - cell [ref=f2e419]:
+                    - link "Modifier l'échéance CANAL+" [ref=f2e420] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-canal
+                - row [ref=f2e423]:
+                  - cell "04/10/2026" [ref=f2e424]
+                  - cell [ref=f2e425]:
+                    - 'checkbox "Pointer l''opération du 04 octobre 2026 : Darty" [ref=f2e428]'
+                  - cell "Cadeaux" [ref=f2e429]
+                  - cell "Darty" [ref=f2e430]
+                  - cell "-57,50 €" [ref=f2e431]
+                  - cell "912,77 €" [ref=f2e432]
+                  - cell [ref=f2e433]:
+                    - link "Éditer" [ref=f2e434] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3467
+                    - button "Supprimer" [ref=f2e438] [cursor=pointer]
+                - row [ref=f2e441]:
+                  - cell "04/10/2026" [ref=f2e442]
+                  - cell [ref=f2e443]:
+                    - 'checkbox "Pointer l''opération du 04 octobre 2026 : Frankos" [ref=f2e446]'
+                  - cell "Frais alimentaires" [ref=f2e447]
+                  - cell "Frankos" [ref=f2e448]
+                  - cell "-6,25 €" [ref=f2e449]
+                  - cell "970,27 €" [ref=f2e450]
+                  - cell [ref=f2e451]:
+                    - link "Éditer" [ref=f2e452] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3466
+                    - button "Supprimer" [ref=f2e456] [cursor=pointer]
+                - row [ref=f2e459]:
+                  - cell "04/10/2026" [ref=f2e460]
+                  - cell [ref=f2e461]:
+                    - checkbox "Enregistrer Frais de tenue de compte comme payée aujourd'hui" [ref=f2e464]
+                  - cell "Frais bancaires" [ref=f2e465]
+                  - cell "Frais de tenue de compte" [ref=f2e466]
+                  - cell "-6,32 €" [ref=f2e467]
+                  - cell "906,45 €" [ref=f2e468]
+                  - cell [ref=f2e469]:
+                    - link "Modifier l'échéance Frais de tenue de compte" [ref=f2e470] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/recurring/index/1#charge-frais-de-tenue-de-compte
+                - row [ref=f2e473]:
+                  - cell "02/10/2026" [ref=f2e474]
+                  - cell [ref=f2e475]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Casa" [checked] [ref=f2e478]'
+                  - cell "Tabac" [ref=f2e479]
+                  - cell "Casa" [ref=f2e480]
+                  - cell "-27,00 €" [ref=f2e481]
+                  - cell "976,52 €" [ref=f2e482]
+                  - cell [ref=f2e483]:
+                    - link "Éditer" [ref=f2e484] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3459
+                    - button "Supprimer" [ref=f2e488] [cursor=pointer]
+                - row [ref=f2e491]:
+                  - cell "02/10/2026" [ref=f2e492]
+                  - cell [ref=f2e493]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Casa" [checked] [ref=f2e496]'
+                  - cell "Tabac" [ref=f2e497]
+                  - cell "Casa" [ref=f2e498]
+                  - cell "-23,50 €" [ref=f2e499]
+                  - cell "1 003,52 €" [ref=f2e500]
+                  - cell [ref=f2e501]:
+                    - link "Éditer" [ref=f2e502] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3458
+                    - button "Supprimer" [ref=f2e506] [cursor=pointer]
+                - row [ref=f2e509]:
+                  - cell "02/10/2026" [ref=f2e510]
+                  - cell [ref=f2e511]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Point B" [checked] [ref=f2e514]'
+                  - cell "Restaurant" [ref=f2e515]
+                  - cell "Point B" [ref=f2e516]
+                  - cell "-24,45 €" [ref=f2e517]
+                  - cell "1 027,02 €" [ref=f2e518]
+                  - cell [ref=f2e519]:
+                    - link "Éditer" [ref=f2e520] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3455
+                    - button "Supprimer" [ref=f2e524] [cursor=pointer]
+                - row [ref=f2e527]:
+                  - cell "02/10/2026" [ref=f2e528]
+                  - cell [ref=f2e529]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Cafe''Inn" [checked] [ref=f2e532]'
+                  - cell "Tabac" [ref=f2e533]
+                  - cell "Cafe'Inn" [ref=f2e534]
+                  - cell "-16,90 €" [ref=f2e535]
+                  - cell "1 051,47 €" [ref=f2e536]
+                  - cell [ref=f2e537]:
+                    - link "Éditer" [ref=f2e538] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/3454
+                    - button "Supprimer" [ref=f2e542] [cursor=pointer]
+                - row [ref=f2e545]:
+                  - cell "02/10/2026" [ref=f2e546]
+                  - cell [ref=f2e547]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : On participe" [checked] [ref=f2e550]'
+                  - cell "Divers" [ref=f2e551]
+                  - cell "On participe" [ref=f2e552]
+                  - cell "-10,00 €" [ref=f2e553]
+                  - cell "1 068,37 €" [ref=f2e554]
+                  - cell [ref=f2e555]:
+                    - link "Éditer" [ref=f2e556] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2280
+                    - button "Supprimer" [ref=f2e560] [cursor=pointer]
+                - row [ref=f2e563]:
+                  - cell "02/10/2026" [ref=f2e564]
+                  - cell [ref=f2e565]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Lidl" [checked] [ref=f2e568]'
+                  - cell "Frais alimentaires" [ref=f2e569]
+                  - cell "Lidl" [ref=f2e570]
+                  - cell "-37,71 €" [ref=f2e571]
+                  - cell "1 078,37 €" [ref=f2e572]
+                  - cell [ref=f2e573]:
+                    - link "Éditer" [ref=f2e574] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2279
+                    - button "Supprimer" [ref=f2e578] [cursor=pointer]
+                - row [ref=f2e581]:
+                  - cell "02/10/2026" [ref=f2e582]
+                  - cell [ref=f2e583]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Esso" [checked] [ref=f2e586]'
+                  - cell "Carburant" [ref=f2e587]
+                  - cell "Esso" [ref=f2e588]
+                  - cell "-50,01 €" [ref=f2e589]
+                  - cell "1 116,08 €" [ref=f2e590]
+                  - cell [ref=f2e591]:
+                    - link "Éditer" [ref=f2e592] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2278
+                    - button "Supprimer" [ref=f2e596] [cursor=pointer]
+                - row [ref=f2e599]:
+                  - cell "02/10/2026" [ref=f2e600]
+                  - cell [ref=f2e601]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Planity" [checked] [ref=f2e604]'
+                  - cell "Coiffeurs" [ref=f2e605]
+                  - cell "Planity" [ref=f2e606]
+                  - cell "-30,00 €" [ref=f2e607]
+                  - cell "1 166,09 €" [ref=f2e608]
+                  - cell [ref=f2e609]:
+                    - link "Éditer" [ref=f2e610] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2277
+                    - button "Supprimer" [ref=f2e614] [cursor=pointer]
+                - row [ref=f2e617]:
+                  - cell "02/10/2026" [ref=f2e618]
+                  - cell [ref=f2e619]:
+                    - 'checkbox "Pointer l''opération du 02 octobre 2026 : Casa" [checked] [ref=f2e622]'
+                  - cell "Tabac" [ref=f2e623]
+                  - cell "Casa" [ref=f2e624]
+                  - cell "-32,00 €" [ref=f2e625]
+                  - cell "1 196,09 €" [ref=f2e626]
+                  - cell [ref=f2e627]:
+                    - link "Éditer" [ref=f2e628] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2276
+                    - button "Supprimer" [ref=f2e632] [cursor=pointer]
+                - row [ref=f2e635]:
+                  - cell "01/10/2026" [ref=f2e636]
+                  - cell [ref=f2e637]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Wines & Vibes" [checked] [ref=f2e640]'
+                  - cell "Sorties" [ref=f2e641]
+                  - cell "Wines & Vibes" [ref=f2e642]
+                  - cell "-30,00 €" [ref=f2e643]
+                  - cell "1 228,09 €" [ref=f2e644]
+                  - cell [ref=f2e645]:
+                    - link "Éditer" [ref=f2e646] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2285
+                    - button "Supprimer" [ref=f2e650] [cursor=pointer]
+                - row [ref=f2e653]:
+                  - cell "01/10/2026" [ref=f2e654]
+                  - cell [ref=f2e655]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Nathalie Combepine" [checked] [ref=f2e658]'
+                  - cell "Loyer" [ref=f2e659]
+                  - cell "Nathalie Combepine" [ref=f2e660]
+                  - cell "-687,17 €" [ref=f2e661]
+                  - cell "1 258,09 €" [ref=f2e662]
+                  - cell [ref=f2e663]:
+                    - link "Éditer" [ref=f2e664] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2284
+                    - button "Supprimer" [ref=f2e668] [cursor=pointer]
+                - row [ref=f2e671]:
+                  - cell "01/10/2026" [ref=f2e672]
+                  - cell [ref=f2e673]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Fournier Sébastien" [checked] [ref=f2e676]'
+                  - cell "Virement vers épargne" [ref=f2e677]
+                  - cell "Fournier Sébastien" [ref=f2e678]
+                  - cell "-500,00 €" [ref=f2e679]
+                  - cell "1 945,26 €" [ref=f2e680]
+                  - cell [ref=f2e681]:
+                    - link "Éditer" [ref=f2e682] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2283
+                    - button "Supprimer" [ref=f2e686] [cursor=pointer]
+                - row [ref=f2e689]:
+                  - cell "01/10/2026" [ref=f2e690]
+                  - cell [ref=f2e691]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Crédit Agricole - Assurance habitation" [checked] [ref=f2e694]'
+                  - cell "Assurance logement" [ref=f2e695]
+                  - cell "Crédit Agricole - Assurance habitation" [ref=f2e696]
+                  - cell "-24,15 €" [ref=f2e697]
+                  - cell "2 445,26 €" [ref=f2e698]
+                  - cell [ref=f2e699]:
+                    - link "Éditer" [ref=f2e700] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2282
+                    - button "Supprimer" [ref=f2e704] [cursor=pointer]
+                - row [ref=f2e707]:
+                  - cell "01/10/2026" [ref=f2e708]
+                  - cell [ref=f2e709]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Casa" [checked] [ref=f2e712]'
+                  - cell "Tabac" [ref=f2e713]
+                  - cell "Casa" [ref=f2e714]
+                  - cell "-17,00 €" [ref=f2e715]
+                  - cell "2 469,41 €" [ref=f2e716]
+                  - cell [ref=f2e717]:
+                    - link "Éditer" [ref=f2e718] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2281
+                    - button "Supprimer" [ref=f2e722] [cursor=pointer]
+                - row [ref=f2e725]:
+                  - cell "01/10/2026" [ref=f2e726]
+                  - cell [ref=f2e727]:
+                    - 'checkbox "Pointer l''opération du 01 octobre 2026 : Felix Multimedia" [checked] [ref=f2e730]'
+                  - cell "Salaires" [ref=f2e731]
+                  - cell "Felix Multimedia" [ref=f2e732]
+                  - cell "+2 542,05 €" [ref=f2e733]
+                  - cell "2 486,41 €" [ref=f2e734]
+                  - cell [ref=f2e735]:
+                    - link "Éditer" [ref=f2e736] [cursor=pointer]:
+                      - /url: /back-8ce49dce83cb97b384b928a5c4ea8926e78f52cc/wallets/operations/edit/2289
+                    - button "Supprimer" [ref=f2e740] [cursor=pointer]
+            - generic [ref=f2e743]: Affichage de 1 à 24 sur 24
+  - status [ref=f2e746]
+  - toolbar "Symfony Web Debug Toolbar" [ref=f2e747]:
+    - generic [ref=f2e750]:
+      - link "Symfony Loading…" [ref=f2e752] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/2c4cc9?panel=request
+        - generic [ref=f2e753]:
+          - img "Symfony" [ref=f2e754]
+          - generic [ref=f2e756]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f2e757] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f2e758]

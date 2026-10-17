@@ -38,7 +38,7 @@ class CaptchaHoneyPotValidator extends ConstraintValidator
             $this->coreLocator->requestStack()->getSession()->getFlashBag()->get('captcha');
             $this->coreLocator->requestStack()->getSession()->getFlashBag()->add(
                 'error',
-                $this->coreLocator->translator()->trans("The captcha is invalid. Please reload the page and try again.", [], 'validators')
+                $this->coreLocator->translator()->trans('Le captcha est invalide. Rechargez la page puis réessayez.', [], 'validators')
             );
         }
     }

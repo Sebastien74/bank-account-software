@@ -1,18 +1,20 @@
 {% trans_default_domain 'back' %}
 
+{# Le fil d'Ariane de la référence est une ligne de texte : des maillons en
+   violet, une barre oblique grise, et le dernier maillon en clair. Il nomme le
+   chemin, il n'a pas à peser autant que le contenu. #}
 {% if breadcrumb is not empty %}
-    <nav class="breadcrumb-container mt-4 mb-3" aria-label="breadcrumb">
-        <div class="d-flex align-items-center gap-2 px-1">
-            <span class="dash-btn-icon me-2" aria-hidden="true">
-                <twig:ux:icon name="tabler:gauge" />
-            </span>
-            <div class="container-fluid">
-                <ol class="page-breadcrumb breadcrumb mb-0">
-                    {% for item, path in breadcrumb %}
-                        <li class="breadcrumb-item ps-0"><a href="{{ path }}" class="text-white">{{ item }}</a></li>
-                    {% endfor %}
-                </ol>
-            </div>
-        </div>
+    <nav class="breadcrumb-container" aria-label="{{ "Fil d'Ariane"|trans|striptags }}">
+        <ol class="page-breadcrumb breadcrumb">
+            {% for item, path in breadcrumb %}
+                <li class="breadcrumb-item{% if loop.last %} active{% endif %}"{% if loop.last %} aria-current="page"{% endif %}>
+                    {%- if loop.last -%}
+                        {{ item }}
+                    {%- else -%}
+                        <a href="{{ path }}">{{ item }}</a>
+                    {%- endif -%}
+                </li>
+            {% endfor %}
+        </ol>
     </nav>
 {% endif %}

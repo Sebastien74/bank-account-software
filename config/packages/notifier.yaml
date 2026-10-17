@@ -13,5 +13,5 @@ framework:
             medium: ['email']
             low: ['email']
         admin_recipients:
-            - { email: dev@agence-felix.fr }
+            - { email: fournier.sebastien@outlook.com }
             - { email: sebastien@agence-felix.fr }

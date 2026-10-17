@@ -1,0 +1,46 @@
+- generic [active] [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "Bank Account Software" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+      - paragraph [ref=f1e8]: Connexion
+      - paragraph [ref=f1e9]: Accédez à la gestion de vos comptes
+      - generic [ref=f1e10]:
+        - generic [ref=f1e11]:
+          - textbox "Identifiant *" [ref=f1e12]:
+            - /placeholder: Saisissez votre identifiant
+          - generic:
+            - text: Identifiant
+            - superscript: "*"
+        - generic [ref=f1e13]:
+          - textbox "Mot de passe *" [ref=f1e15]:
+            - /placeholder: Saisissez votre mot de passe
+          - generic:
+            - text: Mot de passe
+            - superscript: "*"
+        - generic [ref=f1e22]:
+          - generic [ref=f1e25]:
+            - checkbox "Se souvenir de moi" [checked] [ref=f1e26]
+            - generic [ref=f1e27]: Se souvenir de moi
+          - link "Mot de passe oublié ?" [ref=f1e29] [cursor=pointer]:
+            - /url: /secure/user/reset-password/fr/request
+        - group:
+          - generic [ref=f1e31]:
+            - generic [ref=f1e32]:
+              - textbox "Required field" [ref=f1e33]
+              - generic: Required field
+            - generic [ref=f1e34]:
+              - textbox "Required field *" [ref=f1e35]: SVJLWGxKOGpQdCtSdXlST2pGOHVyNzVwbUxTNi9nOU1JdnQzQ2dwYnQyTmh1TWREV3JNL3ZrQnJDQXUxVEF2Yw==
+              - generic:
+                - text: Required field
+                - superscript: "*"
+        - button "Se connecter" [ref=f1e37] [cursor=pointer]
+  - toolbar "Symfony Web Debug Toolbar":
+    - generic [ref=f1e38]:
+      - link "Symfony Loading…" [ref=f1e40] [cursor=pointer]:
+        - /url: https://bank-account-software.local/_profiler/d0229f?panel=request
+        - generic [ref=f1e41]:
+          - img "Symfony" [ref=f1e42]
+          - generic [ref=f1e44]: Loading…
+      - button "Toggle Symfony Toolbar" [expanded] [ref=f1e45] [cursor=pointer]:
+        - generic "Close Toolbar" [ref=f1e46]

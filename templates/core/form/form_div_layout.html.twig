@@ -249,11 +249,15 @@
         {%- endif -%}
     {%- endif -%}
     <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
+        {# Le pictogramme d'un bouton est un glyphe, pas une tuile colorée : une
+           tuile dans un bouton fait une boîte dans une boîte. Et le libellé
+           prend la couleur du bouton — un blanc forcé devient illisible dès
+           que le bouton est en teinte atténuée. #}
         {%- set icon = attr.icon is defined ? attr.icon : 'save' -%}
         {%- if icon -%}
-            <span class="dash-btn-icon" aria-hidden="true"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
+            <span class="btn-glyph" aria-hidden="true"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
         {%- endif -%}
-        <span class="text-white">
+        <span>
             {%- if translation_domain is same as(false) -%}
                 {%- if label_html is same as(false) -%}
                     {{- label -}}

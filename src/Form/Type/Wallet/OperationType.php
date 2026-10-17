@@ -14,9 +14,11 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -44,7 +46,15 @@ class OperationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $isNew = !$builder->getData()->getId();
+        /*
+         * Le tiers dit presque toujours la catégorie : la liste associe à
+         * chaque tiers celle que son historique montre, pour que le choix du
+         * tiers la présélectionne. Elle reste modifiable — c'est une
+         * proposition, pas une règle.
+         */
+        $usual = $this->coreLocator->em()
+            ->getRepository(Wallet\Operation::class)
+            ->usualSubCategoryByOutsider();
 
         $builder->add('outsider', EntityType::class, [
             'label_html' => true,
@@ -52,6 +62,8 @@ class OperationType extends AbstractType
             'label' => $this->translator->trans('Tiers', [], 'back'),
             'attr' => [
                 'data-placeholder' => $this->translator->trans('Sélectionnez', [], 'back'),
+                'data-usual-sub-categories' => json_encode($usual, JSON_THROW_ON_ERROR),
+                'data-usual-target' => 'wallet_operation_subCategory',
             ],
             'class' => Wallet\Outsider::class,
             'query_builder' => function (EntityRepository $er) {
@@ -61,7 +73,7 @@ class OperationType extends AbstractType
             'choice_label' => function ($entity) {
                 return strip_tags($entity->getAdminName());
             },
-            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-5'],
+            'row_attr' => ['class' => 'col-md-6'],
         ]);
 
         $builder->add('adminName', Type\TextType::class, [
@@ -72,7 +84,7 @@ class OperationType extends AbstractType
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un tiers', [], 'back'),
             ],
-            'row_attr' => ['class' => $isNew ? 'col-lg-6' : 'col-lg-7'],
+            'row_attr' => ['class' => 'col-md-6'],
         ]);
 
         $builder->add('date', Type\DateType::class, [
@@ -85,7 +97,7 @@ class OperationType extends AbstractType
                 'placeholder' => $this->translator->trans('Sélectionnez une date', [], 'back'),
                 'class' => 'js-datepicker',
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => 'col-12'],
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez sélectionner une date.', [], 'back'))
             ],
@@ -97,7 +109,7 @@ class OperationType extends AbstractType
             'attr' => [
                 'placeholder' => $this->translator->trans('Saisissez un montant', [], 'back'),
             ],
-            'row_attr' => ['class' => $isNew ? 'col-12' : 'col-lg-9'],
+            'row_attr' => ['class' => 'col-md-6'],
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez saisir un montant.', [], 'back')),
             ],
@@ -117,10 +129,21 @@ class OperationType extends AbstractType
             'choice_label' => function ($entity) {
                 return strip_tags($entity->getAdminName());
             },
+            'row_attr' => ['class' => 'col-md-6'],
             'constraints' => [
                 new Assert\NotBlank(message: $this->translator->trans('Veuillez sélectionne une catégorie.', [], 'back')),
             ],
         ]);
+
+        /*
+         * Le tiers se donne de deux façons : par la liste, ou par le champ
+         * libre. Ce dernier n'est pas mappé — c'est le manager qui en tire un
+         * tiers, après validation — donc le contrôle doit lire la valeur
+         * soumise. Porté jusqu'ici par une contrainte de classe qui
+         * interrogeait l'entité, il n'y trouvait jamais rien et refusait
+         * toute saisie d'un nouveau tiers.
+         */
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'validateOutsiderOrAdminName']);
 
         $save = new SubmitType($this->coreLocator);
         $save->add($builder);
@@ -131,29 +154,27 @@ class OperationType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Wallet\Operation::class,
             'translation_domain' => 'form',
-            'constraints' => [
-                new Assert\Callback([$this, 'validateOutsiderOrAdminName']),
-            ],
         ]);
     }
 
     /**
-     * Ensure at least one of "outsider" or "adminName" is provided.
+     * Exige un tiers : celui de la liste, ou celui que le champ libre nomme.
      */
-    public function validateOutsiderOrAdminName(mixed $data, ExecutionContextInterface $context): void
+    public function validateOutsiderOrAdminName(FormEvent $event): void
     {
-        if (!$data instanceof Wallet\Operation) {
+        $form = $event->getForm();
+        $operation = $event->getData();
+
+        $hasOutsider = $operation instanceof Wallet\Operation && $operation->getOutsider() instanceof Wallet\Outsider;
+        $hasAdminName = '' !== trim((string) $form->get('adminName')->getData());
+
+        if ($hasOutsider || $hasAdminName) {
             return;
         }
 
-        $hasOutsider  = null !== $data->getOutsider();
-        $hasAdminName = null !== $data->getAdminName() && trim((string) $data->getAdminName()) !== '';
-
-        if (!$hasOutsider && !$hasAdminName) {
-            $message = $this->translator->trans('Sélectionnez un tiers existant ou saisissez un nouveau tiers.', [], 'back');
-            $context->buildViolation($message)->atPath('outsider')->addViolation();
-            $context->buildViolation($message)->atPath('adminName')->addViolation();
-        }
+        $message = $this->translator->trans('Sélectionnez un tiers existant ou saisissez un nouveau tiers.', [], 'back');
+        $form->get('outsider')->addError(new FormError($message));
+        $form->get('adminName')->addError(new FormError($message));
     }
 
     public function getBlockPrefix(): string

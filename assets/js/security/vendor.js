@@ -1,3 +1,14 @@
+/**
+ * Public Sans, la police du gabarit de référence (voir .claude/charte-back,
+ * décision n°3). Auto-hébergée par @fontsource : le projet a un plancher
+ * Lighthouse à tenir, et une requête tierce bloquante y coûte cher.
+ * Quatre graisses, 300 à 600, celles qu'emploie la charte.
+ */
+import '@fontsource/public-sans/300.css';
+import '@fontsource/public-sans/400.css';
+import '@fontsource/public-sans/500.css';
+import '@fontsource/public-sans/600.css';
+
 import '../../scss/security/vendor.scss';
 
 /**

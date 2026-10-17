@@ -11,6 +11,11 @@ ux_icons:
         height: '1em'
         width: '1em'
 
+        # Les pictogrammes sont décoratifs : ce sont les commandes qui les
+        # portent qui ont un nom accessible (aria-label ou libellé visible).
+        # Sans cet attribut, chaque <svg> était restitué comme un contenu.
+        aria-hidden: 'true'
+
     # Throw an exception if an icon is not
     ignore_not_found: false
 

@@ -9,6 +9,10 @@
     undefined: {icon: 'info', bgColor: 'primary', color: 'primary', iconColor: 'white'},
 } %}
 
+{# Le message d'un flash n'est pas du HTML : il vient parfois d'un fichier
+   importé — `OperationManager` recopie une cellule brute du XLSX dans son
+   rapport d'erreurs. Un `|raw` ici en faisait une XSS par relevé piégé. #}
+
 {% set display = display is defined ? display : "toast" %}
 {% set size = size is defined ? size : null %}
 {% set icon = icons[alert].icon is defined ? icons[alert].icon : icons['undefined'].icon %}
@@ -25,9 +29,9 @@
             {% if 'small' == size %}
                 <small class="d-inline-block text-{{ iconColor }}">
             {% endif %}
-                {{ message|raw }}
+                {{ message }}
                 {% if help %}
-                    <br>{{ help|raw }}
+                    <br>{{ help }}
                 {% endif %}
             {% if 'small' == size %}
                 </small>
@@ -41,7 +45,7 @@
         </div>
         <button class="btn-close" data-bs-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
         {% if message is defined %}
-            {{ message|raw }}
+            {{ message }}
         {% else %}
             {{ 'What is happening?'|trans|raw }}
         {% endif %}
@@ -49,17 +53,20 @@
 {% elseif 'feedback' == display %}
     <div class="{% if 'error' == alert or 'danger' == alert %}invalid-feedback{% else %}feedback{% endif %} text-{{ bgColor }} d-flex">
         <twig:ux:icon name="{{ ux_icon_name(icon) }}" class="text-{{ bgColor }} position-relative me-2" />
-        <span>{{ message|raw }}</span>
+        <span>{{ message }}</span>
     </div>
 {% else %}
     <div class="toast-container position-fixed top-0 end-0 p-3">
         <div class="toast toast-alert fade show border-0 bg-{{ color }}" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header d-flex border-0 no-radius py-3 px-3 text-{{ bgColor }}">
+                {# La couleur de sens est dans la seule icône : le toast reste
+                   la surface, donc aucun couple de contraste n'est à remesurer
+                   d'un sens à l'autre. #}
                 <div class="inner d-flex align-items-center">
-                    <span class="dash-action dash-{{ bgColor }} dash-accent me-3"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
-                    <div class="message">{{ message|raw }}</div>
+                    <span class="toast-icon toast-icon--{{ bgColor }} me-3"><twig:ux:icon name="{{ ux_icon_name(icon) }}" /></span>
+                    <div class="message">{{ message }}</div>
                 </div>
-                <button type="button" class="btn-close ms-3" data-bs-dismiss="toast" aria-label="{{ "Close"|trans|striptags }}"></button>
+                <button type="button" class="btn-close ms-auto ps-3" data-bs-dismiss="toast" aria-label="{{ "Close"|trans|striptags }}"></button>
             </div>
         </div>
     </div>

@@ -38,7 +38,7 @@ class RecaptchaManager implements RecaptchaInterface
         $fieldHo = $fieldsHo['honeypot_token'] ?? '';
         $fieldHoEntitled = $fieldsHo['honeypot'] ?? '';
 
-        $message = $this->coreLocator->translator()->trans('The captcha is invalid. Please reload the page and try again.', [], 'security_cms');
+        $message = $this->coreLocator->translator()->trans('Le captcha est invalide. Rechargez la page puis réessayez.', [], 'security_cms');
         $session = $this->coreLocator->request()->getSession();
 
         if (!empty($fieldHo) && empty($fieldHoEntitled)) {
