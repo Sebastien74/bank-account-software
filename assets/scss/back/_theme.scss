@@ -912,6 +912,10 @@ form .choices__inner,
         margin-left: auto;
     }
 
+    &__search {
+        width: 18rem;
+    }
+
     @include mediaQuery(max-sm) {
 
         &__actions {
@@ -922,6 +926,17 @@ form .choices__inner,
         .btn,
         .btn-icon {
             width: 100%;
+        }
+
+        /* Le bouton de recherche reste collé à son champ : la règle pleine
+           largeur ci-dessus ne vaut que pour les boutons isolés. Elle doit
+           la suivre, à spécificité égale. */
+        &__search {
+            width: 100%;
+
+            .btn {
+                width: auto;
+            }
         }
     }
 }

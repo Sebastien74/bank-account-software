@@ -21,6 +21,20 @@
                     {% endif %}
                 </div>
                 <div class="index-toolbar__actions">
+                    {# Recherche activée par le contrôleur, qui passe `search` : un index
+                       de plusieurs centaines de lignes ne se parcourt pas page à page. #}
+                    {% if search is defined %}
+                        <form method="get" action="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" class="index-toolbar__search" role="search">
+                            <div class="input-group">
+                                <label for="index-search" class="visually-hidden">{{ "Rechercher"|trans|striptags }}</label>
+                                <input type="search" id="index-search" name="q" value="{{ search.query }}" maxlength="100"
+                                       class="form-control" placeholder="{{ "Rechercher…"|trans|striptags }}">
+                                <button type="submit" class="btn btn-outline-secondary" aria-label="{{ "Lancer la recherche"|trans|striptags }}">
+                                    <twig:ux:icon name="tabler:search" />
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
                     {% include 'back/core/new-modal.html.twig' with {
                         excludedFields: excludedFields,
                         addBtnLabel: addBtnLabel is defined and addBtnLabel ? addBtnLabel : 'Ajouter'|trans,
@@ -141,9 +155,18 @@
                 {# Une liste vide dit pourquoi elle l'est : une carte muette
                    laisse croire à une panne. #}
                 <div class="empty-state">
-                    <twig:ux:icon name="tabler:inbox" />
-                    <p class="empty-state__title">{{ "Rien à afficher"|trans|striptags }}</p>
-                    <p class="empty-state__text">{{ "Aucun enregistrement pour le moment."|trans|striptags }}</p>
+                    {% if search is defined and search.query is not empty %}
+                        <twig:ux:icon name="tabler:search" />
+                        <p class="empty-state__title">{{ "Aucun résultat"|trans|striptags }}</p>
+                        <p class="empty-state__text">
+                            {{ "Rien ne correspond à"|trans|striptags }} « {{ search.query }} ».
+                            <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}">{{ "Afficher tout"|trans|striptags }}</a>
+                        </p>
+                    {% else %}
+                        <twig:ux:icon name="tabler:inbox" />
+                        <p class="empty-state__title">{{ "Rien à afficher"|trans|striptags }}</p>
+                        <p class="empty-state__text">{{ "Aucun enregistrement pour le moment."|trans|striptags }}</p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

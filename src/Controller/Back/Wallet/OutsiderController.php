@@ -7,6 +7,7 @@ namespace App\Controller\Back\Wallet;
 use App\Controller\Back\BaseController;
 use App\Entity\Wallet\Outsider;
 use App\Form\Type\Wallet\OutsiderType;
+use App\Repository\Wallet\OutsiderRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,14 @@ class OutsiderController extends BaseController
     public function index(PaginatorInterface $paginator): Response
     {
         $this->pageTitle = $this->coreLocator->translator()->trans('Gestion des bénéficiaires', [], 'back');
+
+        $query = mb_substr(trim($this->coreLocator->request()->query->getString('q')), 0, 100);
+        $this->arguments['search'] = ['query' => $query];
+        if ('' !== $query) {
+            $repository = $this->coreLocator->em()->getRepository(Outsider::class);
+            $this->entities = $repository instanceof OutsiderRepository ? $repository->search($query) : [];
+            $this->forceEntities = true;
+        }
 
         return parent::index($paginator);
     }
