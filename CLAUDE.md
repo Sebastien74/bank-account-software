@@ -19,5 +19,5 @@
 
 ```bash
 npm run build      # Webpack Encore (production)
-php bin/phpunit
+vendor/bin/phpunit
 ```
