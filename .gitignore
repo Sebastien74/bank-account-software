@@ -86,3 +86,8 @@ blackfire.msi
 /.claude-flow/
 /.claude/
 /.agents/
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

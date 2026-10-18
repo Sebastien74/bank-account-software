@@ -198,6 +198,21 @@
     "phpoffice/phpspreadsheet": {
         "version": "1.9.0"
     },
+    "phpunit/phpunit": {
+        "version": "13.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "11.1",
+            "ref": "ca0bc067abfb40a8de1b2561b96cbfc2b833c314"
+        },
+        "files": [
+            "./.env.test",
+            "./phpunit.xml.dist",
+            "./tests/bootstrap.php",
+            "./bin/phpunit"
+        ]
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -434,21 +449,6 @@
     },
     "symfony/password-hasher": {
         "version": "v5.3.3"
-    },
-    "symfony/phpunit-bridge": {
-        "version": "4.3",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "4.3",
-            "ref": "170ab6f9abd4e1dab87462847116659ae138c34e"
-        },
-        "files": [
-            ".env.test",
-            "bin/phpunit",
-            "phpunit.xml.dist",
-            "tests/bootstrap.php"
-        ]
     },
     "symfony/polyfill-intl-grapheme": {
         "version": "v1.20.0"
