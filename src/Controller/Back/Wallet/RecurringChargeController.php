@@ -185,7 +185,13 @@ class RecurringChargeController extends BaseController
             ->setAmount((float) $line['amount'])
             ->setPointed(true)
             ->setOperationType($expenses);
-        $operation->setAdminName((string) $line['name']);
+        /*
+         * La prevision reconnait un contrat a son tiers et a la reference
+         * masquee que porte le libelle (« 06xxxxx891 »). Sans elle, l'ecriture
+         * creee ici ne se rattachait a aucune echeance : la ligne restait a
+         * venir, et chaque nouveau clic l'encaissait une fois de plus.
+         */
+        $operation->setAdminName(trim($line['name'].' '.($line['reference'] ?? '')));
         if ($subCategory instanceof SubCategory) {
             $operation->setSubCategory($subCategory);
         }
