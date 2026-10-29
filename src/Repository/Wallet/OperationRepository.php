@@ -78,7 +78,11 @@ class OperationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Somme algébrique des opérations d'un compte, hors solde initial.
+     * Somme algébrique des opérations pointées d'un compte, hors solde initial.
+     *
+     * Sert à recaler le solde initial sur le solde bancaire : les saisies
+     * manuelles en attente n'y figurent pas encore et ne doivent pas être
+     * absorbées par le solde initial.
      *
      * @throws NonUniqueResultException|NoResultException
      */
@@ -88,7 +92,9 @@ class OperationRepository extends ServiceEntityRepository
             ->leftJoin('o.subCategory', 'sc')
             ->leftJoin('o.operationType', 'ot')
             ->andWhere('o.wallet = :wallet')
+            ->andWhere('o.pointed = :pointed')
             ->setParameter('wallet', $wallet)
+            ->setParameter('pointed', true)
             ->select("
                 COALESCE(SUM(
                     CASE WHEN ot.type = 'incomes' OR (ot.id IS NULL AND sc.type = 'incomes') THEN o.amount

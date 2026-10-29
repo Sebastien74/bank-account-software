@@ -789,7 +789,8 @@ readonly class OperationManager implements OperationInterface
             if (null === $targetBalance && preg_match('/^solde\s+au/iu', $columnB) && '' !== trim((string) ($row['C'] ?? ''))) {
                 $targetBalance = $this->cleanAmount($row['C']);
             }
-            if (null === $headerIndex && 'date' === mb_strtolower($columnA, 'UTF-8')
+            // « Date » ou « Date d'opération » selon la version de l'export bancaire.
+            if (null === $headerIndex && str_starts_with(mb_strtolower($columnA, 'UTF-8'), 'date')
                 && str_starts_with(mb_strtolower($columnB, 'UTF-8'), 'libell')) {
                 $headerIndex = $index;
             }
@@ -912,7 +913,8 @@ readonly class OperationManager implements OperationInterface
         }
 
         $report['initialAmount'] = round((float) ($wallet->getInitialAmount() ?? 0.0), 2);
-        $report['balance'] = round($operationRepository->sumBalance($wallet), 2);
+        // Le relevé ne connaît que les opérations passées : on le compare au solde pointé.
+        $report['balance'] = round($operationRepository->sumBalance($wallet, true), 2);
 
         return $report;
     }
